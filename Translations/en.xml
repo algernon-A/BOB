@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Language UniqueName="en" ReadableName="English">
+  <Translations>
+    <Translation ID="BOB_NAM" String="BOB: A tree and prop replacer" />
+    <Translation ID="BOB_DESC" String="UNDER DEVELOPMENT: Replaces trees and props." />
+    <Translation ID="TRN_CHOICE" String="Set language" />
+    <Translation ID="TRN_SYS" String="Use system language" />
+    <Translation ID="BOB_PNL_NOP" String="No props found" />
+    <Translation ID="BOB_PNL_NOT" String="No trees found" />
+    <Translation ID="BOB_PNL_TRE" String="Trees" />
+    <Translation ID="BOB_PNL_PRP" String="Props" />
+    <Translation ID="BOB_PNL_GRP" String="Group together" />
+    <Translation ID="BOB_PNL_HDV" String="Hide vanilla" />
+    <Translation ID="BOB_PNL_REP" String="Replace" />
+    <Translation ID="BOB_PNL_REV" String="Revert" />
+    <Translation ID="BOB_PNL_PRB" String="Probability" />
+    <Translation ID="BOB_PNL_ALB" String="All buildings" />
+    <Translation ID="BOB_OPT_KEY" String="Hotkey" />
+    <Translation ID="BOB_OPT_PRS" String="Press any key" />
+    <Translation ID="BOB_NUKE" String="Reset configuration" />
+    <Translation ID="BOB_PER_MEN" String="Group props by default" />
+    <Translation ID="BOB_PER_SIN" String="Always off" />
+    <Translation ID="BOB_PER_GRP" String="Always on" />
+    <Translation ID="BOB_PER_LST" String="Remember previous setting" />
+    <Translation ID="BOB_FIL_NAME" String="Search:" />
+  </Translations>
+</Language>
