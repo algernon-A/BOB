@@ -91,6 +91,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="License.txt" />
     <Content Include="Resources\bob_cursor_dark.png" />
     <Content Include="Resources\bob_cursor_light.png" />
     <Content Include="Translations\en.xml" />
