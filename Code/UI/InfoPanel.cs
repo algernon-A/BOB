@@ -157,7 +157,11 @@ namespace BOB
 				hideVanilla = UIUtils.AddCheckBox((UIComponent)(object)this, Translations.Translate("BOB_PNL_HDV"), nameFilter.relativePosition.x, 75f);
 				hideVanilla.eventCheckChanged += (control, isChecked) =>
 				{
+					// Filter list.
 					loadedList.rowsData = LoadedList(treeCheck.isChecked);
+
+					// Store state.
+					ModSettings.hideVanilla = isChecked;
 				};
 
 				// Replace button.
@@ -312,6 +316,9 @@ namespace BOB
 							treeCheck.isChecked = true;
 						}
 					}
+
+					// Save state.
+					ModSettings.treeSelected = !isChecked;
 				};
 
 				// Event handler for tree checkbox.
@@ -341,6 +348,9 @@ namespace BOB
 							propCheck.isChecked = true;
 						}
 					}
+
+					// Save state.
+					ModSettings.treeSelected = isChecked;
 				};
 
 				// Event handler for group checkbox.
@@ -363,9 +373,6 @@ namespace BOB
 					loadedList.rowsData = LoadedList(treeCheck.isChecked);
 				};
 
-				// Default is 'props' (not trees).
-				propCheck.isChecked = true;
-
 				// Set grouped checkbox initial state according to preferences.
 				switch (ModSettings.groupDefault)
 				{
@@ -382,6 +389,11 @@ namespace BOB
 						groupCheck.isChecked = true;
 						break;
 				}
+
+				// Set remaining check states from previous (OR default) settings.
+				propCheck.isChecked = !ModSettings.treeSelected;
+				treeCheck.isChecked = ModSettings.treeSelected;
+				hideVanilla.isChecked = ModSettings.hideVanilla;
 
 				// Set initial button states.
 				UpdateButtonStates();

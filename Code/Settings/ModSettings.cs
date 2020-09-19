@@ -10,5 +10,11 @@
 
 		// Last selected group.
 		internal static bool lastGroup;
+
+		// Last selected vanilla filter state.
+		internal static bool hideVanilla = false;
+
+		// Last selected tree-or-prop state.
+		internal static bool treeSelected = false;
 	}
 }
