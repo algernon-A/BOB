@@ -1,5 +1,4 @@
 ﻿using System;
-using ColossalFramework;
 using ColossalFramework.UI;
 using UnityEngine;
 
@@ -27,13 +26,31 @@ namespace BOB
 				// If no instance already set, create one.
 				if (uiGameObject == null)
 				{
-					// Give it a unique name for easy finding with ModTools.
-					uiGameObject = new GameObject("BOBBuildingPanel");
-					uiGameObject.transform.parent = UIView.GetAView().transform;
+					if (selectedPrefab is BuildingInfo)
+					{
+						// A building prefab is selected; create a BuildingInfo panel.
+						// Give it a unique name for easy finding with ModTools.
+						uiGameObject = new GameObject("BOBBuildingPanel");
+						uiGameObject.transform.parent = UIView.GetAView().transform;
 
-					_panel = uiGameObject.AddComponent<BOBBuildingInfoPanel>();
-					
-                    // Set up panel with selected building.
+						_panel = uiGameObject.AddComponent<BOBBuildingInfoPanel>();
+					}
+					else if (selectedPrefab is NetInfo)
+					{
+						// A network prefab is selected; create a NetInfo panel.
+						// Give it a unique name for easy finding with ModTools.
+						uiGameObject = new GameObject("BOBNetPanel");
+						uiGameObject.transform.parent = UIView.GetAView().transform;
+
+						_panel = uiGameObject.AddComponent<BOBNetInfoPanel>();
+					}
+					else
+                    {
+						Debugging.Message("unsupported prefab type " + selectedPrefab.ToString());
+						return;
+					}
+
+					// Set up panel with selected prefab.
 					Panel.Setup(uiGameObject.transform.parent, selectedPrefab);
 				}
 			}

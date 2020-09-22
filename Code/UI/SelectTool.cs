@@ -112,7 +112,19 @@ namespace BOB
 				// Try to get a hovered network instance.
 				if (segment != 0)
 				{
+					// We have a hovered network; set the cursor to the light cursor.
 					m_cursor = lightCursor;
+
+					// Check for mousedown events with button zero.
+					if (e.type == EventType.MouseDown && e.button == 0)
+					{
+						// Got one; use the event.
+						UIInput.MouseUsed();
+
+						// Restore the default tool and create the info panel with the hovered network prefab.
+						ToolsModifierControl.SetTool<DefaultTool>();
+						InfoPanelManager.Create(Singleton<NetManager>.instance.m_segments.m_buffer[segment].Info);
+					}
 				}
 				else
 				{
