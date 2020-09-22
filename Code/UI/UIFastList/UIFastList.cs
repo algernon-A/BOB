@@ -335,7 +335,7 @@ namespace BOB
                     selectedIndex = i;
 
                     // Set current panel selection.
-                    InfoPanelManager.Panel.CurrentBuildingItem = propListItem;
+                    InfoPanelManager.Panel.CurrentTargetItem = propListItem;
 
                     // If the selected index is above the topmost visible row item, move the list up to show it.
                     if (selectedIndex < listPosition)

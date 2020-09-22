@@ -31,7 +31,7 @@ namespace BOB
 					uiGameObject = new GameObject("BOBBuildingPanel");
 					uiGameObject.transform.parent = UIView.GetAView().transform;
 
-					_panel = uiGameObject.AddComponent<BOBInfoPanel>();
+					_panel = uiGameObject.AddComponent<BOBBuildingInfoPanel>();
 					
                     // Set up panel with selected building.
 					Panel.Setup(uiGameObject.transform.parent, Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingID].Info);

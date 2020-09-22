@@ -27,7 +27,7 @@
 		public override void UpdateSelection()
 		{
 			// Update currently selected target prefab.
-			InfoPanelManager.Panel.CurrentBuildingItem = thisItem;
+			InfoPanelManager.Panel.CurrentTargetItem = thisItem;
 
 			// Update probability textfield.
 			InfoPanelManager.Panel.probabilityField.text = probability.ToString();
