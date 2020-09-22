@@ -101,9 +101,9 @@ namespace BOB
 					// Got one; use the event.
 					UIInput.MouseUsed();
 
-					// Restore the default tool and create the info panel with the hovered building.
+					// Restore the default tool and create the info panel with the hovered building prefab.
 					ToolsModifierControl.SetTool<DefaultTool>();
-					InfoPanelManager.Create(building);
+					InfoPanelManager.Create(Singleton<BuildingManager>.instance.m_buildings.m_buffer[building].Info);
 				}
 			}
 			else

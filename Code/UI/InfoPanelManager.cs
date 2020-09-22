@@ -20,7 +20,7 @@ namespace BOB
 		/// <summary>
 		/// Creates the panel object in-game and displays it.
 		/// </summary>
-		internal static void Create(ushort buildingID)
+		internal static void Create(PrefabInfo selectedPrefab)
 		{
 			try
 			{
@@ -34,7 +34,7 @@ namespace BOB
 					_panel = uiGameObject.AddComponent<BOBBuildingInfoPanel>();
 					
                     // Set up panel with selected building.
-					Panel.Setup(uiGameObject.transform.parent, Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingID].Info);
+					Panel.Setup(uiGameObject.transform.parent, selectedPrefab);
 				}
 			}
 			catch (Exception exception)
