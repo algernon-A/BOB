@@ -178,9 +178,9 @@ namespace BOB
 				// Grouped or individual?
 				if (groupCheck.isChecked)
 				{
-					// Grouped - set index to -1 and create a list of indexes.
-					propListItem.indexes.Add(i);
+					// Grouped - set index to -1 and add to our list of indexes.
 					propListItem.index = -1;
+					propListItem.indexes.Add(i);
 				}
 				else
 				{

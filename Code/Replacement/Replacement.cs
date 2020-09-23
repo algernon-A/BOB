@@ -35,4 +35,14 @@ namespace BOB
 		[XmlIgnore]
 		public int originalProb;
 	}
+
+
+	public class NetReplacement : Replacement
+    {
+		[XmlAttribute("Lane")]
+		public int lane = -1;
+
+		[XmlAttribute("Final")]
+		public bool final = false;
+	}
 }

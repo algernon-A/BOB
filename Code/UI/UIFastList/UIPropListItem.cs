@@ -32,4 +32,17 @@ namespace BOB
 		// List of indexes.
 		public List<int> indexes = new List<int>();
 	}
+
+
+	/// <summary>
+	/// Data record for UI prop list item for network props.
+	/// </summary>
+	public class NetPropListItem : PropListItem
+    {
+		// Lane reference.
+		public int lane;
+
+		// Lane list.
+		public List<int> lanes = new List<int>();
+    }
 }
