@@ -151,8 +151,9 @@ namespace BOB
 							// Check to see if we already have this in the list - matching original prefab, building replacement prefab, global replacement prefab, and probability.
 							if (item.originalPrefab == propListItem.originalPrefab && item.currentPrefab == propListItem.currentPrefab && propListItem.globalPrefab == item.globalPrefab && item.probability == propListItem.probability)
 							{
-								// We've already got an identical grouped instance of this item - add this index to the list of indexes under that item and set the flag to indicate that we've done so.
+								// We've already got an identical grouped instance of this item - add this index and lane to the lists of indexes and lanes under that item and set the flag to indicate that we've done so.
 								item.indexes.Add(propIndex);
+								item.lanes.Add(lane);
 								matched = true;
 
 								// No point going any further through the list, since we've already found our match.

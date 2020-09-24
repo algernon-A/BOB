@@ -28,6 +28,7 @@ namespace BOB
             PrefabLists.BuildLists();
             GlobalReplacement.Setup();
             BuildingReplacement.Setup();
+            NetworkReplacement.Setup();
 
             // Load configuration file.
             ConfigurationUtils.LoadConfig();

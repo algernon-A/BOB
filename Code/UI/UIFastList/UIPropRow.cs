@@ -113,9 +113,18 @@ namespace BOB
                 angle = thisItem.angle;
                 probability = thisItem.probability;
                 originalProb = thisItem.originalProb;
-                
-                // Set object name, with index number if it's an inidvidual reference, and with original probability in brackets immediately afterwards.
-                objectName.text = (thisItem.index < 0 ? "" : thisItem.index + " ") + UIUtils.GetDisplayName(thisPrefab.name) + " (" + originalProb + "%)";
+
+                // See if this is a network prop.
+                NetPropListItem thisNetItem = data as NetPropListItem;
+
+                // Set object name, with index number if it's an inidvidual reference.
+                objectName.text = (thisItem.index < 0 ? "" : thisItem.index + " ") + UIUtils.GetDisplayName(thisPrefab.name);
+
+                // Show original probability in brackets immediately afterwards, if this isn't a network item.
+                if (thisNetItem == null)
+                {
+                    objectName.text += " (" + originalProb + "%)";
+                }
 
                 // Check to see if there's a currently active building replacement (currentPrefab isn't null).
                 if (thisItem.currentPrefab != null)

@@ -10,7 +10,7 @@ namespace BOB
 	{
 		// Master dictionary of network replacements.
 		// Yes, this is a three-layer dictionary (prefab by lane by prop index).
-		internal static Dictionary<NetInfo, SortedList<int, SortedList<int, Replacement>>> netDict;
+		internal static Dictionary<NetInfo, SortedList<int, SortedList<int, NetReplacement>>> netDict;
 
 
 		/// <summary>
@@ -18,7 +18,7 @@ namespace BOB
 		/// </summary>
 		internal static void Setup()
 		{
-			netDict = new Dictionary<NetInfo, SortedList<int, SortedList<int, Replacement>>>();
+			netDict = new Dictionary<NetInfo, SortedList<int, SortedList<int, NetReplacement>>>();
 		}
 
 
@@ -92,6 +92,34 @@ namespace BOB
 			{
 				// Override provided - simply use the provided index as the target index.
 				clone.lane = lane;
+			}
+
+			// Check to see if we don't already have an entry for this net prefab in the master dictionary.
+			if (!netDict.ContainsKey(netPrefab))
+			{
+				// No existing entry, so add one.
+				netDict.Add(netPrefab, new SortedList<int, SortedList<int, NetReplacement>>());
+			}
+
+			// Check to see if we don't already have an entry for this lane in the master dictionary.
+			if (!netDict[netPrefab].ContainsKey(clone.lane))
+			{
+				// No existing entry, so add one.
+				netDict[netPrefab].Add(clone.lane, new SortedList<int, NetReplacement>());
+			}
+
+
+
+			// Check to see if we already have an entry for this replacement in the master dictionary.
+			if (netDict[netPrefab][clone.lane].ContainsKey(clone.targetIndex))
+			{
+				// An entry already exists - update it.
+				netDict[netPrefab][clone.lane][clone.targetIndex] = clone;
+			}
+			else
+			{
+				// No existing entry - add a new one.
+				netDict[netPrefab][clone.lane].Add(clone.targetIndex, clone);
 			}
 
 			// Apply the actual tree/prop prefab replacement.
