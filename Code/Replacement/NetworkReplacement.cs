@@ -38,33 +38,6 @@ namespace BOB
 
 			// Set new prop.
 			netPrefab.m_lanes[replacement.lane].m_laneProps.m_props[replacement.targetIndex].m_finalProp = (PropInfo)replacement.replacementInfo;
-
-			/*
-			// Iterate through each lane.
-			for (int i = 0; i < netPrefab.m_lanes.Length; ++i)
-			{
-				// Get lane props.
-				NetLaneProps.Prop[] laneProps = netPrefab.m_lanes[i].m_laneProps?.m_props;
-
-				if (laneProps != null && laneProps.Length > 0)
-				{
-					// Iterate through each lane prop.
-					for (int j = 0; j < laneProps.Length; ++j)
-					{
-						// Replace prop, if we have a match.
-						if (laneProps[j].m_prop == replacement.targetInfo)
-                        {
-							laneProps[j].m_prop = (PropInfo)replacement.replacementInfo;
-                        }
-
-						// Replace prop, if we have a match.
-						if (laneProps[j].m_finalProp == replacement.targetInfo)
-						{
-							laneProps[j].m_finalProp = (PropInfo)replacement.replacementInfo;
-						}
-					}
-				}
-            }*/
 		}
 
 
@@ -108,8 +81,6 @@ namespace BOB
 				netDict[netPrefab].Add(clone.lane, new SortedList<int, NetReplacement>());
 			}
 
-
-
 			// Check to see if we already have an entry for this replacement in the master dictionary.
 			if (netDict[netPrefab][clone.lane].ContainsKey(clone.targetIndex))
 			{
@@ -124,6 +95,83 @@ namespace BOB
 
 			// Apply the actual tree/prop prefab replacement.
 			ApplyReplacement(netPrefab, clone);
+		}
+
+
+		/// <summary>
+		/// Reverts an individual building replacement.
+		/// </summary>
+		/// <param name="netPrefab">Targeted network prefab</param>
+		/// <param name="lane">Replacement lane to revert</param>
+		/// <param name="index">Replacement index to revert</param>
+		/// <param name="removeEntries">True (default) to remove the reverted entries from the master dictionary, false to leave the dictionary unchanged</param>
+		/// <returns>True if the entire network record was removed from the dictionary (due to no remaining replacements for that prefab), false if the prefab remains in the dictionary (has other active replacements)</returns>
+		internal static bool Revert(NetInfo netPrefab, int lane, int index, bool removeEntries = true)
+		{
+			// Get original prop.
+			PrefabInfo prefabInfo = GetOriginal(netPrefab, lane, index);
+
+			// Only revert if there is an active replacement (GetOriginal returns null if there's no active replacement).
+			if (prefabInfo != null)
+			{
+				// Tree or prop?
+				if (prefabInfo is TreeInfo)
+				{
+					// Tree - restore original.
+					netPrefab.m_lanes[lane].m_laneProps.m_props[index].m_finalTree = prefabInfo as TreeInfo;
+				}
+				else
+				{
+					// Prop - restore original.
+					netPrefab.m_lanes[lane].m_laneProps.m_props[index].m_finalProp = prefabInfo as PropInfo;
+				}
+
+				// Remove dictionary entries if that setting is enabled.
+				if (removeEntries)
+				{
+					// Remove individual replacement record.
+					netDict[netPrefab][lane].Remove(index);
+
+					// Check to see if there are any remaining replacements for this lane.
+					if (netDict[netPrefab][lane].Count == 0)
+					{
+						// No remaining replacements - remove the entire lane entry.
+						netDict[netPrefab].Remove(lane);
+					}
+
+					// Check to see if there are any remaining replacements for this network prefab.
+					if (netDict[netPrefab].Count == 0)
+					{
+						// No remaining replacements - remove the entire network prefab entry and return true to indicate that we've done so.
+						netDict.Remove(netPrefab);
+						return true;
+					}
+				}
+			}
+
+			// If we got here, we haven't removed the building prefab entry from the master dictionary - return false to indicate that.
+			return false;
+		}
+
+
+		/// <summary>
+		/// Retrieves the original tree/prop prefab for the given lane and index (returns null if there's no active replacement).
+		/// </summary>
+		/// <param name="netPrefab">Network prefab prefab</param>
+		/// <param name="lane">Lane index</param>
+		/// <param name="index">Prop index</param>
+		/// <returns>PrefabInfo of the original prefab, or null if there's no currently active replacement</returns>
+		internal static PrefabInfo GetOriginal(NetInfo netPrefab, int lane, int index)
+		{
+			// Try to find an entry for this index of this building in the master dictionary.
+			if (netDict.ContainsKey(netPrefab) && netDict[netPrefab].ContainsKey(lane) && netDict[netPrefab][lane].ContainsKey(index))
+			{
+				// Entry found - return the stored original prefab.
+				return netDict[netPrefab][lane][index].targetInfo;
+			}
+
+			// No entry found - return null to indicate no active replacement.
+			return null;
 		}
 	}
 }

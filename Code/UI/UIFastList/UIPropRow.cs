@@ -126,12 +126,22 @@ namespace BOB
                     objectName.text += " (" + originalProb + "%)";
                 }
 
-                // Check to see if there's a currently active building replacement (currentPrefab isn't null).
+                // Check to see if there's a currently active replacement (currentPrefab isn't null).
                 if (thisItem.currentPrefab != null)
                 {
-                    // A replacement is currently active; append replacement name and probability to the label.
-                    objectName.text += " (now " + UIUtils.GetDisplayName(thisItem.currentPrefab.name) + " " + probability + "%)";
+                    // A replacement is currently active.
+                    objectName.text += " (now " + UIUtils.GetDisplayName(thisItem.currentPrefab.name);
+
+                    // Append replacement name and probability to the label, if this isn't a network item.
+                    if (thisNetItem == null)
+                    {
+                        objectName.text += " " + probability + "%";
+                    }
+
+                    // Append closing bracket.
+                    objectName.text += ")";
                 }
+
                 // If no current building replacement, check to see if any global replacement is currently active.
                 else if (thisItem.globalPrefab != null)
                 {

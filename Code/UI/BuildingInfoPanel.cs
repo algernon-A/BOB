@@ -108,7 +108,7 @@ namespace BOB
 				}
 				else
 				{
-					// Building reversion - ensuire that we've got a current selection before 
+					// Building reversion - ensuire that we've got a current selection before doing anything.
 					if (currentTargetItem != null)
 					{
 						// Individual or grouped reversion?
@@ -119,7 +119,7 @@ namespace BOB
 						}
 						else
 						{
-							// Grouped replacement - iterate through each index in the list.
+							// Grouped reversion - iterate through each index in the list.
 							foreach (int index in currentTargetItem.indexes)
 							{
 								// Revert the replacement, providing an index override to the current index.

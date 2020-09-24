@@ -64,6 +64,34 @@ namespace BOB
 					TargetListRefresh();
 				}
 			};
+
+			// Revert button event handler.
+			revertButton.eventClicked += (control, clickEvent) =>
+			{
+				// Building reversion - ensuire that we've got a current selection before doing anything.
+				if (currentTargetItem != null)
+				{
+					// Individual or grouped reversion?
+					if (currentTargetItem.index >= 0)
+					{
+						// Individual reversion.
+						NetworkReplacement.Revert(currentNet, CurrentNetTargetItem.lane, currentTargetItem.index);
+					}
+					else
+					{
+						// Grouped reversion - iterate through each instance in the list and revert.
+						for (int i = 0; i < currentTargetItem.indexes.Count; ++i)
+						{
+							// Add the replacement, providing an index override to the current index.
+							NetworkReplacement.Revert(currentNet, CurrentNetTargetItem.lanes[i], currentTargetItem.indexes[i]);
+						}
+					}
+
+					// Save configuration file and refresh building list (to reflect our changes).
+					ConfigurationUtils.SaveConfig();
+					TargetListRefresh();
+				}
+			};
 		}
 
 
@@ -131,9 +159,20 @@ namespace BOB
 						propListItem.lane = lane;
 					}
 
-					// TODO - current replacement.
-					// No currently active global replacement - therefore, the current prefab IS the original, so set original prefab record accordingly.
-					propListItem.originalPrefab = finalInfo;
+					// Try to get original (pre-replacement) tree/prop prefab.
+					propListItem.originalPrefab = NetworkReplacement.GetOriginal(currentNet, lane, propIndex);
+
+					// If the above returned null, there's no currently active building replacement.
+					if (propListItem.originalPrefab == null)
+					{
+						// No currently active global replacement - therefore, the current prefab IS the original, so set original prefab record accordingly.
+						propListItem.originalPrefab = finalInfo;
+					}
+					else
+					{
+						// There's a currently active net replacement - add that to our record.
+						propListItem.currentPrefab = finalInfo;
+					}
 
 					// Angle and probability.
 					propListItem.angle = laneProps[propIndex].m_angle;
