@@ -83,6 +83,48 @@ namespace BOB
 								BuildingReplacement.AddReplacement(buildingInfo, replacement);
 							}
 						}
+
+						// Deserialise network replacements, per network.
+						foreach (BOBNetworkElement network in configFile.networks)
+                        {
+							// Iterate through each replacement recored in each building.
+							foreach (NetReplacement replacement in network.replacements)
+							{
+								// Check for null elements.
+								if (StringExtensions.IsNullOrWhiteSpace(network.prefab) || StringExtensions.IsNullOrWhiteSpace(replacement.targetName) || StringExtensions.IsNullOrWhiteSpace(replacement.replaceName))
+								{
+									Debugging.Message("Null element name in configuration file");
+									continue;
+								}
+
+								// Attempt to find network prefab.
+								NetInfo netInfo = PrefabCollection<NetInfo>.FindLoaded(network.prefab);
+								if (netInfo == null)
+								{
+									Debugging.Message("Couldn't find network prefab " + network.prefab);
+									continue;
+								}
+
+								// Attempt to find target prefab.
+								replacement.targetInfo = replacement.isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.targetName) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.targetName);
+								if (replacement.targetInfo == null)
+								{
+									Debugging.Message("Couldn't find target prefab " + replacement.targetName);
+									continue;
+								}
+
+								// Attempt to find replacement prefab.
+								replacement.replacementInfo = replacement.isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.replaceName) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.replaceName);
+								if (replacement.replacementInfo == null)
+								{
+									Debugging.Message("Couldn't find replacement prefab " + replacement.replaceName);
+									continue;
+								}
+
+								// If we got here, then all prefabs were found sucesfully; activate the replacement.
+								NetworkReplacement.AddReplacement(netInfo, replacement);
+							}
+						}
 					}
 				}
 				else
@@ -131,6 +173,28 @@ namespace BOB
 							buildingElement.replacements.Add(entry.Value);
 						}
 						configFile.buildings.Add(buildingElement);
+					}
+
+					// Serialise network replacements, per network.
+					configFile.networks = new List<BOBNetworkElement>();
+
+					// Serialise each network.
+					foreach (NetInfo network in NetworkReplacement.netDict.Keys)
+					{
+						// Create new element.
+						BOBNetworkElement netElement = new BOBNetworkElement();
+						netElement.prefab = network.name;
+						netElement.replacements = new List<NetReplacement>();
+
+						// Serialise each replacement record for this network.
+						foreach (int lane in NetworkReplacement.netDict[network].Keys)
+						{
+							foreach (int index in NetworkReplacement.netDict[network][lane].Keys)
+							{
+								netElement.replacements.Add(NetworkReplacement.netDict[network][lane][index]);
+							}
+						}
+						configFile.networks.Add(netElement);
 					}
 
 					// Write to file.

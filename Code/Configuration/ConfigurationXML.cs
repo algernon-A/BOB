@@ -24,6 +24,10 @@ namespace BOB
 		[XmlArray("buildings", IsNullable = false)]
 		[XmlArrayItem("building", IsNullable = false)]
 		public List<BOBBuildingElement> buildings { get; set; }
+
+		[XmlArray("networks", IsNullable = false)]
+		[XmlArrayItem("network", IsNullable = false)]
+		public List<BOBNetworkElement> networks { get; set; }
 	}
 
 
@@ -38,6 +42,20 @@ namespace BOB
 		[XmlArray("replacements")]
 		[XmlArrayItem("replacement")]
 		public List<Replacement> replacements;
+	}
+
+
+	/// <summary>
+	/// Network replacment record XML format.
+	/// </summary>
+	public class BOBNetworkElement
+	{
+		[XmlAttribute("prefab")]
+		public string prefab = string.Empty;
+
+		[XmlArray("replacements")]
+		[XmlArrayItem("replacement")]
+		public List<NetReplacement> replacements;
 	}
 
 
