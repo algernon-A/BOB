@@ -19,7 +19,7 @@
 	/// <summary>
 	/// Prop row fastlist item for building props/trees.
 	/// </summary>
-	public class UIBuildingPropRow : UIPropRow
+	public class UIPrefabPropRow : UIPropRow
 	{
 		/// <summary>
 		/// Called when this item is selected.
@@ -30,7 +30,10 @@
 			InfoPanelManager.Panel.CurrentTargetItem = thisItem;
 
 			// Update probability textfield.
-			InfoPanelManager.Panel.probabilityField.text = probability.ToString();
+			if (InfoPanelManager.Panel is BOBBuildingInfoPanel buildingPanel)
+			{
+				buildingPanel.probabilityField.text = probability.ToString();
+			}
 		}
 	}
 }

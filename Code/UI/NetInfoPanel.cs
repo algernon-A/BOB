@@ -6,6 +6,7 @@ namespace BOB
 {
 	class BOBNetInfoPanel : BOBInfoPanel
 	{
+		// Current selection reference.
 		NetInfo currentNet;
 
 

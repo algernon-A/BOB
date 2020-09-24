@@ -11,20 +11,19 @@ namespace BOB
 	public abstract class BOBInfoPanel : UIPanel
 	{
 		// Layout constants.
-		private const float LeftWidth = 500f;
-		private const float MiddleWidth = 200f;
-		private const float RightWidth = 400f;
-		private const float PanelHeight = 490f;
-		private const float TitleHeight = 45f;
-		private const float ToolbarHeight = 50f;
-		private const float Margin = 5f;
+		protected const float LeftWidth = 500f;
+		protected const float MiddleWidth = 200f;
+		protected const float RightWidth = 400f;
+		protected const float PanelHeight = 490f;
+		protected const float TitleHeight = 45f;
+		protected const float ToolbarHeight = 50f;
+		protected const float Margin = 5f;
 
 		// Component locations.
-		private const float ProbabilityY = 95f;
-		private const float GlobalY = 155f;
-		private const float ReplaceY = 185f;
-		private const float RevertY = 220f;
-
+		protected const float ProbabilityY = 95f;
+		protected const float GlobalY = 155f;
+		protected const float ReplaceY = 185f;
+		protected const float RevertY = 220f;
 
 		// Current selections.
 		protected PrefabInfo selectedPrefab;
@@ -35,7 +34,6 @@ namespace BOB
 		// Panel components.
 		private UIFastList targetList;
 		private UIFastList loadedList;
-		internal UITextField probabilityField;
 		protected UIButton replaceButton;
 		protected UIButton revertButton;
 		protected UICheckBox allCheck;
@@ -133,7 +131,7 @@ namespace BOB
 				leftPanel.width = LeftWidth;
 				leftPanel.height = PanelHeight;
 				leftPanel.relativePosition = new Vector2(Margin, TitleHeight + ToolbarHeight);
-				targetList = UIFastList.Create<UIBuildingPropRow>(leftPanel);
+				targetList = UIFastList.Create<UIPrefabPropRow>(leftPanel);
 				ListSetup(targetList);
 
 				// Loaded prop list.
@@ -170,14 +168,6 @@ namespace BOB
 
 				// Revert button.
 				revertButton = UIUtils.CreateButton(this, Translations.Translate("BOB_PNL_REV"), 190f, LeftWidth + (Margin * 2), RevertY);
-
-				// Probability label and textfield.
-				UILabel probabilityLabel = AddUIComponent<UILabel>();
-				probabilityLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), ProbabilityY);
-				probabilityLabel.text = Translations.Translate("BOB_PNL_PRB");
-
-				probabilityField = UIUtils.AddTextField(this, 190f, 30f);
-				probabilityField.relativePosition = new Vector2(LeftWidth + (Margin * 2), ProbabilityY + probabilityLabel.height);
 
 				// Event handler for prop checkbox.
 				propCheck.eventCheckChanged += (control, isChecked) =>

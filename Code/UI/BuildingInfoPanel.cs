@@ -1,13 +1,18 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using ColossalFramework.UI;
 
 
 namespace BOB
 {
     class BOBBuildingInfoPanel : BOBInfoPanel
 	{
+		// Current selection reference.
 		BuildingInfo currentBuilding;
+
+		// Panel components.
+		internal UITextField probabilityField;
 
 
 		/// <summary>
@@ -22,6 +27,16 @@ namespace BOB
 
 			// Base setup.
 			base.Setup(parentTransform, targetPrefabInfo);
+
+
+			// Probability label and textfield.
+			UILabel probabilityLabel = AddUIComponent<UILabel>();
+			probabilityLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), ProbabilityY);
+			probabilityLabel.text = Translations.Translate("BOB_PNL_PRB");
+
+			probabilityField = UIUtils.AddTextField(this, 190f, 30f);
+			probabilityField.relativePosition = new Vector2(LeftWidth + (Margin * 2), ProbabilityY + probabilityLabel.height);
+
 
 			// Replace button event handler.
 			replaceButton.eventClicked += (control, clickEvent) =>
