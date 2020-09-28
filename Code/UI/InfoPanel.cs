@@ -21,7 +21,7 @@ namespace BOB
 
 		// Component locations.
 		protected const float ProbabilityY = 95f;
-		protected const float GlobalY = 155f;
+		protected const float AllY = 155f;
 		protected const float ReplaceY = 185f;
 		protected const float RevertY = 220f;
 
@@ -124,7 +124,7 @@ namespace BOB
 				propCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_PRP"), Margin, TitleHeight);
 				treeCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_TRE"), Margin, TitleHeight + Margin + propCheck.height);
 				groupCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_GRP"), 155f, TitleHeight);
-				allCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_ALB"), LeftWidth + (Margin * 2), GlobalY);
+				allCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_ALB"), LeftWidth + (Margin * 2), AllY);
 
 				// Target prop list.
 				UIPanel leftPanel = AddUIComponent<UIPanel>();
@@ -317,8 +317,8 @@ namespace BOB
 			// Buttons are only enabled if a current target item is selected.
 			if (currentTargetItem != null)
 			{
-				// Reversion requires a currently active replacement (for the relevant target/global setting).
-				if ((!allCheck.isChecked && currentTargetItem.currentPrefab != null) || (allCheck.isChecked && currentTargetItem.globalPrefab != null))
+				// Reversion requires a currently active replacement (for the relevant target/all-building setting).
+				if ((!allCheck.isChecked && currentTargetItem.currentPrefab != null) || (allCheck.isChecked && currentTargetItem.allPrefab != null))
 				{
 					revertButton.Enable();
 				}

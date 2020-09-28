@@ -41,11 +41,11 @@ namespace BOB
 			// Replace button event handler.
 			replaceButton.eventClicked += (control, clickEvent) =>
 			{
-				// Global or local replacement?
+				// All-building or local replacement?
 				if (allCheck.isChecked)
 				{
-					// Global replacement - apply.
-					GlobalReplacement.ApplyGlobal(currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab, replacementPrefab);
+					// All-building replacement - apply.
+					AllBuildingReplacement.Apply(currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab, replacementPrefab);
 
 					// Save configuration file and refresh building list (to reflect our changes).
 					ConfigurationUtils.SaveConfig();
@@ -107,14 +107,14 @@ namespace BOB
 			// Revert button event handler.
 			revertButton.eventClicked += (control, clickEvent) =>
 			{
-				// Building or global reversion?
+				// Building or all-building reversion?
 				if (allCheck.isChecked)
 				{
-					// Global reversion - make sure we've got a currently active replacement before doing anything.
-					if (currentTargetItem.originalPrefab != null && currentTargetItem.globalPrefab != null)
+					// All-building reversion - make sure we've got a currently active replacement before doing anything.
+					if (currentTargetItem.originalPrefab != null && currentTargetItem.allPrefab != null)
 					{
-						// Apply global reversion.
-						GlobalReplacement.RevertGlobal(currentTargetItem.originalPrefab, currentTargetItem.globalPrefab);
+						// Apply all-building reversion.
+						AllBuildingReplacement.Revert(currentTargetItem.originalPrefab, currentTargetItem.allPrefab);
 
 						// Save configuration file and refresh target list (to reflect our changes).
 						ConfigurationUtils.SaveConfig();
@@ -209,17 +209,17 @@ namespace BOB
 				// If the above returned null, there's no currently active building replacement.
 				if (propListItem.originalPrefab == null)
 				{
-					// Check for currently active global replacement.
-					propListItem.originalPrefab = GlobalReplacement.ActiveReplacement(currentBuilding, i);
+					// Check for currently active all-building replacement.
+					propListItem.originalPrefab = AllBuildingReplacement.ActiveReplacement(currentBuilding, i);
 					if (propListItem.originalPrefab == null)
 					{
-						// No currently active global replacement - therefore, the current prefab IS the original, so set original prefab record accordingly.
+						// No currently active all-building replacement - therefore, the current prefab IS the original, so set original prefab record accordingly.
 						propListItem.originalPrefab = prefabInfo;
 					}
 					else
 					{
-						// There's a currently active global replacement - add that to our record.
-						propListItem.globalPrefab = prefabInfo;
+						// There's a currently active all-building replacement - add that to our record.
+						propListItem.allPrefab = prefabInfo;
 					}
 				}
 				else
@@ -242,8 +242,8 @@ namespace BOB
 					// Iterate through each item in our existing list of props.
 					foreach (PropListItem item in propList)
 					{
-						// Check to see if we already have this in the list - matching original prefab, building replacement prefab, global replacement prefab, and probability.
-						if (item.originalPrefab == propListItem.originalPrefab && item.currentPrefab == propListItem.currentPrefab && propListItem.globalPrefab == item.globalPrefab && item.probability == propListItem.probability)
+						// Check to see if we already have this in the list - matching original prefab, building replacement prefab, all-building replacement prefab, and probability.
+						if (item.originalPrefab == propListItem.originalPrefab && item.currentPrefab == propListItem.currentPrefab && propListItem.allPrefab == item.allPrefab && item.probability == propListItem.probability)
 						{
 							// We've already got an identical grouped instance of this item - add this index to the list of indexes under that item and set the flag to indicate that we've done so.
 							item.indexes.Add(i);

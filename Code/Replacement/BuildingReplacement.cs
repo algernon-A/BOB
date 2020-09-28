@@ -72,8 +72,8 @@ namespace BOB
 				// Restore original probability.
 				buildingPrefab.m_props[index].m_probability = buildingDict[buildingPrefab][index].originalProb;
 
-				// Apply any global replacement.
-				GlobalReplacement.RestoreReplacment(buildingPrefab, index);
+				// Apply any all-building replacement.
+				AllBuildingReplacement.Restore(buildingPrefab, index);
 
 				// Remove dictionary entries if that setting is enabled.
 				if (removeEntries)
@@ -126,8 +126,8 @@ namespace BOB
 			buildingPrefab.m_props[replacement.targetIndex].m_angle = replacement.angle;
 			buildingPrefab.m_props[replacement.targetIndex].m_probability = replacement.probability;
 
-			// Remove any currently applied global building replacement entry for this tree or prop.
-			GlobalReplacement.RemoveEntry(buildingPrefab, replacement.targetIndex);
+			// Remove any currently applied all-building building replacement entry for this tree or prop.
+			AllBuildingReplacement.RemoveEntry(buildingPrefab, replacement.targetIndex);
 		}
 
 

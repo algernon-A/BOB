@@ -142,11 +142,11 @@ namespace BOB
                     objectName.text += ")";
                 }
 
-                // If no current building replacement, check to see if any global replacement is currently active.
-                else if (thisItem.globalPrefab != null)
+                // If no current building replacement, check to see if any all-building replacement is currently active.
+                else if (thisItem.allPrefab != null)
                 {
-                    // A global replacement is currently active; append name and probability to the label.
-                    objectName.text +=" (global " + UIUtils.GetDisplayName(thisItem.globalPrefab.name) + " " + probability + "%)";
+                    // An all-building replacement is currently active; append name and probability to the label.
+                    objectName.text +=" (all-building " + UIUtils.GetDisplayName(thisItem.allPrefab.name) + " " + probability + "%)";
                 }
             }
             else

@@ -70,8 +70,8 @@ namespace BOB
             // Nuke all settings button.
             UIButton nukeButton = (UIButton)helper.AddButton(Translations.Translate("BOB_NUKE"), delegate
             {
-                // Revert global and building settings.
-                GlobalReplacement.RevertAll();
+                // Revert all-building and building settings.
+                AllBuildingReplacement.RevertAll();
                 BuildingReplacement.RevertAll();
 
                 // Save configuration.

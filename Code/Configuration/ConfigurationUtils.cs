@@ -37,9 +37,9 @@ namespace BOB
 							return;
 						}
 
-						// Deserialise global replacements.
-						DeserializeGlobal(configFile.globalTrees, isTree: true);
-						DeserializeGlobal(configFile.globalProps, isTree: false);
+						// Deserialise all-building replacements.
+						DeserializeAllBuilding(configFile.allBuildingTrees, isTree: true);
+						DeserializeAllBuilding(configFile.allBuildingProps, isTree: false);
 
 						// Deserialise building replacements, per building.
 						foreach (BOBBuildingElement building in configFile.buildings)
@@ -152,9 +152,9 @@ namespace BOB
 					XmlSerializer xmlSerializer = new XmlSerializer(typeof(BOBConfigurationFile));
 					BOBConfigurationFile configFile = new BOBConfigurationFile();
 
-					// Serialise global replacements.
-					configFile.globalTrees = SerializeGlobal(GlobalReplacement.globalTreeReplacements);
-					configFile.globalProps = SerializeGlobal(GlobalReplacement.globalPropReplacements);
+					// Serialise all-building replacements.
+					configFile.allBuildingTrees = SerializeAllBuilding(AllBuildingReplacement.treeReplacements);
+					configFile.allBuildingProps = SerializeAllBuilding(AllBuildingReplacement.propReplacements);
 
 					// Serialise building replacements, per building.
 					configFile.buildings = new List<BOBBuildingElement>();
@@ -210,14 +210,14 @@ namespace BOB
 
 
 		/// <summary>
-		/// Serialises a global dictionary into a global element list.
+		/// Serialises an all-building dictionary into an all-building element list.
 		/// </summary>
 		/// <param name="dictionary">Dictionary to serialise</param>
-		/// <returns>Serialised list of global elements</returns>
-		private static List<BOBGlobalElement> SerializeGlobal(Dictionary<PrefabInfo, PrefabInfo> dictionary)
+		/// <returns>Serialised list of all-building elements</returns>
+		private static List<BOBAllBuildingElement> SerializeAllBuilding(Dictionary<PrefabInfo, PrefabInfo> dictionary)
 		{
 			// Return list.
-			List<BOBGlobalElement> elementList = new List<BOBGlobalElement>();
+			List<BOBAllBuildingElement> elementList = new List<BOBAllBuildingElement>();
 
 			// Only serialise if number of entries is greater than zero.
 			if (dictionary.Count > 0)
@@ -225,15 +225,15 @@ namespace BOB
 				// Iterate through each entry in the provided dictionary.
 				foreach (PrefabInfo prefab in dictionary.Keys)
 				{
-					// Create a new global replacement element with matching values from the dictionary.
-					BOBGlobalElement globalElement = new BOBGlobalElement()
+					// Create a new all-building replacement element with matching values from the dictionary.
+					BOBAllBuildingElement allBuildElement = new BOBAllBuildingElement()
 					{
 						target = prefab.name,
 						replacement = dictionary[prefab].name
 					};
 
 					// Add new element to the return list.
-					elementList.Add(globalElement);
+					elementList.Add(allBuildElement);
 				}
 			}
 			return elementList;
@@ -241,33 +241,33 @@ namespace BOB
 
 
 		/// <summary>
-		/// Deserialises a global element list.
+		/// Deserialises an all-building element list.
 		/// </summary>
-		/// <param name="elementList">Global element list to deserialise</param>
+		/// <param name="elementList">All-building element list to deserialise</param>
 		/// <param name="isTree">True if the list is a list of tree replacements, false if a list of props</param>
-		private static void DeserializeGlobal(List<BOBGlobalElement> elementList, bool isTree)
+		private static void DeserializeAllBuilding(List<BOBAllBuildingElement> elementList, bool isTree)
 		{
 			// Iterate through each element in the proivided list.
-			foreach (BOBGlobalElement globalElement in elementList)
+			foreach (BOBAllBuildingElement allBuildElement in elementList)
 			{
 				// Try to find target prefab.
-				PrefabInfo targetPrefab = isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(globalElement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(globalElement.target);
+				PrefabInfo targetPrefab = isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(allBuildElement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(allBuildElement.target);
 				if (targetPrefab == null)
 				{
-					Debugging.Message("Couldn't find target prefab " + globalElement.target);
+					Debugging.Message("Couldn't find target prefab " + allBuildElement.target);
 					continue;
 				}
 
 				// Try to find replacement prefab.
-				PrefabInfo replacementPrefab = isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(globalElement.replacement) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(globalElement.replacement);
+				PrefabInfo replacementPrefab = isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(allBuildElement.replacement) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(allBuildElement.replacement);
 				if (replacementPrefab == null)
 				{
-					Debugging.Message("Couldn't find replacement prefab " + globalElement.replacement);
+					Debugging.Message("Couldn't find replacement prefab " + allBuildElement.replacement);
 					continue;
 				}
 
-				// If we got here, it's all good; apply the global replacement.
-				GlobalReplacement.ApplyGlobal(targetPrefab, replacementPrefab);
+				// If we got here, it's all good; apply the all-building replacement.
+				AllBuildingReplacement.Apply(targetPrefab, replacementPrefab);
 			}
 		}
 	}

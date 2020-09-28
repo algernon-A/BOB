@@ -166,7 +166,7 @@ namespace BOB
 					// If the above returned null, there's no currently active building replacement.
 					if (propListItem.originalPrefab == null)
 					{
-						// No currently active global replacement - therefore, the current prefab IS the original, so set original prefab record accordingly.
+						// No currently active all-building replacement - therefore, the current prefab IS the original, so set original prefab record accordingly.
 						propListItem.originalPrefab = finalInfo;
 					}
 					else
@@ -188,8 +188,8 @@ namespace BOB
 						// Iterate through each item in our existing list of props.
 						foreach (NetPropListItem item in propList)
 						{
-							// Check to see if we already have this in the list - matching original prefab, building replacement prefab, global replacement prefab, and probability.
-							if (item.originalPrefab == propListItem.originalPrefab && item.currentPrefab == propListItem.currentPrefab && propListItem.globalPrefab == item.globalPrefab && item.probability == propListItem.probability)
+							// Check to see if we already have this in the list - matching original prefab, building replacement prefab, all-building replacement prefab, and probability.
+							if (item.originalPrefab == propListItem.originalPrefab && item.currentPrefab == propListItem.currentPrefab && propListItem.allPrefab == item.allPrefab && item.probability == propListItem.probability)
 							{
 								// We've already got an identical grouped instance of this item - add this index and lane to the lists of indexes and lanes under that item and set the flag to indicate that we've done so.
 								item.indexes.Add(propIndex);

@@ -4,16 +4,16 @@
 namespace BOB
 {
 	/// <summary>
-	/// Static class to manage global prop and tree replacements.
+	/// Static class to manage all-building prop and tree replacements.
 	/// </summary>
-	internal static class GlobalReplacement
+	internal static class AllBuildingReplacement
 	{
-		// Master dictionaries of currently active global replacements.
-		internal static Dictionary<PrefabInfo, PrefabInfo> globalPropReplacements;
-		internal static Dictionary<PrefabInfo, PrefabInfo> globalTreeReplacements;
+		// Master dictionaries of currently active all-building replacements.
+		internal static Dictionary<PrefabInfo, PrefabInfo> propReplacements;
+		internal static Dictionary<PrefabInfo, PrefabInfo> treeReplacements;
 
-		// Master dictionary of active global replacements currently applied to building prefabs.
-		internal static Dictionary<BuildingInfo, SortedList<int, Replacement>> globalDict;
+		// Master dictionary of active all-building replacements currently applied to building prefabs.
+		internal static Dictionary<BuildingInfo, SortedList<int, Replacement>> allBuildingDict;
 
 
 
@@ -22,29 +22,29 @@ namespace BOB
 		/// </summary>
 		internal static void Setup()
 		{
-			globalDict = new Dictionary<BuildingInfo, SortedList<int, Replacement>>();
-			globalPropReplacements = new Dictionary<PrefabInfo, PrefabInfo>();
-			globalTreeReplacements = new Dictionary<PrefabInfo, PrefabInfo>();
+			allBuildingDict = new Dictionary<BuildingInfo, SortedList<int, Replacement>>();
+			propReplacements = new Dictionary<PrefabInfo, PrefabInfo>();
+			treeReplacements = new Dictionary<PrefabInfo, PrefabInfo>();
 		}
 
 
 		/// <summary>
-		/// Reverts all active global replacements and re-initialises the master dictionaries.
+		/// Reverts all active all-building replacements and re-initialises the master dictionaries.
 		/// </summary>
 		internal static void RevertAll()
 		{
 			// Iterate through each entry in the master tree dictionary.
-			foreach (PrefabInfo tree in globalTreeReplacements.Keys)
+			foreach (PrefabInfo tree in treeReplacements.Keys)
 			{
 				// Revert this replacement (but don't remove the entry, as the dictionary is currently immutable while we're iterating through it).
-				RevertGlobal(tree, globalTreeReplacements[tree], removeEntries: false);
+				Revert(tree, treeReplacements[tree], removeEntries: false);
 			}
 
 			// Iterate through each entry in the master tree dictionary.
-			foreach (PrefabInfo prop in globalPropReplacements.Keys)
+			foreach (PrefabInfo prop in propReplacements.Keys)
 			{
 				// Revert this replacement (but don't remove the entry, as the dictionary is currently immutable while we're iterating through it).
-				RevertGlobal(prop, globalPropReplacements[prop], removeEntries: false);
+				Revert(prop, propReplacements[prop], removeEntries: false);
 			}
 
 			// Re-initialise the dictionaries.
@@ -53,25 +53,25 @@ namespace BOB
 
 
 		/// <summary>
-		/// Reverts a global replacement.
+		/// Reverts an all-building replacement.
 		/// </summary>
 		/// <param name="target">Targeted (original) tree/prop prefab</param>
 		/// <param name="replacement">Applied replacment tree/prop prefab</param>
 		/// <param name="removeEntries">True (default) to remove the reverted entries from the master dictionary, false to leave the dictionary unchanged</param>
 		/// <returns>True if the entire building record was removed from the dictionary (due to no remaining replacements for that prefab), false if the prefab remains in the dictionary (has other active replacements)</returns>
-		internal static void RevertGlobal(PrefabInfo target, PrefabInfo replacement, bool removeEntries = true)
+		internal static void Revert(PrefabInfo target, PrefabInfo replacement, bool removeEntries = true)
 		{
 			// List of reverted entries.
 			List<KeyValuePair<BuildingInfo, int>> list = new List<KeyValuePair<BuildingInfo, int>>();
 
-			// Iterate through all buildings in the applied global replacements dictionary.
-			foreach (BuildingInfo building in globalDict.Keys)
+			// Iterate through all buildings in the applied all-building replacements dictionary.
+			foreach (BuildingInfo building in allBuildingDict.Keys)
 			{
 				// Iterate through each applied replacement for this building.
-				foreach (int index in globalDict[building].Keys)
+				foreach (int index in allBuildingDict[building].Keys)
 				{
 					// Get currently active replacement and check to see if it matches our reversion parameters (target and replacement match).
-					Replacement currentReplacement = globalDict[building][index];
+					Replacement currentReplacement = allBuildingDict[building][index];
 					if (currentReplacement.targetInfo == target && currentReplacement.replacementInfo == replacement)
 					{
 						// Match - tree or prop?
@@ -108,22 +108,22 @@ namespace BOB
 			if (target is TreeInfo)
 			{
 				// Tree.
-				globalTreeReplacements.Remove(target);
+				treeReplacements.Remove(target);
 			}
 			else
 			{
 				// Prop.
-				globalPropReplacements.Remove(target);
+				propReplacements.Remove(target);
 			}
 		}
 
 
 		/// <summary>
-		/// Applies a new (or updated) global replacement.
+		/// Applies a new (or updated) all-building replacement.
 		/// </summary>
 		/// <param name="target">Targeted (original) tree/prop prefab</param>
 		/// <param name="replacement">Replacment tree/prop prefab</param>
-		internal static void ApplyGlobal(PrefabInfo target, PrefabInfo replacement)
+		internal static void Apply(PrefabInfo target, PrefabInfo replacement)
 		{
 			// Set our initial targeted prefab to the provided target. 
 			PrefabInfo targetedPrefab = target;
@@ -138,35 +138,35 @@ namespace BOB
 			if (target is TreeInfo)
 			{
 				// Tree - see if we already have a replacement for this tree.
-				if (globalTreeReplacements.ContainsKey(target))
+				if (treeReplacements.ContainsKey(target))
 				{
 					// We currently have a replacement - change the targeted prefab to replace to match the currently active replacement.
-					targetedPrefab = globalTreeReplacements[target];
+					targetedPrefab = treeReplacements[target];
 
 					// Update dictionary with this replacement.
-					globalTreeReplacements[target] = replacement;
+					treeReplacements[target] = replacement;
 				}
 				else
 				{
 					// No current replacement - add this one to the dictionary (retaining the default targeted prefab).
-					globalTreeReplacements.Add(target, replacement);
+					treeReplacements.Add(target, replacement);
 				}
 			}
 			else
 			{
 				// Prop - see if we already have a replacement for this prop.
-				if (globalPropReplacements.ContainsKey(target))
+				if (propReplacements.ContainsKey(target))
 				{
 					// We currently have a replacement - change the targeted prefab to replace to match the currently active replacement.
-					targetedPrefab = globalPropReplacements[target];
+					targetedPrefab = propReplacements[target];
 
 					// Update dictionary with this replacement.
-					globalPropReplacements[target] = replacement;
+					propReplacements[target] = replacement;
 				}
 				else
 				{
 					// No current replacement - add this one to the dictionary (retaining the default targeted prefab).
-					globalPropReplacements.Add(target, replacement);
+					propReplacements.Add(target, replacement);
 				}
 			}
 
@@ -217,7 +217,7 @@ namespace BOB
 					if (originalPrefab != null)
 					{
 						// We did - add it to our dictionary of currently active replacements.
-						AddGlobalEntry(loaded, originalPrefab, replacement, j);
+						AddEntry(loaded, originalPrefab, replacement, j);
 					}
 				}
 			}
@@ -225,11 +225,11 @@ namespace BOB
 
 
 		/// <summary>
-		/// Restores a global replacement, if any (e.g. after a building replacement has been reverted).
+		/// Restores a all-building replacement, if any (e.g. after a building replacement has been reverted).
 		/// </summary>
 		/// <param name="buildingPrefab">Building prefab</param>
 		/// <param name="index">Prop index</param>
-		internal static void RestoreReplacment(BuildingInfo buildingPrefab, int index)
+		internal static void Restore(BuildingInfo buildingPrefab, int index)
 		{
 			// Get current prop.
 			BuildingInfo.Prop prop = buildingPrefab.m_props[index];
@@ -240,24 +240,24 @@ namespace BOB
 			// Does this building prop record contain a tree?
 			if (prop.m_finalTree != null)
 			{
-				// It does - check for active global replacement for this tree.
-				if (globalTreeReplacements.ContainsKey(prop.m_finalTree))
+				// It does - check for active all-building replacement for this tree.
+				if (treeReplacements.ContainsKey(prop.m_finalTree))
 				{
 					// Found an active replacement - apply it.
 					original = prop.m_finalTree;
-					replacement = globalTreeReplacements[original];
+					replacement = treeReplacements[original];
 					prop.m_finalTree = (TreeInfo)replacement;
 				}
 			}
 			// Otherwise, does it contain a prop?
 			else if (prop.m_finalProp != null)
 			{
-				// It does - check for active global replacement for this prop.
-				if (globalPropReplacements.ContainsKey(prop.m_finalProp))
+				// It does - check for active all-building replacement for this prop.
+				if (propReplacements.ContainsKey(prop.m_finalProp))
 				{
 					// Found an active replacement - apply it.
 					original = prop.m_finalProp;
-					replacement = globalTreeReplacements[original];
+					replacement = treeReplacements[original];
 					prop.m_finalProp = (PropInfo)replacement;
 				}
 			}
@@ -265,24 +265,24 @@ namespace BOB
 			// If we made a replacement (original has been set to a non-null value), add it to our dictionary of replacements applied to buildings.
 			if (original != null)
 			{
-				AddGlobalEntry(buildingPrefab, original, replacement, index);
+				AddEntry(buildingPrefab, original, replacement, index);
 			}
 		}
 
 
 		/// <summary>
-		/// Checks if there's a currently active global replacement applied to the given building prop index.
+		/// Checks if there's a currently active all-building replacement applied to the given building prop index.
 		/// </summary>
 		/// <param name="buildingPrefab">Building prefab to check</param>
 		/// <param name="index">Prop index to check</param>
-		/// <returns>Original prefab if a global replacement is currently applied, null if no global replacement is currently applied</returns>
+		/// <returns>Original prefab if a all-building replacement is currently applied, null if no all-building replacement is currently applied</returns>
 		internal static PrefabInfo ActiveReplacement(BuildingInfo buildingPrefab, int index)
 		{
 			// Try to find an entry for this index of this building and index in the master dictionary.
-			if (globalDict.ContainsKey(buildingPrefab) && globalDict[buildingPrefab].ContainsKey(index))
+			if (allBuildingDict.ContainsKey(buildingPrefab) && allBuildingDict[buildingPrefab].ContainsKey(index))
 			{
 				// Entry found - return the stored original prefab.
-				return globalDict[buildingPrefab][index].targetInfo;
+				return allBuildingDict[buildingPrefab][index].targetInfo;
 			}
 
 			// No entry found - return null to indicate no active replacement.
@@ -291,49 +291,49 @@ namespace BOB
 
 
 		/// <summary>
-		/// Removes an entry from the master dictionary of global replacements currently applied to buildings.
+		/// Removes an entry from the master dictionary of all-building replacements currently applied to buildings.
 		/// </summary>
 		/// <param name="buildingPrefab">Building prefab</param>
 		/// <param name="index">Prop index</param>
 		internal static void RemoveEntry(BuildingInfo buildingPrefab, int index)
 		{
 			// Check to see if we have an entry for this building.
-			if (globalDict.ContainsKey(buildingPrefab))
+			if (allBuildingDict.ContainsKey(buildingPrefab))
 			{
 				// Yes - remove the given index.
-				globalDict[buildingPrefab].Remove(index);
+				allBuildingDict[buildingPrefab].Remove(index);
 
 				// Check to see if there are any remaining replacements for this building prefab.
-				if (globalDict[buildingPrefab].Count == 0)
+				if (allBuildingDict[buildingPrefab].Count == 0)
 				{
 					// No remaining replacements - remove the entire building prefab entry.
-					globalDict.Remove(buildingPrefab);
+					allBuildingDict.Remove(buildingPrefab);
 				}
 			}
 		}
 
 
 		/// <summary>
-		/// Adds an entry to the master dictionary of global replacements currently applied to buildings.
+		/// Adds an entry to the master dictionary of all-building replacements currently applied to buildings.
 		/// </summary>
 		/// <param name="buildingPrefab">Building prefab</param>
 		/// <param name="target">Targeted (original) tree/prop prefab</param>
 		/// <param name="replacement">Replacment tree/prop prefab</param>
 		/// <param name="index">Prop index</param>
-		private static void AddGlobalEntry(BuildingInfo buildingPrefab, PrefabInfo target, PrefabInfo replacement, int index)
+		private static void AddEntry(BuildingInfo buildingPrefab, PrefabInfo target, PrefabInfo replacement, int index)
 		{
 			// Check to see if we don't already have an entry for this building prefab in the master dictionary.
-			if (!globalDict.ContainsKey(buildingPrefab))
+			if (!allBuildingDict.ContainsKey(buildingPrefab))
 			{
 				// No existing entry, so add one.
-				globalDict.Add(buildingPrefab, new SortedList<int, Replacement>());
+				allBuildingDict.Add(buildingPrefab, new SortedList<int, Replacement>());
 			}
 
 			// Check to see if we already have an entry for this index in the master dictionary.
-			if (globalDict[buildingPrefab].ContainsKey(index))
+			if (allBuildingDict[buildingPrefab].ContainsKey(index))
 			{
 				// An entry already exists - just update the replacement info.
-				globalDict[buildingPrefab][index].replacementInfo = replacement;
+				allBuildingDict[buildingPrefab][index].replacementInfo = replacement;
 			}
 			else
 			{
@@ -341,7 +341,7 @@ namespace BOB
 				Replacement newReplacement = new Replacement();
 				newReplacement.targetInfo = target;
 				newReplacement.replacementInfo = replacement;
-				globalDict[buildingPrefab].Add(index, newReplacement);
+				allBuildingDict[buildingPrefab].Add(index, newReplacement);
 			}
 		}
 	}

@@ -14,8 +14,8 @@ namespace BOB
 		// Current replacement (if any).
 		public PrefabInfo currentPrefab;
 
-		// Current global replacement (if any).
-		public PrefabInfo globalPrefab;
+		// Current all- replacement (if any).
+		public PrefabInfo allPrefab;
 
 		// Single index.
 		public int index;

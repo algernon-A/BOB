@@ -15,11 +15,11 @@ namespace BOB
 
 		[XmlArray("trees", IsNullable = true)]
 		[XmlArrayItem("tree", IsNullable = true)]
-		public List<BOBGlobalElement> globalTrees { get; set; }
+		public List<BOBAllBuildingElement> allBuildingTrees { get; set; }
 
 		[XmlArray("props", IsNullable = true)]
 		[XmlArrayItem("prop", IsNullable = true)]
-		public List<BOBGlobalElement> globalProps { get; set; }
+		public List<BOBAllBuildingElement> allBuildingProps { get; set; }
 
 		[XmlArray("buildings", IsNullable = false)]
 		[XmlArrayItem("building", IsNullable = false)]
@@ -60,9 +60,9 @@ namespace BOB
 
 
 	/// <summary>
-	/// Global replacment record XML format.
+	/// All-building replacment record XML format.
 	/// </summary>
-	public class BOBGlobalElement
+	public class BOBAllBuildingElement
 	{
 		[XmlAttribute("target")]
 		public string target = string.Empty;
