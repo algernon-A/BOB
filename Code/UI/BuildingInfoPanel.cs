@@ -67,19 +67,21 @@ namespace BOB
 					// Make sure we have valid a target and replacement.
 					if (currentTargetItem != null && replacementPrefab != null)
 					{
-						// Create new replacement record with current info.
-						Replacement replacement = new Replacement();
-						replacement.isTree = treeCheck.isChecked;
-						replacement.probability = probability;
-						replacement.originalProb = currentTargetItem.originalProb;
-						replacement.angle = currentTargetItem.angle;
-						replacement.targetIndex = currentTargetItem.index;
-						replacement.replacementInfo = replacementPrefab;
-						replacement.replaceName = replacementPrefab.name;
+                        // Create new replacement record with current info.
+                        Replacement replacement = new Replacement
+                        {
+                            isTree = treeCheck.isChecked,
+                            probability = probability,
+                            originalProb = currentTargetItem.originalProb,
+                            angle = currentTargetItem.angle,
+                            targetIndex = currentTargetItem.index,
+                            replacementInfo = replacementPrefab,
+                            replaceName = replacementPrefab.name,
 
-						// Original prefab is null if no active replacement; in which case, use the current prefab (which IS the original prefab).
-						replacement.targetInfo = currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab;
-						replacement.targetName = replacement.targetInfo.name;
+                            // Original prefab is null if no active replacement; in which case, use the current prefab (which IS the original prefab).
+                            targetInfo = currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab
+                        };
+                        replacement.targetName = replacement.targetInfo.name;
 
 						// Individual or grouped replacement?
 						if (currentTargetItem.index >= 0)

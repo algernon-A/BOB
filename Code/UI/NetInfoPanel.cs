@@ -23,26 +23,36 @@ namespace BOB
 			// Base setup.
 			base.Setup(parentTransform, targetPrefabInfo);
 
+			// Disable and hide unused checkboxes.
+			treeCheck.Disable();
+			treeCheck.Hide();
+			propCheck.Disable();
+			propCheck.Hide();
+			allCheck.Disable();
+			allCheck.Hide();
+
 			// Replace button event handler.
 			replaceButton.eventClicked += (control, clickEvent) =>
 			{
 				// Make sure we have valid a target and replacement.
 				if (currentTargetItem != null && replacementPrefab != null)
 				{
-					// Create new replacement record with current info.
-					NetReplacement replacement = new NetReplacement();
-					replacement.isTree = treeCheck.isChecked;
-					replacement.probability = probability;
-					replacement.originalProb = currentTargetItem.originalProb;
-					replacement.angle = currentTargetItem.angle;
-					replacement.targetIndex = currentTargetItem.index;
-					replacement.replacementInfo = replacementPrefab;
-					replacement.replaceName = replacementPrefab.name;
-					replacement.lane = CurrentNetTargetItem.lane;
+                    // Create new replacement record with current info.
+                    NetReplacement replacement = new NetReplacement
+                    {
+                        isTree = treeCheck.isChecked,
+                        probability = probability,
+                        originalProb = currentTargetItem.originalProb,
+                        angle = currentTargetItem.angle,
+                        targetIndex = currentTargetItem.index,
+                        replacementInfo = replacementPrefab,
+                        replaceName = replacementPrefab.name,
+                        lane = CurrentNetTargetItem.lane,
 
-					// Original prefab is null if no active replacement; in which case, use the current prefab (which IS the original prefab).
-					replacement.targetInfo = currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab;
-					replacement.targetName = replacement.targetInfo.name;
+                        // Original prefab is null if no active replacement; in which case, use the current prefab (which IS the original prefab).
+                        targetInfo = currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab
+                    };
+                    replacement.targetName = replacement.targetInfo.name;
 
 					// Individual or grouped replacement?
 					if (currentTargetItem.index >= 0)

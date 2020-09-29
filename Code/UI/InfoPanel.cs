@@ -38,7 +38,7 @@ namespace BOB
 		protected UIButton revertButton;
 		protected UICheckBox allCheck;
 		protected UICheckBox treeCheck;
-		private UICheckBox propCheck;
+		protected UICheckBox propCheck;
 		protected UICheckBox groupCheck;
 		private UICheckBox hideVanilla;
 		private UITextField nameFilter;
