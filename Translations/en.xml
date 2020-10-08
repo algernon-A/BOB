@@ -15,6 +15,7 @@
     <Translation ID="BOB_PNL_REV" String="Revert" />
     <Translation ID="BOB_PNL_PRB" String="Probability" />
     <Translation ID="BOB_PNL_ALB" String="All buildings" />
+    <Translation ID="BOB_PNL_ALN" String="All networks" />
     <Translation ID="BOB_OPT_KEY" String="Hotkey" />
     <Translation ID="BOB_OPT_PRS" String="Press any key" />
     <Translation ID="BOB_NUKE" String="Reset configuration" />

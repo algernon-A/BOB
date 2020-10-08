@@ -40,7 +40,7 @@ namespace BOB
 				Revert(tree, treeReplacements[tree], removeEntries: false);
 			}
 
-			// Iterate through each entry in the master tree dictionary.
+			// Iterate through each entry in the master prop dictionary.
 			foreach (PrefabInfo prop in propReplacements.Keys)
 			{
 				// Revert this replacement (but don't remove the entry, as the dictionary is currently immutable while we're iterating through it).
@@ -257,7 +257,7 @@ namespace BOB
 				{
 					// Found an active replacement - apply it.
 					original = prop.m_finalProp;
-					replacement = treeReplacements[original];
+					replacement = propReplacements[original];
 					prop.m_finalProp = (PropInfo)replacement;
 				}
 			}
@@ -337,11 +337,13 @@ namespace BOB
 			}
 			else
 			{
-				// No existing entry - create one.
-				Replacement newReplacement = new Replacement();
-				newReplacement.targetInfo = target;
-				newReplacement.replacementInfo = replacement;
-				allBuildingDict[buildingPrefab].Add(index, newReplacement);
+                // No existing entry - create one.
+                Replacement newReplacement = new Replacement
+                {
+                    targetInfo = target,
+                    replacementInfo = replacement
+                };
+                allBuildingDict[buildingPrefab].Add(index, newReplacement);
 			}
 		}
 	}

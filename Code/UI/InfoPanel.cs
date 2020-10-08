@@ -270,6 +270,13 @@ namespace BOB
 						break;
 				}
 
+				// Event handler for all checkbox.
+				allCheck.eventCheckChanged += (control, isChecked) =>
+				{
+					// Rebuild target list.
+					targetList.rowsData = TargetList(treeCheck.isChecked);
+				};
+
 				// Set remaining check states from previous (OR default) settings.
 				propCheck.isChecked = !ModSettings.treeSelected;
 				treeCheck.isChecked = ModSettings.treeSelected;

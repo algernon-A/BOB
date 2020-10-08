@@ -28,79 +28,122 @@ namespace BOB
 			treeCheck.Hide();
 			propCheck.Disable();
 			propCheck.Hide();
-			allCheck.Disable();
-			allCheck.Hide();
+
+			// TODO: Remove!  Quick hack for network is always grouped.
+			groupCheck.isChecked = true;
+			groupCheck.Disable();
+			groupCheck.Hide();
+
+			if (!targetPrefabInfo.name.Contains("."))
+			{
+				replaceButton.text = "Replace all vanilla";
+			}
+
+			// 'Replace all' check text.
+			allCheck.text = Translations.Translate("BOB_PNL_ALN");
+
 
 			// Replace button event handler.
 			replaceButton.eventClicked += (control, clickEvent) =>
 			{
-				// Make sure we have valid a target and replacement.
-				if (currentTargetItem != null && replacementPrefab != null)
+				// All-network or local replacement?
+				if (allCheck.isChecked)
 				{
-                    // Create new replacement record with current info.
-                    NetReplacement replacement = new NetReplacement
-                    {
-                        isTree = treeCheck.isChecked,
-                        probability = probability,
-                        originalProb = currentTargetItem.originalProb,
-                        angle = currentTargetItem.angle,
-                        targetIndex = currentTargetItem.index,
-                        replacementInfo = replacementPrefab,
-                        replaceName = replacementPrefab.name,
-                        lane = CurrentNetTargetItem.lane,
+					// All-network replacement - apply.
+					AllNetworkReplacement.Apply(currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab, replacementPrefab);
 
-                        // Original prefab is null if no active replacement; in which case, use the current prefab (which IS the original prefab).
-                        targetInfo = currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab
-                    };
-                    replacement.targetName = replacement.targetInfo.name;
-
-					// Individual or grouped replacement?
-					if (currentTargetItem.index >= 0)
-					{
-						// Individual replacement - add as-is.
-						NetworkReplacement.AddReplacement(currentNet, replacement);
-					}
-					else
-					{
-						// Grouped replacement - iterate through each index in the list.
-						for (int i = 0; i < currentTargetItem.indexes.Count; ++i)
-						{
-							// Add the replacement, providing an index override to the current index.
-							NetworkReplacement.AddReplacement(currentNet, replacement, currentTargetItem.indexes[i], CurrentNetTargetItem.lanes[i]);
-						}
-					}
-
-					// Save configuration file and refresh target list (to reflect our changes).
+					// Save configuration file and refresh building list (to reflect our changes).
 					ConfigurationUtils.SaveConfig();
 					TargetListRefresh();
+				}
+				else
+				{
+					// Local replacement.
+					// Make sure we have valid a target and replacement.
+					if (currentTargetItem != null && replacementPrefab != null)
+					{
+						// Create new replacement record with current info.
+						NetReplacement replacement = new NetReplacement
+						{
+							isTree = treeCheck.isChecked,
+							probability = probability,
+							originalProb = currentTargetItem.originalProb,
+							angle = currentTargetItem.angle,
+							targetIndex = currentTargetItem.index,
+							replacementInfo = replacementPrefab,
+							replaceName = replacementPrefab.name,
+							lane = CurrentNetTargetItem.lane,
+
+							// Original prefab is null if no active replacement; in which case, use the current prefab (which IS the original prefab).
+							targetInfo = currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab
+						};
+						replacement.targetName = replacement.targetInfo.name;
+
+						// Individual or grouped replacement?
+						if (currentTargetItem.index >= 0)
+						{
+							// Individual replacement - add as-is.
+							NetworkReplacement.AddReplacement(currentNet, replacement);
+						}
+						else
+						{
+							// Grouped replacement - iterate through each index in the list.
+							for (int i = 0; i < currentTargetItem.indexes.Count; ++i)
+							{
+								// Add the replacement, providing an index override to the current index.
+								NetworkReplacement.AddReplacement(currentNet, replacement, currentTargetItem.indexes[i], CurrentNetTargetItem.lanes[i]);
+							}
+						}
+
+						// Save configuration file and refresh target list (to reflect our changes).
+						ConfigurationUtils.SaveConfig();
+						TargetListRefresh();
+					}
 				}
 			};
 
 			// Revert button event handler.
 			revertButton.eventClicked += (control, clickEvent) =>
 			{
-				// Building reversion - ensuire that we've got a current selection before doing anything.
-				if (currentTargetItem != null)
+				// Network or all-network reversion?
+				if (allCheck.isChecked)
 				{
-					// Individual or grouped reversion?
-					if (currentTargetItem.index >= 0)
+					// All-network reversion - make sure we've got a currently active replacement before doing anything.
+					if (currentTargetItem.originalPrefab != null && currentTargetItem.allPrefab != null)
 					{
-						// Individual reversion.
-						NetworkReplacement.Revert(currentNet, CurrentNetTargetItem.lane, currentTargetItem.index);
-					}
-					else
-					{
-						// Grouped reversion - iterate through each instance in the list and revert.
-						for (int i = 0; i < currentTargetItem.indexes.Count; ++i)
-						{
-							// Add the replacement, providing an index override to the current index.
-							NetworkReplacement.Revert(currentNet, CurrentNetTargetItem.lanes[i], currentTargetItem.indexes[i]);
-						}
-					}
+						// Apply all-network reversion.
+						AllNetworkReplacement.Revert(currentTargetItem.originalPrefab, currentTargetItem.allPrefab);
 
-					// Save configuration file and refresh building list (to reflect our changes).
-					ConfigurationUtils.SaveConfig();
-					TargetListRefresh();
+						// Save configuration file and refresh target list (to reflect our changes).
+						ConfigurationUtils.SaveConfig();
+						TargetListRefresh();
+					}
+				}
+				else
+				{
+					// Individual network reversion - ensuire that we've got a current selection before doing anything.
+					if (currentTargetItem != null)
+					{
+						// Individual or grouped reversion?
+						if (currentTargetItem.index >= 0)
+						{
+							// Individual reversion.
+							NetworkReplacement.Revert(currentNet, CurrentNetTargetItem.lane, currentTargetItem.index);
+						}
+						else
+						{
+							// Grouped reversion - iterate through each instance in the list and revert.
+							for (int i = 0; i < currentTargetItem.indexes.Count; ++i)
+							{
+								// Add the replacement, providing an index override to the current index.
+								NetworkReplacement.Revert(currentNet, CurrentNetTargetItem.lanes[i], currentTargetItem.indexes[i]);
+							}
+						}
+
+						// Save configuration file and refresh building list (to reflect our changes).
+						ConfigurationUtils.SaveConfig();
+						TargetListRefresh();
+					}
 				}
 			};
 		}
@@ -176,8 +219,18 @@ namespace BOB
 					// If the above returned null, there's no currently active building replacement.
 					if (propListItem.originalPrefab == null)
 					{
-						// No currently active all-building replacement - therefore, the current prefab IS the original, so set original prefab record accordingly.
-						propListItem.originalPrefab = finalInfo;
+						// Check for currently active all-network replacement.
+						propListItem.originalPrefab = AllNetworkReplacement.ActiveReplacement(currentNet, lane, propIndex);
+						if (propListItem.originalPrefab == null)
+						{
+							// No currently active all-network replacement - therefore, the current prefab IS the original, so set original prefab record accordingly.
+							propListItem.originalPrefab = finalInfo;
+						}
+						else
+						{
+							// There's a currently active all-network replacement - add that to our record.
+							propListItem.allPrefab = finalInfo;
+						}
 					}
 					else
 					{

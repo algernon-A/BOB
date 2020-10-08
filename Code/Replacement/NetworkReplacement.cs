@@ -38,6 +38,9 @@ namespace BOB
 
 			// Set new prop.
 			netPrefab.m_lanes[replacement.lane].m_laneProps.m_props[replacement.targetIndex].m_finalProp = (PropInfo)replacement.replacementInfo;
+
+			// Remove any currently applied all-building building replacement entry for this tree or prop.
+			AllNetworkReplacement.RemoveEntry(netPrefab, replacement.lane, replacement.targetIndex);
 		}
 
 
@@ -125,6 +128,9 @@ namespace BOB
 					// Prop - restore original.
 					netPrefab.m_lanes[lane].m_laneProps.m_props[index].m_finalProp = prefabInfo as PropInfo;
 				}
+
+				// Apply any all-building replacement.
+				AllNetworkReplacement.Restore(netPrefab, lane, index);
 
 				// Remove dictionary entries if that setting is enabled.
 				if (removeEntries)

@@ -27,6 +27,7 @@ namespace BOB
             // Initialise data sets.
             PrefabLists.BuildLists();
             AllBuildingReplacement.Setup();
+            AllNetworkReplacement.Setup();
             BuildingReplacement.Setup();
             NetworkReplacement.Setup();
 

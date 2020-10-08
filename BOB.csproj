@@ -63,6 +63,7 @@
     <Compile Include="Code\FileUtils.cs" />
     <Compile Include="Code\Mod.cs" />
     <Compile Include="Code\Patches\Patcher.cs" />
+    <Compile Include="Code\Replacement\AllNetworkReplacement.cs" />
     <Compile Include="Code\Replacement\BuildingReplacement.cs" />
     <Compile Include="Code\Replacement\AllBuildingReplacement.cs" />
     <Compile Include="Code\Replacement\NetworkReplacement.cs" />

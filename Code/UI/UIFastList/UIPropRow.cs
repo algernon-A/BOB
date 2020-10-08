@@ -141,11 +141,10 @@ namespace BOB
                     // Append closing bracket.
                     objectName.text += ")";
                 }
-
-                // If no current building replacement, check to see if any all-building replacement is currently active.
+                // If no current building replacement, check to see if any all- replacement is currently active.
                 else if (thisItem.allPrefab != null)
                 {
-                    // An all-building replacement is currently active; append name and probability to the label.
+                    // An all- replacement is currently active; append name and probability to the label.
                     objectName.text +=" (all-building " + UIUtils.GetDisplayName(thisItem.allPrefab.name) + " " + probability + "%)";
                 }
             }
