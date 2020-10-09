@@ -84,6 +84,9 @@ namespace BOB
 							}
 						}
 
+						// Deserialise all-network replacements.
+						DeserializeAllNetwork(configFile.allNetworkProps);
+
 						// Deserialise network replacements, per network.
 						foreach (BOBNetworkElement network in configFile.networks)
                         {
@@ -175,6 +178,9 @@ namespace BOB
 						configFile.buildings.Add(buildingElement);
 					}
 
+					// Serialise all-network replacements.
+					configFile.allNetworkProps = SerializeAllNetwork(AllNetworkReplacement.propReplacements);
+
 					// Serialise network replacements, per network.
 					configFile.networks = new List<BOBNetworkElement>();
 
@@ -241,6 +247,37 @@ namespace BOB
 
 
 		/// <summary>
+		/// Serialises an all-network dictionary into an all-building element list.
+		/// </summary>
+		/// <param name="dictionary">Dictionary to serialise</param>
+		/// <returns>Serialised list of all-building elements</returns>
+		private static List<BOBAllNetworkElement> SerializeAllNetwork(Dictionary<PrefabInfo, PrefabInfo> dictionary)
+		{
+			// Return list.
+			List<BOBAllNetworkElement> elementList = new List<BOBAllNetworkElement>();
+
+			// Only serialise if number of entries is greater than zero.
+			if (dictionary.Count > 0)
+			{
+				// Iterate through each entry in the provided dictionary.
+				foreach (PrefabInfo prefab in dictionary.Keys)
+				{
+					// Create a new all-building replacement element with matching values from the dictionary.
+					BOBAllNetworkElement allNetElement = new BOBAllNetworkElement()
+					{
+						target = prefab.name,
+						replacement = dictionary[prefab].name
+					};
+
+					// Add new element to the return list.
+					elementList.Add(allNetElement);
+				}
+			}
+			return elementList;
+		}
+
+
+		/// <summary>
 		/// Deserialises an all-building element list.
 		/// </summary>
 		/// <param name="elementList">All-building element list to deserialise</param>
@@ -268,6 +305,37 @@ namespace BOB
 
 				// If we got here, it's all good; apply the all-building replacement.
 				AllBuildingReplacement.Apply(targetPrefab, replacementPrefab);
+			}
+		}
+
+
+		/// <summary>
+		/// Deserialises an all-network element list.
+		/// </summary>
+		/// <param name="elementList">All-network element list to deserialise</param>
+		private static void DeserializeAllNetwork(List<BOBAllNetworkElement> elementList)
+		{
+			// Iterate through each element in the proivided list.
+			foreach (BOBAllNetworkElement allNetElement in elementList)
+			{
+				// Try to find target prefab.
+				PrefabInfo targetPrefab = (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(allNetElement.target);
+				if (targetPrefab == null)
+				{
+					Debugging.Message("Couldn't find target prefab " + allNetElement.target);
+					continue;
+				}
+
+				// Try to find replacement prefab.
+				PrefabInfo replacementPrefab = (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(allNetElement.replacement);
+				if (replacementPrefab == null)
+				{
+					Debugging.Message("Couldn't find replacement prefab " + allNetElement.replacement);
+					continue;
+				}
+
+				// If we got here, it's all good; apply the all-building replacement.
+				AllNetworkReplacement.Apply(targetPrefab, replacementPrefab);
 			}
 		}
 	}
