@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Text;
+using UnityEngine;
 using ColossalFramework.UI;
 
 
@@ -105,6 +106,9 @@ namespace BOB
             thisPrefab = data as PrefabInfo;
             if (thisPrefab == null)
             {
+                // Text to display - StringBuilder due to the amount of manipulation we're doing.
+                StringBuilder displayText = new StringBuilder();
+
                 // Not a raw PropInfo, so it should be a PropListItem replacement record.
                 // Set local references.
                 thisItem = data as PropListItem;
@@ -117,36 +121,66 @@ namespace BOB
                 // See if this is a network prop.
                 NetPropListItem thisNetItem = data as NetPropListItem;
 
-                // Set object name, with index number if it's an inidvidual reference.
-                objectName.text = (thisItem.index < 0 ? "" : thisItem.index + " ") + UIUtils.GetDisplayName(thisPrefab.name);
+                // Display index number if this is an individual reference.
+                if (thisItem.index < 0)
+                {
+                    displayText.Append(thisItem.index);
+                    displayText.Append(" ");
+                }
+
+                // Prefab display name.
+                displayText.Append(UIUtils.GetDisplayName(thisPrefab.name));
 
                 // Show original probability in brackets immediately afterwards, if this isn't a network item.
                 if (thisNetItem == null)
                 {
-                    objectName.text += " (" + originalProb + "%)";
+                    displayText.Append(" (");
+                    displayText.Append(originalProb);
+                    displayText.Append("%)");
                 }
 
                 // Check to see if there's a currently active replacement (currentPrefab isn't null).
                 if (thisItem.currentPrefab != null)
                 {
-                    // A replacement is currently active.
-                    objectName.text += " (now " + UIUtils.GetDisplayName(thisItem.currentPrefab.name);
+                    // A replacement is currently active - include it in the text.
+                    displayText.Append(" (");
+                    displayText.Append(Translations.Translate("BOB_ROW_NOW"));
+                    displayText.Append(UIUtils.GetDisplayName(thisItem.currentPrefab.name));
 
                     // Append replacement name and probability to the label, if this isn't a network item.
                     if (thisNetItem == null)
                     {
-                        objectName.text += " " + probability + "%";
+                        displayText.Append(" ");
+                        displayText.Append(probability);
+                        displayText.Append("%");
                     }
 
                     // Append closing bracket.
-                    objectName.text += ")";
+                    displayText.Append(")");
                 }
                 // If no current building replacement, check to see if any all- replacement is currently active.
                 else if (thisItem.allPrefab != null)
                 {
-                    // An all- replacement is currently active; append name and probability to the label.
-                    objectName.text +=" (all-building " + UIUtils.GetDisplayName(thisItem.allPrefab.name) + " " + probability + "%)";
+                    // An all- replacement is currently active; append name to the label.
+                    displayText.Append(" (");
+                    displayText.Append(thisNetItem == null ? Translations.Translate("BOB_PNL_RAB") : Translations.Translate("BOB_PNL_RAN"));
+                    displayText.Append(" ");
+                    displayText.Append(UIUtils.GetDisplayName(thisItem.allPrefab.name));
+
+                    // Append probability if this is not a network item.
+                    if (thisNetItem == null)
+                    {
+                        displayText.Append(" ");
+                        displayText.Append(probability);
+                        displayText.Append("%");
+                    }
+
+                    // Closing bracket.
+                    displayText.Append(")");
                 }
+
+                // Set display text.
+                objectName.text = displayText.ToString();
             }
             else
             {

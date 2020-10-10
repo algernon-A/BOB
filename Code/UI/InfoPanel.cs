@@ -21,9 +21,10 @@ namespace BOB
 
 		// Component locations.
 		protected const float ProbabilityY = 95f;
-		protected const float AllY = 155f;
-		protected const float ReplaceY = 185f;
-		protected const float RevertY = 220f;
+		protected const float ReplaceLabelY = 185f;
+		protected const float ReplaceY = ReplaceLabelY + 35f;
+		protected const float ReplaceAllY = ReplaceY + 35f;
+		protected const float RevertY = ReplaceAllY + 50f;
 
 		// Current selections.
 		protected PrefabInfo selectedPrefab;
@@ -35,14 +36,18 @@ namespace BOB
 		private UIFastList targetList;
 		private UIFastList loadedList;
 		protected UIButton replaceButton;
+		protected UIButton replaceAllButton;
 		protected UIButton revertButton;
-		protected UICheckBox allCheck;
 		protected UICheckBox treeCheck;
 		protected UICheckBox propCheck;
 		protected UICheckBox groupCheck;
 		private UICheckBox hideVanilla;
 		private UITextField nameFilter;
 		protected UILabel noPropsLabel;
+
+		// Button labels.
+		protected abstract string ReplaceLabel { get; }
+		protected abstract string ReplaceAllLabel { get; }
 
 
 		/// <summary>
@@ -124,7 +129,6 @@ namespace BOB
 				propCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_PRP"), Margin, TitleHeight);
 				treeCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_TRE"), Margin, TitleHeight + Margin + propCheck.height);
 				groupCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_GRP"), 155f, TitleHeight);
-				allCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_ALB"), LeftWidth + (Margin * 2), AllY);
 
 				// Target prop list.
 				UIPanel leftPanel = AddUIComponent<UIPanel>();
@@ -162,9 +166,16 @@ namespace BOB
 					ModSettings.hideVanilla = isChecked;
 				};
 
-				// Replace button.
-				replaceButton = UIUtils.CreateButton(this, Translations.Translate("BOB_PNL_REP"), 190f, LeftWidth + (Margin * 2), ReplaceY);
+				// Replace text label.
+				UILabel replaceLabel = AddUIComponent<UILabel>();
+				replaceLabel.text = Translations.Translate("BOB_PNL_REP");
+				replaceLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), ReplaceLabelY);
 
+				// Replace button.
+				replaceButton = UIUtils.CreateButton(this, ReplaceLabel, 190f, LeftWidth + (Margin * 2), ReplaceY);
+
+				// Replace all button.
+				replaceAllButton = UIUtils.CreateButton(this, ReplaceAllLabel, 190f, LeftWidth + (Margin * 2), ReplaceAllY);
 
 				// Revert button.
 				revertButton = UIUtils.CreateButton(this, Translations.Translate("BOB_PNL_REV"), 190f, LeftWidth + (Margin * 2), RevertY);
@@ -270,13 +281,6 @@ namespace BOB
 						break;
 				}
 
-				// Event handler for all checkbox.
-				allCheck.eventCheckChanged += (control, isChecked) =>
-				{
-					// Rebuild target list.
-					targetList.rowsData = TargetList(treeCheck.isChecked);
-				};
-
 				// Set remaining check states from previous (OR default) settings.
 				propCheck.isChecked = !ModSettings.treeSelected;
 				treeCheck.isChecked = ModSettings.treeSelected;
@@ -299,6 +303,7 @@ namespace BOB
 		{
 			// Save current list position.
 			float listPosition = targetList.listPosition;
+			targetList.Refresh();
 
 			// Rebuild list.
 			targetList.rowsData = TargetList(treeCheck.isChecked);
@@ -319,13 +324,14 @@ namespace BOB
 		{
 			// Disable by default (selectively (re)-enable if eligible).
 			replaceButton.Disable();
+			replaceAllButton.Disable();
 			revertButton.Disable();
 
 			// Buttons are only enabled if a current target item is selected.
 			if (currentTargetItem != null)
 			{
 				// Reversion requires a currently active replacement (for the relevant target/all-building setting).
-				if ((!allCheck.isChecked && currentTargetItem.currentPrefab != null) || (allCheck.isChecked && currentTargetItem.allPrefab != null))
+				if (currentTargetItem.currentPrefab != null || currentTargetItem.allPrefab != null)
 				{
 					revertButton.Enable();
 				}
@@ -334,6 +340,7 @@ namespace BOB
 				if (replacementPrefab != null)
 				{
 					replaceButton.Enable();
+					replaceAllButton.Enable();
 				}
 			}
 		}

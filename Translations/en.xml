@@ -5,6 +5,7 @@
     <Translation ID="BOB_DESC" String="UNDER DEVELOPMENT: Replaces trees and props." />
     <Translation ID="TRN_CHOICE" String="Set language" />
     <Translation ID="TRN_SYS" String="Use system language" />
+    <Translation ID="BOB_ROW_NOW" String="now" />
     <Translation ID="BOB_PNL_NOP" String="No props found" />
     <Translation ID="BOB_PNL_NOT" String="No trees found" />
     <Translation ID="BOB_PNL_TRE" String="Trees" />
@@ -12,10 +13,12 @@
     <Translation ID="BOB_PNL_GRP" String="Group together" />
     <Translation ID="BOB_PNL_HDV" String="Hide vanilla" />
     <Translation ID="BOB_PNL_REP" String="Replace" />
+    <Translation ID="BOB_PNL_RTB" String="This building" />
+    <Translation ID="BOB_PNL_RAB" String="All buildings" />
+    <Translation ID="BOB_PNL_RTN" String="This network" />
+    <Translation ID="BOB_PNL_RAN" String="All networks" />
     <Translation ID="BOB_PNL_REV" String="Revert" />
     <Translation ID="BOB_PNL_PRB" String="Probability" />
-    <Translation ID="BOB_PNL_ALB" String="All buildings" />
-    <Translation ID="BOB_PNL_ALN" String="All networks" />
     <Translation ID="BOB_OPT_KEY" String="Hotkey" />
     <Translation ID="BOB_OPT_PRS" String="Press any key" />
     <Translation ID="BOB_NUKE" String="Reset configuration" />

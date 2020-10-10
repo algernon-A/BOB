@@ -15,6 +15,12 @@ namespace BOB
 		internal UITextField probabilityField;
 
 
+		// Button labels.
+		protected override string ReplaceLabel => Translations.Translate("BOB_PNL_RTB");
+
+		protected override string ReplaceAllLabel => Translations.Translate("BOB_PNL_RAB");
+
+
 		/// <summary>
 		/// Performs initial setup 
 		/// </summary>
@@ -41,19 +47,6 @@ namespace BOB
 			// Replace button event handler.
 			replaceButton.eventClicked += (control, clickEvent) =>
 			{
-				// All-building or local replacement?
-				if (allCheck.isChecked)
-				{
-					// All-building replacement - apply.
-					AllBuildingReplacement.Apply(currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab, replacementPrefab);
-
-					// Save configuration file and refresh building list (to reflect our changes).
-					ConfigurationUtils.SaveConfig();
-					TargetListRefresh();
-				}
-				else
-				{
-					// Local replacement.
 					// Try to read the probability text field.
 					if (int.TryParse(probabilityField.text, out int result))
 					{
@@ -64,56 +57,66 @@ namespace BOB
 					// (Re) set prpbability textfield text to what we currently have.
 					probabilityField.text = probability.ToString();
 
-					// Make sure we have valid a target and replacement.
-					if (currentTargetItem != null && replacementPrefab != null)
+				// Make sure we have valid a target and replacement.
+				if (currentTargetItem != null && replacementPrefab != null)
+				{
+					// Create new replacement record with current info.
+					Replacement replacement = new Replacement
 					{
-                        // Create new replacement record with current info.
-                        Replacement replacement = new Replacement
-                        {
-                            isTree = treeCheck.isChecked,
-                            probability = probability,
-                            originalProb = currentTargetItem.originalProb,
-                            angle = currentTargetItem.angle,
-                            targetIndex = currentTargetItem.index,
-                            replacementInfo = replacementPrefab,
-                            replaceName = replacementPrefab.name,
+						isTree = treeCheck.isChecked,
+						probability = probability,
+						originalProb = currentTargetItem.originalProb,
+						angle = currentTargetItem.angle,
+						targetIndex = currentTargetItem.index,
+						replacementInfo = replacementPrefab,
+						replaceName = replacementPrefab.name,
 
-                            // Original prefab is null if no active replacement; in which case, use the current prefab (which IS the original prefab).
-                            targetInfo = currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab
-                        };
-                        replacement.targetName = replacement.targetInfo.name;
+						// Original prefab is null if no active replacement; in which case, use the current prefab (which IS the original prefab).
+						targetInfo = currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab
+					};
+					replacement.targetName = replacement.targetInfo.name;
 
-						// Individual or grouped replacement?
-						if (currentTargetItem.index >= 0)
-						{
-							// Individual replacement - add as-is.
-							BuildingReplacement.AddReplacement(currentBuilding, replacement);
-						}
-						else
-						{
-							// Grouped replacement - iterate through each index in the list.
-							foreach (int index in currentTargetItem.indexes)
-							{
-								// Add the replacement, providing an index override to the current index.
-								BuildingReplacement.AddReplacement(currentBuilding, replacement, index);
-							}
-						}
-
-						// Save configuration file and refresh target list (to reflect our changes).
-						ConfigurationUtils.SaveConfig();
-						TargetListRefresh();
+					// Individual or grouped replacement?
+					if (currentTargetItem.index >= 0)
+					{
+						// Individual replacement - add as-is.
+						BuildingReplacement.AddReplacement(currentBuilding, replacement);
 					}
+					else
+					{
+						// Grouped replacement - iterate through each index in the list.
+						foreach (int index in currentTargetItem.indexes)
+						{
+							// Add the replacement, providing an index override to the current index.
+							BuildingReplacement.AddReplacement(currentBuilding, replacement, index);
+						}
+					}
+
+					// Save configuration file and refresh target list (to reflect our changes).
+					ConfigurationUtils.SaveConfig();
+					TargetListRefresh();
 				}
+			};
+
+			// All building button event handler.
+			replaceAllButton.eventClicked += (control, clickEvent) =>
+			{
+				// Apply replacement.
+				AllBuildingReplacement.Apply(currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab, replacementPrefab);
+
+				// Save configuration file and refresh building list (to reflect our changes).
+				ConfigurationUtils.SaveConfig();
+				TargetListRefresh();
 			};
 
 			// Revert button event handler.
 			revertButton.eventClicked += (control, clickEvent) =>
 			{
 				// Building or all-building reversion?
-				if (allCheck.isChecked)
+				if (currentTargetItem.allPrefab != null)
 				{
 					// All-building reversion - make sure we've got a currently active replacement before doing anything.
-					if (currentTargetItem.originalPrefab != null && currentTargetItem.allPrefab != null)
+					if (currentTargetItem.originalPrefab != null)
 					{
 						// Apply all-building reversion.
 						AllBuildingReplacement.Revert(currentTargetItem.originalPrefab, currentTargetItem.allPrefab);
