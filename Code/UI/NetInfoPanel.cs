@@ -54,8 +54,8 @@ namespace BOB
 					// Create new replacement record with current info.
 					NetReplacement replacement = new NetReplacement
 					{
-						isTree = treeCheck.isChecked,
-						probability = probability,
+						isTree = false,
+						probability = 100,
 						originalProb = currentTargetItem.originalProb,
 						angle = currentTargetItem.angle,
 						targetIndex = currentTargetItem.index,
@@ -68,25 +68,22 @@ namespace BOB
 					};
 					replacement.targetName = replacement.targetInfo.name;
 
-					// Individual or grouped replacement?
-					if (currentTargetItem.index >= 0)
+					// Network replacements are always grouped - iterate through each index in the list.
+					for (int i = 0; i < currentTargetItem.indexes.Count; ++i)
 					{
-						// Individual replacement - add as-is.
-						NetworkReplacement.AddReplacement(currentNet, replacement);
+						// Add the replacement, providing an index override to the current index.
+						NetworkReplacement.AddReplacement(currentNet, replacement, currentTargetItem.indexes[i], CurrentNetTargetItem.lanes[i]);
 					}
-					else
-					{
-						// Grouped replacement - iterate through each index in the list.
-						for (int i = 0; i < currentTargetItem.indexes.Count; ++i)
-						{
-							// Add the replacement, providing an index override to the current index.
-							NetworkReplacement.AddReplacement(currentNet, replacement, currentTargetItem.indexes[i], CurrentNetTargetItem.lanes[i]);
-						}
-					}
+
+					// Update current target.
+					currentTargetItem.currentPrefab = replacementPrefab;
 
 					// Save configuration file and refresh target list (to reflect our changes).
 					ConfigurationUtils.SaveConfig();
-					TargetListRefresh();
+					targetList.Refresh();
+
+					// Update button states.
+					UpdateButtonStates();
 				}
 			};
 
@@ -96,9 +93,15 @@ namespace BOB
 				// Apply replacement.
 				AllNetworkReplacement.Apply(currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab, replacementPrefab);
 
+				// Update current target.
+				currentTargetItem.allPrefab = replacementPrefab;
+
 				// Save configuration file and refresh building list (to reflect our changes).
 				ConfigurationUtils.SaveConfig();
-				TargetListRefresh();
+				targetList.Refresh();
+
+				// Update button states.
+				UpdateButtonStates();
 			};
 
 			// Revert button event handler.
@@ -113,9 +116,15 @@ namespace BOB
 						// Apply all-network reversion.
 						AllNetworkReplacement.Revert(currentTargetItem.originalPrefab, currentTargetItem.allPrefab);
 
+						// Clear current target 'all' prefab.
+						currentTargetItem.allPrefab = null;
+
 						// Save configuration file and refresh target list (to reflect our changes).
 						ConfigurationUtils.SaveConfig();
-						TargetListRefresh();
+						targetList.Refresh();
+
+						// Update button states.
+						UpdateButtonStates();
 					}
 				}
 				else
@@ -123,25 +132,22 @@ namespace BOB
 					// Individual network reversion - ensuire that we've got a current selection before doing anything.
 					if (currentTargetItem != null)
 					{
-						// Individual or grouped reversion?
-						if (currentTargetItem.index >= 0)
-						{
-							// Individual reversion.
-							NetworkReplacement.Revert(currentNet, CurrentNetTargetItem.lane, currentTargetItem.index);
-						}
-						else
-						{
-							// Grouped reversion - iterate through each instance in the list and revert.
+						// Network replacements are always grouped -iterate through each instance in the list and revert.
 							for (int i = 0; i < currentTargetItem.indexes.Count; ++i)
-							{
-								// Add the replacement, providing an index override to the current index.
-								NetworkReplacement.Revert(currentNet, CurrentNetTargetItem.lanes[i], currentTargetItem.indexes[i]);
-							}
+						{
+							// Add the replacement, providing an index override to the current index.
+							NetworkReplacement.Revert(currentNet, CurrentNetTargetItem.lanes[i], currentTargetItem.indexes[i]);
 						}
+
+						// Clear current target 'all' prefab.
+						currentTargetItem.currentPrefab = null;
 
 						// Save configuration file and refresh building list (to reflect our changes).
 						ConfigurationUtils.SaveConfig();
-						TargetListRefresh();
+						targetList.Refresh();
+
+						// Update button states.
+						UpdateButtonStates();
 					}
 				}
 			};

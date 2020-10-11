@@ -33,7 +33,7 @@ namespace BOB
 		protected int probability;
 
 		// Panel components.
-		private UIFastList targetList;
+		protected UIFastList targetList;
 		private UIFastList loadedList;
 		protected UIButton replaceButton;
 		protected UIButton replaceAllButton;
@@ -320,7 +320,7 @@ namespace BOB
 		/// <summary>
 		/// Updates button states (enabled/disabled) according to current control states.
 		/// </summary>
-		private void UpdateButtonStates()
+		protected void UpdateButtonStates()
 		{
 			// Disable by default (selectively (re)-enable if eligible).
 			replaceButton.Disable();
