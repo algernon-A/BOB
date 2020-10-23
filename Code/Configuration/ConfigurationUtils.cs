@@ -251,7 +251,7 @@ namespace BOB
 		/// </summary>
 		/// <param name="dictionary">Dictionary to serialise</param>
 		/// <returns>Serialised list of all-building elements</returns>
-		private static List<BOBAllNetworkElement> SerializeAllNetwork(Dictionary<PrefabInfo, PrefabInfo> dictionary)
+		private static List<BOBAllNetworkElement> SerializeAllNetwork(Dictionary<PrefabInfo, KeyValuePair<PrefabInfo, float>> dictionary)
 		{
 			// Return list.
 			List<BOBAllNetworkElement> elementList = new List<BOBAllNetworkElement>();
@@ -266,7 +266,8 @@ namespace BOB
 					BOBAllNetworkElement allNetElement = new BOBAllNetworkElement()
 					{
 						target = prefab.name,
-						replacement = dictionary[prefab].name
+						replacement = dictionary[prefab].Key.name,
+						angle = dictionary[prefab].Value
 					};
 
 					// Add new element to the return list.
@@ -335,7 +336,7 @@ namespace BOB
 				}
 
 				// If we got here, it's all good; apply the all-building replacement.
-				AllNetworkReplacement.Apply(targetPrefab, replacementPrefab);
+				AllNetworkReplacement.Apply(targetPrefab, replacementPrefab, allNetElement.angle);
 			}
 		}
 	}

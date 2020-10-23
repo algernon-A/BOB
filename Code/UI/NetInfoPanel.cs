@@ -91,7 +91,7 @@ namespace BOB
 			replaceAllButton.eventClicked += (control, clickEvent) =>
 			{
 				// Apply replacement.
-				AllNetworkReplacement.Apply(currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab, replacementPrefab);
+				AllNetworkReplacement.Apply(currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab, replacementPrefab, float.Parse(angleField.text));
 
 				// Update current target.
 				currentTargetItem.allPrefab = replacementPrefab;
