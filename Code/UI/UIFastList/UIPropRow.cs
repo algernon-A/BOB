@@ -122,7 +122,7 @@ namespace BOB
                 NetPropListItem thisNetItem = data as NetPropListItem;
 
                 // Display index number if this is an individual reference.
-                if (thisItem.index < 0)
+                if (thisItem.index >= 0)
                 {
                     displayText.Append(thisItem.index);
                     displayText.Append(" ");

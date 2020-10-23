@@ -1,5 +1,6 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using UnityEngine;
+using ColossalFramework.UI;
 
 
 namespace BOB
@@ -9,11 +10,18 @@ namespace BOB
 		// Current selection reference.
 		NetInfo currentNet;
 
+		// Panel components.
+		internal UITextField angleField;
+
 
 		// Button labels.
 		protected override string ReplaceLabel => Translations.Translate("BOB_PNL_RTN");
 
 		protected override string ReplaceAllLabel => Translations.Translate("BOB_PNL_RAN");
+
+
+		// Trees or props?
+		protected override bool IsTree => false;
 
 
 		/// <summary>
@@ -29,21 +37,13 @@ namespace BOB
 			// Base setup.
 			base.Setup(parentTransform, targetPrefabInfo);
 
-			// Disable and hide unused checkboxes.
-			treeCheck.Disable();
-			treeCheck.Hide();
-			propCheck.Disable();
-			propCheck.Hide();
+			// Angle label and textfield.
+			UILabel angleLabel = AddUIComponent<UILabel>();
+			angleLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), ProbabilityY);
+			angleLabel.text = Translations.Translate("BOB_PNL_ANG");
 
-			// TODO: Remove!  Quick hack for network is always grouped.
-			groupCheck.isChecked = true;
-			groupCheck.Disable();
-			groupCheck.Hide();
-
-			if (!targetPrefabInfo.name.Contains("."))
-			{
-				replaceButton.text = "Replace all vanilla";
-			}
+			angleField = UIUtils.AddTextField(this, 190f, 30f);
+			angleField.relativePosition = new Vector2(LeftWidth + (Margin * 2), ProbabilityY + angleLabel.height);
 
 			// Replace button event handler.
 			replaceButton.eventClicked += (control, clickEvent) =>
@@ -57,7 +57,7 @@ namespace BOB
 						isTree = false,
 						probability = 100,
 						originalProb = currentTargetItem.originalProb,
-						angle = currentTargetItem.angle,
+						angle = float.Parse(angleField.text),
 						targetIndex = currentTargetItem.index,
 						replacementInfo = replacementPrefab,
 						replaceName = replacementPrefab.name,
@@ -151,6 +151,10 @@ namespace BOB
 					}
 				}
 			};
+
+			// Populate initial lists.
+			loadedList.rowsData = LoadedList(false);
+			targetList.rowsData = TargetList(false);
 		}
 
 
@@ -202,21 +206,11 @@ namespace BOB
 						continue;
 					}
 
-					// Grouped or individual?
-					if (groupCheck.isChecked)
-					{
-						// Grouped - set index and lane to -1 and add to our lists of indexes and lanes.
-						propListItem.index = -1;
-						propListItem.lane = -1;
-						propListItem.indexes.Add(propIndex);
-						propListItem.lanes.Add(lane);
-					}
-					else
-					{
-						// Individual - set index and lane to the current building prop index and lane.
-						propListItem.index = propIndex;
-						propListItem.lane = lane;
-					}
+					// Networks are always grouped - set index and lane to -1 and add to our lists of indexes and lanes.
+					propListItem.index = -1;
+					propListItem.lane = -1;
+					propListItem.indexes.Add(propIndex);
+					propListItem.lanes.Add(lane);
 
 					// Try to get original (pre-replacement) tree/prop prefab.
 					propListItem.originalPrefab = NetworkReplacement.GetOriginal(currentNet, lane, propIndex);
@@ -243,8 +237,7 @@ namespace BOB
 						propListItem.currentPrefab = finalInfo;
 					}
 
-					// Angle and probability.
-					propListItem.angle = laneProps[propIndex].m_angle;
+					// Probability.
 					propListItem.probability = laneProps[propIndex].m_probability;
 
 					// Are we grouping?

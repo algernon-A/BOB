@@ -65,7 +65,7 @@ namespace BOB
 					foreach (int propIndex in allNetworkDict[network][laneIndex].Keys)
 					{
 						// Get currently active replacement and check to see if it matches our reversion parameters (target and replacement match).
-						Replacement currentReplacement = allNetworkDict[network][laneIndex][propIndex];
+						NetReplacement currentReplacement = allNetworkDict[network][laneIndex][propIndex];
 						if (currentReplacement.targetInfo == target && currentReplacement.replacementInfo == replacement)
 						{
 							// Match - revert to original.

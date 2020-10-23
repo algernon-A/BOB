@@ -34,6 +34,12 @@
 			{
 				buildingPanel.probabilityField.text = probability.ToString();
 			}
+
+			// Update angle textfield.
+			if (InfoPanelManager.Panel is BOBNetInfoPanel netPanel)
+			{
+				netPanel.angleField.text = angle.ToString();
+			}
 		}
 	}
 }

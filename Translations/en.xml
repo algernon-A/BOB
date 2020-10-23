@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Language UniqueName="en" ReadableName="English">
   <Translations>
-    <Translation ID="BOB_NAM" String="BOB: A tree and prop replacer" />
+    <Translation ID="BOB_NAM" String="BOB: the tree and prop replacer" />
     <Translation ID="BOB_DESC" String="UNDER DEVELOPMENT: Replaces trees and props." />
     <Translation ID="TRN_CHOICE" String="Set language" />
     <Translation ID="TRN_SYS" String="Use system language" />
@@ -19,6 +19,7 @@
     <Translation ID="BOB_PNL_RAN" String="All networks" />
     <Translation ID="BOB_PNL_REV" String="Revert" />
     <Translation ID="BOB_PNL_PRB" String="Probability" />
+    <Translation ID="BOB_PNL_ANG" String="Angle" />
     <Translation ID="BOB_OPT_KEY" String="Hotkey" />
     <Translation ID="BOB_OPT_PRS" String="Press any key" />
     <Translation ID="BOB_NUKE" String="Reset configuration" />

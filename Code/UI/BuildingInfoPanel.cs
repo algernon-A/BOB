@@ -1,6 +1,6 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using ColossalFramework.UI;
 
 
@@ -13,6 +13,9 @@ namespace BOB
 
 		// Panel components.
 		internal UITextField probabilityField;
+		private UICheckBox treeCheck;
+		private UICheckBox propCheck;
+		private UICheckBox groupCheck;
 
 
 		// Button labels.
@@ -21,12 +24,16 @@ namespace BOB
 		protected override string ReplaceAllLabel => Translations.Translate("BOB_PNL_RAB");
 
 
-		/// <summary>
-		/// Performs initial setup 
-		/// </summary>
-		/// <param name="parentTransform">Parent transform</param>
-		/// <param name="targetPrefabInfo">Currently selected target prefab</param>
-		internal override void Setup(Transform parentTransform, PrefabInfo targetPrefabInfo)
+		// Trees or props?
+		protected override bool IsTree => treeCheck.isChecked;
+
+
+        /// <summary>
+        /// Performs initial setup 
+        /// </summary>
+        /// <param name="parentTransform">Parent transform</param>
+        /// <param name="targetPrefabInfo">Currently selected target prefab</param>
+        internal override void Setup(Transform parentTransform, PrefabInfo targetPrefabInfo)
 		{
 			// Set target reference.
 			currentBuilding = targetPrefabInfo as BuildingInfo;
@@ -34,6 +41,10 @@ namespace BOB
 			// Base setup.
 			base.Setup(parentTransform, targetPrefabInfo);
 
+			// Add checkboxes.
+			propCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_PRP"), Margin, TitleHeight);
+			treeCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_TRE"), Margin, TitleHeight + Margin + propCheck.height);
+			groupCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_GRP"), 155f, TitleHeight);
 
 			// Probability label and textfield.
 			UILabel probabilityLabel = AddUIComponent<UILabel>();
@@ -43,6 +54,79 @@ namespace BOB
 			probabilityField = UIUtils.AddTextField(this, 190f, 30f);
 			probabilityField.relativePosition = new Vector2(LeftWidth + (Margin * 2), ProbabilityY + probabilityLabel.height);
 
+			// Event handler for prop checkbox.
+			propCheck.eventCheckChanged += (control, isChecked) =>
+			{
+				if (isChecked)
+				{
+					// Props are now selected - unset tree check.
+					treeCheck.isChecked = false;
+
+					// Reset current items.
+					currentTargetItem = null;
+					replacementPrefab = null;
+
+					// Set loaded lists to 'props'.
+					loadedList.rowsData = LoadedList(isTree: false);
+					targetList.rowsData = TargetList(isTree: false);
+
+					// Set 'no props' label text.
+					noPropsLabel.text = Translations.Translate("BOB_PNL_NOP");
+				}
+				else
+				{
+					// Props are now unselected - set tree check if it isn't already (letting tree check event handler do the work required).
+					if (!treeCheck.isChecked)
+					{
+						treeCheck.isChecked = true;
+					}
+				}
+
+				// Save state.
+				ModSettings.treeSelected = !isChecked;
+			};
+
+			// Event handler for tree checkbox.
+			treeCheck.eventCheckChanged += (control, isChecked) =>
+			{
+				if (isChecked)
+				{
+					// Trees are now selected - unset prop check.
+					propCheck.isChecked = false;
+
+					// Reset current items.
+					currentTargetItem = null;
+					replacementPrefab = null;
+
+					// Set loaded lists to 'trees'.
+					loadedList.rowsData = LoadedList(isTree: true);
+					targetList.rowsData = TargetList(isTree: true);
+
+					// Set 'no props' label text.
+					noPropsLabel.text = Translations.Translate("BOB_PNL_NOT");
+				}
+				else
+				{
+					// Trees are now unselected - set prop check if it isn't already (letting prop check event handler do the work required).
+					if (!propCheck.isChecked)
+					{
+						propCheck.isChecked = true;
+					}
+				}
+
+				// Save state.
+				ModSettings.treeSelected = isChecked;
+			};
+
+			// Event handler for group checkbox.
+			groupCheck.eventCheckChanged += (control, isChecked) =>
+			{
+				// Rebuild target list.
+				targetList.rowsData = TargetList(treeCheck.isChecked);
+
+				// Store current group state as most recent state.
+				ModSettings.lastGroup = isChecked;
+			};
 
 			// Replace button event handler.
 			replaceButton.eventClicked += (control, clickEvent) =>
@@ -156,6 +240,27 @@ namespace BOB
 					}
 				}
 			};
+
+			// Set grouped checkbox initial state according to preferences.
+			switch (ModSettings.groupDefault)
+			{
+				case 0:
+					// Most recent state.
+					groupCheck.isChecked = ModSettings.lastGroup;
+					break;
+				case 1:
+					// Grouping off by default.
+					groupCheck.isChecked = false;
+					break;
+				case 2:
+					// Grouping on by default.
+					groupCheck.isChecked = true;
+					break;
+			}
+
+			// Set remaining check states from previous (OR default) settings.
+			propCheck.isChecked = !ModSettings.treeSelected;
+			treeCheck.isChecked = ModSettings.treeSelected;
 		}
 
 
@@ -287,6 +392,27 @@ namespace BOB
 			}
 
 			return fastList;
+		}
+
+
+		/// <summary>
+		/// Refreshes the target prop list according to current settings.
+		/// </summary>
+		private void TargetListRefresh()
+		{
+			// Save current list position.
+			float listPosition = targetList.listPosition;
+			targetList.Refresh();
+
+			// Rebuild list.
+			targetList.rowsData = TargetList(treeCheck.isChecked);
+
+			// Restore list position and (re)select the current target item in the list.
+			targetList.listPosition = listPosition;
+			targetList.FindItem(currentTargetItem);
+
+			// Update button states.
+			UpdateButtonStates();
 		}
 	}
 }

@@ -86,5 +86,8 @@ namespace BOB
 
 		[XmlAttribute("replacement")]
 		public string replacement = string.Empty;
+
+		[XmlAttribute("angle")]
+		public float angle = 0f;
 	}
 }

@@ -10,7 +10,7 @@ namespace BOB
     /// </summary>
     public class BOBMod : IUserMod
     {
-        public static string ModName => "BOB - a tree and prop replacer";
+        public static string ModName => "BOB - the tree and prop replacer";
         public static string Version => "0.2";
 
         public string Name => ModName + " " + Version;

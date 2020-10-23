@@ -27,7 +27,8 @@ namespace BOB
 		/// </summary>
 		/// <param name="netPrefab">Network prefab to apply to</param>
 		/// <param name="replacement">Replacement to apply</param>
-		internal static void ApplyReplacement(NetInfo netPrefab, NetReplacement replacement)
+		/// <param name="oldAngle">Currently appplied replacement angle (if any)</param>
+		internal static void ApplyReplacement(NetInfo netPrefab, NetReplacement replacement, float oldAngle = 0f)
 		{
 			// Just in case.
 			if (replacement.targetInfo == null || replacement.targetName == null || replacement.replaceName == null || replacement.replacementInfo == null)
@@ -38,6 +39,9 @@ namespace BOB
 
 			// Set new prop.
 			netPrefab.m_lanes[replacement.lane].m_laneProps.m_props[replacement.targetIndex].m_finalProp = (PropInfo)replacement.replacementInfo;
+
+			// Apply new angle, subtracting currently applied angle (if any).
+			netPrefab.m_lanes[replacement.lane].m_laneProps.m_props[replacement.targetIndex].m_angle += replacement.angle - oldAngle;
 
 			// Remove any currently applied all-building building replacement entry for this tree or prop.
 			AllNetworkReplacement.RemoveEntry(netPrefab, replacement.lane, replacement.targetIndex);
@@ -53,6 +57,9 @@ namespace BOB
 		/// <param name="lane">(Optional) target lane override</param>
 		internal static void AddReplacement(NetInfo netPrefab, NetReplacement replacement, int index = -1, int lane = -1)
 		{
+			// Originally applied angle.
+			float oldAngle = 0f;
+
 			// Clone the provided replacement record for adding to the master dictionary (so the original can be modified by the calling method without clobbering the dictionary entry, and so we can tweak the clone here prior to adding without affecting the original).
 			NetReplacement clone = ReplacementUtils.Clone(replacement);
 
@@ -87,7 +94,8 @@ namespace BOB
 			// Check to see if we already have an entry for this replacement in the master dictionary.
 			if (netDict[netPrefab][clone.lane].ContainsKey(clone.targetIndex))
 			{
-				// An entry already exists - update it.
+				// An entry already exists - update it, but record the angle first.
+				oldAngle = netDict[netPrefab][clone.lane][clone.targetIndex].angle;
 				netDict[netPrefab][clone.lane][clone.targetIndex] = clone;
 			}
 			else
@@ -97,7 +105,7 @@ namespace BOB
 			}
 
 			// Apply the actual tree/prop prefab replacement.
-			ApplyReplacement(netPrefab, clone);
+			ApplyReplacement(netPrefab, clone, oldAngle);
 		}
 
 
@@ -117,19 +125,13 @@ namespace BOB
 			// Only revert if there is an active replacement (GetOriginal returns null if there's no active replacement).
 			if (prefabInfo != null)
 			{
-				// Tree or prop?
-				if (prefabInfo is TreeInfo)
-				{
-					// Tree - restore original.
-					netPrefab.m_lanes[lane].m_laneProps.m_props[index].m_finalTree = prefabInfo as TreeInfo;
-				}
-				else
-				{
-					// Prop - restore original.
-					netPrefab.m_lanes[lane].m_laneProps.m_props[index].m_finalProp = prefabInfo as PropInfo;
-				}
+				// Prop - restore original.
+				netPrefab.m_lanes[lane].m_laneProps.m_props[index].m_finalProp = prefabInfo as PropInfo;
 
-				// Apply any all-building replacement.
+				// Restore original angle.
+				netPrefab.m_lanes[lane].m_laneProps.m_props[index].m_angle -= netDict[netPrefab][lane][index].angle;
+
+				// Apply any all-network replacement.
 				AllNetworkReplacement.Restore(netPrefab, lane, index);
 
 				// Remove dictionary entries if that setting is enabled.
@@ -169,7 +171,7 @@ namespace BOB
 		/// <returns>PrefabInfo of the original prefab, or null if there's no currently active replacement</returns>
 		internal static PrefabInfo GetOriginal(NetInfo netPrefab, int lane, int index)
 		{
-			// Try to find an entry for this index of this building in the master dictionary.
+			// Try to find an entry for this index of this network in the master dictionary.
 			if (netDict.ContainsKey(netPrefab) && netDict[netPrefab].ContainsKey(lane) && netDict[netPrefab][lane].ContainsKey(index))
 			{
 				// Entry found - return the stored original prefab.

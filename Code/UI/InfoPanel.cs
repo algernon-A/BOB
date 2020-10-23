@@ -34,13 +34,10 @@ namespace BOB
 
 		// Panel components.
 		protected UIFastList targetList;
-		private UIFastList loadedList;
+		protected UIFastList loadedList;
 		protected UIButton replaceButton;
 		protected UIButton replaceAllButton;
 		protected UIButton revertButton;
-		protected UICheckBox treeCheck;
-		protected UICheckBox propCheck;
-		protected UICheckBox groupCheck;
 		private UICheckBox hideVanilla;
 		private UITextField nameFilter;
 		protected UILabel noPropsLabel;
@@ -48,6 +45,10 @@ namespace BOB
 		// Button labels.
 		protected abstract string ReplaceLabel { get; }
 		protected abstract string ReplaceAllLabel { get; }
+
+
+		// Trees or props?
+		protected abstract bool IsTree { get; }
 
 
 		/// <summary>
@@ -125,11 +126,6 @@ namespace BOB
 					InfoPanelManager.Close();
 				};
 
-				// Add checkboxes.
-				propCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_PRP"), Margin, TitleHeight);
-				treeCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_TRE"), Margin, TitleHeight + Margin + propCheck.height);
-				groupCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_GRP"), 155f, TitleHeight);
-
 				// Target prop list.
 				UIPanel leftPanel = AddUIComponent<UIPanel>();
 				leftPanel.width = LeftWidth;
@@ -160,7 +156,7 @@ namespace BOB
 				hideVanilla.eventCheckChanged += (control, isChecked) =>
 				{
 					// Filter list.
-					loadedList.rowsData = LoadedList(treeCheck.isChecked);
+					loadedList.rowsData = LoadedList(IsTree);
 
 					// Store state.
 					ModSettings.hideVanilla = isChecked;
@@ -180,140 +176,24 @@ namespace BOB
 				// Revert button.
 				revertButton = UIUtils.CreateButton(this, Translations.Translate("BOB_PNL_REV"), 190f, LeftWidth + (Margin * 2), RevertY);
 
-				// Event handler for prop checkbox.
-				propCheck.eventCheckChanged += (control, isChecked) =>
-				{
-					if (isChecked)
-					{
-						// Props are now selected - unset tree check.
-						treeCheck.isChecked = false;
-
-						// Reset current items.
-						currentTargetItem = null;
-						replacementPrefab = null;
-
-						// Set loaded lists to 'props'.
-						loadedList.rowsData = LoadedList(isTree: false);
-						targetList.rowsData = TargetList(isTree: false);
-
-						// Set 'no props' label text.
-						noPropsLabel.text = Translations.Translate("BOB_PNL_NOP");
-					}
-					else
-					{
-						// Props are now unselected - set tree check if it isn't already (letting tree check event handler do the work required).
-						if (!treeCheck.isChecked)
-						{
-							treeCheck.isChecked = true;
-						}
-					}
-
-					// Save state.
-					ModSettings.treeSelected = !isChecked;
-				};
-
-				// Event handler for tree checkbox.
-				treeCheck.eventCheckChanged += (control, isChecked) =>
-				{
-					if (isChecked)
-					{
-						// Trees are now selected - unset prop check.
-						propCheck.isChecked = false;
-
-						// Reset current items.
-						currentTargetItem = null;
-						replacementPrefab = null;
-
-						// Set loaded lists to 'trees'.
-						loadedList.rowsData = LoadedList(isTree: true);
-						targetList.rowsData = TargetList(isTree: true);
-
-						// Set 'no props' label text.
-						noPropsLabel.text = Translations.Translate("BOB_PNL_NOT");
-					}
-					else
-					{
-						// Trees are now unselected - set prop check if it isn't already (letting prop check event handler do the work required).
-						if (!propCheck.isChecked)
-						{
-							propCheck.isChecked = true;
-						}
-					}
-
-					// Save state.
-					ModSettings.treeSelected = isChecked;
-				};
-
-				// Event handler for group checkbox.
-				groupCheck.eventCheckChanged += (control, isChecked) =>
-				{
-					// Rebuild target list.
-					targetList.rowsData = TargetList(treeCheck.isChecked);
-
-					// Store current group state as most recent state.
-					ModSettings.lastGroup = isChecked;
-				};
-
 				// Event handlers for name filter textbox.
 				nameFilter.eventTextChanged += (control, text) =>
 				{
-					loadedList.rowsData = LoadedList(treeCheck.isChecked);
+					loadedList.rowsData = LoadedList(IsTree);
 				};
 				nameFilter.eventTextSubmitted += (control, text) =>
 				{
-					loadedList.rowsData = LoadedList(treeCheck.isChecked);
+					loadedList.rowsData = LoadedList(IsTree);
 				};
 
-				// Set grouped checkbox initial state according to preferences.
-				switch (ModSettings.groupDefault)
-				{
-					case 0:
-						// Most recent state.
-						groupCheck.isChecked = ModSettings.lastGroup;
-						break;
-					case 1:
-						// Grouping off by default.
-						groupCheck.isChecked = false;
-						break;
-					case 2:
-						// Grouping on by default.
-						groupCheck.isChecked = true;
-						break;
-				}
-
-				// Set remaining check states from previous (OR default) settings.
-				propCheck.isChecked = !ModSettings.treeSelected;
-				treeCheck.isChecked = ModSettings.treeSelected;
+				// Set initial button and checkbox states.
 				hideVanilla.isChecked = ModSettings.hideVanilla;
-
-				// Set initial button states.
 				UpdateButtonStates();
 			}
 			catch (Exception exception)
 			{
 				Debugging.LogException(exception);
 			}
-		}
-
-
-		/// <summary>
-		/// Refreshes the target prop list according to current settings.
-		/// </summary>
-		protected void TargetListRefresh()
-		{
-			// Save current list position.
-			float listPosition = targetList.listPosition;
-			targetList.Refresh();
-
-			// Rebuild list.
-			targetList.rowsData = TargetList(treeCheck.isChecked);
-
-			// Restore list position and (re)select the current target item in the list.
-			targetList.listPosition = listPosition;
-			targetList.FindItem(currentTargetItem);
-
-			// Update button states.
-			UpdateButtonStates();
 		}
 
 
@@ -374,7 +254,7 @@ namespace BOB
 		/// </summary>
 		/// <param name="isTree">True for a list of trees, false for props</param>
 		/// <returns>Populated fastlist of loaded prefabs</returns>
-		private FastList<object> LoadedList(bool isTree)
+		protected FastList<object> LoadedList(bool isTree)
 		{
 			// List of prefabs that have passed filtering.
 			List<PrefabInfo> list = new List<PrefabInfo>();
