@@ -337,8 +337,8 @@ namespace BOB
                     // Set current panel selection.
                     InfoPanelManager.Panel.CurrentTargetItem = propListItem;
 
-                    // If the selected index is above the topmost visible row item, move the list up to show it.
-                    if (selectedIndex < listPosition)
+                    // If the selected index is outside the current visibility range, move the to show it.
+                    if (selectedIndex < listPosition || selectedIndex > listPosition + m_rows.m_size)
                     {
                         listPosition = selectedIndex;
                     }
@@ -352,6 +352,45 @@ namespace BOB
             selectedIndex = -1;
             listPosition = 0f;
         }
+
+
+        /// <summary>
+        /// Sets the selection to the given prefab item.
+        /// If no item is found, clears the selection and resets the list.
+        /// </summary>
+        /// <param name="item">The item to find</param>
+        public void FindItem(PrefabInfo prefab)
+        {
+            // Iterate through the rows list.
+            for (int i = 0; i < m_rowsData.m_size; ++i)
+            {
+                PrefabInfo listItem = m_rowsData.m_buffer[i] as PrefabInfo;
+
+                // Look for an index match; individual or grouped (contained within propListItem.indexes list).
+                if (listItem != null && listItem == prefab)
+                {
+                    // Found a match; set the selected index to this one.
+                    selectedIndex = i;
+
+                    // Set current panel selection.
+                    InfoPanelManager.Panel.ReplacementPrefab = prefab;
+
+                    // If the selected index is outside the current visibility range, move the to show it.
+                    if (selectedIndex < listPosition || selectedIndex > listPosition + m_rows.m_size)
+                    {
+                        listPosition = selectedIndex;
+                    }
+
+                    // Done here; return.
+                    return;
+                }
+            }
+
+            // If we got here, we didn't find a match; clear the selection and reset the list position.
+            selectedIndex = -1;
+            listPosition = 0f;
+        }
+
 
         /// <summary>
         /// Clear the list

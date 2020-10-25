@@ -59,6 +59,10 @@ namespace BOB
 			set
 			{
 				currentTargetItem = value;
+
+				// Select current replacement prefab.
+				loadedList.FindItem(currentTargetItem.allPrefab ?? currentTargetItem.currentPrefab ?? currentTargetItem.originalPrefab);
+
 				UpdateButtonStates();
 			}
 		}
@@ -112,7 +116,7 @@ namespace BOB
 
 				// Title label.
 				UILabel titleLabel = AddUIComponent<UILabel>();
-				titleLabel.relativePosition  = new Vector2(50f, 13f);
+				titleLabel.relativePosition = new Vector2(50f, 13f);
 				titleLabel.text = Translations.Translate("BOB_NAM");
 
 				// Close button.
