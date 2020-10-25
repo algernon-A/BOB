@@ -46,7 +46,7 @@ namespace BOB
                         _processed = true;
 
                         // Check to see if the select tool is currently active.
-                        if (ToolsModifierControl.toolController?.CurrentTool is SelectTool)
+                        if (ToolsModifierControl.toolController?.CurrentTool is BOBTool)
                         {
                             // Select tool is currently active - deactivate it by activating the default tool instead.
                             ToolsModifierControl.SetTool<DefaultTool>();
@@ -54,7 +54,7 @@ namespace BOB
                         else
                         {
                             // Select tool is not currently active - select it.
-                            ToolsModifierControl.toolController.CurrentTool = SelectTool.Instance;
+                            ToolsModifierControl.toolController.CurrentTool = BOBTool.Instance;
                         }
                     }
                 }
@@ -71,5 +71,4 @@ namespace BOB
             }
         }
     }
-
 }

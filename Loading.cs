@@ -35,7 +35,7 @@ namespace BOB
             ConfigurationUtils.LoadConfig();
 
             // Initialise select tool.
-            ToolsModifierControl.toolController.gameObject.AddComponent<SelectTool>();
+            ToolsModifierControl.toolController.gameObject.AddComponent<BOBTool>();
             Debugging.Message("loading complete");
         }
     }

@@ -8,7 +8,7 @@ namespace BOB
 	/// <summary>
 	/// The BOB selection tool.
 	/// </summary>
-	public class SelectTool : DefaultTool
+	public class BOBTool : DefaultTool
 	{
 		// Cursor textures.
 		private CursorInfo lightCursor;
@@ -25,7 +25,7 @@ namespace BOB
 		/// <summary>
 		/// Instance reference.
 		/// </summary>
-		public static SelectTool Instance => ToolsModifierControl.toolController?.gameObject?.GetComponent<SelectTool>();
+		public static BOBTool Instance => ToolsModifierControl.toolController?.gameObject?.GetComponent<BOBTool>();
 
 		
 		/// <summary>
