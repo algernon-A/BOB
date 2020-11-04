@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 
 namespace BOB
@@ -44,5 +45,8 @@ namespace BOB
 
 		// Lane list.
 		public List<int> lanes = new List<int>();
-    }
+
+		// Position offset.
+		public Vector3 offset;
+	}
 }

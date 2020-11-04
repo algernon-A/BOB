@@ -11,7 +11,7 @@ namespace BOB
 		NetInfo currentNet;
 
 		// Panel components.
-		internal UITextField angleField;
+		internal UITextField angleField, xField, yField, zField;
 
 
 		// Button labels.
@@ -45,6 +45,27 @@ namespace BOB
 			angleField = UIUtils.AddTextField(this, 190f, 30f);
 			angleField.relativePosition = new Vector2(LeftWidth + (Margin * 2), ProbabilityY + angleLabel.height);
 
+			// Offset X position.
+			UILabel xLabel = AddUIComponent<UILabel>();
+			xLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 367f);
+			xLabel.text = Translations.Translate("BOB_PNL_XOF");
+			xField = UIUtils.AddTextField(this, 100f, 30f);
+			xField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 360f);
+
+			// Offset Y position.
+			UILabel yLabel = AddUIComponent<UILabel>();
+			yLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 407f);
+			yLabel.text = Translations.Translate("BOB_PNL_YOF");
+			yField = UIUtils.AddTextField(this, 100f, 30f);
+			yField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 400f);
+
+			// Offset Z position.
+			UILabel zLabel = AddUIComponent<UILabel>();
+			zLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 447f);
+			zLabel.text = Translations.Translate("BOB_PNL_ZOF");
+			zField = UIUtils.AddTextField(this, 100f, 30f);
+			zField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 440f);
+
 			// Replace button event handler.
 			replaceButton.eventClicked += (control, clickEvent) =>
 			{
@@ -67,6 +88,11 @@ namespace BOB
 						targetInfo = currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab
 					};
 					replacement.targetName = replacement.targetInfo.name;
+
+					// Try to parse offset textfields.
+					float.TryParse(xField.text, out replacement.offsetX);
+					float.TryParse(yField.text, out replacement.offsetY);
+					float.TryParse(zField.text, out replacement.offsetZ);
 
 					// Network replacements are always grouped - iterate through each index in the list.
 					for (int i = 0; i < currentTargetItem.indexes.Count; ++i)

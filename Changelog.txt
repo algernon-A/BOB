@@ -1,4 +1,9 @@
-﻿Version 0.2.1 -
+﻿- Add position offset for network props (individual networks only)
+- Automatically update selected replacement item when target selection changes
+- Rename SelectTool to BOBTool (preparing for UnifiedUI support)
+
+
+Version 0.2.1 -
 
 - Add rotation adjustment for network props
 

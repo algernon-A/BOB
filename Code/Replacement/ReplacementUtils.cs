@@ -1,4 +1,7 @@
-﻿namespace BOB
+﻿using UnityEngine;
+
+
+namespace BOB
 {
 	/// <summary>
 	/// Static class for replacment record management utilities.
@@ -49,6 +52,9 @@
 			clone.replacementInfo = replacement.replacementInfo;
 			clone.targetInfo = replacement.targetInfo;
 			clone.lane = replacement.lane;
+			clone.offsetX = replacement.offsetX;
+			clone.offsetY = replacement.offsetY;
+			clone.offsetZ = replacement.offsetZ;
 
 			return clone;
 		}

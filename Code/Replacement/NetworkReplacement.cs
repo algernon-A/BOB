@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 
 namespace BOB
@@ -27,8 +28,11 @@ namespace BOB
 		/// </summary>
 		/// <param name="netPrefab">Network prefab to apply to</param>
 		/// <param name="replacement">Replacement to apply</param>
-		/// <param name="oldAngle">Currently appplied replacement angle (if any)</param>
-		internal static void ApplyReplacement(NetInfo netPrefab, NetReplacement replacement, float oldAngle = 0f)
+		/// <param name="oldAngle">Currently applied replacement angle (if any)</param>
+		/// <param name="oldX">Currently applied position X offset (if any)</param>
+		/// <param name="oldY">Currently applied position X offset (if any)</param>
+		/// <param name="oldZ">Currently applied position X offset (if any)</param>
+		internal static void ApplyReplacement(NetInfo netPrefab, NetReplacement replacement, float oldAngle = 0f, float oldX = 0f, float oldY = 0f, float oldZ = 0f)
 		{
 			// Just in case.
 			if (replacement.targetInfo == null || replacement.targetName == null || replacement.replaceName == null || replacement.replacementInfo == null)
@@ -42,6 +46,10 @@ namespace BOB
 
 			// Apply new angle, subtracting currently applied angle (if any).
 			netPrefab.m_lanes[replacement.lane].m_laneProps.m_props[replacement.targetIndex].m_angle += replacement.angle - oldAngle;
+
+			// Apply new offset, subtracting currently applied offset.
+			Vector3 newOffset = new Vector3 { x = replacement.offsetX - oldX, y = replacement.offsetY - oldY, z = replacement.offsetZ - oldZ };
+			netPrefab.m_lanes[replacement.lane].m_laneProps.m_props[replacement.targetIndex].m_position += newOffset;
 
 			// Remove any currently applied all-building building replacement entry for this tree or prop.
 			AllNetworkReplacement.RemoveEntry(netPrefab, replacement.lane, replacement.targetIndex);
@@ -57,8 +65,8 @@ namespace BOB
 		/// <param name="lane">(Optional) target lane override</param>
 		internal static void AddReplacement(NetInfo netPrefab, NetReplacement replacement, int index = -1, int lane = -1)
 		{
-			// Originally applied angle.
-			float oldAngle = 0f;
+			// Originally applied angle and offsets.
+			float oldAngle = 0f, oldX = 0f, oldY = 0f, oldZ = 0f;
 
 			// Clone the provided replacement record for adding to the master dictionary (so the original can be modified by the calling method without clobbering the dictionary entry, and so we can tweak the clone here prior to adding without affecting the original).
 			NetReplacement clone = ReplacementUtils.Clone(replacement);
@@ -94,8 +102,11 @@ namespace BOB
 			// Check to see if we already have an entry for this replacement in the master dictionary.
 			if (netDict[netPrefab][clone.lane].ContainsKey(clone.targetIndex))
 			{
-				// An entry already exists - update it, but record the angle first.
+				// An entry already exists - update it, but record the angle and offset first.
 				oldAngle = netDict[netPrefab][clone.lane][clone.targetIndex].angle;
+				oldX = netDict[netPrefab][clone.lane][clone.targetIndex].offsetX;
+				oldY = netDict[netPrefab][clone.lane][clone.targetIndex].offsetY;
+				oldZ = netDict[netPrefab][clone.lane][clone.targetIndex].offsetZ;
 				netDict[netPrefab][clone.lane][clone.targetIndex] = clone;
 			}
 			else
@@ -105,7 +116,7 @@ namespace BOB
 			}
 
 			// Apply the actual tree/prop prefab replacement.
-			ApplyReplacement(netPrefab, clone, oldAngle);
+			ApplyReplacement(netPrefab, clone, oldAngle, oldX, oldY, oldZ);
 		}
 
 
@@ -125,11 +136,18 @@ namespace BOB
 			// Only revert if there is an active replacement (GetOriginal returns null if there's no active replacement).
 			if (prefabInfo != null)
 			{
+				// Local reference.
+				NetReplacement netReplacement = netDict[netPrefab][lane][index];
+
 				// Prop - restore original.
 				netPrefab.m_lanes[lane].m_laneProps.m_props[index].m_finalProp = prefabInfo as PropInfo;
 
 				// Restore original angle.
-				netPrefab.m_lanes[lane].m_laneProps.m_props[index].m_angle -= netDict[netPrefab][lane][index].angle;
+				netPrefab.m_lanes[lane].m_laneProps.m_props[index].m_angle -= netReplacement.angle;
+
+				// Undo offset.
+				Vector3 oldOffset = new Vector3 { x = netReplacement.offsetX, y = netReplacement.offsetY, z = netReplacement.offsetZ };
+				netPrefab.m_lanes[lane].m_laneProps.m_props[index].m_position -= oldOffset;
 
 				// Apply any all-network replacement.
 				AllNetworkReplacement.Restore(netPrefab, lane, index);

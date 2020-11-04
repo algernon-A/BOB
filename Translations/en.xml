@@ -4,7 +4,7 @@
     <Translation ID="BOB_NAM" String="BOB: the tree and prop replacer" />
     <Translation ID="BOB_DESC" String="UNDER DEVELOPMENT: Replaces trees and props." />
     <Translation ID="TRN_CHOICE" String="Set language" />
-    <Translation ID="TRN_SYS" String="Use system language" />
+    <Translation ID="TRN_SYS" String="Use game language" />
     <Translation ID="BOB_ROW_NOW" String="now" />
     <Translation ID="BOB_PNL_NOP" String="No props found" />
     <Translation ID="BOB_PNL_NOT" String="No trees found" />
@@ -20,6 +20,9 @@
     <Translation ID="BOB_PNL_REV" String="Revert" />
     <Translation ID="BOB_PNL_PRB" String="Probability" />
     <Translation ID="BOB_PNL_ANG" String="Angle" />
+    <Translation ID="BOB_PNL_XOF" String="X offset" />
+    <Translation ID="BOB_PNL_YOF" String="Y offset" />
+    <Translation ID="BOB_PNL_ZOF" String="Z offset" />
     <Translation ID="BOB_OPT_KEY" String="Hotkey" />
     <Translation ID="BOB_OPT_PRS" String="Press any key" />
     <Translation ID="BOB_NUKE" String="Reset configuration" />
