@@ -9,7 +9,7 @@ namespace BOB
 	internal static class AllNetworkReplacement
 	{
 		// Master dictionaries of currently active all-network replacements.
-		internal static Dictionary<PrefabInfo, KeyValuePair<PrefabInfo, float>> propReplacements;
+		internal static Dictionary<PrefabInfo, BOBAllNetworkElement> propReplacements;
 
 		// Master dictionary of active all-network replacements currently applied to network prefabs.
 		internal static Dictionary<NetInfo, SortedList<int, SortedList<int, NetReplacement>>> allNetworkDict;
@@ -22,7 +22,7 @@ namespace BOB
 		internal static void Setup()
 		{
 			allNetworkDict = new Dictionary<NetInfo, SortedList<int, SortedList<int, NetReplacement>>>();
-			propReplacements = new Dictionary<PrefabInfo, KeyValuePair<PrefabInfo, float>>();
+			propReplacements = new Dictionary<PrefabInfo, BOBAllNetworkElement>();
 		}
 
 		
@@ -35,7 +35,7 @@ namespace BOB
 			foreach (PrefabInfo prop in propReplacements.Keys)
 			{
 				// Revert this replacement (but don't remove the entry, as the dictionary is currently immutable while we're iterating through it).
-				Revert(prop, propReplacements[prop].Key, removeEntries: false);
+				Revert(prop, propReplacements[prop].targetInfo, removeEntries: false);
 			}
 
 			// Re-initialise the dictionaries.
@@ -142,9 +142,6 @@ namespace BOB
 			// Set our initial targeted prefab to the provided target. 
 			PrefabInfo targetedPrefab = target;
 
-			// Set initial new prop angle to that provided.
-			float angleAdjust = angle;
-
 			// Make sure that target and replacement are the same type before doing anything.
 			if ((target == null || replacement == null) || (target is TreeInfo && !(replacement is TreeInfo)) || (target is PropInfo) && !(replacement is PropInfo))
 			{
@@ -155,18 +152,16 @@ namespace BOB
 			if (propReplacements.ContainsKey(target))
 			{
 				// We currently have a replacement - change the targeted prefab to replace to match the currently active replacement.
-				targetedPrefab = propReplacements[target].Key;
-
-				// Adjsut the angle to be applied to take into account the currently applied angle.
-				angleAdjust -= propReplacements[target].Value;
+				targetedPrefab = propReplacements[target].targetInfo;
 
 				// Update dictionary with this replacement.
-				propReplacements[target] = new KeyValuePair<PrefabInfo, float>(replacement, angle);
+				propReplacements[target].replacementInfo = target;
+				propReplacements[target].angle = angle;
 			}
 			else
 			{
 				// No current replacement - add this one to the dictionary (retaining the default targeted prefab).
-				propReplacements.Add(target, new KeyValuePair<PrefabInfo, float>(replacement, angle));
+				propReplacements.Add(target, new BOBAllNetworkElement { replacementInfo = replacement, angle = angle });
 			}
 
 			// Iterate through each loaded network to apply replacements.
@@ -259,18 +254,18 @@ namespace BOB
 				{
 					// Found an active replacement - apply it.
 					original = prop.m_finalProp;
-					replacement = propReplacements[original].Key;
+					replacement = propReplacements[original].targetInfo;
 					prop.m_finalProp = (PropInfo)replacement;
 
 					// Adjust angle.
-					prop.m_angle += propReplacements[original].Value;
+					prop.m_angle += propReplacements[original].angle;
 				}
 			}
 
 			// If we made a replacement (original has been set to a non-null value), add it to our dictionary of replacements applied to networks.
 			if (original != null)
 			{
-				AddEntry(netPrefab, original, replacement, laneIndex, propIndex, propReplacements[original].Value);
+				AddEntry(netPrefab, original, replacement, laneIndex, propIndex, propReplacements[original].angle);
 			}
 		}
 

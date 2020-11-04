@@ -89,5 +89,11 @@ namespace BOB
 
 		[XmlAttribute("angle")]
 		public float angle = 0f;
+
+		[XmlIgnore]
+		public PrefabInfo replacementInfo;
+
+		[XmlIgnore]
+		public PrefabInfo targetInfo;
 	}
 }
