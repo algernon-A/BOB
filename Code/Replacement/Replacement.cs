@@ -42,9 +42,6 @@ namespace BOB
 		[XmlAttribute("Lane")]
 		public int lane = -1;
 
-		[XmlAttribute("Final")]
-		public bool final = false;
-
 		[XmlAttribute("OffsetX")]
 		public float offsetX = 0f;
 

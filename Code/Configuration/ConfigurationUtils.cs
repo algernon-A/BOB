@@ -251,7 +251,7 @@ namespace BOB
 		/// </summary>
 		/// <param name="dictionary">Dictionary to serialise</param>
 		/// <returns>Serialised list of all-building elements</returns>
-		private static List<BOBAllNetworkElement> SerializeAllNetwork(Dictionary<PrefabInfo, KeyValuePair<PrefabInfo, float>> dictionary)
+		private static List<BOBAllNetworkElement> SerializeAllNetwork(Dictionary<PrefabInfo, BOBAllNetworkElement> dictionary)
 		{
 			// Return list.
 			List<BOBAllNetworkElement> elementList = new List<BOBAllNetworkElement>();
@@ -262,16 +262,12 @@ namespace BOB
 				// Iterate through each entry in the provided dictionary.
 				foreach (PrefabInfo prefab in dictionary.Keys)
 				{
-					// Create a new all-building replacement element with matching values from the dictionary.
-					BOBAllNetworkElement allNetElement = new BOBAllNetworkElement()
-					{
-						target = prefab.name,
-						replacement = dictionary[prefab].Key.name,
-						angle = dictionary[prefab].Value
-					};
+					// Set names for serialization.
+					dictionary[prefab].target = prefab.name;
+					dictionary[prefab].replacement = dictionary[prefab].replacementInfo.name;
 
 					// Add new element to the return list.
-					elementList.Add(allNetElement);
+					elementList.Add(dictionary[prefab]);
 				}
 			}
 			return elementList;

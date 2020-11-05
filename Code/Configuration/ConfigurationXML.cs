@@ -90,6 +90,15 @@ namespace BOB
 		[XmlAttribute("angle")]
 		public float angle = 0f;
 
+		[XmlAttribute("OffsetX")]
+		public float offsetX = 0f;
+
+		[XmlAttribute("OffsetY")]
+		public float offsetY = 0f;
+
+		[XmlAttribute("OffsetZ")]
+		public float offsetZ = 0f;
+
 		[XmlIgnore]
 		public PrefabInfo replacementInfo;
 
