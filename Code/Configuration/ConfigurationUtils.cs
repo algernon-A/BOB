@@ -331,8 +331,8 @@ namespace BOB
 					continue;
 				}
 
-				// If we got here, it's all good; apply the all-building replacement.
-				AllNetworkReplacement.Apply(targetPrefab, replacementPrefab, allNetElement.angle);
+				// If we got here, it's all good; apply the all-network replacement.
+				AllNetworkReplacement.Apply(targetPrefab, replacementPrefab, allNetElement.angle, allNetElement.offsetX, allNetElement.offsetY, allNetElement.offsetZ);
 			}
 		}
 	}

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 
 namespace BOB
@@ -55,7 +56,11 @@ namespace BOB
 			// List of reverted entries.
 			List<KeyValuePair<NetInfo, KeyValuePair<int, int>>> list = new List<KeyValuePair<NetInfo, KeyValuePair<int, int>>>();
 
-			// Iterate through all buildings in the applied all-network replacements dictionary.
+			// Get original offset for this replacement.
+			BOBAllNetworkElement replacementEntry = propReplacements[target];
+			Vector3 offset = new Vector3 { x = replacementEntry.offsetX, y = replacementEntry.offsetY, z = replacementEntry.offsetZ };
+
+ 			// Iterate through all buildings in the applied all-network replacements dictionary.
 			foreach (NetInfo network in allNetworkDict.Keys)
 			{
 				// Iterate through each lane in this network.
@@ -68,9 +73,10 @@ namespace BOB
 						NetReplacement currentReplacement = allNetworkDict[network][laneIndex][propIndex];
 						if (currentReplacement.targetInfo == target && currentReplacement.replacementInfo == replacement)
 						{
-							// Match - revert to original (including reverting angle).
+							// Match - revert to original (including reverting angle and position).
 							network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_finalProp = (PropInfo)target;
 							network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_angle -= currentReplacement.angle;
+							network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position -= offset;
 
 							// Add this to our list of reverted entries.
 							list.Add(new KeyValuePair<NetInfo, KeyValuePair<int, int>>(network, new KeyValuePair<int, int>(laneIndex, propIndex)));
@@ -137,13 +143,19 @@ namespace BOB
 		/// <param name="target">Targeted (original) prop prefab</param>
 		/// <param name="replacement">Replacment prop prefab</param>
 		/// <param name="angle">Replacment prop angle adjustment</param>
-		internal static void Apply(PrefabInfo target, PrefabInfo replacement, float angle)
+		/// <param name="offsetX">Replacment X position offset</param>
+		/// <param name="offsetY">Replacment Y position offset</param>
+		/// <param name="offsetZ">Replacment Z position offset</param>
+		internal static void Apply(PrefabInfo target, PrefabInfo replacement, float angle, float offsetX, float offsetY, float offsetZ)
 		{
+			// Initialize old offsets.
+			float oldX = 0f, oldY = 0f, oldZ = 0f;
+
 			// Set our initial targeted prefab to the provided target. 
 			PrefabInfo targetedPrefab = target;
 
 			// Make sure that target and replacement are the same type before doing anything.
-			if ((target == null || replacement == null) || (target is TreeInfo && !(replacement is TreeInfo)) || (target is PropInfo) && !(replacement is PropInfo))
+			if (target == null || replacement == null || (target is TreeInfo && !(replacement is TreeInfo)) || (target is PropInfo) && !(replacement is PropInfo))
 			{
 				return;
 			}
@@ -154,14 +166,22 @@ namespace BOB
 				// We currently have a replacement - change the targeted prefab to replace to match the currently active replacement.
 				targetedPrefab = propReplacements[target].targetInfo;
 
+				// Get previous offset.
+				oldX = propReplacements[target].offsetX;
+				oldY = propReplacements[target].offsetY;
+				oldZ = propReplacements[target].offsetZ;
+
 				// Update dictionary with this replacement.
 				propReplacements[target].replacementInfo = target;
 				propReplacements[target].angle = angle;
+				propReplacements[target].offsetX = offsetX;
+				propReplacements[target].offsetY = offsetY;
+				propReplacements[target].offsetZ = offsetZ;
 			}
 			else
 			{
 				// No current replacement - add this one to the dictionary (retaining the default targeted prefab).
-				propReplacements.Add(target, new BOBAllNetworkElement { replacementInfo = replacement, angle = angle });
+				propReplacements.Add(target, new BOBAllNetworkElement { replacementInfo = replacement, angle = angle, offsetX = offsetX, offsetY = offsetY, offsetZ = offsetZ });
 			}
 
 			// Iterate through each loaded network to apply replacements.
@@ -199,11 +219,13 @@ namespace BOB
 						if (loaded.m_lanes[lane].m_laneProps.m_props[propIndex].m_finalProp != null && loaded.m_lanes[lane].m_laneProps.m_props[propIndex].m_finalProp == targetedPrefab)
 						{
 							// Match!  Add to dictionary of currently active replacements.
-							AddEntry(loaded, target, replacement, lane, propIndex, angle);
+							AddEntry(loaded, target, replacement, lane, propIndex, angle, offsetX, offsetY, offsetZ);
 
-							// Apply replacement (including angle).
+							// Apply replacement (including angle and offset).
+							Vector3 newOffset = new Vector3 { x = offsetX - oldX, y = offsetY - oldY, z = offsetZ - oldZ };
 							loaded.m_lanes[lane].m_laneProps.m_props[propIndex].m_finalProp = (PropInfo)replacement;
 							loaded.m_lanes[lane].m_laneProps.m_props[propIndex].m_angle += angle;
+							loaded.m_lanes[lane].m_laneProps.m_props[propIndex].m_position += newOffset;
 						}
 					}
 				}
@@ -259,13 +281,16 @@ namespace BOB
 
 					// Adjust angle.
 					prop.m_angle += propReplacements[original].angle;
+
+					// Adjust position.
+					prop.m_position += new Vector3 { x = propReplacements[original].offsetX, y = propReplacements[original].offsetY, z = propReplacements[original].offsetZ };
 				}
 			}
 
 			// If we made a replacement (original has been set to a non-null value), add it to our dictionary of replacements applied to networks.
 			if (original != null)
 			{
-				AddEntry(netPrefab, original, replacement, laneIndex, propIndex, propReplacements[original].angle);
+				AddEntry(netPrefab, original, replacement, laneIndex, propIndex, propReplacements[original].angle, propReplacements[original].offsetX, propReplacements[original].offsetY, propReplacements[original].offsetZ);
 			}
 		}
 
@@ -279,7 +304,10 @@ namespace BOB
 		/// <param name="laneIndex">Lane index</param>
 		/// <param name="propIndex">Prop index</param>
 		/// <param name="angle">Prop angle adjustment</param>
-		private static void AddEntry(NetInfo netPrefab, PrefabInfo target, PrefabInfo replacement, int laneIndex, int propIndex, float angle)
+		/// <param name="offsetX">Replacment X position offset</param>
+		/// <param name="offsetY">Replacment Y position offset</param>
+		/// <param name="offsetZ">Replacment Z position offset</param>
+		private static void AddEntry(NetInfo netPrefab, PrefabInfo target, PrefabInfo replacement, int laneIndex, int propIndex, float angle, float offsetX, float offsetY, float offsetZ)
 		{
 			// Check to see if we don't already have an entry for this network prefab in the master dictionary.
 			if (!allNetworkDict.ContainsKey(netPrefab))
@@ -300,6 +328,10 @@ namespace BOB
 			{
 				// An entry already exists - just update the replacement info.
 				allNetworkDict[netPrefab][laneIndex][propIndex].replacementInfo = replacement;
+				allNetworkDict[netPrefab][laneIndex][propIndex].angle = angle;
+				allNetworkDict[netPrefab][laneIndex][propIndex].offsetX = offsetX;
+				allNetworkDict[netPrefab][laneIndex][propIndex].offsetY = offsetY;
+				allNetworkDict[netPrefab][laneIndex][propIndex].offsetZ = offsetZ;
 			}
 			else
 			{
@@ -308,7 +340,10 @@ namespace BOB
                 {
                     targetInfo = target,
                     replacementInfo = replacement,
-					angle = angle
+					angle = angle,
+					offsetX = offsetX,
+					offsetY = offsetY,
+					offsetZ = offsetZ
                 };
                 allNetworkDict[netPrefab][laneIndex].Add(propIndex, newReplacement);
 			}

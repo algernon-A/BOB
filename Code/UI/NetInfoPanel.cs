@@ -78,7 +78,6 @@ namespace BOB
 						isTree = false,
 						probability = 100,
 						originalProb = currentTargetItem.originalProb,
-						angle = float.Parse(angleField.text),
 						targetIndex = currentTargetItem.index,
 						replacementInfo = replacementPrefab,
 						replaceName = replacementPrefab.name,
@@ -89,10 +88,17 @@ namespace BOB
 					};
 					replacement.targetName = replacement.targetInfo.name;
 
-					// Try to parse offset textfields.
+					// Try to parse textfields.
+					float.TryParse(angleField.text, out replacement.angle);
 					float.TryParse(xField.text, out replacement.offsetX);
 					float.TryParse(yField.text, out replacement.offsetY);
 					float.TryParse(zField.text, out replacement.offsetZ);
+
+					// Update text fields to match parsed values.
+					angleField.text = replacement.angle.ToString();
+					xField.text = replacement.offsetX.ToString();
+					yField.text = replacement.offsetY.ToString();
+					zField.text = replacement.offsetZ.ToString();
 
 					// Network replacements are always grouped - iterate through each index in the list.
 					for (int i = 0; i < currentTargetItem.indexes.Count; ++i)
@@ -116,8 +122,21 @@ namespace BOB
 			// All network button event handler.
 			replaceAllButton.eventClicked += (control, clickEvent) =>
 			{
+				// Try to parse text fields.
+				float angle, xOffset, yOffset, zOffset;
+				float.TryParse(angleField.text, out angle);
+				float.TryParse(xField.text, out xOffset);
+				float.TryParse(yField.text, out yOffset);
+				float.TryParse(zField.text, out zOffset);
+
+				// Update text fields to match parsed values.
+				angleField.text = angle.ToString();
+				xField.text = xOffset.ToString();
+				yField.text = yOffset.ToString();
+				zField.text = zOffset.ToString();
+
 				// Apply replacement.
-				AllNetworkReplacement.Apply(currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab, replacementPrefab, float.Parse(angleField.text));
+				AllNetworkReplacement.Apply(currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset);
 
 				// Update current target.
 				currentTargetItem.allPrefab = replacementPrefab;
