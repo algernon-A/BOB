@@ -52,7 +52,7 @@ namespace BOB
 			netPrefab.m_lanes[replacement.lane].m_laneProps.m_props[replacement.targetIndex].m_position += newOffset;
 
 			// Remove any currently applied all-building building replacement entry for this tree or prop.
-			AllNetworkReplacement.RemoveEntry(netPrefab, replacement.lane, replacement.targetIndex);
+			AllNetworkReplacement.RemoveEntry(netPrefab, replacement.targetInfo, replacement.lane, replacement.targetIndex);
 		}
 
 
@@ -150,7 +150,7 @@ namespace BOB
 				netPrefab.m_lanes[lane].m_laneProps.m_props[index].m_position -= oldOffset;
 
 				// Apply any all-network replacement.
-				AllNetworkReplacement.Restore(netPrefab, lane, index);
+				AllNetworkReplacement.Restore(netPrefab, prefabInfo, lane, index);
 
 				// Remove dictionary entries if that setting is enabled.
 				if (removeEntries)

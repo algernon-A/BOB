@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
@@ -179,7 +180,7 @@ namespace BOB
 					}
 
 					// Serialise all-network replacements.
-					configFile.allNetworkProps = SerializeAllNetwork(AllNetworkReplacement.propReplacements);
+					configFile.allNetworkProps = AllNetworkReplacement.replacements.Values.ToList();
 
 					// Serialise network replacements, per network.
 					configFile.networks = new List<BOBNetworkElement>();
@@ -240,34 +241,6 @@ namespace BOB
 
 					// Add new element to the return list.
 					elementList.Add(allBuildElement);
-				}
-			}
-			return elementList;
-		}
-
-
-		/// <summary>
-		/// Serialises an all-network dictionary into an all-building element list.
-		/// </summary>
-		/// <param name="dictionary">Dictionary to serialise</param>
-		/// <returns>Serialised list of all-building elements</returns>
-		private static List<BOBAllNetworkElement> SerializeAllNetwork(Dictionary<PrefabInfo, BOBAllNetworkElement> dictionary)
-		{
-			// Return list.
-			List<BOBAllNetworkElement> elementList = new List<BOBAllNetworkElement>();
-
-			// Only serialise if number of entries is greater than zero.
-			if (dictionary.Count > 0)
-			{
-				// Iterate through each entry in the provided dictionary.
-				foreach (PrefabInfo prefab in dictionary.Keys)
-				{
-					// Set names for serialization.
-					dictionary[prefab].target = prefab.name;
-					dictionary[prefab].replacement = dictionary[prefab].replacementInfo.name;
-
-					// Add new element to the return list.
-					elementList.Add(dictionary[prefab]);
 				}
 			}
 			return elementList;

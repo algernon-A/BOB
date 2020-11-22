@@ -25,6 +25,42 @@ namespace BOB
 
 
 		/// <summary>
+		/// Handles changes to the currently selected target prefab.
+		/// </summary>
+		internal override PropListItem CurrentTargetItem
+        {
+            set
+            {
+				// Call base.
+				base.CurrentTargetItem = value;
+
+				// If we've got a replacement, update the offset fields with the replacement vlues
+				if (currentTargetItem.currentPrefab != null)
+				{
+					// TODO: Stuff goes here.
+					xField.text = "";
+					yField.text = "";
+					zField.text = "";
+				}
+				// Ditto for any all-network replacement.
+				else if (currentTargetItem.allPrefab != null)
+                {
+					xField.text = AllNetworkReplacement.replacements[currentTargetItem.originalPrefab].offsetX.ToString();
+					yField.text = AllNetworkReplacement.replacements[currentTargetItem.originalPrefab].offsetY.ToString();
+					zField.text = AllNetworkReplacement.replacements[currentTargetItem.originalPrefab].offsetZ.ToString();
+				}
+				else
+                {
+					// No current replacement; set all offset fields to zero.
+					xField.text = "0";
+					yField.text = "0";
+					zField.text = "0";
+                }
+            }
+        }
+
+
+		/// <summary>
 		/// Performs initial setup 
 		/// </summary>
 		/// <param name="parentTransform">Parent transform</param>
@@ -159,7 +195,7 @@ namespace BOB
 					if (currentTargetItem.originalPrefab)
 					{
 						// Apply all-network reversion.
-						AllNetworkReplacement.Revert(currentTargetItem.originalPrefab, currentTargetItem.allPrefab);
+						AllNetworkReplacement.Revert(currentTargetItem.originalPrefab, true);
 
 						// Clear current target 'all' prefab.
 						currentTargetItem.allPrefab = null;

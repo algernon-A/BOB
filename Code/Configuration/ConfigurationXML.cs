@@ -104,5 +104,8 @@ namespace BOB
 
 		[XmlIgnore]
 		public PrefabInfo targetInfo;
+
+		[XmlIgnore]
+		public List<NetPropReference> references;
 	}
 }
