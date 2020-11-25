@@ -198,8 +198,6 @@ namespace BOB
 								angle = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_angle,
 								postion = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position
 							});
-
-							Debugging.Message("Adding to dictionary " + network.name + " at lane " + laneIndex + " and position " + propIndex);
 						}
 					}
 				}

@@ -87,7 +87,7 @@
     <Compile Include="Code\UI\UIFastList\UIPropRowTypes.cs" />
     <Compile Include="Code\UI\UIThreading.cs" />
     <Compile Include="Code\UI\UIUtils.cs" />
-    <Compile Include="Loading.cs" />
+    <Compile Include="Code\Loading.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />
