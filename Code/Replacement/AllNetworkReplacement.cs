@@ -66,7 +66,14 @@ namespace BOB
 			foreach (NetPropReference propReference in replacements[target].references)
 			{
 				// Revert entry.
-				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = (PropInfo)target;
+				if (target is PropInfo)
+				{
+					propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = (PropInfo)target;
+				}
+				else
+                {
+					propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = (TreeInfo)target;
+				}
 				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle;
 				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.postion;
 			}
@@ -143,6 +150,7 @@ namespace BOB
 
 			// Add/replace dictionary replacement data.
 			replacements[target].references = new List<NetPropReference>();
+			replacements[target].tree = target is TreeInfo;
 			replacements[target].targetInfo = target;
 			replacements[target].target = target.name;
 			replacements[target].angle = angle;
@@ -182,12 +190,14 @@ namespace BOB
 						if (NetworkReplacement.GetOriginal(network, laneIndex, propIndex) != null)
 						{
 							// Active network replacement; skip this one.
-							Debugging.Message("Found active replacement in network " + network.name + " at lane " + laneIndex + " and position " + propIndex + "; skipping");
 							continue;
 						}
 
+						// Get this prop from network.
+						PrefabInfo thisProp = target is PropInfo ? (PrefabInfo)network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_finalProp : (PrefabInfo)network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_finalTree;
+
 						// See if this prop matches our replacement.
-						if (network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_finalProp != null && network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_finalProp == target)
+						if (thisProp != null && thisProp == target)
 						{
 							// Match!  Add reference data to the list.
 							replacements[target].references.Add(new NetPropReference
@@ -317,7 +327,16 @@ namespace BOB
 			};
 
 			// Apply replacement.
-			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = (PropInfo)netElement.replacementInfo;
+			if (netElement.replacementInfo is PropInfo)
+			{
+				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = (PropInfo)netElement.replacementInfo;
+			}
+			else
+			{
+				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = (TreeInfo)netElement.replacementInfo;
+			}
+
+			// Angle and offset.
 			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle + netElement.angle;
 			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.postion + offset;
 		}
