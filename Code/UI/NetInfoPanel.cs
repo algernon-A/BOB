@@ -37,10 +37,9 @@ namespace BOB
 				// If we've got a replacement, update the offset fields with the replacement vlues
 				if (currentTargetItem.currentPrefab != null)
 				{
-					// TODO: Stuff goes here.
-					xField.text = "";
-					yField.text = "";
-					zField.text = "";
+					xField.text = NetworkReplacement.replacements[currentNet][currentTargetItem.originalPrefab].offsetX.ToString();
+					yField.text = NetworkReplacement.replacements[currentNet][currentTargetItem.originalPrefab].offsetY.ToString();
+					zField.text = NetworkReplacement.replacements[currentNet][currentTargetItem.originalPrefab].offsetZ.ToString();
 				}
 				// Ditto for any all-network replacement.
 				else if (currentTargetItem.allPrefab != null)
@@ -108,39 +107,24 @@ namespace BOB
 				// Make sure we have valid a target and replacement.
 				if (currentTargetItem != null && replacementPrefab != null)
 				{
-					// Create new replacement record with current info.
-					NetReplacement replacement = new NetReplacement
-					{
-						isTree = false,
-						probability = 100,
-						originalProb = currentTargetItem.originalProb,
-						targetIndex = currentTargetItem.index,
-						replacementInfo = replacementPrefab,
-						replaceName = replacementPrefab.name,
-						lane = CurrentNetTargetItem.lane,
-
-						// Original prefab is null if no active replacement; in which case, use the current prefab (which IS the original prefab).
-						targetInfo = currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab
-					};
-					replacement.targetName = replacement.targetInfo.name;
-
 					// Try to parse textfields.
-					float.TryParse(angleField.text, out replacement.angle);
-					float.TryParse(xField.text, out replacement.offsetX);
-					float.TryParse(yField.text, out replacement.offsetY);
-					float.TryParse(zField.text, out replacement.offsetZ);
+					float angle, xOffset, yOffset, zOffset;
+					float.TryParse(angleField.text, out angle);
+					float.TryParse(xField.text, out xOffset);
+					float.TryParse(yField.text, out yOffset);
+					float.TryParse(zField.text, out zOffset);
 
 					// Update text fields to match parsed values.
-					angleField.text = replacement.angle.ToString();
-					xField.text = replacement.offsetX.ToString();
-					yField.text = replacement.offsetY.ToString();
-					zField.text = replacement.offsetZ.ToString();
+					angleField.text = angle.ToString();
+					xField.text = xOffset.ToString();
+					yField.text = yOffset.ToString();
+					zField.text = zOffset.ToString();
 
 					// Network replacements are always grouped - iterate through each index in the list.
 					for (int i = 0; i < currentTargetItem.indexes.Count; ++i)
 					{
 						// Add the replacement, providing an index override to the current index.
-						NetworkReplacement.AddReplacement(currentNet, replacement, currentTargetItem.indexes[i], CurrentNetTargetItem.lanes[i]);
+						NetworkReplacement.Apply(currentNet, currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset);
 					}
 
 					// Update current target.
@@ -189,7 +173,30 @@ namespace BOB
 			revertButton.eventClicked += (control, clickEvent) =>
 			{
 				// Network or all-network reversion?
-				if (currentTargetItem.allPrefab != null)
+				if (currentTargetItem.currentPrefab != null)
+				{
+					// Individual network reversion - ensuire that we've got a current selection before doing anything.
+					if (currentTargetItem != null && currentTargetItem is NetPropListItem currentNetItem)
+					{
+						// Network replacements are always grouped -iterate through each instance in the list and revert.
+						for (int i = 0; i < currentTargetItem.indexes.Count; ++i)
+						{
+							// Add the replacement, providing an index override to the current index.
+							NetworkReplacement.Revert(currentNet, currentTargetItem.originalPrefab, true);
+						}
+
+						// Clear current target replacement prefab.
+						currentTargetItem.currentPrefab = null;
+
+						// Save configuration file and refresh building list (to reflect our changes).
+						ConfigurationUtils.SaveConfig();
+						targetList.Refresh();
+
+						// Update button states.
+						UpdateButtonStates();
+					}
+				}
+				else if (currentTargetItem.allPrefab != null)
 				{
 					// All-network reversion - make sure we've got a currently active replacement before doing anything.
 					if (currentTargetItem.originalPrefab)
@@ -201,29 +208,6 @@ namespace BOB
 						currentTargetItem.allPrefab = null;
 
 						// Save configuration file and refresh target list (to reflect our changes).
-						ConfigurationUtils.SaveConfig();
-						targetList.Refresh();
-
-						// Update button states.
-						UpdateButtonStates();
-					}
-				}
-				else
-				{
-					// Individual network reversion - ensuire that we've got a current selection before doing anything.
-					if (currentTargetItem != null)
-					{
-						// Network replacements are always grouped -iterate through each instance in the list and revert.
-							for (int i = 0; i < currentTargetItem.indexes.Count; ++i)
-						{
-							// Add the replacement, providing an index override to the current index.
-							NetworkReplacement.Revert(currentNet, CurrentNetTargetItem.lanes[i], currentTargetItem.indexes[i]);
-						}
-
-						// Clear current target 'all' prefab.
-						currentTargetItem.currentPrefab = null;
-
-						// Save configuration file and refresh building list (to reflect our changes).
 						ConfigurationUtils.SaveConfig();
 						targetList.Refresh();
 
@@ -293,30 +277,14 @@ namespace BOB
 					propListItem.indexes.Add(propIndex);
 					propListItem.lanes.Add(lane);
 
-					// Try to get original (pre-replacement) tree/prop prefab.
-					propListItem.originalPrefab = NetworkReplacement.GetOriginal(currentNet, lane, propIndex);
+					// Get original (pre-replacement) tree/prop prefab.
+					propListItem.originalPrefab = NetworkReplacement.GetOriginal(currentNet, lane, propIndex) ?? AllNetworkReplacement.GetOriginal(currentNet, lane, propIndex) ?? finalInfo;
 
-					// If the above returned null, there's no currently active building replacement.
-					if (propListItem.originalPrefab == null)
-					{
-						// Check for currently active all-network replacement.
-						propListItem.originalPrefab = AllNetworkReplacement.ActiveReplacement(currentNet, lane, propIndex);
-						if (propListItem.originalPrefab == null)
-						{
-							// No currently active all-network replacement - therefore, the current prefab IS the original, so set original prefab record accordingly.
-							propListItem.originalPrefab = finalInfo;
-						}
-						else
-						{
-							// There's a currently active all-network replacement - add that to our record.
-							propListItem.allPrefab = finalInfo;
-						}
-					}
-					else
-					{
-						// There's a currently active net replacement - add that to our record.
-						propListItem.currentPrefab = finalInfo;
-					}
+					// All-network replacement (if any).
+					propListItem.allPrefab = AllNetworkReplacement.ActiveReplacement(currentNet, lane, propIndex);
+
+					// Individual network replacement (if any).
+					propListItem.currentPrefab = NetworkReplacement.ActiveReplacement(currentNet, lane, propIndex);
 
 					// Probability.
 					propListItem.probability = laneProps[propIndex].m_probability;

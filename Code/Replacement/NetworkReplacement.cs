@@ -5,13 +5,13 @@ using UnityEngine;
 namespace BOB
 {
 	/// <summary>
-	/// Static class to manage building prop and tree replacements.
+	/// Static class to manage network prop and tree replacements.
 	/// </summary>
 	internal static class NetworkReplacement
 	{
-		// Master dictionary of network replacements.
-		// Yes, this is a three-layer dictionary (prefab by lane by prop index).
-		internal static Dictionary<NetInfo, SortedList<int, SortedList<int, NetReplacement>>> netDict;
+		// Master dictionary of replaced prop references.
+		internal static Dictionary<NetInfo, Dictionary<PrefabInfo, BOBNetReplacement>> replacements;
+
 
 
 		/// <summary>
@@ -19,185 +19,262 @@ namespace BOB
 		/// </summary>
 		internal static void Setup()
 		{
-			netDict = new Dictionary<NetInfo, SortedList<int, SortedList<int, NetReplacement>>>();
+			replacements = new Dictionary<NetInfo, Dictionary<PrefabInfo, BOBNetReplacement>>();
 		}
 
 
 		/// <summary>
-		/// Applies a new network replacement (replacing individual trees or props).
+		/// Reverts all active network replacements and re-initialises the master dictionary.
 		/// </summary>
-		/// <param name="netPrefab">Network prefab to apply to</param>
-		/// <param name="replacement">Replacement to apply</param>
-		/// <param name="oldAngle">Currently applied replacement angle (if any)</param>
-		/// <param name="oldX">Currently applied position X offset (if any)</param>
-		/// <param name="oldY">Currently applied position X offset (if any)</param>
-		/// <param name="oldZ">Currently applied position X offset (if any)</param>
-		internal static void ApplyReplacement(NetInfo netPrefab, NetReplacement replacement, float oldAngle = 0f, float oldX = 0f, float oldY = 0f, float oldZ = 0f)
+		internal static void RevertAll()
 		{
-			// Just in case.
-			if (replacement.targetInfo == null || replacement.targetName == null || replacement.replaceName == null || replacement.replacementInfo == null)
+			foreach (NetInfo network in replacements.Keys)
 			{
-				Debugging.Message("invalid replacement");
+				// Iterate through each entry in the master prop dictionary.
+				foreach (PrefabInfo prop in replacements[network].Keys)
+				{
+					// Revert this replacement (but don't remove the entry, as the dictionary is currently immutable while we're iterating through it).
+					Revert(network, prop, removeEntries: false);
+				}
+			}
+
+			// Re-initialise the dictionaries.
+			Setup();
+		}
+
+
+		/// <summary>
+		/// Reverts a network replacement.
+		/// </summary>
+		/// <param name="network">Targeted network</param>
+		/// <param name="target">Targeted (original) tree/prop prefab</param>
+		/// <param name="replacement">Applied replacment tree/prop prefab</param>
+		/// <param name="removeEntries">True (default) to remove the reverted entries from the master dictionary, false to leave the dictionary unchanged</param>
+		/// <returns>True if the entire network record was removed from the dictionary (due to no remaining replacements for that prefab), false if the prefab remains in the dictionary (has other active replacements)</returns>
+		internal static void Revert(NetInfo network, PrefabInfo target, bool removeEntries = true)
+		{
+			// Safety check.
+			if (network == null || !replacements.ContainsKey(network))
+            {
+				return;
+            }
+
+			// Iterate through each entry in our dictionary.
+			foreach (NetPropReference propReference in replacements[network][target].references)
+			{
+				// Revert entry.
+				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = (PropInfo)target;
+				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle;
+				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.postion;
+
+				// Restore any all-network replacement.
+				AllNetworkReplacement.Restore(network, target, propReference.laneIndex, propReference.propIndex);
+			}
+
+			// Remove entry from dictionary, if we're doing so.
+			if (removeEntries)
+			{
+				replacements[network].Remove(target);
+
+				// Delete entire network entry if nothing left after removing this one.
+				if (replacements[network].Count == 0)
+                {
+					replacements.Remove(network);
+                }
+			}
+		}
+
+
+		/// <summary>
+		/// Applies a new (or updated) network replacement.
+		/// </summary>
+		/// <param name="network">Targeted network</param>
+		/// <param name="target">Targeted (original) prop prefab</param>
+		/// <param name="replacement">Replacment prop prefab</param>
+		/// <param name="angle">Replacment prop angle adjustment</param>
+		/// <param name="offsetX">Replacment X position offset</param>
+		/// <param name="offsetY">Replacment Y position offset</param>
+		/// <param name="offsetZ">Replacment Z position offset</param>
+		internal static void Apply(NetInfo network, PrefabInfo target, PrefabInfo replacement, float angle, float offsetX, float offsetY, float offsetZ)
+		{
+			// Safety check.
+			if (network?.m_lanes == null)
+			{
 				return;
 			}
 
-			// Set new prop.
-			netPrefab.m_lanes[replacement.lane].m_laneProps.m_props[replacement.targetIndex].m_finalProp = (PropInfo)replacement.replacementInfo;
-
-			// Apply new angle, subtracting currently applied angle (if any).
-			netPrefab.m_lanes[replacement.lane].m_laneProps.m_props[replacement.targetIndex].m_angle += replacement.angle - oldAngle;
-
-			// Apply new offset, subtracting currently applied offset.
-			Vector3 newOffset = new Vector3 { x = replacement.offsetX - oldX, y = replacement.offsetY - oldY, z = replacement.offsetZ - oldZ };
-			netPrefab.m_lanes[replacement.lane].m_laneProps.m_props[replacement.targetIndex].m_position += newOffset;
-
-			// Remove any currently applied all-building building replacement entry for this tree or prop.
-			AllNetworkReplacement.RemoveEntry(netPrefab, replacement.targetInfo, replacement.lane, replacement.targetIndex);
-		}
-
-
-		/// <summary>
-		/// Adds or upates a network prop or tree replacement.
-		/// </summary>
-		/// <param name="netPrefab">Network prefab to apply to</param>
-		/// <param name="replacement">Replacement to apply</param>
-		/// <param name="index">(Optional) target index override</param>
-		/// <param name="lane">(Optional) target lane override</param>
-		internal static void AddReplacement(NetInfo netPrefab, NetReplacement replacement, int index = -1, int lane = -1)
-		{
-			// Originally applied angle and offsets.
-			float oldAngle = 0f, oldX = 0f, oldY = 0f, oldZ = 0f;
-
-			// Clone the provided replacement record for adding to the master dictionary (so the original can be modified by the calling method without clobbering the dictionary entry, and so we can tweak the clone here prior to adding without affecting the original).
-			NetReplacement clone = ReplacementUtils.Clone(replacement);
-
-			// Check to see if an index override has been provided.
-			if (index >= 0)
+			// Make sure that target and replacement are the same type before doing anything.
+			if (target == null || replacement == null || (target is TreeInfo && !(replacement is TreeInfo)) || (target is PropInfo) && !(replacement is PropInfo))
 			{
-				// Override provided - simply use the provided index as the target index.
-				clone.targetIndex = index;
+				return;
 			}
 
-			// Check to see if a lane override has been provided.
-			if (lane >= 0)
+			// Check to see if we already have a replacement entry for this prop - if so, revert the replacement first.
+			if (replacements.ContainsKey(network) && replacements[network].ContainsKey(target))
 			{
-				// Override provided - simply use the provided index as the target index.
-				clone.lane = lane;
+				Revert(network, target, true);
 			}
 
-			// Check to see if we don't already have an entry for this net prefab in the master dictionary.
-			if (!netDict.ContainsKey(netPrefab))
+			// Create new dictionary entry for network if none already exists.
+			if (!replacements.ContainsKey(network))
 			{
-				// No existing entry, so add one.
-				netDict.Add(netPrefab, new SortedList<int, SortedList<int, NetReplacement>>());
+				replacements.Add(network, new Dictionary<PrefabInfo, BOBNetReplacement>());
 			}
 
-			// Check to see if we don't already have an entry for this lane in the master dictionary.
-			if (!netDict[netPrefab].ContainsKey(clone.lane))
+			// Create new dictionary entry for prop if none already exists.
+			if (!replacements[network].ContainsKey(target))
 			{
-				// No existing entry, so add one.
-				netDict[netPrefab].Add(clone.lane, new SortedList<int, NetReplacement>());
+				replacements[network].Add(target, new BOBNetReplacement());
 			}
 
-			// Check to see if we already have an entry for this replacement in the master dictionary.
-			if (netDict[netPrefab][clone.lane].ContainsKey(clone.targetIndex))
+			// Add/replace dictionary replacement data.
+			replacements[network][target].references = new List<NetPropReference>();
+			replacements[network][target].targetInfo = target;
+			replacements[network][target].target = target.name;
+			replacements[network][target].angle = angle;
+			replacements[network][target].offsetX = offsetX;
+			replacements[network][target].offsetY = offsetY;
+			replacements[network][target].offsetZ = offsetZ;
+
+			// Record replacement prop.
+			replacements[network][target].replacementInfo = replacement;
+			replacements[network][target].replacement = replacement.name;
+
+			// Iterate through each lane.
+			for (int laneIndex = 0; laneIndex < network.m_lanes.Length; ++laneIndex)
 			{
-				// An entry already exists - update it, but record the angle and offset first.
-				oldAngle = netDict[netPrefab][clone.lane][clone.targetIndex].angle;
-				oldX = netDict[netPrefab][clone.lane][clone.targetIndex].offsetX;
-				oldY = netDict[netPrefab][clone.lane][clone.targetIndex].offsetY;
-				oldZ = netDict[netPrefab][clone.lane][clone.targetIndex].offsetZ;
-				netDict[netPrefab][clone.lane][clone.targetIndex] = clone;
-			}
-			else
-			{
-				// No existing entry - add a new one.
-				netDict[netPrefab][clone.lane].Add(clone.targetIndex, clone);
-			}
-
-			// Apply the actual tree/prop prefab replacement.
-			ApplyReplacement(netPrefab, clone, oldAngle, oldX, oldY, oldZ);
-		}
-
-
-		/// <summary>
-		/// Reverts an individual building replacement.
-		/// </summary>
-		/// <param name="netPrefab">Targeted network prefab</param>
-		/// <param name="lane">Replacement lane to revert</param>
-		/// <param name="index">Replacement index to revert</param>
-		/// <param name="removeEntries">True (default) to remove the reverted entries from the master dictionary, false to leave the dictionary unchanged</param>
-		/// <returns>True if the entire network record was removed from the dictionary (due to no remaining replacements for that prefab), false if the prefab remains in the dictionary (has other active replacements)</returns>
-		internal static bool Revert(NetInfo netPrefab, int lane, int index, bool removeEntries = true)
-		{
-			// Get original prop.
-			PrefabInfo prefabInfo = GetOriginal(netPrefab, lane, index);
-
-			// Only revert if there is an active replacement (GetOriginal returns null if there's no active replacement).
-			if (prefabInfo != null)
-			{
-				// Local reference.
-				NetReplacement netReplacement = netDict[netPrefab][lane][index];
-
-				// Prop - restore original.
-				netPrefab.m_lanes[lane].m_laneProps.m_props[index].m_finalProp = prefabInfo as PropInfo;
-
-				// Restore original angle.
-				netPrefab.m_lanes[lane].m_laneProps.m_props[index].m_angle -= netReplacement.angle;
-
-				// Undo offset.
-				Vector3 oldOffset = new Vector3 { x = netReplacement.offsetX, y = netReplacement.offsetY, z = netReplacement.offsetZ };
-				netPrefab.m_lanes[lane].m_laneProps.m_props[index].m_position -= oldOffset;
-
-				// Apply any all-network replacement.
-				AllNetworkReplacement.Restore(netPrefab, prefabInfo, lane, index);
-
-				// Remove dictionary entries if that setting is enabled.
-				if (removeEntries)
+				// If no props in this lane, skip it and go to the next one.
+				if (network.m_lanes[laneIndex].m_laneProps?.m_props == null)
 				{
-					// Remove individual replacement record.
-					netDict[netPrefab][lane].Remove(index);
+					continue;
+				}
 
-					// Check to see if there are any remaining replacements for this lane.
-					if (netDict[netPrefab][lane].Count == 0)
-					{
-						// No remaining replacements - remove the entire lane entry.
-						netDict[netPrefab].Remove(lane);
+				// Iterate through each prop in lane.
+				for (int propIndex = 0; propIndex < network.m_lanes[laneIndex].m_laneProps.m_props.Length; ++propIndex)
+				{
+					// Check for any existing all-network replacement.
+					PrefabInfo thisProp = AllNetworkReplacement.GetOriginal(network, laneIndex, propIndex);
+					if (thisProp == null)
+                    {
+						// No active replacement; use current PropInfo.
+						thisProp = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_finalProp;
 					}
 
-					// Check to see if there are any remaining replacements for this network prefab.
-					if (netDict[netPrefab].Count == 0)
+					// See if this prop (wmatches our replacement.
+					if (thisProp != null && thisProp == target)
 					{
-						// No remaining replacements - remove the entire network prefab entry and return true to indicate that we've done so.
-						netDict.Remove(netPrefab);
-						return true;
+						// Match!  Add reference data to the list.
+						replacements[network][target].references.Add(new NetPropReference
+						{
+							network = network,
+							laneIndex = laneIndex,
+							propIndex = propIndex,
+							angle = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_angle,
+							postion = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position
+						});
 					}
 				}
 			}
 
-			// If we got here, we haven't removed the building prefab entry from the master dictionary - return false to indicate that.
-			return false;
+			// Now, iterate through each entry found.
+			foreach (NetPropReference propReference in replacements[network][target].references)
+			{
+				// Reset any all-network replacements first.
+				AllNetworkReplacement.RemoveEntry(network, target, propReference.laneIndex, propReference.propIndex);
+
+				// Apply the replacement.
+				ReplaceProp(replacements[network][target], propReference);
+			}
 		}
 
 
 		/// <summary>
-		/// Retrieves the original tree/prop prefab for the given lane and index (returns null if there's no active replacement).
+		/// Checks if there's a currently active network replacement applied to the given network prop index, and if so, returns the *original* prefab.
 		/// </summary>
-		/// <param name="netPrefab">Network prefab prefab</param>
-		/// <param name="lane">Lane index</param>
-		/// <param name="index">Prop index</param>
-		/// <returns>PrefabInfo of the original prefab, or null if there's no currently active replacement</returns>
-		internal static PrefabInfo GetOriginal(NetInfo netPrefab, int lane, int index)
+		/// <param name="netPrefab">Network prefab to check</param>
+		/// <param name="laneIndex">Lane index to check</param>
+		/// <param name="propIndex">Prop index to check</param>
+		/// <returns>Original prefab if a all-building replacement is currently applied, null if no all-building replacement is currently applied</returns>
+		internal static PrefabInfo GetOriginal(NetInfo netPrefab, int laneIndex, int propIndex)
 		{
-			// Try to find an entry for this index of this network in the master dictionary.
-			if (netDict.ContainsKey(netPrefab) && netDict[netPrefab].ContainsKey(lane) && netDict[netPrefab][lane].ContainsKey(index))
+			// Safety check.
+			if (netPrefab != null && replacements.ContainsKey(netPrefab))
 			{
-				// Entry found - return the stored original prefab.
-				return netDict[netPrefab][lane][index].targetInfo;
+				// Iterate through each entry in master dictionary.
+				foreach (PrefabInfo target in replacements[netPrefab].Keys)
+				{
+					BOBNetReplacement reference = replacements[netPrefab][target];
+					// Iterate through each network in this entry.
+					foreach (NetPropReference propRef in reference.references)
+					{
+						// Check for a network, lane, and prop index match.
+						if (propRef.network == netPrefab && propRef.laneIndex == laneIndex && propRef.propIndex == propIndex)
+						{
+							// Match!  Return the original prefab.
+							return target;
+						}
+					}
+				}
 			}
 
-			// No entry found - return null to indicate no active replacement.
+			// If we got here, no entry was found - return null to indicate no active replacement.
 			return null;
+		}
+
+
+		/// <summary>
+		/// Checks if there's a currently active anetwork replacement applied to the given network prop index, and if so, returns the *replacement* prefab.
+		/// </summary>
+		/// <param name="netPrefab">Network prefab to check</param>
+		/// <param name="laneIndex">Lane index to check</param>
+		/// <param name="propIndex">Prop index to check</param>
+		/// <returns>Replacement prefab if a all-building replacement is currently applied, null if no all-building replacement is currently applied</returns>
+		internal static PrefabInfo ActiveReplacement(NetInfo netPrefab, int laneIndex, int propIndex)
+		{
+			// Safety check.
+			if (netPrefab != null && replacements.ContainsKey(netPrefab))
+			{
+				// Iterate through each entry in master dictionary.
+				foreach (PrefabInfo target in replacements[netPrefab].Keys)
+				{
+					BOBNetReplacement reference = replacements[netPrefab][target];
+					// Iterate through each network in this entry.
+					foreach (NetPropReference propRef in reference.references)
+					{
+						// Check for a network, lane, and prop index match.
+						if (propRef.network == netPrefab && propRef.laneIndex == laneIndex && propRef.propIndex == propIndex)
+						{
+							// Match!  Return the original prefab.
+							return replacements[netPrefab][target].replacementInfo;
+						}
+					}
+				}
+			}
+
+			// If we got here, no entry was found - return null to indicate no active replacement.
+			return null;
+		}
+
+
+		/// <summary>
+		/// Replaces a prop using an all-network replacement.
+		/// </summary>
+		/// <param name="netElement">All-network replacement element to apply</param>
+		/// <param name="propReference">Individual prop reference to apply to</param>
+		private static void ReplaceProp(BOBNetReplacement netElement, NetPropReference propReference)
+		{
+			// Convert offset to Vector3.
+			Vector3 offset = new Vector3
+			{
+				x = netElement.offsetX,
+				y = netElement.offsetY,
+				z = netElement.offsetZ
+			};
+
+			// Apply replacement.
+			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = (PropInfo)netElement.replacementInfo;
+			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle + netElement.angle;
+			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.postion + offset;
 		}
 	}
 }

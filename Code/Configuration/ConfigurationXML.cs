@@ -27,7 +27,7 @@ namespace BOB
 
 		[XmlArray("netprops", IsNullable = true)]
 		[XmlArrayItem("netprop", IsNullable = true)]
-		public List<BOBAllNetworkElement> allNetworkProps { get; set; }
+		public List<BOBNetReplacement> allNetworkProps { get; set; }
 
 		[XmlArray("networks", IsNullable = false)]
 		[XmlArrayItem("network", IsNullable = false)]
@@ -50,20 +50,6 @@ namespace BOB
 
 
 	/// <summary>
-	/// Network replacment record XML format.
-	/// </summary>
-	public class BOBNetworkElement
-	{
-		[XmlAttribute("prefab")]
-		public string prefab = string.Empty;
-
-		[XmlArray("replacements")]
-		[XmlArrayItem("replacement")]
-		public List<NetReplacement> replacements;
-	}
-
-
-	/// <summary>
 	/// All-building replacment record XML format.
 	/// </summary>
 	public class BOBAllBuildingElement
@@ -79,8 +65,11 @@ namespace BOB
 	/// <summary>
 	/// All-building network record XML format.
 	/// </summary>
-	public class BOBAllNetworkElement
+	public class BOBNetReplacement
 	{
+		[XmlAttribute("tree")]
+		public bool tree = false;
+
 		[XmlAttribute("target")]
 		public string target = string.Empty;
 
@@ -108,4 +97,18 @@ namespace BOB
 		[XmlIgnore]
 		public List<NetPropReference> references;
 	}
+
+
+	public class BOBNetworkElement
+    {
+		[XmlElement("network")]
+		public string network = string.Empty;
+
+		[XmlIgnore]
+		public PrefabInfo netInfo;
+
+		[XmlArray("replacements")]
+		[XmlArrayItem("replacement")]
+		public List<BOBNetReplacement> replacements;
+    }
 }

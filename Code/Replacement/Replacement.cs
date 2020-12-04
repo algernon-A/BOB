@@ -35,20 +35,4 @@ namespace BOB
 		[XmlIgnore]
 		public int originalProb;
 	}
-
-
-	public class NetReplacement : Replacement
-    {
-		[XmlAttribute("Lane")]
-		public int lane = -1;
-
-		[XmlAttribute("OffsetX")]
-		public float offsetX = 0f;
-
-		[XmlAttribute("OffsetY")]
-		public float offsetY = 0f;
-
-		[XmlAttribute("OffsetZ")]
-		public float offsetZ = 0f;
-	}
 }
