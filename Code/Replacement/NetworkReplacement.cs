@@ -63,7 +63,14 @@ namespace BOB
 			foreach (NetPropReference propReference in replacements[network][target].references)
 			{
 				// Revert entry.
-				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = (PropInfo)target;
+				if (target is PropInfo)
+				{
+					propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = (PropInfo)target;
+				}
+				else
+                {
+					propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = (TreeInfo)target;
+				}
 				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle;
 				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.postion;
 
@@ -129,6 +136,7 @@ namespace BOB
 
 			// Add/replace dictionary replacement data.
 			replacements[network][target].references = new List<NetPropReference>();
+			replacements[network][target].tree = target is TreeInfo;
 			replacements[network][target].targetInfo = target;
 			replacements[network][target].target = target.name;
 			replacements[network][target].angle = angle;
@@ -157,7 +165,14 @@ namespace BOB
 					if (thisProp == null)
                     {
 						// No active replacement; use current PropInfo.
-						thisProp = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_finalProp;
+						if (target is PropInfo)
+						{
+							thisProp = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_finalProp;
+						}
+						else
+						{
+							thisProp = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_finalTree;
+						}
 					}
 
 					// See if this prop (wmatches our replacement.
@@ -272,7 +287,16 @@ namespace BOB
 			};
 
 			// Apply replacement.
-			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = (PropInfo)netElement.replacementInfo;
+			if (netElement.replacementInfo is PropInfo)
+			{
+				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = (PropInfo)netElement.replacementInfo;
+			}
+			else
+			{
+				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = (TreeInfo)netElement.replacementInfo;
+			}
+
+			// Angle oand offset.
 			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle + netElement.angle;
 			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.postion + offset;
 		}

@@ -283,26 +283,26 @@ namespace BOB
 
 
 			// Iterate through each element in the provided list.
-			foreach (BOBNetReplacement allNetElement in networkElement.replacements)
+			foreach (BOBNetReplacement replacement in networkElement.replacements)
 			{
 				// Try to find target prefab.
-				PrefabInfo targetPrefab = (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(allNetElement.target);
+				PrefabInfo targetPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);
 				if (targetPrefab == null)
 				{
-					Debugging.Message("Couldn't find target prefab " + allNetElement.target);
+					Debugging.Message("Couldn't find target prefab " + replacement.target);
 					continue;
 				}
 
 				// Try to find replacement prefab.
-				PrefabInfo replacementPrefab = (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(allNetElement.replacement);
+				PrefabInfo replacementPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.replacement) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.replacement);
 				if (replacementPrefab == null)
 				{
-					Debugging.Message("Couldn't find replacement prefab " + allNetElement.replacement);
+					Debugging.Message("Couldn't find replacement prefab " + replacement.replacement);
 					continue;
 				}
 
 				// If we got here, it's all good; apply the all-network replacement.
-				NetworkReplacement.Apply(networkInfo, targetPrefab, replacementPrefab, allNetElement.angle, allNetElement.offsetX, allNetElement.offsetY, allNetElement.offsetZ);
+				NetworkReplacement.Apply(networkInfo, targetPrefab, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ);
 			}
 		}
 	}
