@@ -12,9 +12,6 @@ namespace BOB
 		BuildingInfo currentBuilding;
 
 		// Panel components.
-		internal UITextField probabilityField;
-		private UICheckBox treeCheck;
-		private UICheckBox propCheck;
 		private UICheckBox groupCheck;
 
 
@@ -45,14 +42,6 @@ namespace BOB
 			propCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_PRP"), Margin, TitleHeight);
 			treeCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_TRE"), Margin, TitleHeight + Margin + propCheck.height);
 			groupCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_GRP"), 155f, TitleHeight);
-
-			// Probability label and textfield.
-			UILabel probabilityLabel = AddUIComponent<UILabel>();
-			probabilityLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), ProbabilityY);
-			probabilityLabel.text = Translations.Translate("BOB_PNL_PRB");
-
-			probabilityField = UIUtils.AddTextField(this, 190f, 30f);
-			probabilityField.relativePosition = new Vector2(LeftWidth + (Margin * 2), ProbabilityY + probabilityLabel.height);
 
 			// Event handler for prop checkbox.
 			propCheck.eventCheckChanged += (control, isChecked) =>

@@ -131,13 +131,10 @@ namespace BOB
                 // Prefab display name.
                 displayText.Append(UIUtils.GetDisplayName(thisPrefab.name));
 
-                // Show original probability in brackets immediately afterwards, if this isn't a network item.
-                if (thisNetItem == null)
-                {
-                    displayText.Append(" (");
-                    displayText.Append(originalProb);
-                    displayText.Append("%)");
-                }
+                // Show original probability in brackets immediately afterwards.
+                displayText.Append(" (");
+                displayText.Append(originalProb);
+                displayText.Append("%)");
 
                 // Check to see if there's a currently active replacement (currentPrefab isn't null).
                 if (thisItem.currentPrefab != null)
@@ -147,13 +144,10 @@ namespace BOB
                     displayText.Append(Translations.Translate("BOB_ROW_NOW"));
                     displayText.Append(UIUtils.GetDisplayName(thisItem.currentPrefab.name));
 
-                    // Append replacement name and probability to the label, if this isn't a network item.
-                    if (thisNetItem == null)
-                    {
-                        displayText.Append(" ");
-                        displayText.Append(probability);
-                        displayText.Append("%");
-                    }
+                    // Append replacement name and probability to the label.
+                    displayText.Append(" ");
+                    displayText.Append(probability);
+                    displayText.Append("%");
 
                     // Append closing bracket.
                     displayText.Append(")");

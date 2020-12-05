@@ -12,8 +12,6 @@ namespace BOB
 
 		// Panel components.
 		internal UITextField angleField, xField, yField, zField;
-		private UICheckBox treeCheck;
-		private UICheckBox propCheck;
 
 
 		// Button labels.
@@ -42,6 +40,7 @@ namespace BOB
 					xField.text = NetworkReplacement.replacements[currentNet][currentTargetItem.originalPrefab].offsetX.ToString();
 					yField.text = NetworkReplacement.replacements[currentNet][currentTargetItem.originalPrefab].offsetY.ToString();
 					zField.text = NetworkReplacement.replacements[currentNet][currentTargetItem.originalPrefab].offsetZ.ToString();
+					probabilityField.text = NetworkReplacement.replacements[currentNet][currentTargetItem.originalPrefab].probability.ToString();
 				}
 				// Ditto for any all-network replacement.
 				else if (currentTargetItem.allPrefab != null)
@@ -49,14 +48,16 @@ namespace BOB
 					xField.text = AllNetworkReplacement.replacements[currentTargetItem.originalPrefab].offsetX.ToString();
 					yField.text = AllNetworkReplacement.replacements[currentTargetItem.originalPrefab].offsetY.ToString();
 					zField.text = AllNetworkReplacement.replacements[currentTargetItem.originalPrefab].offsetZ.ToString();
+					probabilityField.text = AllNetworkReplacement.replacements[currentTargetItem.originalPrefab].probability.ToString();
 				}
 				else
                 {
-					// No current replacement; set all offset fields to zero.
+					// No current replacement; set all offset fields to blank.
 					xField.text = "0";
 					yField.text = "0";
 					zField.text = "0";
-                }
+					probabilityField.text = "100";
+				}
             }
         }
 
@@ -73,10 +74,6 @@ namespace BOB
 
 			// Base setup.
 			base.Setup(parentTransform, targetPrefabInfo);
-
-			// Add checkboxes.
-			propCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_PRP"), Margin, TitleHeight);
-			treeCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_TRE"), Margin, TitleHeight + Margin + propCheck.height);
 
 			// Event handler for prop checkbox.
 			propCheck.eventCheckChanged += (control, isChecked) =>
@@ -144,32 +141,31 @@ namespace BOB
 
 			// Angle label and textfield.
 			UILabel angleLabel = AddUIComponent<UILabel>();
-			angleLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), ProbabilityY);
+			angleLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 367f);
 			angleLabel.text = Translations.Translate("BOB_PNL_ANG");
-
-			angleField = UIUtils.AddTextField(this, 190f, 30f);
-			angleField.relativePosition = new Vector2(LeftWidth + (Margin * 2), ProbabilityY + angleLabel.height);
+			angleField = UIUtils.AddTextField(this, 100f, 30f);
+			angleField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 360f);
 
 			// Offset X position.
 			UILabel xLabel = AddUIComponent<UILabel>();
-			xLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 367f);
+			xLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 407f);
 			xLabel.text = Translations.Translate("BOB_PNL_XOF");
 			xField = UIUtils.AddTextField(this, 100f, 30f);
-			xField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 360f);
+			xField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 400f);
 
 			// Offset Y position.
 			UILabel yLabel = AddUIComponent<UILabel>();
-			yLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 407f);
+			yLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 447f);
 			yLabel.text = Translations.Translate("BOB_PNL_YOF");
 			yField = UIUtils.AddTextField(this, 100f, 30f);
-			yField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 400f);
+			yField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 440f);
 
 			// Offset Z position.
 			UILabel zLabel = AddUIComponent<UILabel>();
-			zLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 447f);
+			zLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 487f);
 			zLabel.text = Translations.Translate("BOB_PNL_ZOF");
 			zField = UIUtils.AddTextField(this, 100f, 30f);
-			zField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 440f);
+			zField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 480f);
 
 			// Replace button event handler.
 			replaceButton.eventClicked += (control, clickEvent) =>
@@ -179,22 +175,25 @@ namespace BOB
 				{
 					// Try to parse textfields.
 					float angle, xOffset, yOffset, zOffset;
+					int probability;
 					float.TryParse(angleField.text, out angle);
 					float.TryParse(xField.text, out xOffset);
 					float.TryParse(yField.text, out yOffset);
 					float.TryParse(zField.text, out zOffset);
+					int.TryParse(probabilityField.text, out probability);
 
 					// Update text fields to match parsed values.
 					angleField.text = angle.ToString();
 					xField.text = xOffset.ToString();
 					yField.text = yOffset.ToString();
 					zField.text = zOffset.ToString();
+					probabilityField.text = probability.ToString();
 
 					// Network replacements are always grouped - iterate through each index in the list.
 					for (int i = 0; i < currentTargetItem.indexes.Count; ++i)
 					{
 						// Add the replacement, providing an index override to the current index.
-						NetworkReplacement.Apply(currentNet, currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset);
+						NetworkReplacement.Apply(currentNet, currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
 					}
 
 					// Update current target.
@@ -214,19 +213,22 @@ namespace BOB
 			{
 				// Try to parse text fields.
 				float angle, xOffset, yOffset, zOffset;
+				int probability;
 				float.TryParse(angleField.text, out angle);
 				float.TryParse(xField.text, out xOffset);
 				float.TryParse(yField.text, out yOffset);
 				float.TryParse(zField.text, out zOffset);
+				int.TryParse(probabilityField.text, out probability);
 
 				// Update text fields to match parsed values.
 				angleField.text = angle.ToString();
 				xField.text = xOffset.ToString();
 				yField.text = yOffset.ToString();
 				zField.text = zOffset.ToString();
+				probabilityField.text = probability.ToString();
 
 				// Apply replacement.
-				AllNetworkReplacement.Apply(currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset);
+				AllNetworkReplacement.Apply(currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
 
 				// Update current target.
 				currentTargetItem.allPrefab = replacementPrefab;
@@ -287,9 +289,10 @@ namespace BOB
 				}
 			};
 
-			// Populate initial lists.
-			loadedList.rowsData = LoadedList(false);
-			targetList.rowsData = TargetList(false);
+
+			// Set remaining check states from previous (OR default) settings.
+			propCheck.isChecked = !ModSettings.treeSelected;
+			treeCheck.isChecked = ModSettings.treeSelected;
 		}
 
 
@@ -347,17 +350,26 @@ namespace BOB
 					propListItem.indexes.Add(propIndex);
 					propListItem.lanes.Add(lane);
 
-					// Get original (pre-replacement) tree/prop prefab.
+					// Get original (pre-replacement) tree/prop prefab and current probability (as default original probability).
 					propListItem.originalPrefab = NetworkReplacement.GetOriginal(currentNet, lane, propIndex) ?? AllNetworkReplacement.GetOriginal(currentNet, lane, propIndex) ?? finalInfo;
+					propListItem.originalProb = laneProps[propIndex].m_probability;
+					propListItem.probability = propListItem.originalProb;
 
-					// All-network replacement (if any).
-					propListItem.allPrefab = AllNetworkReplacement.ActiveReplacement(currentNet, lane, propIndex);
+					// All-network replacement and original probability (if any).
+					BOBNetReplacement allNetReplacement = AllNetworkReplacement.ActiveReplacement(currentNet, lane, propIndex);
+					if (allNetReplacement != null)
+					{
+						propListItem.allPrefab = allNetReplacement.replacementInfo;
+						propListItem.originalProb = allNetReplacement.probability;
+					}
 
-					// Individual network replacement (if any).
-					propListItem.currentPrefab = NetworkReplacement.ActiveReplacement(currentNet, lane, propIndex);
-
-					// Probability.
-					propListItem.probability = laneProps[propIndex].m_probability;
+					// Individual network replacement and original probability (if any).
+					BOBNetReplacement netReplacment = NetworkReplacement.ActiveReplacement(currentNet, lane, propIndex);
+					if (netReplacment != null)
+					{
+						propListItem.currentPrefab = netReplacment.replacementInfo;
+						propListItem.originalProb = netReplacment.probability;
+					}
 
 					// Are we grouping?
 					if (propListItem.index == -1)

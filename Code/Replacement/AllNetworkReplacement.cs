@@ -14,6 +14,7 @@ namespace BOB
 		public int propIndex;
 		public float angle;
 		public Vector3 postion;
+		public int probability;
 	}
 
 
@@ -76,6 +77,7 @@ namespace BOB
 				}
 				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle;
 				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.postion;
+				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_probability = propReference.probability;
 			}
 
 			// Remove entry from dictionary, if we're doing so.
@@ -106,9 +108,17 @@ namespace BOB
 					if (propReference.network == netPrefab && propReference.laneIndex == laneIndex && propReference.propIndex == propIndex)
                     {
 						// Got a match!  Revert instance.
-						netPrefab.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_finalProp = (PropInfo)target;
+						if (target is PropInfo)
+						{
+							propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = (PropInfo)target;
+						}
+						else
+						{
+							propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = (TreeInfo)target;
+						}
 						netPrefab.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_angle = propReference.angle;
 						netPrefab.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position = propReference.postion;
+						netPrefab.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_probability = propReference.probability;
 
 						// Remove this reference and return.
 						replacements[target].references.Remove(replacements[target].references[i]);
@@ -128,7 +138,8 @@ namespace BOB
 		/// <param name="offsetX">Replacment X position offset</param>
 		/// <param name="offsetY">Replacment Y position offset</param>
 		/// <param name="offsetZ">Replacment Z position offset</param>
-		internal static void Apply(PrefabInfo target, PrefabInfo replacement, float angle, float offsetX, float offsetY, float offsetZ)
+		/// <param name="probability">Replacement probability</param>
+		internal static void Apply(PrefabInfo target, PrefabInfo replacement, float angle, float offsetX, float offsetY, float offsetZ, int probability)
 		{
 			// Make sure that target and replacement are the same type before doing anything.
 			if (target == null || replacement == null || (target is TreeInfo && !(replacement is TreeInfo)) || (target is PropInfo) && !(replacement is PropInfo))
@@ -157,6 +168,7 @@ namespace BOB
 			replacements[target].offsetX = offsetX;
 			replacements[target].offsetY = offsetY;
 			replacements[target].offsetZ = offsetZ;
+			replacements[target].probability = probability;
 
 			// Record replacement prop.
 			replacements[target].replacementInfo = replacement;
@@ -206,7 +218,8 @@ namespace BOB
 								laneIndex = laneIndex,
 								propIndex = propIndex,
 								angle = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_angle,
-								postion = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position
+								postion = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position,
+								probability = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_probability
 							});
 						}
 					}
@@ -216,7 +229,7 @@ namespace BOB
 			// Now, iterate through each entry found and apply the replacement to each one.
 			foreach (NetPropReference propReference in replacements[target].references)
 			{
-				ReplaceProp(replacements[target], propReference);
+				NetworkReplacement.ReplaceProp(replacements[target], propReference);
 			}
 		}
 
@@ -227,7 +240,7 @@ namespace BOB
 		/// <param name="netPrefab">Network prefab to check</param>
 		/// <param name="laneIndex">Lane index to check</param>
 		/// <param name="propIndex">Prop index to check</param>
-		/// <returns>Original prefab if a all-building replacement is currently applied, null if no all-building replacement is currently applied</returns>
+		/// <returns>Replacement record if a all-network replacement is currently applied, null if no all-network replacement is currently applied</returns>
 		internal static PrefabInfo GetOriginal(NetInfo netPrefab, int laneIndex, int propIndex)
 		{
 			// Iterate through each entry in master dictionary.
@@ -257,8 +270,8 @@ namespace BOB
 		/// <param name="netPrefab">Network prefab to check</param>
 		/// <param name="laneIndex">Lane index to check</param>
 		/// <param name="propIndex">Prop index to check</param>
-		/// <returns>Replacement prefab if a all-building replacement is currently applied, null if no all-building replacement is currently applied</returns>
-		internal static PrefabInfo ActiveReplacement(NetInfo netPrefab, int laneIndex, int propIndex)
+		/// <returns>Replacement record if a all-network replacement is currently applied, null if no all-network replacement is currently applied</returns>
+		internal static BOBNetReplacement ActiveReplacement(NetInfo netPrefab, int laneIndex, int propIndex)
 		{
 			// Iterate through each entry in master dictionary.
 			foreach (PrefabInfo target in replacements.Keys)
@@ -270,8 +283,8 @@ namespace BOB
 					// Check for a network, lane, and prop index match.
 					if (propRef.network == netPrefab && propRef.laneIndex == laneIndex && propRef.propIndex == propIndex)
 					{
-						// Match!  Return the original prefab.
-						return replacements[target].replacementInfo;
+						// Match!  Return the replacement record.
+						return replacements[target];
 					}
 				}
 			}
@@ -306,39 +319,8 @@ namespace BOB
 				replacements[target].references.Add(newReference);
 
 				// Apply replacement.
-				ReplaceProp(replacements[target], newReference);
+				NetworkReplacement.ReplaceProp(replacements[target], newReference);
 			}
-		}
-
-
-		/// <summary>
-		/// Replaces a prop using an all-network replacement.
-		/// </summary>
-		/// <param name="netElement">All-network replacement element to apply</param>
-		/// <param name="propReference">Individual prop reference to apply to</param>
-		private static void ReplaceProp(BOBNetReplacement netElement, NetPropReference propReference)
-        {
-			// Convert offset to Vector3.
-			Vector3 offset = new Vector3
-			{
-				x = netElement.offsetX,
-				y = netElement.offsetY,
-				z = netElement.offsetZ
-			};
-
-			// Apply replacement.
-			if (netElement.replacementInfo is PropInfo)
-			{
-				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = (PropInfo)netElement.replacementInfo;
-			}
-			else
-			{
-				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = (TreeInfo)netElement.replacementInfo;
-			}
-
-			// Angle and offset.
-			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle + netElement.angle;
-			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.postion + offset;
 		}
 	}
 }

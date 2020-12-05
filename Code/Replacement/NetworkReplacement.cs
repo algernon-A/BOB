@@ -73,6 +73,7 @@ namespace BOB
 				}
 				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle;
 				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.postion;
+				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_probability = propReference.probability;
 
 				// Restore any all-network replacement.
 				AllNetworkReplacement.Restore(network, target, propReference.laneIndex, propReference.propIndex);
@@ -102,7 +103,8 @@ namespace BOB
 		/// <param name="offsetX">Replacment X position offset</param>
 		/// <param name="offsetY">Replacment Y position offset</param>
 		/// <param name="offsetZ">Replacment Z position offset</param>
-		internal static void Apply(NetInfo network, PrefabInfo target, PrefabInfo replacement, float angle, float offsetX, float offsetY, float offsetZ)
+		/// <param name="probability">Replacement probability</param>
+		internal static void Apply(NetInfo network, PrefabInfo target, PrefabInfo replacement, float angle, float offsetX, float offsetY, float offsetZ, int probability)
 		{
 			// Safety check.
 			if (network?.m_lanes == null)
@@ -143,6 +145,7 @@ namespace BOB
 			replacements[network][target].offsetX = offsetX;
 			replacements[network][target].offsetY = offsetY;
 			replacements[network][target].offsetZ = offsetZ;
+			replacements[network][target].probability = probability;
 
 			// Record replacement prop.
 			replacements[network][target].replacementInfo = replacement;
@@ -185,7 +188,8 @@ namespace BOB
 							laneIndex = laneIndex,
 							propIndex = propIndex,
 							angle = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_angle,
-							postion = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position
+							postion = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position,
+							probability = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_probability
 						});
 					}
 				}
@@ -243,8 +247,8 @@ namespace BOB
 		/// <param name="netPrefab">Network prefab to check</param>
 		/// <param name="laneIndex">Lane index to check</param>
 		/// <param name="propIndex">Prop index to check</param>
-		/// <returns>Replacement prefab if a all-building replacement is currently applied, null if no all-building replacement is currently applied</returns>
-		internal static PrefabInfo ActiveReplacement(NetInfo netPrefab, int laneIndex, int propIndex)
+		/// <returns>Replacement record if a network replacement is currently applied, null if no network replacement is currently applied</returns>
+		internal static BOBNetReplacement ActiveReplacement(NetInfo netPrefab, int laneIndex, int propIndex)
 		{
 			// Safety check.
 			if (netPrefab != null && replacements.ContainsKey(netPrefab))
@@ -259,8 +263,10 @@ namespace BOB
 						// Check for a network, lane, and prop index match.
 						if (propRef.network == netPrefab && propRef.laneIndex == laneIndex && propRef.propIndex == propIndex)
 						{
+							Debugging.Message("Found active replacement for net " + netPrefab.name + " with target " + target.name);
+
 							// Match!  Return the original prefab.
-							return replacements[netPrefab][target].replacementInfo;
+							return replacements[netPrefab][target];
 						}
 					}
 				}
@@ -276,7 +282,7 @@ namespace BOB
 		/// </summary>
 		/// <param name="netElement">All-network replacement element to apply</param>
 		/// <param name="propReference">Individual prop reference to apply to</param>
-		private static void ReplaceProp(BOBNetReplacement netElement, NetPropReference propReference)
+		internal static void ReplaceProp(BOBNetReplacement netElement, NetPropReference propReference)
 		{
 			// Convert offset to Vector3.
 			Vector3 offset = new Vector3
@@ -296,9 +302,12 @@ namespace BOB
 				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = (TreeInfo)netElement.replacementInfo;
 			}
 
-			// Angle oand offset.
+			// Angle and offset.
 			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle + netElement.angle;
 			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.postion + offset;
+
+			// Probability.
+			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_probability = netElement.probability;
 		}
 	}
 }

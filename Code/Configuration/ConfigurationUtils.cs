@@ -262,7 +262,7 @@ namespace BOB
 				}
 
 				// If we got here, it's all good; apply the all-network replacement.
-				AllNetworkReplacement.Apply(targetPrefab, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ);
+				AllNetworkReplacement.Apply(targetPrefab, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
 			}
 		}
 
@@ -302,7 +302,7 @@ namespace BOB
 				}
 
 				// If we got here, it's all good; apply the all-network replacement.
-				NetworkReplacement.Apply(networkInfo, targetPrefab, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ);
+				NetworkReplacement.Apply(networkInfo, targetPrefab, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
 			}
 		}
 	}

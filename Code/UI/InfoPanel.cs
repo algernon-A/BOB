@@ -41,6 +41,9 @@ namespace BOB
 		private UICheckBox hideVanilla;
 		private UITextField nameFilter;
 		protected UILabel noPropsLabel;
+		protected UICheckBox treeCheck;
+		protected UICheckBox propCheck;
+		internal UITextField probabilityField;
 
 		// Button labels.
 		protected abstract string ReplaceLabel { get; }
@@ -193,6 +196,18 @@ namespace BOB
 				// Set initial button and checkbox states.
 				hideVanilla.isChecked = ModSettings.hideVanilla;
 				UpdateButtonStates();
+
+				// Add checkboxes.
+				propCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_PRP"), Margin, TitleHeight);
+				treeCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_TRE"), Margin, TitleHeight + Margin + propCheck.height);
+
+				// Probability label and textfield.
+				UILabel probabilityLabel = AddUIComponent<UILabel>();
+				probabilityLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), ProbabilityY);
+				probabilityLabel.text = Translations.Translate("BOB_PNL_PRB");
+
+				probabilityField = UIUtils.AddTextField(this, 190f, 30f);
+				probabilityField.relativePosition = new Vector2(LeftWidth + (Margin * 2), ProbabilityY + probabilityLabel.height);
 			}
 			catch (Exception exception)
 			{

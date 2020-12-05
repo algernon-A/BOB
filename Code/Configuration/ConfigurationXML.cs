@@ -88,6 +88,9 @@ namespace BOB
 		[XmlAttribute("OffsetZ")]
 		public float offsetZ = 0f;
 
+		[XmlAttribute("probability")]
+		public int probability = 100;
+
 		[XmlIgnore]
 		public PrefabInfo replacementInfo;
 
