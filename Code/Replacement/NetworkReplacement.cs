@@ -178,7 +178,7 @@ namespace BOB
 						}
 					}
 
-					// See if this prop (wmatches our replacement.
+					// See if this prop matches our replacement.
 					if (thisProp != null && thisProp == target)
 					{
 						// Match!  Add reference data to the list.
@@ -213,7 +213,7 @@ namespace BOB
 		/// <param name="netPrefab">Network prefab to check</param>
 		/// <param name="laneIndex">Lane index to check</param>
 		/// <param name="propIndex">Prop index to check</param>
-		/// <returns>Original prefab if a all-building replacement is currently applied, null if no all-building replacement is currently applied</returns>
+		/// <returns>Original prefab if a network replacement is currently applied, null if no network replacement is currently applied</returns>
 		internal static PrefabInfo GetOriginal(NetInfo netPrefab, int laneIndex, int propIndex)
 		{
 			// Safety check.
@@ -242,7 +242,7 @@ namespace BOB
 
 
 		/// <summary>
-		/// Checks if there's a currently active anetwork replacement applied to the given network prop index, and if so, returns the *replacement* prefab.
+		/// Checks if there's a currently active network replacement applied to the given network prop index, and if so, returns the replacement record.
 		/// </summary>
 		/// <param name="netPrefab">Network prefab to check</param>
 		/// <param name="laneIndex">Lane index to check</param>
@@ -278,9 +278,9 @@ namespace BOB
 
 
 		/// <summary>
-		/// Replaces a prop using an all-network replacement.
+		/// Replaces a prop using a network replacement.
 		/// </summary>
-		/// <param name="netElement">All-network replacement element to apply</param>
+		/// <param name="netElement">Network replacement element to apply</param>
 		/// <param name="propReference">Individual prop reference to apply to</param>
 		internal static void ReplaceProp(BOBNetReplacement netElement, NetPropReference propReference)
 		{

@@ -240,7 +240,7 @@ namespace BOB
 		/// <param name="netPrefab">Network prefab to check</param>
 		/// <param name="laneIndex">Lane index to check</param>
 		/// <param name="propIndex">Prop index to check</param>
-		/// <returns>Replacement record if a all-network replacement is currently applied, null if no all-network replacement is currently applied</returns>
+		/// <returns>Replacement record if an all-network replacement is currently applied, null if no all-network replacement is currently applied</returns>
 		internal static PrefabInfo GetOriginal(NetInfo netPrefab, int laneIndex, int propIndex)
 		{
 			// Iterate through each entry in master dictionary.
@@ -265,7 +265,7 @@ namespace BOB
 
 
 		/// <summary>
-		/// Checks if there's a currently active all-network replacement applied to the given network prop index, and if so, returns the *replacement* prefab.
+		/// Checks if there's a currently active all-network replacement applied to the given network prop index, and if so, returns the replacement record.
 		/// </summary>
 		/// <param name="netPrefab">Network prefab to check</param>
 		/// <param name="laneIndex">Lane index to check</param>

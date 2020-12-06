@@ -1,15 +1,30 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 
 namespace BOB
 {
 	/// <summary>
+	/// Records original prop data.
+	/// </summary>
+	public class BuildingPropReference
+	{
+		public BuildingInfo building;
+		public int propIndex;
+		public float radAngle;
+		public Vector3 postion;
+		public int probability;
+	}
+
+
+	/// <summary>
 	/// Static class to manage building prop and tree replacements.
 	/// </summary>
 	internal static class BuildingReplacement
 	{
-		// Master dictionary of building replacements.
-		internal static Dictionary<BuildingInfo, SortedList<int, Replacement>> buildingDict;
+		// Master dictionary of replaced prop references.
+		internal static Dictionary<BuildingInfo, Dictionary<PrefabInfo, BOBBuildingReplacement>> replacements;
+
 
 
 		/// <summary>
@@ -17,7 +32,7 @@ namespace BOB
 		/// </summary>
 		internal static void Setup()
 		{
-			buildingDict = new Dictionary<BuildingInfo, SortedList<int, Replacement>>();
+			replacements = new Dictionary<BuildingInfo, Dictionary<PrefabInfo, BOBBuildingReplacement>>();
 		}
 
 
@@ -26,199 +41,352 @@ namespace BOB
 		/// </summary>
 		internal static void RevertAll()
 		{
-			// Iterate through each entry in the master dictionary.
-			foreach (BuildingInfo building in buildingDict.Keys)
+			foreach (BuildingInfo building in replacements.Keys)
 			{
-				// Iterate through each active replacement for this building.
-				foreach (int index in buildingDict[building].Keys)
+				// Iterate through each entry in the master prop dictionary.
+				foreach (PrefabInfo prop in replacements[building].Keys)
 				{
 					// Revert this replacement (but don't remove the entry, as the dictionary is currently immutable while we're iterating through it).
-					Revert(building, index, removeEntries: false);
+					Revert(building, prop, removeEntries: false);
 				}
 			}
 
-			// Re-initialise the dictionary.
+			// Re-initialise the dictionaries.
 			Setup();
 		}
 
 
 		/// <summary>
-		/// Reverts an individual building replacement.
+		/// Reverts a building replacement.
 		/// </summary>
-		/// <param name="buildingPrefab">Targeted building prefab</param>
-		/// <param name="index">Replacement index to revert</param>
+		/// <param name="building">Targeted building</param>
+		/// <param name="target">Targeted (original) tree/prop prefab</param>
+		/// <param name="replacement">Applied replacment tree/prop prefab</param>
 		/// <param name="removeEntries">True (default) to remove the reverted entries from the master dictionary, false to leave the dictionary unchanged</param>
 		/// <returns>True if the entire building record was removed from the dictionary (due to no remaining replacements for that prefab), false if the prefab remains in the dictionary (has other active replacements)</returns>
-		internal static bool Revert(BuildingInfo buildingPrefab, int index, bool removeEntries = true)
+		internal static void Revert(BuildingInfo building, PrefabInfo target, bool removeEntries = true)
 		{
-			// Get original prop.
-			PrefabInfo prefabInfo = GetOriginal(buildingPrefab, index);
-
-			// Only revert if there is an active replacement (GetOriginal returns null if there's no active replacement).
-			if (prefabInfo != null)
+			// Safety check.
+			if (building == null || !replacements.ContainsKey(building))
 			{
-				// Tree or prop?
-				if (prefabInfo is TreeInfo)
+				return;
+			}
+
+			// Iterate through each entry in our dictionary.
+			foreach (BuildingPropReference propReference in replacements[building][target].references)
+			{
+				// Revert entry.
+				if (target is PropInfo)
 				{
-					// Tree - restore original.
-					buildingPrefab.m_props[index].m_finalTree = prefabInfo as TreeInfo;
+					propReference.building.m_props[propReference.propIndex].m_finalProp = (PropInfo)target;
 				}
 				else
 				{
-					// Prop - restore original.
-					buildingPrefab.m_props[index].m_finalProp = (prefabInfo as PropInfo);
+					propReference.building.m_props[propReference.propIndex].m_finalTree = (TreeInfo)target;
+				}
+				propReference.building.m_props[propReference.propIndex].m_radAngle = propReference.radAngle;
+				propReference.building.m_props[propReference.propIndex].m_position = propReference.postion;
+				propReference.building.m_props[propReference.propIndex].m_probability = propReference.probability;
+
+				// Restore any all-building replacement.
+				AllBuildingReplacement.Restore(building, target, propReference.propIndex);
+			}
+
+			// Remove entry from dictionary, if we're doing so.
+			if (removeEntries)
+			{
+				replacements[building].Remove(target);
+
+				// Delete entire building entry if nothing left after removing this one.
+				if (replacements[building].Count == 0)
+				{
+					replacements.Remove(building);
+				}
+			}
+		}
+
+
+		/// <summary>
+		/// Removes an entry from the master dictionary of building replacements currently applied to building.
+		/// </summary>
+		/// <param name="buildingPrefab">Building prefab</param>
+		/// <param name="target">Target prop info</param>
+		/// <param name="laneIndex">Lane index</param>
+		/// <param name="propIndex">Prop index</param>
+		internal static void RemoveEntry(BuildingInfo buildingPrefab, PrefabInfo target, int propIndex)
+		{
+			// Check to see if we have an entry for this prefab.
+			if (replacements.ContainsKey(buildingPrefab))
+			{
+				if (replacements[buildingPrefab].ContainsKey(target))
+				{
+					// Yes - iterate through each recorded prop reference.
+					for (int i = 0; i < replacements[buildingPrefab][target].references.Count; ++i)
+					{
+						// Look for a building and index match.
+						BuildingPropReference propReference = replacements[buildingPrefab][target].references[i];
+						if (propReference.building == buildingPrefab && propReference.propIndex == propIndex)
+						{
+							// Got a match!  Revert instance.
+							if (target is PropInfo)
+							{
+								propReference.building.m_props[propReference.propIndex].m_finalProp = (PropInfo)target;
+							}
+							else
+							{
+								propReference.building.m_props[propReference.propIndex].m_finalTree = (TreeInfo)target;
+							}
+							buildingPrefab.m_props[propIndex].m_radAngle = propReference.radAngle;
+							buildingPrefab.m_props[propIndex].m_position = propReference.postion;
+							buildingPrefab.m_props[propIndex].m_probability = propReference.probability;
+
+							// Remove this reference and return.
+							replacements[buildingPrefab][target].references.Remove(replacements[buildingPrefab][target].references[i]);
+							return;
+						}
+					}
+				}
+			}
+		}
+
+
+		/// <summary>
+		/// Applies a new (or updated) building replacement.
+		/// </summary>
+		/// <param name="building">Targeted building</param>
+		/// <param name="target">Targeted (original) prop prefab</param>
+		/// <param name="replacement">Replacment prop prefab</param>
+		/// <param name="angle">Replacment prop angle adjustment</param>
+		/// <param name="offsetX">Replacment X position offset</param>
+		/// <param name="offsetY">Replacment Y position offset</param>
+		/// <param name="offsetZ">Replacment Z position offset</param>
+		/// <param name="probability">Replacement probability</param>
+		internal static void Apply(BuildingInfo building, PrefabInfo target, PrefabInfo replacement, float angle, float offsetX, float offsetY, float offsetZ, int probability)
+		{
+			// Make sure that target and replacement are the same type before doing anything.
+			if (target == null || replacement == null || (target is TreeInfo && !(replacement is TreeInfo)) || (target is PropInfo) && !(replacement is PropInfo))
+			{
+				return;
+			}
+
+			// Check to see if we already have a replacement entry for this prop - if so, revert the replacement first.
+			if (replacements.ContainsKey(building) && replacements[building].ContainsKey(target))
+			{
+				Revert(building, target, true);
+			}
+
+			// Create new dictionary entry for building if none already exists.
+			if (!replacements.ContainsKey(building))
+			{
+				replacements.Add(building, new Dictionary<PrefabInfo, BOBBuildingReplacement>());
+			}
+
+			// Create new dictionary entry for prop if none already exists.
+			if (!replacements[building].ContainsKey(target))
+			{
+				replacements[building].Add(target, new BOBBuildingReplacement());
+			}
+
+			// Add/replace dictionary replacement data.
+			replacements[building][target].references = new List<BuildingPropReference>();
+			replacements[building][target].tree = target is TreeInfo;
+			replacements[building][target].targetInfo = target;
+			replacements[building][target].target = target.name;
+			replacements[building][target].angle = angle;
+			replacements[building][target].offsetX = offsetX;
+			replacements[building][target].offsetY = offsetY;
+			replacements[building][target].offsetZ = offsetZ;
+			replacements[building][target].probability = probability;
+
+			// Record replacement prop.
+			replacements[building][target].replacementInfo = replacement;
+			replacements[building][target].replacement = replacement.name;
+
+			// Iterate through each prop in building.
+			for (int propIndex = 0; propIndex < building.m_props.Length; ++propIndex)
+			{
+				// Check for any currently active individual building prop replacement.
+				if (IndividualReplacement.GetOriginal(building, propIndex) != null)
+				{
+					// Active individual building prop replacement; skip this one.
+					continue;
 				}
 
-				// Restore original probability.
-				buildingPrefab.m_props[index].m_probability = buildingDict[buildingPrefab][index].originalProb;
-
-				// Apply any all-building replacement.
-				AllBuildingReplacement.Restore(buildingPrefab, index);
-
-				// Remove dictionary entries if that setting is enabled.
-				if (removeEntries)
+				// Check for any existing all-building replacement.
+				PrefabInfo thisProp = AllBuildingReplacement.GetOriginal(building, propIndex);
+				if (thisProp == null)
 				{
-					// Remove individual replacement record.
-					buildingDict[buildingPrefab].Remove(index);
-
-					// Check to see if there are any remaining replacements for this building prefab.
-					if (buildingDict[buildingPrefab].Count == 0)
+					// No active replacement; use current PropInfo.
+					if (target is PropInfo)
 					{
-						// No remaining replacements - remove the entire building prefab entry and return true to indicate that we've done so.
-						buildingDict.Remove(buildingPrefab);
-						return true;
+						thisProp = building.m_props[propIndex].m_finalProp;
+					}
+					else
+					{
+						thisProp = building.m_props[propIndex].m_finalTree;
+					}
+				}
+
+				// See if this prop matches our replacement.
+				if (thisProp != null && thisProp == target)
+				{
+					// Match!  Add reference data to the list.
+					replacements[building][target].references.Add(new BuildingPropReference
+					{
+						building = building,
+						propIndex = propIndex,
+						radAngle = building.m_props[propIndex].m_radAngle,
+						postion = building.m_props[propIndex].m_position,
+						probability = building.m_props[propIndex].m_probability
+					});
+				}
+			}
+
+			// Now, iterate through each entry found.
+			foreach (BuildingPropReference propReference in replacements[building][target].references)
+			{
+				// Reset any all-building replacements first.
+				AllBuildingReplacement.RemoveEntry(building, target, propReference.propIndex);
+
+				// Apply the replacement.
+				ReplaceProp(replacements[building][target], propReference);
+			}
+		}
+
+
+		/// <summary>
+		/// Checks if there's a currently active building replacement applied to the given building prop index, and if so, returns the *original* prefab.
+		/// </summary>
+		/// <param name="buildingPrefab">Building prefab to check</param>
+		/// <param name="propIndex">Prop index to check</param>
+		/// <returns>Original prefab if a building replacement is currently applied, null if no building replacement is currently applied</returns>
+		internal static PrefabInfo GetOriginal(BuildingInfo buildingPrefab, int propIndex)
+		{
+			// Safety check.
+			if (buildingPrefab != null && replacements.ContainsKey(buildingPrefab))
+			{
+				// Iterate through each entry in master dictionary.
+				foreach (PrefabInfo target in replacements[buildingPrefab].Keys)
+				{
+					BOBBuildingReplacement reference = replacements[buildingPrefab][target];
+					// Iterate through each prop reference in this entry.
+					foreach (BuildingPropReference propRef in reference.references)
+					{
+						// Check for a building and prop index match.
+						if (propRef.building == buildingPrefab && propRef.propIndex == propIndex)
+						{
+							// Match!  Return the original prefab.
+							return target;
+						}
 					}
 				}
 			}
 
-			// If we got here, we haven't removed the building prefab entry from the master dictionary - return false to indicate that.
-			return false;
-		}
-
-
-		/// <summary>
-		/// Applies a new building replacement (replacing individual trees or props).
-		/// </summary>
-		/// <param name="buildingPrefab">Building prefab to apply to</param>
-		/// <param name="replacement">Replacement to apply</param>
-		internal static void ApplyReplacement(BuildingInfo buildingPrefab, Replacement replacement)
-		{
-			// Just in case.
-			if (replacement.targetInfo == null || replacement.targetName == null || replacement.replaceName == null || replacement.replacementInfo == null)
-			{
-				Debugging.Message("invalid replacement");
-				return;
-			}
-
-			// Tree or prop?
-			if (replacement.isTree)
-			{
-				// Tree - replace the target tree with the replacement tree.
-				buildingPrefab.m_props[replacement.targetIndex].m_finalTree = (TreeInfo)replacement.replacementInfo;
-			}
-			else
-			{
-				// Tree - replace the target prop with the replacement prop.
-				buildingPrefab.m_props[replacement.targetIndex].m_finalProp = (PropInfo)replacement.replacementInfo;
-			}
-
-			// Apply replacement angle and probability.
-			buildingPrefab.m_props[replacement.targetIndex].m_angle = replacement.angle;
-			buildingPrefab.m_props[replacement.targetIndex].m_probability = replacement.probability;
-
-			// Remove any currently applied all-building building replacement entry for this tree or prop.
-			AllBuildingReplacement.RemoveEntry(buildingPrefab, replacement.targetIndex);
-		}
-
-
-		/// <summary>
-		/// Adds or upates a building prop or tree replacement.
-		/// </summary>
-		/// <param name="buildingPrefab">Building prefab to apply to</param>
-		/// <param name="replacement">Replacement to apply</param>
-		/// <param name="index">(Optional) target index override</param>
-		internal static void AddReplacement(BuildingInfo buildingPrefab, Replacement replacement, int index = -1)
-		{
-			// Just in case.
-			if (replacement.targetInfo == null || replacement.targetName == null || replacement.replaceName == null || replacement.replacementInfo == null)
-			{
-				Debugging.Message("invalid replacement");
-				return;
-			}
-
-			// Clone the provided replacement record for adding to the master dictionary (so the original can be modified by the calling method without clobbering the dictionary entry, and so we can tweak the clone here prior to adding without affecting the original).
-			Replacement clone = ReplacementUtils.Clone(replacement);
-
-			// Check to see if an index override has been provided.
-			if (index >= 0)
-			{
-				// Override provided - simply use the provided index as the target index.
-				clone.targetIndex = index;
-			}
-
-			// Check to see if we don't already have an entry for this building prefab in the master dictionary.
-			if (!buildingDict.ContainsKey(buildingPrefab))
-			{
-				// No existing entry, so add one.
-				buildingDict.Add(buildingPrefab, new SortedList<int, Replacement>());
-			}
-
-			// Check to see if we already have an entry for this replacement in the master dictionary.
-			if (buildingDict[buildingPrefab].ContainsKey(clone.targetIndex))
-			{
-				// An entry already exists - update it (first preserving the original probability).
-				clone.originalProb = buildingDict[buildingPrefab][clone.targetIndex].originalProb;
-				buildingDict[buildingPrefab][clone.targetIndex] = clone;
-			}
-			else
-			{
-				// No existing entry - add a new one (first storing the original probability).
-				clone.originalProb = buildingPrefab.m_props[clone.targetIndex].m_probability;
-				buildingDict[buildingPrefab].Add(clone.targetIndex, clone);
-			}
-
-			// Apply the actual tree/prop prefab replacement.
-			ApplyReplacement(buildingPrefab, clone);
-		}
-
-
-		/// <summary>
-		/// Returns the original probability for the given building prop record.
-		/// </summary>
-		/// <param name="buildingPrefab">Building prefab</param>
-		/// <param name="index">Building prop index</param>
-		/// <returns>Original probability (which will be the current probability if no replacement is active)</returns>
-		internal static int OriginalProbability(BuildingInfo buildingPrefab, int index)
-		{
-			// Try to find an entry for this index of this building in the master dictionary.
-			if (buildingDict.ContainsKey(buildingPrefab) && buildingDict[buildingPrefab].ContainsKey(index))
-			{
-				// Entry found - return the stored original probability.
-				return buildingDict[buildingPrefab][index].originalProb;
-			}
-
-			// No entry found - return the current probability (which IS the original probability).
-			return buildingPrefab.m_props[index].m_probability;
-		}
-
-
-		/// <summary>
-		/// Retrieves the original tree/prop prefab for the given index (returns null if there's no active replacement).
-		/// </summary>
-		/// <param name="buildingPrefab">Building prefab</param>
-		/// <param name="index">Prop index</param>
-		/// <returns>PrefabInfo of the original prefab, or null if there's no currently active replacement</returns>
-		internal static PrefabInfo GetOriginal(BuildingInfo buildingPrefab, int index)
-		{
-			// Try to find an entry for this index of this building in the master dictionary.
-			if (buildingDict.ContainsKey(buildingPrefab) && buildingDict[buildingPrefab].ContainsKey(index))
-			{
-				// Entry found - return the stored original prefab.
-				return buildingDict[buildingPrefab][index].targetInfo;
-			}
-
-			// No entry found - return null to indicate no active replacement.
+			// If we got here, no entry was found - return null to indicate no active replacement.
 			return null;
+		}
+
+
+		/// <summary>
+		/// Checks if there's a currently active building replacement applied to the given building prop index, and if so, returns the replacement record.
+		/// </summary>
+		/// <param name="buildingPrefab">Building prefab to check</param>
+		/// <param name="propIndex">Prop index to check</param>
+		/// <returns>Replacement record if a building replacement is currently applied, null if no building replacement is currently applied</returns>
+		internal static BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingPrefab, int propIndex)
+		{
+			// Safety check.
+			if (buildingPrefab != null && replacements.ContainsKey(buildingPrefab))
+			{
+				// Iterate through each entry in master dictionary.
+				foreach (PrefabInfo target in replacements[buildingPrefab].Keys)
+				{
+					BOBBuildingReplacement reference = replacements[buildingPrefab][target];
+					// Iterate through each building reference in this entry.
+					foreach (BuildingPropReference propRef in reference.references)
+					{
+						// Check for a building and prop index match.
+						if (propRef.building == buildingPrefab && propRef.propIndex == propIndex)
+						{
+							// Match!  Return the original prefab.
+							return replacements[buildingPrefab][target];
+						}
+					}
+				}
+			}
+
+			// If we got here, no entry was found - return null to indicate no active replacement.
+			return null;
+		}
+
+
+		/// <summary>
+		/// Replaces a prop using a building replacement.
+		/// </summary>
+		/// <param name="buildingElement">Building replacement element to apply</param>
+		/// <param name="propReference">Individual prop reference to apply to</param>
+		internal static void ReplaceProp(BOBBuildingReplacement buildingElement, BuildingPropReference propReference)
+		{
+			// Convert offset to Vector3.
+			Vector3 offset = new Vector3
+			{
+				x = buildingElement.offsetX,
+				y = buildingElement.offsetY,
+				z = buildingElement.offsetZ
+			};
+
+			// Apply replacement.
+			if (buildingElement.replacementInfo is PropInfo)
+			{
+				propReference.building.m_props[propReference.propIndex].m_finalProp = (PropInfo)buildingElement.replacementInfo;
+			}
+			else
+			{
+				propReference.building.m_props[propReference.propIndex].m_finalTree = (TreeInfo)buildingElement.replacementInfo;
+			}
+
+			// Angle and offset.
+			propReference.building.m_props[propReference.propIndex].m_radAngle = propReference.radAngle + ((buildingElement.angle * Mathf.PI) / 180f);
+			propReference.building.m_props[propReference.propIndex].m_position = propReference.postion + offset;
+
+			// Probability.
+			propReference.building.m_props[propReference.propIndex].m_probability = buildingElement.probability;
+		}
+
+
+		/// <summary>
+		/// Restores a building replacement, if any (e.g. after a individual building prop replacement has been reverted).
+		/// </summary>
+		/// <param name="buildingPrefab">Building prefab</param>
+		/// <param name="target">Target prop info</param>
+		/// <param name="propIndex">Prop index</param>
+		/// <returns>True if a restoration was made, false otherwise</returns>
+		internal static bool Restore(BuildingInfo buildingPrefab, PrefabInfo target, int propIndex)
+		{
+			// Check to see if we have an entry for this prefab.
+			if (replacements.ContainsKey(buildingPrefab))
+			{
+				if (replacements[buildingPrefab].ContainsKey(target))
+				{
+					// Yes - add reference data to the list.
+					BuildingPropReference newReference = new BuildingPropReference
+					{
+						building = buildingPrefab,
+						propIndex = propIndex,
+						radAngle = buildingPrefab.m_props[propIndex].m_radAngle,
+						postion = buildingPrefab.m_props[propIndex].m_position
+					};
+
+					replacements[buildingPrefab][target].references.Add(newReference);
+
+					// Apply replacement and return true to indicate restoration.
+					ReplaceProp(replacements[buildingPrefab][target], newReference);
+					return true;
+				}
+			}
+
+			// If we got here, no restoration was made.
+			return false;
 		}
 	}
 }

@@ -11,24 +11,22 @@ namespace BOB
 	{
 		// Original prefab.
 		public PrefabInfo originalPrefab;
+		public int originalProb;
+
+		// Current individual replacement (if any).
+		public PrefabInfo individualPrefab;
+		public int individualProb;
 
 		// Current replacement (if any).
-		public PrefabInfo currentPrefab;
+		public PrefabInfo replacementPrefab;
+		public int replacementProb;
 
 		// Current all- replacement (if any).
 		public PrefabInfo allPrefab;
+		public int allProb;
 
 		// Single index.
 		public int index;
-
-		// Prop angle.
-		public float angle;
-
-		// Current probability.
-		public int probability;
-
-		// Original probability.
-		public int originalProb;
 
 		// List of indexes.
 		public List<int> indexes = new List<int>();
@@ -45,8 +43,5 @@ namespace BOB
 
 		// Lane list.
 		public List<int> lanes = new List<int>();
-
-		// Position offset.
-		public Vector3 offset;
 	}
 }

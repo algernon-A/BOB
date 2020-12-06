@@ -21,9 +21,6 @@ namespace BOB
 		protected PrefabInfo thisPrefab;
 		protected PropListItem thisItem;
 		protected int index;
-		protected float angle;
-		protected int probability;
-		protected int originalProb;
 
 
         // Background for each list item.
@@ -112,11 +109,7 @@ namespace BOB
                 // Not a raw PropInfo, so it should be a PropListItem replacement record.
                 // Set local references.
                 thisItem = data as PropListItem;
-                thisPrefab = thisItem.originalPrefab;
                 index = thisItem.index;
-                angle = thisItem.angle;
-                probability = thisItem.probability;
-                originalProb = thisItem.originalProb;
 
                 // See if this is a network prop.
                 NetPropListItem thisNetItem = data as NetPropListItem;
@@ -128,25 +121,43 @@ namespace BOB
                     displayText.Append(" ");
                 }
 
-                // Prefab display name.
-                displayText.Append(UIUtils.GetDisplayName(thisPrefab.name));
+                // Original prefab display name.
+                displayText.Append(UIUtils.GetDisplayName(thisItem.originalPrefab.name));
 
                 // Show original probability in brackets immediately afterwards.
                 displayText.Append(" (");
-                displayText.Append(originalProb);
+                displayText.Append(thisItem.originalProb);
                 displayText.Append("%)");
 
-                // Check to see if there's a currently active replacement (currentPrefab isn't null).
-                if (thisItem.currentPrefab != null)
+                // Check to see if there's a currently active individual replacement.
+                if (thisItem.individualPrefab != null)
                 {
                     // A replacement is currently active - include it in the text.
                     displayText.Append(" (");
                     displayText.Append(Translations.Translate("BOB_ROW_NOW"));
-                    displayText.Append(UIUtils.GetDisplayName(thisItem.currentPrefab.name));
+                    displayText.Append(" ");
+                    displayText.Append(UIUtils.GetDisplayName(thisItem.individualPrefab.name));
 
                     // Append replacement name and probability to the label.
                     displayText.Append(" ");
-                    displayText.Append(probability);
+                    displayText.Append(thisItem.individualProb);
+                    displayText.Append("%");
+
+                    // Append closing bracket.
+                    displayText.Append(")");
+                }
+                // If no current individual replacement, check to see if there's a currently active building replacement.
+                else if (thisItem.replacementPrefab != null)
+                {
+                    // A replacement is currently active - include it in the text.
+                    displayText.Append(" (");
+                    displayText.Append(Translations.Translate("BOB_ROW_NOW"));
+                    displayText.Append(" ");
+                    displayText.Append(UIUtils.GetDisplayName(thisItem.replacementPrefab.name));
+
+                    // Append replacement name and probability to the label.
+                    displayText.Append(" ");
+                    displayText.Append(thisItem.replacementProb);
                     displayText.Append("%");
 
                     // Append closing bracket.
@@ -165,7 +176,7 @@ namespace BOB
                     if (thisNetItem == null)
                     {
                         displayText.Append(" ");
-                        displayText.Append(probability);
+                        displayText.Append(thisItem.allProb);
                         displayText.Append("%");
                     }
 

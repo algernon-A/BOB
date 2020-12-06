@@ -28,18 +28,6 @@
 		{
 			// Update currently selected target prefab.
 			InfoPanelManager.Panel.CurrentTargetItem = thisItem;
-
-			// Update probability textfield.
-			if (InfoPanelManager.Panel is BOBBuildingInfoPanel buildingPanel)
-			{
-				buildingPanel.probabilityField.text = probability.ToString();
-			}
-
-			// Update angle textfield.
-			if (InfoPanelManager.Panel is BOBNetInfoPanel netPanel)
-			{
-				netPanel.angleField.text = angle.ToString();
-			}
 		}
 	}
 }

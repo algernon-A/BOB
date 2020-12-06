@@ -35,8 +35,9 @@ namespace BOB
 				base.CurrentTargetItem = value;
 
 				// If we've got a replacement, update the offset fields with the replacement vlues
-				if (currentTargetItem.currentPrefab != null)
+				if (currentTargetItem.replacementPrefab != null)
 				{
+					angleField.text = NetworkReplacement.replacements[currentNet][currentTargetItem.originalPrefab].angle.ToString();
 					xField.text = NetworkReplacement.replacements[currentNet][currentTargetItem.originalPrefab].offsetX.ToString();
 					yField.text = NetworkReplacement.replacements[currentNet][currentTargetItem.originalPrefab].offsetY.ToString();
 					zField.text = NetworkReplacement.replacements[currentNet][currentTargetItem.originalPrefab].offsetZ.ToString();
@@ -44,7 +45,8 @@ namespace BOB
 				}
 				// Ditto for any all-network replacement.
 				else if (currentTargetItem.allPrefab != null)
-                {
+				{
+					angleField.text = AllNetworkReplacement.replacements[currentTargetItem.originalPrefab].angle.ToString();
 					xField.text = AllNetworkReplacement.replacements[currentTargetItem.originalPrefab].offsetX.ToString();
 					yField.text = AllNetworkReplacement.replacements[currentTargetItem.originalPrefab].offsetY.ToString();
 					zField.text = AllNetworkReplacement.replacements[currentTargetItem.originalPrefab].offsetZ.ToString();
@@ -53,6 +55,8 @@ namespace BOB
 				else
                 {
 					// No current replacement; set all offset fields to blank.
+					// TODO: populate with base values.
+					angleField.text = "0";
 					xField.text = "0";
 					yField.text = "0";
 					zField.text = "0";
@@ -189,15 +193,11 @@ namespace BOB
 					zField.text = zOffset.ToString();
 					probabilityField.text = probability.ToString();
 
-					// Network replacements are always grouped - iterate through each index in the list.
-					for (int i = 0; i < currentTargetItem.indexes.Count; ++i)
-					{
-						// Add the replacement, providing an index override to the current index.
-						NetworkReplacement.Apply(currentNet, currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
-					}
+					// Network replacements are always grouped.
+					NetworkReplacement.Apply(currentNet, currentTargetItem.originalPrefab ?? currentTargetItem.replacementPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
 
 					// Update current target.
-					currentTargetItem.currentPrefab = replacementPrefab;
+					currentTargetItem.replacementPrefab = replacementPrefab;
 
 					// Save configuration file and refresh target list (to reflect our changes).
 					ConfigurationUtils.SaveConfig();
@@ -228,7 +228,7 @@ namespace BOB
 				probabilityField.text = probability.ToString();
 
 				// Apply replacement.
-				AllNetworkReplacement.Apply(currentTargetItem.originalPrefab ?? currentTargetItem.currentPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
+				AllNetworkReplacement.Apply(currentTargetItem.originalPrefab ?? currentTargetItem.replacementPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
 
 				// Update current target.
 				currentTargetItem.allPrefab = replacementPrefab;
@@ -245,20 +245,16 @@ namespace BOB
 			revertButton.eventClicked += (control, clickEvent) =>
 			{
 				// Network or all-network reversion?
-				if (currentTargetItem.currentPrefab != null)
+				if (currentTargetItem.replacementPrefab != null)
 				{
 					// Individual network reversion - ensuire that we've got a current selection before doing anything.
 					if (currentTargetItem != null && currentTargetItem is NetPropListItem currentNetItem)
 					{
-						// Network replacements are always grouped -iterate through each instance in the list and revert.
-						for (int i = 0; i < currentTargetItem.indexes.Count; ++i)
-						{
-							// Add the replacement, providing an index override to the current index.
-							NetworkReplacement.Revert(currentNet, currentTargetItem.originalPrefab, true);
-						}
+						// Network replacements are always grouped.
+						NetworkReplacement.Revert(currentNet, currentTargetItem.originalPrefab, true);
 
 						// Clear current target replacement prefab.
-						currentTargetItem.currentPrefab = null;
+						currentTargetItem.replacementPrefab = null;
 
 						// Save configuration file and refresh building list (to reflect our changes).
 						ConfigurationUtils.SaveConfig();
@@ -353,22 +349,21 @@ namespace BOB
 					// Get original (pre-replacement) tree/prop prefab and current probability (as default original probability).
 					propListItem.originalPrefab = NetworkReplacement.GetOriginal(currentNet, lane, propIndex) ?? AllNetworkReplacement.GetOriginal(currentNet, lane, propIndex) ?? finalInfo;
 					propListItem.originalProb = laneProps[propIndex].m_probability;
-					propListItem.probability = propListItem.originalProb;
 
 					// All-network replacement and original probability (if any).
 					BOBNetReplacement allNetReplacement = AllNetworkReplacement.ActiveReplacement(currentNet, lane, propIndex);
 					if (allNetReplacement != null)
 					{
 						propListItem.allPrefab = allNetReplacement.replacementInfo;
-						propListItem.originalProb = allNetReplacement.probability;
+						propListItem.allProb = allNetReplacement.probability;
 					}
 
 					// Individual network replacement and original probability (if any).
-					BOBNetReplacement netReplacment = NetworkReplacement.ActiveReplacement(currentNet, lane, propIndex);
-					if (netReplacment != null)
+					BOBNetReplacement netReplacement = NetworkReplacement.ActiveReplacement(currentNet, lane, propIndex);
+					if (netReplacement != null)
 					{
-						propListItem.currentPrefab = netReplacment.replacementInfo;
-						propListItem.originalProb = netReplacment.probability;
+						propListItem.replacementPrefab = netReplacement.replacementInfo;
+						propListItem.replacementProb = netReplacement.probability;
 					}
 
 					// Are we grouping?
@@ -381,7 +376,7 @@ namespace BOB
 						foreach (NetPropListItem item in propList)
 						{
 							// Check to see if we already have this in the list - matching original prefab, building replacement prefab, all-building replacement prefab, and probability.
-							if (item.originalPrefab == propListItem.originalPrefab && item.currentPrefab == propListItem.currentPrefab && propListItem.allPrefab == item.allPrefab && item.probability == propListItem.probability)
+							if (item.originalPrefab == propListItem.originalPrefab && item.replacementPrefab == propListItem.replacementPrefab && propListItem.allPrefab == item.allPrefab)
 							{
 								// We've already got an identical grouped instance of this item - add this index and lane to the lists of indexes and lanes under that item and set the flag to indicate that we've done so.
 								item.indexes.Add(propIndex);
@@ -423,11 +418,5 @@ namespace BOB
 
 			return fastList;
 		}
-
-
-		/// <summary>
-		/// Gets the current target item as a NetPropListItem.
-		/// </summary>
-		private NetPropListItem CurrentNetTargetItem => currentTargetItem as NetPropListItem;
 	}
 }

@@ -13,17 +13,17 @@ namespace BOB
 		[XmlAttribute("version")]
 		public int version = 0;
 
-		[XmlArray("trees", IsNullable = true)]
-		[XmlArrayItem("tree", IsNullable = true)]
-		public List<BOBAllBuildingElement> allBuildingTrees { get; set; }
-
-		[XmlArray("props", IsNullable = true)]
-		[XmlArrayItem("prop", IsNullable = true)]
-		public List<BOBAllBuildingElement> allBuildingProps { get; set; }
+		[XmlArray("buildprops", IsNullable = true)]
+		[XmlArrayItem("buildprop", IsNullable = true)]
+		public List<BOBBuildingReplacement> allBuildingProps { get; set; }
 
 		[XmlArray("buildings", IsNullable = false)]
 		[XmlArrayItem("building", IsNullable = false)]
 		public List<BOBBuildingElement> buildings { get; set; }
+
+		[XmlArray("individuals", IsNullable = false)]
+		[XmlArrayItem("individual", IsNullable = false)]
+		public List<BOBBuildingElement> indBuildings { get; set; }
 
 		[XmlArray("netprops", IsNullable = true)]
 		[XmlArrayItem("netprop", IsNullable = true)]
@@ -32,20 +32,6 @@ namespace BOB
 		[XmlArray("networks", IsNullable = false)]
 		[XmlArrayItem("network", IsNullable = false)]
 		public List<BOBNetworkElement> networks { get; set; }
-	}
-
-
-	/// <summary>
-	/// Building replacment record XML format.
-	/// </summary>
-	public class BOBBuildingElement
-	{
-		[XmlAttribute("prefab")]
-		public string prefab = string.Empty;
-
-		[XmlArray("replacements")]
-		[XmlArrayItem("replacement")]
-		public List<Replacement> replacements;
 	}
 
 
@@ -60,6 +46,42 @@ namespace BOB
 		[XmlAttribute("replacement")]
 		public string replacement = string.Empty;
 	}
+
+
+	public class BOBNetworkElement
+    {
+		[XmlElement("network")]
+		public string network = string.Empty;
+
+		[XmlIgnore]
+		public NetInfo netInfo;
+
+		[XmlArray("replacements")]
+		[XmlArrayItem("replacement")]
+		public List<BOBNetReplacement> replacements;
+	}
+
+	public class BOBBuildingElement
+	{
+		[XmlElement("building")]
+		public string building = string.Empty;
+
+		[XmlIgnore]
+		public BuildingInfo buildingInfo;
+
+		[XmlArray("replacements")]
+		[XmlArrayItem("replacement")]
+		public List<BOBBuildingReplacement> replacements;
+	}
+
+	public class BOBBuildingReplacement : BOBNetReplacement
+    {
+		[XmlAttribute("index")]
+		public int index = -1;
+
+		[XmlIgnore]
+		new public List<BuildingPropReference> references;
+    }
 
 
 	/// <summary>
@@ -100,18 +122,4 @@ namespace BOB
 		[XmlIgnore]
 		public List<NetPropReference> references;
 	}
-
-
-	public class BOBNetworkElement
-    {
-		[XmlElement("network")]
-		public string network = string.Empty;
-
-		[XmlIgnore]
-		public PrefabInfo netInfo;
-
-		[XmlArray("replacements")]
-		[XmlArrayItem("replacement")]
-		public List<BOBNetReplacement> replacements;
-    }
 }

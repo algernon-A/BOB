@@ -64,7 +64,7 @@ namespace BOB
 				currentTargetItem = value;
 
 				// Select current replacement prefab.
-				loadedList.FindItem(currentTargetItem.allPrefab ?? currentTargetItem.currentPrefab ?? currentTargetItem.originalPrefab);
+				loadedList.FindItem(currentTargetItem.replacementPrefab ?? currentTargetItem.allPrefab ?? currentTargetItem.originalPrefab);
 
 				UpdateButtonStates();
 			}
@@ -230,7 +230,7 @@ namespace BOB
 			if (currentTargetItem != null)
 			{
 				// Reversion requires a currently active replacement (for the relevant target/all-building setting).
-				if (currentTargetItem.currentPrefab != null || currentTargetItem.allPrefab != null)
+				if (currentTargetItem.replacementPrefab != null || currentTargetItem.allPrefab != null)
 				{
 					revertButton.Enable();
 				}

@@ -32,6 +32,7 @@ namespace BOB
             AllNetworkReplacement.Setup();
             BuildingReplacement.Setup();
             NetworkReplacement.Setup();
+            IndividualReplacement.Setup();
 
             // Load configuration file.
             ConfigurationUtils.LoadConfig();
