@@ -163,6 +163,7 @@ namespace BOB
 
 					// Update current target.
 					currentTargetItem.replacementPrefab = replacementPrefab;
+					currentTargetItem.replacementProb = probability;
 
 					// Save configuration file and refresh target list (to reflect our changes).
 					ConfigurationUtils.SaveConfig();
@@ -197,6 +198,7 @@ namespace BOB
 
 				// Update current target.
 				currentTargetItem.allPrefab = replacementPrefab;
+				currentTargetItem.allProb = probability;
 
 				// Save configuration file and refresh building list (to reflect our changes).
 				ConfigurationUtils.SaveConfig();

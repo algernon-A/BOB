@@ -187,15 +187,20 @@ namespace BOB
 					{
 						// Grouped replacement.
 						BuildingReplacement.Apply(currentBuilding, currentTargetItem.originalPrefab ?? currentTargetItem.replacementPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
+
+						// Update current target.
+						currentTargetItem.replacementPrefab = replacementPrefab;
+						currentTargetItem.replacementProb = probability;
 					}
 					else
 					{
 						// Individual replacement.
 						IndividualReplacement.Apply(currentBuilding, currentTargetItem.index, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
-					}
 
-					// Update current target.
-					currentTargetItem.replacementPrefab = replacementPrefab;
+						// Update current target.
+						currentTargetItem.individualPrefab = replacementPrefab;
+						currentTargetItem.individualProb = probability;
+					}
 
 					// Save configuration file and refresh target list (to reflect our changes).
 					ConfigurationUtils.SaveConfig();
@@ -230,6 +235,7 @@ namespace BOB
 
 				// Update current target.
 				currentTargetItem.allPrefab = replacementPrefab;
+				currentTargetItem.allProb = probability;
 
 				// Save configuration file and refresh building list (to reflect our changes).
 				ConfigurationUtils.SaveConfig();
