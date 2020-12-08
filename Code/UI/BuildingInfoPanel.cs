@@ -247,29 +247,36 @@ namespace BOB
 			// Revert button event handler.
 			revertButton.eventClicked += (control, clickEvent) =>
 			{
-				// Building or all-building reversion?
-				if (currentTargetItem.replacementPrefab != null)
+				// Individual building prop reversion?
+				if (currentTargetItem.individualPrefab != null)
 				{
-					// Individual building reversion - ensuire that we've got a current selection before doing anything.
+					// Individual building prop reversion - ensuire that we've got a current selection before doing anything.
 					if (currentTargetItem != null && currentTargetItem is PropListItem currentItem)
 					{
-						// Grouped or individual?
-						if (currentTargetItem.index < 0)
-						{
-							// Grouped reversion.
-							BuildingReplacement.Revert(currentBuilding, currentTargetItem.originalPrefab, true);
+						// Individual reversion.
+						IndividualReplacement.Revert(currentBuilding, currentTargetItem.index, true);
 
-							// Clear current target replacement prefab.
-							currentTargetItem.replacementPrefab = null;
-						}
-						else
-						{
-							// Individual reversion.
-							IndividualReplacement.Revert(currentBuilding, currentTargetItem.index, true);
+						// Clear current target replacement prefab.
+						currentTargetItem.individualPrefab = null;
+					}
 
-							// Clear current target replacement prefab.
-							currentTargetItem.individualPrefab = null;
-						}
+					// Save configuration file and refresh building list (to reflect our changes).
+					ConfigurationUtils.SaveConfig();
+					targetList.Refresh();
+
+					// Update button states.
+					UpdateButtonStates();
+				}
+				else if (currentTargetItem.replacementPrefab != null)
+				{
+					// Building reversion - ensuire that we've got a current selection before doing anything.
+					if (currentTargetItem != null && currentTargetItem is PropListItem currentItem)
+					{
+						// Grouped reversion.
+						BuildingReplacement.Revert(currentBuilding, currentTargetItem.originalPrefab, true);
+
+						// Clear current target replacement prefab.
+						currentTargetItem.replacementPrefab = null;
 					}
 
 					// Save configuration file and refresh building list (to reflect our changes).
