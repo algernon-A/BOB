@@ -257,7 +257,7 @@ namespace BOB
 			if (currentTargetItem != null)
 			{
 				// Reversion requires a currently active replacement (for the relevant target/all-building setting).
-				if (currentTargetItem.replacementPrefab != null || currentTargetItem.allPrefab != null)
+				if (currentTargetItem.individualPrefab != null || currentTargetItem.replacementPrefab != null || currentTargetItem.allPrefab != null)
 				{
 					revertButton.Enable();
 				}
