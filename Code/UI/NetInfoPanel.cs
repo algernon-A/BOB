@@ -47,13 +47,12 @@ namespace BOB
 				}
 				else
                 {
-					// No current replacement; set all offset fields to blank.
-					// TODO: populate with base values.
-					angleField.text = "0";
+					// No current replacement; set all offset fields to original prop.
+					angleField.text = value.originalAngle.ToString();
 					xField.text = "0";
 					yField.text = "0";
 					zField.text = "0";
-					probabilityField.text = "100";
+					probabilityField.text = value.originalProb.ToString();
 				}
             }
         }
@@ -316,6 +315,7 @@ namespace BOB
 					// Get original (pre-replacement) tree/prop prefab and current probability (as default original probability).
 					propListItem.originalPrefab = NetworkReplacement.GetOriginal(currentNet, lane, propIndex) ?? AllNetworkReplacement.GetOriginal(currentNet, lane, propIndex) ?? finalInfo;
 					propListItem.originalProb = laneProps[propIndex].m_probability;
+					propListItem.originalAngle = laneProps[propIndex].m_angle;
 
 					// All-network replacement and original probability (if any).
 					BOBNetReplacement allNetReplacement = AllNetworkReplacement.ActiveReplacement(currentNet, lane, propIndex);

@@ -12,6 +12,7 @@ namespace BOB
 		// Original prefab.
 		public PrefabInfo originalPrefab;
 		public int originalProb;
+		public float originalAngle;
 
 		// Current individual replacement (if any).
 		public PrefabInfo individualPrefab;

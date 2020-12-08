@@ -58,13 +58,12 @@ namespace BOB
 					probabilityField.text = AllBuildingReplacement.replacements[currentTargetItem.originalPrefab].probability.ToString();				}
 				else
 				{
-					// No current replacement; set all offset fields to blank.
-					// TODO: populate with base values.
-					angleField.text = "0";
+					// No current replacement; set all offset fields to original prop.
+					angleField.text = value.originalAngle.ToString();
 					xField.text = "0";
 					yField.text = "0";
 					zField.text = "0";
-					probabilityField.text = "100";
+					probabilityField.text = value.originalProb.ToString();
 				}
 			}
 		}
@@ -374,7 +373,7 @@ namespace BOB
 				// Get original (pre-replacement) tree/prop prefab and current probability (as default original probability).
 				propListItem.originalPrefab = BuildingReplacement.GetOriginal(currentBuilding, propIndex) ?? AllBuildingReplacement.GetOriginal(currentBuilding, propIndex) ?? finalInfo;
 				propListItem.originalProb = currentBuilding.m_props[propIndex].m_probability;
-
+				propListItem.originalAngle = (currentBuilding.m_props[propIndex].m_radAngle * 180f) / Mathf.PI;
 
 				// All-building replacement and original probability (if any).
 				BOBBuildingReplacement allBuildingReplacement = AllBuildingReplacement.ActiveReplacement(currentBuilding, propIndex);
