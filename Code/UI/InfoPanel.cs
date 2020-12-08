@@ -35,15 +35,13 @@ namespace BOB
 		// Panel components.
 		protected UIFastList targetList;
 		protected UIFastList loadedList;
-		protected UIButton replaceButton;
-		protected UIButton replaceAllButton;
-		protected UIButton revertButton;
+		protected UILabel noPropsLabel;
 		private UICheckBox hideVanilla;
 		private UITextField nameFilter;
-		protected UILabel noPropsLabel;
-		protected UICheckBox treeCheck;
-		protected UICheckBox propCheck;
+		protected UIButton replaceButton, replaceAllButton, revertButton;
+		protected UICheckBox treeCheck, propCheck;
 		internal UITextField probabilityField;
+		internal UITextField angleField, xField, yField, zField;
 
 		// Button labels.
 		protected abstract string ReplaceLabel { get; }
@@ -51,7 +49,7 @@ namespace BOB
 
 
 		// Trees or props?
-		protected abstract bool IsTree { get; }
+		protected bool IsTree => treeCheck.isChecked;
 
 
 		/// <summary>
@@ -154,21 +152,6 @@ namespace BOB
 				noPropsLabel.relativePosition = new Vector2(Margin, Margin);
 				noPropsLabel.Hide();
 
-				// Name filter.
-				nameFilter = UIUtils.LabelledTextField(this, Translations.Translate("BOB_FIL_NAME"));
-				nameFilter.relativePosition = new Vector2(width - nameFilter.width - Margin, 40f);
-
-				// Vanilla filter.
-				hideVanilla = UIUtils.AddCheckBox((UIComponent)(object)this, Translations.Translate("BOB_PNL_HDV"), nameFilter.relativePosition.x, 75f);
-				hideVanilla.eventCheckChanged += (control, isChecked) =>
-				{
-					// Filter list.
-					loadedList.rowsData = LoadedList(IsTree);
-
-					// Store state.
-					ModSettings.hideVanilla = isChecked;
-				};
-
 				// Replace text label.
 				UILabel replaceLabel = AddUIComponent<UILabel>();
 				replaceLabel.text = Translations.Translate("BOB_PNL_REP");
@@ -183,19 +166,33 @@ namespace BOB
 				// Revert button.
 				revertButton = UIUtils.CreateButton(this, Translations.Translate("BOB_PNL_REV"), 190f, LeftWidth + (Margin * 2), RevertY);
 
-				// Event handlers for name filter textbox.
-				nameFilter.eventTextChanged += (control, text) =>
-				{
-					loadedList.rowsData = LoadedList(IsTree);
-				};
-				nameFilter.eventTextSubmitted += (control, text) =>
-				{
-					loadedList.rowsData = LoadedList(IsTree);
-				};
+				// Angle label and textfield.
+				UILabel angleLabel = AddUIComponent<UILabel>();
+				angleLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 367f);
+				angleLabel.text = Translations.Translate("BOB_PNL_ANG");
+				angleField = UIUtils.AddTextField(this, 100f, 30f);
+				angleField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 360f);
 
-				// Set initial button and checkbox states.
-				hideVanilla.isChecked = ModSettings.hideVanilla;
-				UpdateButtonStates();
+				// Offset X position.
+				UILabel xLabel = AddUIComponent<UILabel>();
+				xLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 407f);
+				xLabel.text = Translations.Translate("BOB_PNL_XOF");
+				xField = UIUtils.AddTextField(this, 100f, 30f);
+				xField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 400f);
+
+				// Offset Y position.
+				UILabel yLabel = AddUIComponent<UILabel>();
+				yLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 447f);
+				yLabel.text = Translations.Translate("BOB_PNL_YOF");
+				yField = UIUtils.AddTextField(this, 100f, 30f);
+				yField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 440f);
+
+				// Offset Z position.
+				UILabel zLabel = AddUIComponent<UILabel>();
+				zLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 487f);
+				zLabel.text = Translations.Translate("BOB_PNL_ZOF");
+				zField = UIUtils.AddTextField(this, 100f, 30f);
+				zField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 480f);
 
 				// Add checkboxes.
 				propCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_PRP"), Margin, TitleHeight);
@@ -208,6 +205,36 @@ namespace BOB
 
 				probabilityField = UIUtils.AddTextField(this, 190f, 30f);
 				probabilityField.relativePosition = new Vector2(LeftWidth + (Margin * 2), ProbabilityY + probabilityLabel.height);
+
+				// Name filter.
+				nameFilter = UIUtils.LabelledTextField(this, Translations.Translate("BOB_FIL_NAME"));
+				nameFilter.relativePosition = new Vector2(width - nameFilter.width - Margin, 40f);
+				// Event handlers for name filter textbox.
+				nameFilter.eventTextChanged += (control, text) =>
+				{
+					loadedList.rowsData = LoadedList(IsTree);
+				};
+				nameFilter.eventTextSubmitted += (control, text) =>
+				{
+					loadedList.rowsData = LoadedList(IsTree);
+				};
+
+				// Vanilla filter.
+				hideVanilla = UIUtils.AddCheckBox((UIComponent)(object)this, Translations.Translate("BOB_PNL_HDV"), nameFilter.relativePosition.x, 75f);
+				hideVanilla.eventCheckChanged += (control, isChecked) =>
+				{
+					// Filter list.
+					loadedList.rowsData = LoadedList(IsTree);
+
+					// Store state.
+					ModSettings.hideVanilla = isChecked;
+				};
+
+
+				// Set initial button and checkbox states.
+				hideVanilla.isChecked = ModSettings.hideVanilla;
+				UpdateButtonStates();
+
 			}
 			catch (Exception exception)
 			{

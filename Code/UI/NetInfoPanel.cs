@@ -10,18 +10,11 @@ namespace BOB
 		// Current selection reference.
 		NetInfo currentNet;
 
-		// Panel components.
-		internal UITextField angleField, xField, yField, zField;
-
 
 		// Button labels.
 		protected override string ReplaceLabel => Translations.Translate("BOB_PNL_RTN");
 
 		protected override string ReplaceAllLabel => Translations.Translate("BOB_PNL_RAN");
-
-
-		// Trees or props?
-		protected override bool IsTree => treeCheck.isChecked;
 
 
 		/// <summary>
@@ -142,34 +135,6 @@ namespace BOB
 				// Save state.
 				ModSettings.treeSelected = isChecked;
 			};
-
-			// Angle label and textfield.
-			UILabel angleLabel = AddUIComponent<UILabel>();
-			angleLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 367f);
-			angleLabel.text = Translations.Translate("BOB_PNL_ANG");
-			angleField = UIUtils.AddTextField(this, 100f, 30f);
-			angleField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 360f);
-
-			// Offset X position.
-			UILabel xLabel = AddUIComponent<UILabel>();
-			xLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 407f);
-			xLabel.text = Translations.Translate("BOB_PNL_XOF");
-			xField = UIUtils.AddTextField(this, 100f, 30f);
-			xField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 400f);
-
-			// Offset Y position.
-			UILabel yLabel = AddUIComponent<UILabel>();
-			yLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 447f);
-			yLabel.text = Translations.Translate("BOB_PNL_YOF");
-			yField = UIUtils.AddTextField(this, 100f, 30f);
-			yField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 440f);
-
-			// Offset Z position.
-			UILabel zLabel = AddUIComponent<UILabel>();
-			zLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 487f);
-			zLabel.text = Translations.Translate("BOB_PNL_ZOF");
-			zField = UIUtils.AddTextField(this, 100f, 30f);
-			zField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 480f);
 
 			// Replace button event handler.
 			replaceButton.eventClicked += (control, clickEvent) =>
