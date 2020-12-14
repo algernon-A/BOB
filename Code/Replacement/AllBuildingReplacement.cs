@@ -192,7 +192,7 @@ namespace BOB
 						{
 							building = building,
 							propIndex = propIndex,
-							radAngle = building.m_props[propIndex].m_angle,
+							radAngle = building.m_props[propIndex].m_radAngle,
 							postion = building.m_props[propIndex].m_position,
 							probability = building.m_props[propIndex].m_probability
 						});

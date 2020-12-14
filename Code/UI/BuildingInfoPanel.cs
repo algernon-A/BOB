@@ -58,8 +58,8 @@ namespace BOB
 					probabilityField.text = AllBuildingReplacement.replacements[currentTargetItem.originalPrefab].probability.ToString();				}
 				else
 				{
-					// No current replacement; set all offset fields to original prop.
-					angleField.text = value.originalAngle.ToString();
+					// No current replacement; set all relative fields to zero, and absolute fields to final prop.
+					angleField.text = "0";
 					xField.text = "0";
 					yField.text = "0";
 					zField.text = "0";
