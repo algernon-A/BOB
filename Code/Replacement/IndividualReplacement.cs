@@ -111,7 +111,7 @@ namespace BOB
 		/// <param name="offsetY">Replacment Y position offset</param>
 		/// <param name="offsetZ">Replacment Z position offset</param>
 		/// <param name="probability">Replacement probability</param>
-		internal static void Apply(BuildingInfo building, int targetIndex, PrefabInfo replacement, float angle, float offsetX, float offsetY, float offsetZ, int probability)
+		internal static void Apply(BuildingInfo building, PrefabInfo target, int targetIndex, PrefabInfo replacement, float angle, float offsetX, float offsetY, float offsetZ, int probability)
 		{
 			// Local reference.
 			BuildingInfo.Prop targetProp = building?.m_props?[targetIndex];
@@ -119,15 +119,7 @@ namespace BOB
 			// Bail out if no building prop.
 			if (targetProp == null)
 			{
-				return;
-			}
-
-			// Tree or prop?
-			PrefabInfo target = replacement is TreeInfo ? (PrefabInfo)targetProp.m_finalTree : (PrefabInfo)targetProp.m_finalProp;
-
-			// Bail out if no valid target.
-			if (target == null)
-			{
+				Debugging.Message("ERROR: no target prop reference found when applying individual replacement");
 				return;
 			}
 

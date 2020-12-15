@@ -185,7 +185,7 @@ namespace BOB
 					if (currentTargetItem.index < 0)
 					{
 						// Grouped replacement.
-						BuildingReplacement.Apply(currentBuilding, currentTargetItem.originalPrefab ?? currentTargetItem.replacementPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
+						BuildingReplacement.Apply(currentBuilding, currentTargetItem.originalPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
 
 						// Update current target.
 						currentTargetItem.replacementPrefab = replacementPrefab;
@@ -194,7 +194,7 @@ namespace BOB
 					else
 					{
 						// Individual replacement.
-						IndividualReplacement.Apply(currentBuilding, currentTargetItem.index, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
+						IndividualReplacement.Apply(currentBuilding, currentTargetItem.originalPrefab, currentTargetItem.index, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
 
 						// Update current target.
 						currentTargetItem.individualPrefab = replacementPrefab;

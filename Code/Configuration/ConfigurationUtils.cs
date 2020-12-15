@@ -300,6 +300,14 @@ namespace BOB
 			// Iterate through each element in the provided list.
 			foreach (BOBBuildingReplacement replacement in buildingElement.replacements)
 			{
+				// Try to find target prefab.
+				PrefabInfo targetPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);
+				if (targetPrefab == null)
+				{
+					Debugging.Message("Couldn't find target prefab " + replacement.target);
+					continue;
+				}
+
 				// Try to find replacement prefab.
 				PrefabInfo replacementPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.replacement) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.replacement);
 				if (replacementPrefab == null)
@@ -309,7 +317,7 @@ namespace BOB
 				}
 
 				// If we got here, it's all good; apply the building replacement.
-				IndividualReplacement.Apply(buildingInfo, replacement.index, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
+				IndividualReplacement.Apply(buildingInfo, targetPrefab, replacement.index, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
 			}
 		}
 	}
