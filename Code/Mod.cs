@@ -64,7 +64,7 @@ namespace BOB
                 Translations.Translate("BOB_PER_SIN"),
                 Translations.Translate("BOB_PER_GRP")
             };
-            UIDropDown groupDropDown = (UIDropDown)helper.AddDropdown(Translations.Translate("BOB_PER_MEN"), groupItems, ModSettings.groupDefault, (index) => { ModSettings.groupDefault = index; SettingsUtils.SaveSettings(); });
+            UIDropDown groupDropDown = (UIDropDown)helper.AddDropdown(Translations.Translate("BOB_PER_IND"), groupItems, ModSettings.indDefault, (index) => { ModSettings.indDefault = index; SettingsUtils.SaveSettings(); });
             groupDropDown.width = 350f;
 
             // Nuke all settings button.

@@ -11,7 +11,7 @@ namespace BOB
 		BuildingInfo currentBuilding;
 
 		// Panel components.
-		private UICheckBox groupCheck;
+		private UICheckBox indCheck;
 
 
 		// Button labels.
@@ -83,7 +83,7 @@ namespace BOB
 			base.Setup(parentTransform, targetPrefabInfo);
 
 			// Add group checkbox.
-			groupCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_GRP"), 155f, TitleHeight);
+			indCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_IND"), 155f, TitleHeight);
 
 			// Event handler for prop checkbox.
 			propCheck.eventCheckChanged += (control, isChecked) =>
@@ -150,13 +150,23 @@ namespace BOB
 			};
 
 			// Event handler for group checkbox.
-			groupCheck.eventCheckChanged += (control, isChecked) =>
+			indCheck.eventCheckChanged += (control, isChecked) =>
 			{
 				// Rebuild target list.
 				targetList.rowsData = TargetList(treeCheck.isChecked);
 
 				// Store current group state as most recent state.
-				ModSettings.lastGroup = isChecked;
+				ModSettings.lastInd = isChecked;
+
+				// Toggle replace all button visibility.
+				if (isChecked)
+                {
+					replaceAllButton.Hide();
+                }
+				else
+                {
+					replaceAllButton.Show();
+                }
 			};
 
 			// Replace button event handler.
@@ -213,6 +223,12 @@ namespace BOB
 			// All building button event handler.
 			replaceAllButton.eventClicked += (control, clickEvent) =>
 			{
+				// Saftey net - don't do anything if individual check is selected.
+				if (indCheck.isChecked)
+                {
+					return;
+                }
+
 				// Try to parse text fields.
 				float angle, xOffset, yOffset, zOffset;
 				int probability;
@@ -308,19 +324,19 @@ namespace BOB
 			};
 
 			// Set grouped checkbox initial state according to preferences.
-			switch (ModSettings.groupDefault)
+			switch (ModSettings.indDefault)
 			{
 				case 0:
 					// Most recent state.
-					groupCheck.isChecked = ModSettings.lastGroup;
+					indCheck.isChecked = ModSettings.lastInd;
 					break;
 				case 1:
 					// Grouping off by default.
-					groupCheck.isChecked = false;
+					indCheck.isChecked = false;
 					break;
 				case 2:
 					// Grouping on by default.
-					groupCheck.isChecked = true;
+					indCheck.isChecked = true;
 					break;
 			}
 
@@ -365,16 +381,16 @@ namespace BOB
 				}
 
 				// Grouped or individual?
-				if (groupCheck.isChecked)
+				if (indCheck.isChecked)
+				{
+					// Individual - set index to the current building prop indexes.
+					propListItem.index = propIndex;
+				}
+				else
 				{
 					// Grouped - set index to -1 and add to our list of indexes.
 					propListItem.index = -1;
 					propListItem.indexes.Add(propIndex);
-				}
-				else
-				{
-					// Individual - set index to the current building prop indexes.
-					propListItem.index = propIndex;
 				}
 
 				// Get original (pre-replacement) tree/prop prefab and current probability (as default original probability).

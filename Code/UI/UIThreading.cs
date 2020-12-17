@@ -45,8 +45,14 @@ namespace BOB
                         // Set processed flag.
                         _processed = true;
 
-                        // Check to see if the select tool is currently active.
-                        if (ToolsModifierControl.toolController?.CurrentTool is BOBTool)
+                        // Is a BOB info panel already open?
+                        if (InfoPanelManager.Panel != null)
+                        {
+                            // Yes - close it.
+                            InfoPanelManager.Close();
+                        }
+                        // Otherwise, check to see if the select tool is currently active.
+                        else if (ToolsModifierControl.toolController?.CurrentTool is BOBTool)
                         {
                             // Select tool is currently active - deactivate it by activating the default tool instead.
                             ToolsModifierControl.SetTool<DefaultTool>();

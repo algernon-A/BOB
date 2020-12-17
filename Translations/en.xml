@@ -10,7 +10,7 @@
     <Translation ID="BOB_PNL_NOT" String="No trees found" />
     <Translation ID="BOB_PNL_TRE" String="Trees" />
     <Translation ID="BOB_PNL_PRP" String="Props" />
-    <Translation ID="BOB_PNL_GRP" String="Group together" />
+    <Translation ID="BOB_PNL_IND" String="Show individual props" />
     <Translation ID="BOB_PNL_HDV" String="Hide vanilla" />
     <Translation ID="BOB_PNL_REP" String="Replace" />
     <Translation ID="BOB_PNL_RTB" String="This building" />
@@ -26,7 +26,7 @@
     <Translation ID="BOB_OPT_KEY" String="Hotkey" />
     <Translation ID="BOB_OPT_PRS" String="Press any key" />
     <Translation ID="BOB_NUKE" String="Reset configuration" />
-    <Translation ID="BOB_PER_MEN" String="Group props by default" />
+    <Translation ID="BOB_PER_IND" String="Show individual props by default" />
     <Translation ID="BOB_PER_SIN" String="Always off" />
     <Translation ID="BOB_PER_GRP" String="Always on" />
     <Translation ID="BOB_PER_LST" String="Remember previous setting" />

@@ -5,11 +5,11 @@
 	/// </summary>
 	internal static class ModSettings
 	{
-		// Default behaviour of the group setting.
-		internal static int groupDefault;
+		// Default behaviour of the show individual props setting.
+		internal static int indDefault;
 
-		// Last selected group.
-		internal static bool lastGroup;
+		// Last selected indivisual setting.
+		internal static bool lastInd;
 
 		// Last selected vanilla filter state.
 		internal static bool hideVanilla = false;

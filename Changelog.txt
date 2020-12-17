@@ -1,7 +1,8 @@
 ﻿- Add tree replacement for networks
-- Add position offset for network props
-- Add rotation and position offset for building props
+- Add rotation and position offsets
 - Automatically update selected replacement item when target selection changes
+- Overhaul individual props vs. grouping behaviour in builidng info panel
+- Hotkey now closes info panel if open
 - Redo network replacement code and data formats
 - Redo building replacement code and data formats
 - Rename SelectTool to BOBTool (preparing for UnifiedUI support)

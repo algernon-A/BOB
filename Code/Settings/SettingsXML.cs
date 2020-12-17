@@ -52,11 +52,11 @@ namespace BOB
 		{
 			get
 			{
-				return ModSettings.groupDefault;
+				return ModSettings.indDefault;
 			}
 			set
 			{
-				ModSettings.groupDefault = value;
+				ModSettings.indDefault = value;
 			}
 		}
 	}
