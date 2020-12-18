@@ -77,6 +77,9 @@ namespace BOB
 
 				// Restore any all-network replacement.
 				AllNetworkReplacement.Restore(network, target, propReference.laneIndex, propReference.propIndex);
+
+				// Refresh network render.
+				RefreshBuilding(network);
 			}
 
 			// Remove entry from dictionary, if we're doing so.
@@ -263,8 +266,6 @@ namespace BOB
 						// Check for a network, lane, and prop index match.
 						if (propRef.network == netPrefab && propRef.laneIndex == laneIndex && propRef.propIndex == propIndex)
 						{
-							Debugging.Message("Found active replacement for net " + netPrefab.name + " with target " + target.name);
-
 							// Match!  Return the original prefab.
 							return replacements[netPrefab][target];
 						}
@@ -308,6 +309,44 @@ namespace BOB
 
 			// Probability.
 			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_probability = netElement.probability;
+
+			// Update network renderer (to regenerate LOD) - need to do this for each segment instance, so iterate through all segments.
+			NetSegment[] segments = NetManager.instance.m_segments.m_buffer;
+			for (ushort i = 0; i < segments.Length; ++i)
+			{
+				// Local reference.
+				NetSegment segment = segments[i];
+
+				// Make sure that this is a valid building, and one that matches our target.
+				if (segment.m_flags != NetSegment.Flags.None && segment.Info == propReference.network)
+				{
+					// Match - update building render.
+					NetManager.instance.UpdateSegmentRenderer(i, true);
+				}
+			}
+		}
+
+
+		/// <summary>
+		/// Refreshes a network prefab's render (e.g. to regenerate a LOD with new props).
+		/// </summary>
+		/// <param name="netPrefab">Network prefab to refresh</param>
+		private static void RefreshBuilding(NetInfo netPrefab)
+		{
+			// Need to do this for each segment instance, so iterate through all segments.
+			NetSegment[] segments = NetManager.instance.m_segments.m_buffer;
+			for (ushort i = 0; i < segments.Length; ++i)
+			{
+				// Local reference.
+				NetSegment segment = segments[i];
+
+				// Make sure that this is a valid building, and one that matches our target.
+				if (segment.m_flags != NetSegment.Flags.None && segment.Info == netPrefab)
+				{
+					// Match - update building render.
+					NetManager.instance.UpdateSegmentRenderer(i, true);
+				}
+			}
 		}
 	}
 }
