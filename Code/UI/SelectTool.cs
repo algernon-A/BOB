@@ -82,6 +82,14 @@ namespace BOB
 		/// <param name="e">Event</param>
 		protected override void OnToolGUI(Event e)
 		{
+			// Check for escape key.
+			if (e.type == EventType.keyDown && e.keyCode == KeyCode.Escape)
+			{
+				// Escape key pressed - disable tool.
+				e.Use();
+				ToolsModifierControl.SetTool<DefaultTool>();
+			}
+
 			// Don't do anything if mouse is inside UI or if there are any errors other than failed raycast.
 			if (m_toolController.IsInsideUI || (m_selectErrors != ToolErrors.None && m_selectErrors != ToolErrors.RaycastFailed))
 			{

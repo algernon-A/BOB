@@ -1,8 +1,10 @@
 ﻿- Add tree replacement for networks
 - Add rotation and position offsets
+- Refresh building and network renders when props/trees replaced and reverted (to ensure LODs and lighting effects are updated).
 - Automatically update selected replacement item when target selection changes
 - Overhaul individual props vs. grouping behaviour in builidng info panel
 - Hotkey now closes info panel if open
+- Escape key cancels tool activation
 - Redo network replacement code and data formats
 - Redo building replacement code and data formats
 - Rename SelectTool to BOBTool (preparing for UnifiedUI support)
