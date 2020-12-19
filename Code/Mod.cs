@@ -67,6 +67,9 @@ namespace BOB
             UIDropDown groupDropDown = (UIDropDown)helper.AddDropdown(Translations.Translate("BOB_PER_IND"), groupItems, ModSettings.indDefault, (index) => { ModSettings.indDefault = index; SettingsUtils.SaveSettings(); });
             groupDropDown.width = 350f;
 
+            // Rember last position.
+            UICheckBox rememberPosCheck = (UICheckBox)helper.AddCheckbox(Translations.Translate("BOB_OPT_POS"), ModSettings.rememberPosition, (isChecked) => { ModSettings.rememberPosition = isChecked; SettingsUtils.SaveSettings(); });
+
             // Nuke all settings button.
             UIButton nukeButton = (UIButton)helper.AddButton(Translations.Translate("BOB_NUKE"), delegate
             {

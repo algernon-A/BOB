@@ -11,16 +11,10 @@ namespace BOB
 		[XmlElement("Language")]
 		public string language
 		{
-			get
-			{
-				return Translations.Language;
-			}
-			set
-			{
-				Translations.Language = value;
-			}
+			get => Translations.Language;
+			
+			set => Translations.Language = value;
 		}
-
 
 		// New building details panel hotkey element.
 		[XmlElement("PanelKey")]
@@ -45,20 +39,21 @@ namespace BOB
 			}
 		}
 
-
-		// Group 
+		// Grouping behaviour.
 		[XmlElement("GroupDefault")]
 		public int GroupDefault
 		{
-			get
-			{
-				return ModSettings.indDefault;
-			}
-			set
-			{
-				ModSettings.indDefault = value;
-			}
+			get => ModSettings.indDefault;
+			set => ModSettings.indDefault = value;
 		}
+
+		// Remember position.
+		[XmlElement("RememberPos")]
+		public bool RememberPos
+        {
+			get => ModSettings.rememberPosition;
+			set => ModSettings.rememberPosition = value;
+        }
 	}
 
 

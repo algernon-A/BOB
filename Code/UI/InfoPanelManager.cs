@@ -15,6 +15,9 @@ namespace BOB
 		private static BOBInfoPanel _panel;
 		internal static BOBInfoPanel Panel => _panel;
 
+		// Recent state.
+		internal static float lastX, lastY;
+
 
 		/// <summary>
 		/// Creates the panel object in-game and displays it.
@@ -66,6 +69,11 @@ namespace BOB
 		/// </summary>
 		internal static void Close()
 		{
+			// Store previous position.
+			lastX = _panel.relativePosition.x;
+			lastY = _panel.relativePosition.y;
+
+			// Destroy game objects.
 			GameObject.Destroy(_panel);
 			GameObject.Destroy(uiGameObject);
 

@@ -104,9 +104,20 @@ namespace BOB
 				backgroundSprite = "MenuPanel2";
 				opacity = 0.8f;
 
-				// Size and position.
+				// Size.
 				size = new Vector2(LeftWidth + MiddleWidth + RightWidth + (Margin * 4), PanelHeight + TitleHeight + ToolbarHeight + (Margin * 3));
-				relativePosition = new Vector2(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
+
+				// Position - are we restoring the previous position?.
+				if (ModSettings.rememberPosition && (InfoPanelManager.lastX != 0f ||InfoPanelManager.lastY != 0f))
+				{
+					// 'Remember default position' is active and at least one of X and Y positions is non-zero.
+					relativePosition = new Vector2(InfoPanelManager.lastX, InfoPanelManager.lastY);
+				}
+				else
+				{
+					// Default position - centre in screen.
+					relativePosition = new Vector2(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
+				}
 
 				// Drag bar.
 				UIDragHandle dragHandle = AddUIComponent<UIDragHandle>();

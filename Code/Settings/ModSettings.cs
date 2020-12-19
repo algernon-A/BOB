@@ -16,5 +16,8 @@
 
 		// Last selected tree-or-prop state.
 		internal static bool treeSelected = false;
+
+		// Remember last panel position.
+		internal static bool rememberPosition = false;
 	}
 }
