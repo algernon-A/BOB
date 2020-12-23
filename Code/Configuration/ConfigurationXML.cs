@@ -7,11 +7,11 @@ namespace BOB
 	/// <summary>
 	/// BOB configuration XML file format.
 	/// </summary>
-	[XmlRoot(ElementName = "TreePropReplacer", Namespace = "", IsNullable = false)]
+	[XmlRoot(ElementName = "BOBConfig", Namespace = "", IsNullable = false)]
 	public class BOBConfigurationFile
 	{
 		[XmlAttribute("version")]
-		public int version = 0;
+		public int version = 1;
 
 		[XmlArray("buildprops", IsNullable = true)]
 		[XmlArrayItem("buildprop", IsNullable = true)]
@@ -101,13 +101,13 @@ namespace BOB
 		[XmlAttribute("angle")]
 		public float angle = 0f;
 
-		[XmlAttribute("OffsetX")]
+		[XmlAttribute("offsetX")]
 		public float offsetX = 0f;
 
-		[XmlAttribute("OffsetY")]
+		[XmlAttribute("offsetY")]
 		public float offsetY = 0f;
 
-		[XmlAttribute("OffsetZ")]
+		[XmlAttribute("offsetZ")]
 		public float offsetZ = 0f;
 
 		[XmlAttribute("probability")]

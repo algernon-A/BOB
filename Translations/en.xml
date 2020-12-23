@@ -5,6 +5,7 @@
     <Translation ID="BOB_DESC" String="UNDER DEVELOPMENT: Replaces trees and props." />
     <Translation ID="TRN_CHOICE" String="Set language" />
     <Translation ID="TRN_SYS" String="Use game language" />
+    <Translation ID="BOB_MBX_OK" String="OK" />
     <Translation ID="BOB_ROW_NOW" String="now" />
     <Translation ID="BOB_PNL_NOP" String="No props found" />
     <Translation ID="BOB_PNL_NOT" String="No trees found" />

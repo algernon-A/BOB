@@ -13,7 +13,7 @@ namespace BOB
 	internal static class ConfigurationUtils
 	{
 		// Configuration file name.
-		private static readonly string SettingsFileName = "TreePropReplacer-config.xml";
+		private static readonly string SettingsFileName = "BOB-config.xml";
 
 		/// <summary>
 		/// Load settings from XML file.
@@ -86,6 +86,9 @@ namespace BOB
 				{
 					XmlSerializer xmlSerializer = new XmlSerializer(typeof(BOBConfigurationFile));
 					BOBConfigurationFile configFile = new BOBConfigurationFile();
+
+					// Version 1.
+					configFile.version = 1;
 
 					// Serialise all-building replacements.
 					configFile.allBuildingProps = AllBuildingReplacement.replacements.Values.ToList();

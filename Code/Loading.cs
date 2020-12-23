@@ -1,6 +1,5 @@
 ﻿using ICities;
-
-using System.Collections.Generic;
+using BOB.MessageBox;
 
 
 namespace BOB
@@ -41,46 +40,13 @@ namespace BOB
             ToolsModifierControl.toolController.gameObject.AddComponent<BOBTool>();
             Debugging.Message("loading complete");
 
-            CheckNets();
-        }
 
-
-        private void CheckNets()
-        {
-            List<NetInfo.Lane> laneList = new List<NetInfo.Lane>();
-            List<NetLaneProps> lanePropList = new List<NetLaneProps>();
-
-
-            // Iterate through all loaded nets.
-            for (uint i = 0u; i < PrefabCollection<NetInfo>.LoadedCount(); ++i)
+            // Warning message box for 0.3 update if a configuration file exists without the 0.3 notification flag.
+            if (System.IO.File.Exists("TreePropReplacer-config.xml") && !System.IO.File.Exists("BOB-config.xml"))
             {
-
-                NetInfo network = PrefabCollection<NetInfo>.GetLoaded(i);
-                Debugging.Message("checking network " + network.name);
-
-
-
-                // Iterate through all lanes in prefab.
-                for (int j = 0; j < network.m_lanes.Length; ++j)
-                {
-                    if (laneList.Contains(network.m_lanes[j]))
-                    {
-                        Debugging.Message("duplicate lane found in " + network.name);
-                    }
-                    else
-                    {
-                        laneList.Add(network.m_lanes[j]);
-                    }
-
-                    if (lanePropList.Contains(network.m_lanes[j].m_laneProps))
-                    {
-                        Debugging.Message("duplicate laneprop found in " + network.name);
-                    }
-                    else
-                    {
-                        lanePropList.Add(network.m_lanes[j].m_laneProps);
-                    }
-                }
+                OkMessageBox messageBox = MessageBoxBase.ShowModal<OkMessageBox>();
+                messageBox.CaprionText = BOBMod.ModName;
+                messageBox.MessageText = "BOB, the Tree and Prop Replacer, has been updated to version 0.3.  As part of this update the configuration file format has changed in order to support expanded functionality.  These changes are NOT backwards-compatible.\r\n\r\nIMPORTANT\r\nThis means that your existing replacements will be lost and will need to be redone.\r\n\r\nThe new configuration file format (BOB-config.xml) is now final and will be supported in all future releases.  Your old configuration file (TreePropReplacer-config.xml) has been left unaltered for use as a reference.";
             }
         }
     }

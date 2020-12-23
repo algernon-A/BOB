@@ -10,7 +10,8 @@ namespace BOB
 	/// </summary>
 	internal static class SettingsUtils
 	{
-		internal static readonly string SettingsFileName = "TreePropReplacer-settings.xml";
+		internal static readonly string OldSettingsFileName = "TreePropReplacer-settings.xml";
+        internal static readonly string NewSettingsFileName = "BOB-settings.xml";
 
 
         /// <summary>
@@ -20,11 +21,18 @@ namespace BOB
         {
             try
             {
+                // Attempt to read new settings file name; if that fails, try to read the old one.
+                string fileName = NewSettingsFileName;
+                if (!File.Exists(NewSettingsFileName))
+                {
+                    fileName = OldSettingsFileName;
+                }
+
                 // Check to see if configuration file exists.
-                if (File.Exists(SettingsFileName))
+                if (File.Exists(fileName))
                 {
                     // Read it.
-                    using (StreamReader reader = new StreamReader(SettingsFileName))
+                    using (StreamReader reader = new StreamReader(fileName))
                     {
                         XmlSerializer xmlSerializer = new XmlSerializer(typeof(BOBSettingsFile));
                         if (!(xmlSerializer.Deserialize(reader) is BOBSettingsFile settingsFile))
@@ -54,7 +62,7 @@ namespace BOB
             try
             {
                 // Pretty straightforward.  Serialisation is within GBRSettingsFile class.
-                using (StreamWriter writer = new StreamWriter(SettingsFileName))
+                using (StreamWriter writer = new StreamWriter(NewSettingsFileName))
                 {
                     XmlSerializer xmlSerializer = new XmlSerializer(typeof(BOBSettingsFile));
                     xmlSerializer.Serialize(writer, new BOBSettingsFile());

@@ -10,6 +10,7 @@
 - Add option to remember (and restore!) previous panel position
 - Redo network replacement code and data formats
 - Redo building replacement code and data formats
+- Settings and configuration files renamed (from TreePropReplacer to BOB)
 - Rename SelectTool to BOBTool (preparing for UnifiedUI support)
 
 
