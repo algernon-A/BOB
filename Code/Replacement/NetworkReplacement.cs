@@ -303,6 +303,12 @@ namespace BOB
 				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = (TreeInfo)netElement.replacementInfo;
 			}
 
+			// Invert x offset if lane position is negative.
+			if (propReference.network.m_lanes[propReference.laneIndex].m_position < 0)
+            {
+				offset.x = 0 - offset.x;
+            }
+
 			// Angle and offset.
 			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle + netElement.angle;
 			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.postion + offset;

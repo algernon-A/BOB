@@ -1,4 +1,7 @@
-﻿Version 0.3 -
+﻿- Invert X offset for networks if lane position is negative
+
+
+Version 0.3 -
 
 - Add tree replacement for networks
 - Add rotation and position offsets
