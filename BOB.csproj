@@ -84,7 +84,7 @@
     <Compile Include="Code\UI\BuildingInfoPanel.cs" />
     <Compile Include="Code\UI\InfoPanelManager.cs" />
     <Compile Include="Code\UI\NetInfoPanel.cs" />
-    <Compile Include="Code\UI\SelectTool.cs" />
+    <Compile Include="Code\UI\BOBTool.cs" />
     <Compile Include="Code\UI\InfoPanel.cs" />
     <Compile Include="Code\UI\UIFastList\UIFastList.cs" />
     <Compile Include="Code\UI\UIFastList\UIPropListItem.cs" />
