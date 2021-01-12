@@ -18,6 +18,7 @@
     <Translation ID="BOB_PNL_RAB" String="All buildings" />
     <Translation ID="BOB_PNL_RTN" String="This network" />
     <Translation ID="BOB_PNL_RAN" String="All networks" />
+    <Translation ID="BOB_PNL_RTT" String="Map trees" />
     <Translation ID="BOB_PNL_REV" String="Revert" />
     <Translation ID="BOB_PNL_PRB" String="Probability" />
     <Translation ID="BOB_PNL_ANG" String="Angle" />

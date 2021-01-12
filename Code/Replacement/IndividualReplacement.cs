@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 
 
 namespace BOB
@@ -11,7 +10,6 @@ namespace BOB
 	{
 		// Master dictionary of replaced prop references.
 		internal static Dictionary<BuildingInfo, Dictionary<int, BOBBuildingReplacement>> replacements;
-
 
 
 		/// <summary>

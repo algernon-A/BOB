@@ -125,9 +125,12 @@ namespace BOB
                 displayText.Append(UIUtils.GetDisplayName(thisItem.originalPrefab.name));
 
                 // Show original probability in brackets immediately afterwards.
-                displayText.Append(" (");
-                displayText.Append(thisItem.originalProb);
-                displayText.Append("%)");
+                if (thisItem.showProbs)
+                {
+                    displayText.Append(" (");
+                    displayText.Append(thisItem.originalProb);
+                    displayText.Append("%)");
+                }
 
                 // Check to see if there's a currently active individual replacement.
                 if (thisItem.individualPrefab != null)
@@ -138,10 +141,13 @@ namespace BOB
                     displayText.Append(" ");
                     displayText.Append(UIUtils.GetDisplayName(thisItem.individualPrefab.name));
 
-                    // Append replacement name and probability to the label.
-                    displayText.Append(" ");
-                    displayText.Append(thisItem.individualProb);
-                    displayText.Append("%");
+                    // Append probability to the label, if we're showing it.
+                    if (thisItem.showProbs)
+                    {
+                        displayText.Append(" ");
+                        displayText.Append(thisItem.individualProb);
+                        displayText.Append("%");
+                    }
 
                     // Append closing bracket.
                     displayText.Append(")");
@@ -155,10 +161,13 @@ namespace BOB
                     displayText.Append(" ");
                     displayText.Append(UIUtils.GetDisplayName(thisItem.replacementPrefab.name));
 
-                    // Append replacement name and probability to the label.
-                    displayText.Append(" ");
-                    displayText.Append(thisItem.replacementProb);
-                    displayText.Append("%");
+                    // Append probability to the label, if we're showing it.
+                    if (thisItem.showProbs)
+                    {
+                        displayText.Append(" ");
+                        displayText.Append(thisItem.replacementProb);
+                        displayText.Append("%");
+                    }
 
                     // Append closing bracket.
                     displayText.Append(")");
@@ -172,8 +181,8 @@ namespace BOB
                     displayText.Append(" ");
                     displayText.Append(UIUtils.GetDisplayName(thisItem.allPrefab.name));
 
-                    // Append probability if this is not a network item.
-                    if (thisNetItem == null)
+                    // Append probability if this is not a network item and we're shoing probs.
+                    if (thisNetItem == null && thisItem.showProbs)
                     {
                         displayText.Append(" ");
                         displayText.Append(thisItem.allProb);

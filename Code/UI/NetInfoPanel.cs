@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using ColossalFramework.UI;
 
 
 namespace BOB
 {
-	class BOBNetInfoPanel : BOBInfoPanel
+	/// <summary>
+	/// BOB network tree/prop replacement panel.
+	/// </summary>
+	public class BOBNetInfoPanel : BOBInfoPanel
 	{
 		// Current selection reference.
 		NetInfo currentNet;
@@ -251,10 +253,10 @@ namespace BOB
 				}
 			};
 
-
-			// Set remaining check states from previous (OR default) settings.
+			// Set remaining check states from previous (OR default) settings and update button states.
 			propCheck.isChecked = !ModSettings.treeSelected;
 			treeCheck.isChecked = ModSettings.treeSelected;
+			UpdateButtonStates();
 		}
 
 

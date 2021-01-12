@@ -12,8 +12,8 @@ namespace BOB
 	{
 		// Instance references.
 		private static GameObject uiGameObject;
-		private static BOBInfoPanel _panel;
-		internal static BOBInfoPanel Panel => _panel;
+		private static BOBInfoPanelBase _panel;
+		internal static BOBInfoPanelBase Panel => _panel;
 
 		// Recent state.
 		internal static float lastX, lastY;
@@ -46,6 +46,15 @@ namespace BOB
 						uiGameObject.transform.parent = UIView.GetAView().transform;
 
 						_panel = uiGameObject.AddComponent<BOBNetInfoPanel>();
+					}
+					else if (selectedPrefab is TreeInfo)
+					{
+						// A tree prefab is selected; create a TreeInfo panel.
+						// Give it a unique name for easy finding with ModTools.
+						uiGameObject = new GameObject("BOBTreePanel");
+						uiGameObject.transform.parent = UIView.GetAView().transform;
+
+						_panel = uiGameObject.AddComponent<BOBTreeInfoPanel>();
 					}
 					else
                     {

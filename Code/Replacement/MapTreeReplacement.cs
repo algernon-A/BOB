@@ -1,0 +1,123 @@
+﻿using System.Collections.Generic;
+using ColossalFramework;
+
+
+namespace BOB
+{
+	internal static class MapTreeReplacement
+	{
+		// Master dictionary of replaced tree prefabs.
+		internal static Dictionary<TreeInfo, TreeInfo> replacements;
+
+
+		/// <summary>
+		/// Performs setup and initialises the master dictionary.  Must be called prior to use.
+		/// </summary>
+		internal static void Setup()
+		{
+			replacements = new Dictionary<TreeInfo, TreeInfo>();
+		}
+
+
+
+		/// <summary>
+		/// Applies a new (or updated) map tree replacement.
+		/// </summary>
+		/// <param name="target">Tree to replace</param>
+		/// <param name="replacement">Replacement tree</param>
+		internal static void Apply(TreeInfo target, TreeInfo replacement)
+		{
+			// Check to see if we already have a replacement entry for this tree - if so, revert the replacement first.
+			if (replacements.ContainsKey(target))
+			{
+				Revert(target);
+			}
+
+			// Create new dictionary entry for tree if none already exists.
+			if (!replacements.ContainsKey(replacement))
+			{
+				replacements.Add(replacement, target);
+			}
+
+			// Apply the replacement.
+			ReplaceTrees(target, replacement);
+		}
+
+
+		/// <summary>
+		/// Reverts a map tree replacement.
+		/// </summary>
+		/// <param name="tree">Applied replacment tree prefab</param>
+		/// <returns>True if the entire building record was removed from the dictionary (due to no remaining replacements for that prefab), false if the prefab remains in the dictionary (has other active replacements)</returns>
+		internal static void Revert(TreeInfo tree)
+		{
+			// Safety check.
+			if (tree == null || !replacements.ContainsKey(tree))
+			{
+				return;
+			}
+
+			// Restore original trees.
+			ReplaceTrees(tree, replacements[tree]);
+
+			// Remove dictionary entry.
+			replacements.Remove(tree);
+		}
+
+
+		/// <summary>
+		/// Checks if the given tree prefab has a currently recorded map replacement, and if so, returns the *original* tree prefab.
+		/// </summary>
+		/// <param name="treePrefab">Tree prefab to check</param>
+		/// <returns>Original prefab if a map tree replacement is currently recorded, null if no map tree replacement is currently recorded</returns>
+		internal static TreeInfo GetOriginal(TreeInfo treePrefab)
+		{
+			// Safety check.
+			if (treePrefab != null && replacements.ContainsKey(treePrefab))
+			{
+				// Return the original prefab.
+				return replacements[treePrefab];
+			}
+
+			// If we got here, no entry was found - return null to indicate no active replacement.
+			return null;
+		}
+
+
+		/// <summary>
+		/// Replaces a map tree.
+		/// </summary>
+		/// <param name="target">Tree to replace</param>
+		/// <param name="replacement">Replacement tree</param>
+		private static void ReplaceTrees(TreeInfo target, TreeInfo replacement)
+		{
+			// Check for valid parameters.
+			if (target != null && replacement != null)
+			{
+				Debugging.Message("replacing tree " + target.name + " with " + replacement.name);
+
+				// Iterate through each tree in map.
+				for (uint treeIndex = 0; treeIndex < Singleton<TreeManager>.instance.m_trees.m_buffer.Length; ++treeIndex)
+				{
+					// Local reference.
+					TreeInstance tree = Singleton<TreeManager>.instance.m_trees.m_buffer[treeIndex];
+
+					// Skip non-existent trees (those with no flags).
+					if (tree.m_flags == (ushort)TreeInstance.Flags.None)
+					{
+						continue;
+					}
+
+					// If tree matches, replace!
+					if (tree.Info == target)
+					{
+						Singleton<TreeManager>.instance.m_trees.m_buffer[treeIndex].Info = replacement;
+
+						// Referesh tree render (to update LOD).
+						TreeManager.instance.UpdateTreeRenderer(treeIndex, true);
+					}
+				}
+			}
+		}
+	}
+}

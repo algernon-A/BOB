@@ -393,6 +393,44 @@ namespace BOB
 
 
         /// <summary>
+        /// Sets the selection to the prop list item that has the given prefab as its originalPrefab.
+        /// If no item is found, clears the selection and resets the list.
+        /// </summary>
+        /// <param name="item">The item to find</param>
+        public void FindTargetItem(PrefabInfo item)
+        {
+            // Iterate through the rows list.
+            for (int i = 0; i < m_rowsData.m_size; ++i)
+            {
+                PropListItem propListItem = m_rowsData.m_buffer[i] as PropListItem;
+
+                // Look for a prefab match.
+                if (propListItem != null && propListItem.originalPrefab == item)
+                {
+                    // Found a match; set the selected index to this one.
+                    selectedIndex = i;
+
+                    // Set current panel selection.
+                    InfoPanelManager.Panel.CurrentTargetItem = propListItem;
+
+                    // If the selected index is outside the current visibility range, move the to show it.
+                    if (selectedIndex < listPosition || selectedIndex > listPosition + m_rows.m_size)
+                    {
+                        listPosition = selectedIndex;
+                    }
+
+                    // Done here; return.
+                    return;
+                }
+            }
+
+            // If we got here, we didn't find a match; clear the selection and reset the list position.
+            selectedIndex = -1;
+            listPosition = 0f;
+        }
+
+
+        /// <summary>
         /// Clear the list
         /// </summary>
         public void Clear()

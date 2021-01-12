@@ -5,7 +5,10 @@ using ColossalFramework.UI;
 
 namespace BOB
 {
-	class BOBBuildingInfoPanel : BOBInfoPanel
+	/// <summary>
+	/// BOB building tree/prop replacement panel.
+	/// </summary>
+	public class BOBBuildingInfoPanel : BOBInfoPanel
 	{
 		// Current selection reference.
 		BuildingInfo currentBuilding;
@@ -340,9 +343,10 @@ namespace BOB
 					break;
 			}
 
-			// Set remaining check states from previous (OR default) settings.
+			// Set remaining check states from previous (OR default) settings and update button states.
 			propCheck.isChecked = !ModSettings.treeSelected;
 			treeCheck.isChecked = ModSettings.treeSelected;
+			UpdateButtonStates();
 		}
 
 

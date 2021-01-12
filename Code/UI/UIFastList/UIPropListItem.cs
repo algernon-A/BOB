@@ -31,6 +31,9 @@ namespace BOB
 
 		// List of indexes.
 		public List<int> indexes = new List<int>();
+
+		// Whether or not to show probabilities.
+		public bool showProbs = false;
 	}
 
 

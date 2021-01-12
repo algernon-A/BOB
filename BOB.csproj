@@ -70,6 +70,7 @@
     <Compile Include="Code\Replacement\AllNetworkReplacement.cs" />
     <Compile Include="Code\Replacement\BuildingReplacement.cs" />
     <Compile Include="Code\Replacement\AllBuildingReplacement.cs" />
+    <Compile Include="Code\Replacement\MapTreeReplacement.cs" />
     <Compile Include="Code\Replacement\NetworkReplacement.cs" />
     <Compile Include="Code\Replacement\PrefabLists.cs" />
     <Compile Include="Code\Replacement\Replacement.cs" />
@@ -81,11 +82,13 @@
     <Compile Include="Code\Settings\SettingsXML.cs" />
     <Compile Include="Code\TranslationFramework\TranslationFramework.cs" />
     <Compile Include="Code\TranslationFramework\TranslationXML.cs" />
+    <Compile Include="Code\UI\InfoPanelBase.cs" />
     <Compile Include="Code\UI\BuildingInfoPanel.cs" />
     <Compile Include="Code\UI\InfoPanelManager.cs" />
     <Compile Include="Code\UI\NetInfoPanel.cs" />
     <Compile Include="Code\UI\BOBTool.cs" />
     <Compile Include="Code\UI\InfoPanel.cs" />
+    <Compile Include="Code\UI\TreeInfoPanel.cs" />
     <Compile Include="Code\UI\UIFastList\UIFastList.cs" />
     <Compile Include="Code\UI\UIFastList\UIPropListItem.cs" />
     <Compile Include="Code\UI\UIFastList\UIPropRow.cs" />

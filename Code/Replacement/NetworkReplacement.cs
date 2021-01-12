@@ -48,7 +48,6 @@ namespace BOB
 		/// </summary>
 		/// <param name="network">Targeted network</param>
 		/// <param name="target">Targeted (original) tree/prop prefab</param>
-		/// <param name="replacement">Applied replacment tree/prop prefab</param>
 		/// <param name="removeEntries">True (default) to remove the reverted entries from the master dictionary, false to leave the dictionary unchanged</param>
 		/// <returns>True if the entire network record was removed from the dictionary (due to no remaining replacements for that prefab), false if the prefab remains in the dictionary (has other active replacements)</returns>
 		internal static void Revert(NetInfo network, PrefabInfo target, bool removeEntries = true)
