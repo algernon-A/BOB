@@ -14,9 +14,9 @@
     <Translation ID="BOB_PNL_IND" String="Show individual props" />
     <Translation ID="BOB_PNL_HDV" String="Hide vanilla" />
     <Translation ID="BOB_PNL_REP" String="Replace" />
-    <Translation ID="BOB_PNL_RTB" String="This building" />
+    <Translation ID="BOB_PNL_RTB" String="These buildings" />
     <Translation ID="BOB_PNL_RAB" String="All buildings" />
-    <Translation ID="BOB_PNL_RTN" String="This network" />
+    <Translation ID="BOB_PNL_RTN" String="These networks" />
     <Translation ID="BOB_PNL_RAN" String="All networks" />
     <Translation ID="BOB_PNL_RTT" String="Map trees" />
     <Translation ID="BOB_PNL_REV" String="Revert" />

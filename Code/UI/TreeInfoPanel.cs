@@ -37,8 +37,7 @@ namespace BOB
 				// Update current target.
 				currentTargetItem.replacementPrefab = replacementPrefab;
 
-				// Save configuration file and refresh target list (to reflect our changes).
-				// ConfigurationUtils.SaveConfig();
+				// Refresh target list (to reflect our changes).
 				targetList.Refresh();
 
 				// Update button states.
@@ -58,8 +57,7 @@ namespace BOB
 					currentTargetItem.replacementPrefab = null;
 				}
 
-				// Save configuration file and refresh building list (to reflect our changes).
-				//ConfigurationUtils.SaveConfig();
+				// Refresh target list (to reflect our changes).
 				targetList.Refresh();
 
 				// Update button states.
