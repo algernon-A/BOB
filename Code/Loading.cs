@@ -10,6 +10,27 @@ namespace BOB
     public class Loading : LoadingExtensionBase
     {
         /// <summary>
+        /// Called by the game when the mod is initialised at the start of the loading process.
+        /// </summary>
+        /// <param name="loading">Loading mode (e.g. game, editor, scenario, etc.)</param>
+        public override void OnCreated(ILoading loading)
+        {
+            Debugging.Message("loading");
+
+            // Initialise data sets prior to savegame load.
+            AllBuildingReplacement.Setup();
+            AllNetworkReplacement.Setup();
+            BuildingReplacement.Setup();
+            NetworkReplacement.Setup();
+            IndividualReplacement.Setup();
+            MapTreeReplacement.Setup();
+
+            base.OnCreated(loading);
+        }
+
+
+
+        /// <summary>
         /// Called by the game when level loading is complete.
         /// </summary>
         /// <param name="mode">Loading mode (e.g. game, editor, scenario, etc.)</param>
@@ -23,16 +44,8 @@ namespace BOB
                 return;
             }
 
-            Debugging.Message("loading");
-
-            // Initialise data sets.
+            // Build lists of loaded prefabs.
             PrefabLists.BuildLists();
-            AllBuildingReplacement.Setup();
-            AllNetworkReplacement.Setup();
-            BuildingReplacement.Setup();
-            NetworkReplacement.Setup();
-            IndividualReplacement.Setup();
-            MapTreeReplacement.Setup();
 
             // Load configuration file.
             ConfigurationUtils.LoadConfig();

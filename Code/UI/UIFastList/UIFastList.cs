@@ -402,10 +402,18 @@ namespace BOB
             // Iterate through the rows list.
             for (int i = 0; i < m_rowsData.m_size; ++i)
             {
+                // Skip anything that's not a valid item.
                 PropListItem propListItem = m_rowsData.m_buffer[i] as PropListItem;
+                if (propListItem == null)
+                {
+                    continue;
+                }
+
+                // Match to replacement prefab if any, if none then match against original prefab.
+                PrefabInfo targetInfo = propListItem.replacementPrefab ?? propListItem.originalPrefab;
 
                 // Look for a prefab match.
-                if (propListItem != null && propListItem.originalPrefab == item)
+                if (targetInfo != null && targetInfo == item)
                 {
                     // Found a match; set the selected index to this one.
                     selectedIndex = i;

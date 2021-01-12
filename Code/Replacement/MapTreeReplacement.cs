@@ -113,7 +113,7 @@ namespace BOB
 					{
 						Singleton<TreeManager>.instance.m_trees.m_buffer[treeIndex].Info = replacement;
 
-						// Referesh tree render (to update LOD).
+						// Refresh tree render (to update LOD).
 						TreeManager.instance.UpdateTreeRenderer(treeIndex, true);
 					}
 				}

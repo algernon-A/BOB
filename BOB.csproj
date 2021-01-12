@@ -76,6 +76,7 @@
     <Compile Include="Code\Replacement\Replacement.cs" />
     <Compile Include="Code\Replacement\ReplacementUtils.cs" />
     <Compile Include="Code\Replacement\IndividualReplacement.cs" />
+    <Compile Include="Code\Serialization.cs" />
     <Compile Include="Code\Settings\ModSettings.cs" />
     <Compile Include="Code\Settings\OptionsKeymapping.cs" />
     <Compile Include="Code\Settings\SettingsUtils.cs" />
