@@ -1,4 +1,11 @@
-﻿Version 0.3.1 -
+﻿Version 0.4 -
+
+- Add map tree replacement
+- Change wording of building and network replacment buttons ('this' => 'these'), to hopefully make things a bit clearer
+- Fix occasional exception when creating building replacment panel
+
+
+Version 0.3.1 -
 
 - Invert X offset for networks if lane position is negative
 
