@@ -19,5 +19,8 @@
 
 		// Remember last panel position.
 		internal static bool rememberPosition = false;
+
+		// What's new notification version.
+		internal static string whatsNewVersion = "0.0";
 	}
 }

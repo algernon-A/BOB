@@ -1,6 +1,7 @@
 ﻿Version 0.4 -
 
 - Add map tree replacement
+- Add "what's new" update notifictions
 - Change wording of building and network replacment buttons ('this' => 'these'), to hopefully make things a bit clearer
 - Fix occasional exception when creating building replacment panel
 

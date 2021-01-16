@@ -1,4 +1,4 @@
-﻿// Copied from macsergey (NodeMarkup/Intersection Marking Tool)
+﻿// Based on from macsergey's work (NodeMarkup/Intersection Marking Tool)
 
 using ColossalFramework;
 using ColossalFramework.UI;
@@ -8,58 +8,87 @@ using UnityEngine;
 
 namespace BOB.MessageBox
 {
+    /// <summary>
+    /// Base class for displaying modal message boxes.
+    /// </summary>
     public abstract class MessageBoxBase : UIPanel
     {
-        protected static float Width { get; } = 573;
-        protected static float Height { get; } = 200;
-        protected static float ButtonHeight { get; } = 47;
-        protected static float Padding { get; } = 16;
-        private static float MaxContentHeight { get; } = 500;
+        // Layout constants.
+        protected const float Width = 573f;
+        protected const float Height = 200f;
+        protected const float TitleBarHeight = 42f;
+        protected const float ButtonHeight = 47f;
+        protected const float Padding = 16f;
+        protected const float ButtonSpacing = 25f;
+        protected const float MaxContentHeight = 500f;
 
+        // Reference constants.
+        private const int DefaultButton = 1;
+
+
+        // Panel components.
+        private UILabel title;
+        private UIDragHandle titleBar;
+        private UIScrollablePanel mainPanel;
+        private UIPanel buttonPanel;
+
+        // Acessors.
+        public string Title { get => title.text; set => title.text = value; }
+        public UIScrollablePanel ScrollableContent => mainPanel;
+        public void Close() => CloseModal(this);
+
+
+        /// <summary>
+        /// Show modal message box.
+        /// </summary>
+        /// <typeparam name="T">MessageBox type to show</typeparam>
+        /// <returns>New MessageBox</returns>
         public static T ShowModal<T>()
         where T : MessageBoxBase
         {
-            var uiObject = new GameObject();
-            uiObject.transform.parent = UIView.GetAView().transform;
-            var messageBox = uiObject.AddComponent<T>();
+            // Get global view.
+            UIView view = UIView.GetAView();
 
+            // Create new gameobject in global view and attach new MessageBox.
+            GameObject gameObject = new GameObject();
+            gameObject.transform.parent = view.transform;
+            MessageBoxBase messageBox = gameObject.AddComponent<T>();
+
+            // Display box as modal.
             UIView.PushModal(messageBox);
             messageBox.Show(true);
             messageBox.Focus();
 
-            var view = UIView.GetAView();
-
+            // Apply modal view effects.
             if (view.panelsLibraryModalEffect != null)
             {
                 view.panelsLibraryModalEffect.FitTo(null);
                 if (!view.panelsLibraryModalEffect.isVisible || view.panelsLibraryModalEffect.opacity != 1f)
                 {
                     view.panelsLibraryModalEffect.Show(false);
-                    ValueAnimator.Animate("ModalEffect67419", delegate (float val)
-                    {
-                        view.panelsLibraryModalEffect.opacity = val;
-                    }, new AnimatedFloat(0f, 1f, 0.7f, EasingType.CubicEaseOut));
+                    ValueAnimator.Animate("ModalEffect67419", (value) => view.panelsLibraryModalEffect.opacity = value, new AnimatedFloat(0f, 1f, 0.7f, EasingType.CubicEaseOut));
                 }
             }
 
-            return messageBox;
+            return messageBox as T;
         }
-        public static void HideModal(MessageBoxBase messageBox)
+
+
+        /// <summary>
+        ///  Closes the message box.
+        /// </summary>
+        public static void CloseModal(MessageBoxBase messageBox)
         {
+            // Stop modality.
             UIView.PopModal();
 
-            var view = UIView.GetAView();
+            // Clear modal view effects.
+            UIView view = UIView.GetAView();
             if (view.panelsLibraryModalEffect != null)
             {
                 if (!UIView.HasModalInput())
                 {
-                    ValueAnimator.Animate("ModalEffect67419", delegate (float val)
-                    {
-                        view.panelsLibraryModalEffect.opacity = val;
-                    }, new AnimatedFloat(1f, 0f, 0.7f, EasingType.CubicEaseOut), delegate ()
-                    {
-                        view.panelsLibraryModalEffect.Hide();
-                    });
+                    ValueAnimator.Animate("ModalEffect67419", (value) => view.panelsLibraryModalEffect.opacity = value, new AnimatedFloat(1f, 0f, 0.7f, EasingType.CubicEaseOut), () => view.panelsLibraryModalEffect.Hide());
                 }
                 else
                 {
@@ -67,20 +96,19 @@ namespace BOB.MessageBox
                 }
             }
 
+            // Hide messagebox, clear child event handlers, and destroy game object.
             messageBox.Hide();
-            messageBox.ClearScrollableContent();
+            messageBox.RemoveEventHandlers();
             Destroy(messageBox.gameObject);
         }
 
-        public string CaprionText { set => Caption.text = value; }
 
-        private UILabel Caption { get; set; }
-        protected UIPanel ButtonPanel { get; private set; }
-        protected UIScrollablePanel ScrollableContent { get; private set; }
-        private UIDragHandle Handle { get; set; }
-
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public MessageBoxBase()
         {
+            // Basic setup.
             isVisible = true;
             canFocus = true;
             isInteractive = true;
@@ -89,168 +117,251 @@ namespace BOB.MessageBox
             color = new Color32(58, 88, 104, 255);
             backgroundSprite = "MenuPanel";
 
-            AddHandle();
-            AddPanel();
-            FillContent();
+            // Add components.
+            AddTitleBar();
+            AddMainPanel();
             AddButtonPanel();
-            Init();
+            Resize();
 
-            ScrollableContent.eventSizeChanged += ContentSizeChanged;
+            // Event handler for size change.
+            mainPanel.eventSizeChanged += (component, size) => Resize();
         }
 
+
+        /// <summary>
+        /// Adds a button to the message box's button panel.
+        /// </summary>
+        /// <param name="buttonNumber">Number of this button (one-based)</param>
+        /// <param name="totalButtons">Total number of buttons to add</param>
+        /// <param name="action">Action to perform when button pressed</param>
+        /// <returns>New UIButton</returns>
+        protected UIButton AddButton(int buttonNumber, int totalButtons, Action action)
+        {
+            // Get zero-based button number.
+            int zeroedNumber = buttonNumber - 1;
+
+            // Basic setup.
+            UIButton newButton = buttonPanel.AddUIComponent<UIButton>();
+            newButton.normalBgSprite = "ButtonMenu";
+            newButton.hoveredTextColor = new Color32(7, 132, 255, 255);
+            newButton.pressedTextColor = new Color32(30, 30, 44, 255);
+            newButton.disabledTextColor = new Color32(7, 7, 7, 255);
+            newButton.horizontalAlignment = UIHorizontalAlignment.Center;
+            newButton.verticalAlignment = UIVerticalAlignment.Middle;
+            newButton.eventClick += (UIComponent component, UIMouseEventParameter eventParam) => action?.Invoke();
+
+            // Calculate size and position based on this button number and total number of buttons.
+            // Width of button is avalable space divided by number of buttons, less spacing at both sides of button.
+            float buttonPlaceWidth = this.width / totalButtons;
+            float buttonWidth = buttonPlaceWidth - (ButtonSpacing * 2f);
+            newButton.size = new Vector2(buttonWidth, ButtonHeight);
+            newButton.relativePosition = new Vector2(((buttonNumber - 1) * buttonPlaceWidth) + ButtonSpacing, 0f);
+
+            return newButton;
+        }
+
+
+        /// <summary>
+        /// Centres the message box on the screen.  Called by the game when the panel size changes.
+        /// </summary>
         protected override void OnSizeChanged()
         {
             base.OnSizeChanged();
-            relativePosition = new Vector3(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
+            relativePosition = new Vector2(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
         }
 
-        private void AddHandle()
+
+        /// <summary>
+        /// Handles key down events - escape and return.
+        /// </summary>
+        /// <param name="keyEvent">UI key event</param>
+        protected override void OnKeyDown(UIKeyEventParameter keyEvent)
         {
-            Handle = AddUIComponent<UIDragHandle>();
-            Handle.size = new Vector2(Width, 42);
-            Handle.relativePosition = new Vector2(0, 0);
-            Handle.eventSizeChanged += (component, size) =>
+            // Ensure key hasn't already been used.
+            if (!keyEvent.used)
             {
-                Caption.size = size;
-                Caption.CenterToParent();
+                // Checking for key - escape and enter.
+                if (keyEvent.keycode == KeyCode.Escape)
+                {
+                    // Escape key pressed - use up the event and close the messagebox.
+                    keyEvent.Use();
+                    Close();
+                }
+                else if (keyEvent.keycode == KeyCode.Return)
+                {
+                    // Enter key pressed - simulate click of first button.
+                    keyEvent.Use();
+                    if (buttonPanel.components.OfType<UIButton>().Skip(DefaultButton - 1).FirstOrDefault() is UIButton button)
+                    {
+                        button.SimulateClick();
+                    }
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Resizes the message box to fit all contents.
+        /// </summary>
+        private void Resize()
+        {
+            // Set height.
+            height = titleBar.height + mainPanel.height + buttonPanel.height + Padding;
+
+            // Position main panel under title bar.
+            mainPanel.relativePosition = new Vector2(0, titleBar.height);
+
+            // Position button panel under main panel.
+            buttonPanel.relativePosition = new Vector2(0, titleBar.height + mainPanel.height + Padding);
+
+            // Set width of each component in main panel to panel width (less padding on either side).
+            foreach (UIComponent component in mainPanel.components)
+            {
+                component.width = mainPanel.width - 2 * Padding;
+            }
+        }
+
+
+        /// <summary>
+        /// Adds the titlebar to the top of the message box.
+        /// </summary>
+        private void AddTitleBar()
+        {
+            // Drag handle.
+            titleBar = AddUIComponent<UIDragHandle>();
+            titleBar.relativePosition = Vector2.zero;
+            titleBar.size = new Vector2(Width, TitleBarHeight);
+
+            // Title
+            title = titleBar.AddUIComponent<UILabel>();
+            title.textAlignment = UIHorizontalAlignment.Center;
+            title.textScale = 1.3f;
+            title.anchor = UIAnchorStyle.Top;
+
+            // Close button.
+            UIButton closeButton = titleBar.AddUIComponent<UIButton>();
+            closeButton.normalBgSprite = "buttonclose";
+            closeButton.hoveredBgSprite = "buttonclosehover";
+            closeButton.pressedBgSprite = "buttonclosepressed";
+            closeButton.size = new Vector2(32f, 32f);
+            closeButton.relativePosition = new Vector2(527f, 4f);
+
+            // Event handler - resize.
+            titleBar.eventSizeChanged += (component, newSize) =>
+            {
+                title.size = newSize;
+                title.CenterToParent();
             };
 
-            Caption = Handle.AddUIComponent<UILabel>();
-            Caption.textAlignment = UIHorizontalAlignment.Center;
-            Caption.textScale = 1.3f;
-            Caption.anchor = UIAnchorStyle.Top;
+            // Event handler - centre title on drag handle when text changes.
+            title.eventTextChanged += (component, text) => title.CenterToParent();
 
-            Caption.eventTextChanged += (component, text) => Caption.CenterToParent();
-
-            var cancel = Handle.AddUIComponent<UIButton>();
-            cancel.normalBgSprite = "buttonclose";
-            cancel.hoveredBgSprite = "buttonclosehover";
-            cancel.pressedBgSprite = "buttonclosepressed";
-            cancel.size = new Vector2(32, 32);
-            cancel.relativePosition = new Vector2(527, 4);
-            cancel.eventClick += (UIComponent component, UIMouseEventParameter eventParam) => Cancel();
+            // Event handler - close button.
+            closeButton.eventClick += (UIComponent component, UIMouseEventParameter eventParam) => Close();
         }
-        private void AddPanel()
+
+
+        /// <summary>
+        /// Adds the main panel to the message box.
+        /// </summary>
+        private void AddMainPanel()
         {
-            ScrollableContent = AddUIComponent<UIScrollablePanel>();
-            ScrollableContent.width = Width;
-            ScrollableContent.autoLayout = true;
-            ScrollableContent.autoLayoutDirection = LayoutDirection.Vertical;
-            ScrollableContent.autoLayoutPadding = new RectOffset((int)Padding, (int)Padding, 0, 0);
-            ScrollableContent.clipChildren = true;
-            ScrollableContent.builtinKeyNavigation = true;
-            ScrollableContent.scrollWheelDirection = UIOrientation.Vertical;
-            ScrollableContent.maximumSize = new Vector2(Width, MaxContentHeight);
-            this.AddScrollbar(ScrollableContent);
 
-            ScrollableContent.eventComponentAdded += (UIComponent container, UIComponent child) => AddChildHandles(child);
-            ScrollableContent.eventComponentRemoved += (UIComponent container, UIComponent child) => RemoveChildHandles(child);
+            // Basic setup.
+            mainPanel = AddUIComponent<UIScrollablePanel>();
+            mainPanel.width = Width;
+            mainPanel.autoLayout = true;
+            mainPanel.autoLayoutDirection = LayoutDirection.Vertical;
+            mainPanel.autoLayoutPadding = new RectOffset((int)Padding, (int)Padding, 0, 0);
+            mainPanel.clipChildren = true;
+            mainPanel.builtinKeyNavigation = true;
+            mainPanel.scrollWheelDirection = UIOrientation.Vertical;
+            mainPanel.maximumSize = new Vector2(Width, MaxContentHeight);
+
+            // Add scrollbar.
+            UIControls.AddScrollbar(this, mainPanel);
+
+            // Event handlers to add/remove event handlers for resizing when child components re resized.
+            ScrollableContent.eventComponentAdded += (container, child) => AddChildEvents(child);
+            ScrollableContent.eventComponentRemoved += (container, child) => RemoveChildEvents(child);
         }
-        private void ClearScrollableContent()
+
+
+        /// <summary>
+        ///  Adds the button panel to the message box.
+        /// </summary>
+        private void AddButtonPanel()
         {
-            if (ScrollableContent == null)
-                return;
-
-            foreach (var item in ScrollableContent.components)
-                RemoveChildHandles(item);
+            buttonPanel = AddUIComponent<UIPanel>();
+            buttonPanel.size = new Vector2(Width, ButtonHeight + 10f);
         }
-        private void AddChildHandles(UIComponent child)
+
+
+        /// <summary>
+        /// Attaches event handlers to child components to ensure that the main panel is resized to fit children when their size changes.
+        /// </summary>
+        /// <param name="child">Child component</param>
+        private void AddChildEvents(UIComponent child)
         {
             child.eventVisibilityChanged += OnChildVisibilityChanged;
             child.eventSizeChanged += OnChildSizeChanged;
             child.eventPositionChanged += OnChildPositionChanged;
         }
-        private void RemoveChildHandles(UIComponent child)
+
+
+        /// <summary>
+        /// Removes event handlers from child components.  Should be called when child components are removed.
+        /// </summary>
+        /// <param name="child">Child component</param>
+        private void RemoveChildEvents(UIComponent child)
         {
             child.eventVisibilityChanged -= OnChildVisibilityChanged;
             child.eventSizeChanged -= OnChildSizeChanged;
             child.eventPositionChanged -= OnChildPositionChanged;
         }
-        private void OnChildVisibilityChanged(UIComponent component, bool value) => FitContentChildren();
-        private void OnChildSizeChanged(UIComponent component, Vector2 value) => FitContentChildren();
-        private void OnChildPositionChanged(UIComponent component, Vector2 value) => FitContentChildren();
 
-        private void FitContentChildren()
+        /// <summary>
+        /// Removes event handlers from all child components of the main panel.
+        /// </summary>
+        private void RemoveEventHandlers()
         {
-            ScrollableContent.FitChildrenVertically();
-            ScrollableContent.width = ScrollableContent.verticalScrollbar?.isVisible == true ? Width - ScrollableContent.verticalScrollbar.width - 3 : Width;
-        }
-        private void ContentSizeChanged(UIComponent component, Vector2 value) => Init();
-        private void Init()
-        {
-            height = Handle.height + ScrollableContent.height + ButtonPanel.height + Padding;
-            ScrollableContent.relativePosition = new Vector2(0, Handle.height);
-            ButtonPanel.relativePosition = new Vector2(0, Handle.height + ScrollableContent.height + Padding);
-
-            foreach (var item in ScrollableContent.components)
-                item.width = ScrollableContent.width - 2 * Padding;
-        }
-        protected virtual void FillContent() { }
-        private void AddButtonPanel()
-        {
-            ButtonPanel = AddUIComponent<UIPanel>();
-            ButtonPanel.size = new Vector2(Width, ButtonHeight + 10);
-        }
-        protected UIButton AddButton(int num, int from, Action action)
-        {
-            var button = ButtonPanel.AddUIComponent<UIButton>();
-            button.normalBgSprite = "ButtonMenu";
-            button.hoveredTextColor = new Color32(7, 132, 255, 255);
-            button.pressedTextColor = new Color32(30, 30, 44, 255);
-            button.disabledTextColor = new Color32(7, 7, 7, 255);
-            button.horizontalAlignment = UIHorizontalAlignment.Center;
-            button.verticalAlignment = UIVerticalAlignment.Middle;
-            button.eventClick += (UIComponent component, UIMouseEventParameter eventParam) => action?.Invoke();
-
-            ChangeButton(button, num, from);
-
-            return button;
-        }
-        private static float Space => 25f;
-        public static int DefaultButton { get; set; } = 1;
-        protected void ChangeButton(UIButton button, int i, int from, float? positionRatio = null, float? widthRatio = null)
-        {
-            var width = this.width - (Space * 2 + Space / 2 * (from - 1));
-            button.size = new Vector2(width * (widthRatio ?? 1f / from), ButtonHeight);
-            button.relativePosition = new Vector2(Space * (0.5f + i / 2f) + width * (positionRatio ?? 1f / from * (i - 1)), 0);
-        }
-        public void SetButtonsRatio(int[] ratio)
-        {
-            var buttons = ButtonPanel.components.OfType<UIButton>().ToArray();
-            if (buttons.Length == 0)
-                return;
-
-            var sum = 0;
-            var resultRatio = new int[buttons.Length];
-            for (var i = 0; i < buttons.Length; i += 1)
-                sum += resultRatio[i] = (i < ratio.Length ? ratio[i] : 1);
-
-            var before = 0;
-            for (var i = 0; i < buttons.Length; i += 1)
+            if (mainPanel != null)
             {
-                ChangeButton(buttons[i], i + 1, buttons.Length, (float)before / sum, (float)resultRatio[i] / sum);
-                before += resultRatio[i];
-            }
-        }
-
-        protected override void OnKeyDown(UIKeyEventParameter p)
-        {
-            if (!p.used)
-            {
-                if (p.keycode == KeyCode.Escape)
+                // Iterate through each child component and remove event handler.
+                foreach (UIComponent child in mainPanel.components)
                 {
-                    p.Use();
-                    Cancel();
-                }
-                else if (p.keycode == KeyCode.Return)
-                {
-                    if (ButtonPanel.components.OfType<UIButton>().Skip(DefaultButton - 1).FirstOrDefault() is UIButton button)
-                        button.SimulateClick();
-                    p.Use();
+                    RemoveChildEvents(child);
                 }
             }
         }
 
-        protected virtual void Cancel() => HideModal(this);
+        /// <summary>
+        /// Event handler delegate for child visibility changes.
+        /// </summary>
+        private void OnChildVisibilityChanged(UIComponent component, bool isVisible) => ChildResized();
+
+
+        /// <summary>
+        /// Event handler delegate for child size changes.
+        /// </summary>
+        private void OnChildSizeChanged(UIComponent component, Vector2 newSize) => ChildResized();
+
+
+        /// <summary>
+        /// Event handler delegate for child position changes.
+        /// </summary>
+        private void OnChildPositionChanged(UIComponent component, Vector2 position) => ChildResized();
+
+
+        /// <summary>
+        /// Resizes panel when child size changes - called through event handlers.
+        /// </summary>
+        private void ChildResized()
+        {
+            mainPanel.FitChildrenVertically();
+
+            // Resize main panel, allowing for scrollbar width if scrollbar is visible.
+            mainPanel.width = mainPanel.verticalScrollbar?.isVisible == true ? Width - mainPanel.verticalScrollbar.width - 3f : Width;
+        }
     }
 }

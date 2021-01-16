@@ -61,10 +61,10 @@
     <Compile Include="Code\Configuration\ConfigurationXML.cs" />
     <Compile Include="Code\Debugging.cs" />
     <Compile Include="Code\FileUtils.cs" />
-    <Compile Include="Code\MessageBox\SimpleMessageBox.cs" />
+    <Compile Include="Code\MessageBox\ListMessageBox.cs" />
+    <Compile Include="Code\MessageBox\WhatsNew.cs" />
     <Compile Include="Code\Mod.cs" />
     <Compile Include="Code\MessageBox\BaseMessageBox.cs" />
-    <Compile Include="Code\MessageBox\MessageBoxUtils.cs" />
     <Compile Include="Code\MessageBox\WhatsNewMessageBox.cs" />
     <Compile Include="Code\Patches\Patcher.cs" />
     <Compile Include="Code\Replacement\AllNetworkReplacement.cs" />
@@ -90,6 +90,7 @@
     <Compile Include="Code\UI\BOBTool.cs" />
     <Compile Include="Code\UI\InfoPanel.cs" />
     <Compile Include="Code\UI\TreeInfoPanel.cs" />
+    <Compile Include="Code\UI\UIControls.cs" />
     <Compile Include="Code\UI\UIFastList\UIFastList.cs" />
     <Compile Include="Code\UI\UIFastList\UIPropListItem.cs" />
     <Compile Include="Code\UI\UIFastList\UIPropRow.cs" />

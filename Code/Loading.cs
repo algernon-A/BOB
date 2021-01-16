@@ -54,13 +54,14 @@ namespace BOB
             ToolsModifierControl.toolController.gameObject.AddComponent<BOBTool>();
             Debugging.Message("loading complete");
 
+            // Display update notification.
+            WhatsNew.ShowWhatsNew();
 
             // Warning message box for 0.3 update if a configuration file exists without the 0.3 notification flag.
             if (System.IO.File.Exists("TreePropReplacer-config.xml") && !System.IO.File.Exists("BOB-config.xml"))
             {
-                OkMessageBox messageBox = MessageBoxBase.ShowModal<OkMessageBox>();
-                messageBox.CaprionText = BOBMod.ModName;
-                messageBox.MessageText = "BOB, the Tree and Prop Replacer, has been updated to version 0.3.  As part of this update the configuration file format has changed in order to support expanded functionality.  These changes are NOT backwards-compatible.\r\n\r\nIMPORTANT\r\nThis means that your existing replacements will be lost and will need to be redone.\r\n\r\nThe new configuration file format (BOB-config.xml) is now final and will be supported in all future releases.  Your old configuration file (TreePropReplacer-config.xml) has been left unaltered for use as a reference.";
+                ListMessageBox messageBox = MessageBoxBase.ShowModal<ListMessageBox>();
+                messageBox.AddParas("BOB, the Tree and Prop Replacer, has been updated to version 0.3.  As part of this update the configuration file format has changed in order to support expanded functionality.  These changes are NOT backwards-compatible.", "IMPORTANT", "This means that your existing replacements will be lost and will need to be redone.", "The new configuration file format (BOB-config.xml) is now final and will be supported in all future releases.  Your old configuration file (TreePropReplacer-config.xml) has been left unaltered for use as a reference.");
             }
         }
     }

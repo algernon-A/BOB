@@ -18,19 +18,19 @@ namespace BOB.MessageBox
         public WhatsNewMessageBox()
         {
             CloseButton = AddButton(1, 2, OkClick);
-            CloseButton.text = Translations.Translate("PRR_MES_CLS");
+            CloseButton.text = Translations.Translate("MES_CLS");
             DontShowButton = AddButton(2, 2, DontShowClick);
-            DontShowButton.text = Translations.Translate("PRR_MES_DSA");
+            DontShowButton.text = Translations.Translate("MES_DSA");
         }
         protected virtual void OkClick()
         {
             if (OnButton1Click?.Invoke() != false)
-                Cancel();
+                Close();
         }
         protected virtual void DontShowClick()
         {
             if (OnButton2Click?.Invoke() != false)
-                Cancel();
+                Close();
         }
 
         public void Init(Dictionary<Version, string> messages)

@@ -7,6 +7,9 @@ namespace BOB
 	[XmlRoot("TreePropReplacer")]
 	public class BOBSettingsFile
 	{
+		[XmlElement("WhatsNewVersion")]
+		public string WhatsNewVersion { get => ModSettings.whatsNewVersion; set => ModSettings.whatsNewVersion = value; }
+
 		// Language.
 		[XmlElement("Language")]
 		public string language
