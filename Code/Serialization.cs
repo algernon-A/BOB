@@ -36,7 +36,7 @@ namespace BOB
                 // Write to savegame.
                 serializableDataManager.SaveData(dataID, stream.ToArray());
 
-                Debugging.Message("wrote " + stream.Length);
+                Logging.Message("wrote ", stream.Length.ToString());
             }
         }
 
@@ -62,13 +62,13 @@ namespace BOB
 
                     // Deserialise savegame settings.
                     DataSerializer.Deserialize<BOBSerializer>(stream, DataSerializer.Mode.Memory);
-                    Debugging.Message("read " + stream.Length);
+                    Logging.Message("read ", stream.Length.ToString());
                 }
             }
             else
             {
                 // No data read.
-                Debugging.Message("no data read");
+                Logging.Message("no data read");
             }
         }
     }
@@ -88,7 +88,7 @@ namespace BOB
         /// <param name="serializer">Data serializer</param>
         public void Serialize(DataSerializer serializer)
         {
-            Debugging.Message("writing data to save file");
+            Logging.Message("writing data to save file");
 
             // Write data version.
             serializer.WriteInt32(CurrentDataVersion);
@@ -104,7 +104,7 @@ namespace BOB
             // Write tree replacement lists to savegame.
             serializer.WriteUniqueStringArray(treeNames.ToArray());
 
-            Debugging.Message("wrote trees length " + treeNames.Count);
+            Logging.Message("wrote trees length ", treeNames.Count.ToString());
         }
 
 
@@ -114,23 +114,23 @@ namespace BOB
         /// <param name="serializer">Data serializer</param>
         public void Deserialize(DataSerializer serializer)
         {
-            Debugging.Message("reading data from save file");
+            Logging.Message("reading data from save file");
 
             try
             {
                 // Read data version.
                 int dataVersion = serializer.ReadInt32();
-                Debugging.Message("read data version " + dataVersion);
+                Logging.Message("read data version ", dataVersion.ToString());
 
                 // Deserialize tree replacement dictionary keys and values.
                 treeNames = serializer.ReadUniqueStringArray();
 
-                Debugging.Message("read trees length " + treeNames.Length);
+                Logging.Message("read trees length ", treeNames.Length.ToString());
             }
             catch
             {
                 // Don't really care much if nothing read; assume no settings.
-                Debugging.Message("error deserializing data");
+                Logging.Message("error deserializing data");
                 return;
             }
 
@@ -144,7 +144,7 @@ namespace BOB
                     if (targetTree == null)
                     {
                         // Failed to find matching tree prefab - skip this one.
-                        Debugging.Message("couldn't find replacement tree " + treeNames[i]);
+                        Logging.Message("couldn't find replacement tree ", treeNames[i]);
                         continue;
                     }
 
@@ -153,7 +153,7 @@ namespace BOB
                     if (replacementTree == null)
                     {
                         // Failed to find matching tree prefab - skip this one.
-                        Debugging.Message("couldn't find original tree " + treeNames[i]);
+                        Logging.Message("couldn't find original tree ", treeNames[i]);
                         continue;
                     }
 

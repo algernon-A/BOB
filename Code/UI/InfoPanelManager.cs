@@ -58,7 +58,7 @@ namespace BOB
 					}
 					else
                     {
-						Debugging.Message("unsupported prefab type " + selectedPrefab.ToString());
+						Logging.Message("unsupported prefab type ", selectedPrefab.ToString());
 						return;
 					}
 
@@ -66,9 +66,9 @@ namespace BOB
 					Panel.Setup(uiGameObject.transform.parent, selectedPrefab);
 				}
 			}
-			catch (Exception exception)
+			catch (Exception e)
 			{
-				Debugging.LogException(exception);
+				Logging.LogException(e, "exception creating InfoPanel");
 			}
 		}
 

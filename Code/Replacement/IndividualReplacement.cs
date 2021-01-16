@@ -117,7 +117,7 @@ namespace BOB
 			// Bail out if no building prop.
 			if (targetProp == null)
 			{
-				Debugging.Message("ERROR: no target prop reference found when applying individual replacement");
+				Logging.Error("no target prop reference found when applying individual replacement");
 				return;
 			}
 

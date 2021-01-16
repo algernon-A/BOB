@@ -1,4 +1,7 @@
-﻿Version 0.4 -
+﻿- Overhaul logging
+
+
+Version 0.4 -
 
 - Add map tree replacement
 - Add "what's new" update notifictions

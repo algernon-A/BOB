@@ -33,7 +33,7 @@ namespace BOB
 
 						if (configFile == null)
 						{
-							Debugging.Message("couldn't deserialize settings file");
+							Logging.Error("couldn't deserialize settings file");
 							return;
 						}
 
@@ -64,13 +64,12 @@ namespace BOB
 				}
 				else
 				{
-					Debugging.Message("no configuration file found");
+					Logging.Message("no configuration file found");
 				}
 			}
-			catch (Exception exception)
+			catch (Exception e)
 			{
-				Debugging.Message("exception reading XML settings file");
-				Debugging.LogException(exception);
+				Logging.LogException(e, "exception reading XML settings file");
 			}
 		}
 
@@ -136,10 +135,9 @@ namespace BOB
 					xmlSerializer.Serialize(textWriter, configFile);
 				}
 			}
-			catch (Exception exception)
+			catch (Exception e)
 			{
-				Debugging.Message("exception saving XML settings file");
-				Debugging.LogException(exception);
+				Logging.LogException(e, "exception saving XML settings file");
 			}
 		}
 
@@ -157,7 +155,7 @@ namespace BOB
 				PrefabInfo targetPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);
 				if (targetPrefab == null)
 				{
-					Debugging.Message("Couldn't find target prefab " + replacement.target);
+					Logging.Message("Couldn't find target prefab ", replacement.target);
 					continue;
 				}
 
@@ -165,7 +163,7 @@ namespace BOB
 				PrefabInfo replacementPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.replacement) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.replacement);
 				if (replacementPrefab == null)
 				{
-					Debugging.Message("Couldn't find replacement prefab " + replacement.replacement);
+					Logging.Message("Couldn't find replacement prefab ", replacement.replacement);
 					continue;
 				}
 
@@ -185,7 +183,7 @@ namespace BOB
 			NetInfo networkInfo = (NetInfo)PrefabCollection<NetInfo>.FindLoaded(networkElement.network);
 			if (networkInfo == null)
 			{
-				Debugging.Message("Couldn't find target network " + networkElement.network);
+				Logging.Message("Couldn't find target network ", networkElement.network);
 				return;
 			}
 
@@ -197,7 +195,7 @@ namespace BOB
 				PrefabInfo targetPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);
 				if (targetPrefab == null)
 				{
-					Debugging.Message("Couldn't find target prefab " + replacement.target);
+					Logging.Message("Couldn't find target prefab ", replacement.target);
 					continue;
 				}
 
@@ -205,7 +203,7 @@ namespace BOB
 				PrefabInfo replacementPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.replacement) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.replacement);
 				if (replacementPrefab == null)
 				{
-					Debugging.Message("Couldn't find replacement prefab " + replacement.replacement);
+					Logging.Message("Couldn't find replacement prefab ", replacement.replacement);
 					continue;
 				}
 
@@ -228,7 +226,7 @@ namespace BOB
 				PrefabInfo targetPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);
 				if (targetPrefab == null)
 				{
-					Debugging.Message("Couldn't find target prefab " + replacement.target);
+					Logging.Message("Couldn't find target prefab ", replacement.target);
 					continue;
 				}
 
@@ -236,7 +234,7 @@ namespace BOB
 				PrefabInfo replacementPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.replacement) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.replacement);
 				if (replacementPrefab == null)
 				{
-					Debugging.Message("Couldn't find replacement prefab " + replacement.replacement);
+					Logging.Message("Couldn't find replacement prefab ", replacement.replacement);
 					continue;
 				}
 
@@ -256,7 +254,7 @@ namespace BOB
 			BuildingInfo buildingInfo = (BuildingInfo)PrefabCollection<BuildingInfo>.FindLoaded(buildingElement.building);
 			if (buildingInfo == null)
 			{
-				Debugging.Message("Couldn't find target building " + buildingElement.building);
+				Logging.Message("Couldn't find target building ", buildingElement.building);
 				return;
 			}
 
@@ -268,7 +266,7 @@ namespace BOB
 				PrefabInfo targetPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);
 				if (targetPrefab == null)
 				{
-					Debugging.Message("Couldn't find target prefab " + replacement.target);
+					Logging.Message("Couldn't find target prefab ", replacement.target);
 					continue;
 				}
 
@@ -276,7 +274,7 @@ namespace BOB
 				PrefabInfo replacementPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.replacement) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.replacement);
 				if (replacementPrefab == null)
 				{
-					Debugging.Message("Couldn't find replacement prefab " + replacement.replacement);
+					Logging.Message("Couldn't find replacement prefab ", replacement.replacement);
 					continue;
 				}
 
@@ -296,7 +294,7 @@ namespace BOB
 			BuildingInfo buildingInfo = (BuildingInfo)PrefabCollection<BuildingInfo>.FindLoaded(buildingElement.building);
 			if (buildingInfo == null)
 			{
-				Debugging.Message("Couldn't find target building " + buildingElement.building);
+				Logging.Message("Couldn't find target building ", buildingElement.building);
 				return;
 			}
 
@@ -307,7 +305,7 @@ namespace BOB
 				PrefabInfo targetPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);
 				if (targetPrefab == null)
 				{
-					Debugging.Message("Couldn't find target prefab " + replacement.target);
+					Logging.Message("Couldn't find target prefab ", replacement.target);
 					continue;
 				}
 
@@ -315,7 +313,7 @@ namespace BOB
 				PrefabInfo replacementPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.replacement) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.replacement);
 				if (replacementPrefab == null)
 				{
-					Debugging.Message("Couldn't find replacement prefab " + replacement.replacement);
+					Logging.Message("Couldn't find replacement prefab ", replacement.replacement);
 					continue;
 				}
 

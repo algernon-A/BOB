@@ -94,7 +94,7 @@ namespace BOB
 			// Check for valid parameters.
 			if (target != null && replacement != null)
 			{
-				Debugging.Message("replacing tree " + target.name + " with " + replacement.name);
+				Logging.Message("replacing tree ", target.name, " with ", replacement.name);
 
 				// Iterate through each tree in map.
 				for (uint treeIndex = 0; treeIndex < Singleton<TreeManager>.instance.m_trees.m_buffer.Length; ++treeIndex)

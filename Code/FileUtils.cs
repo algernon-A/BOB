@@ -45,7 +45,7 @@ namespace BOB
 			}
 
 			// If we got here, then we didn't find the assembly.
-			Debugging.Message("assembly path not found");
+			Logging.Message("assembly path not found");
 			throw new FileNotFoundException(BOBMod.ModName + ": assembly path not found!");
 		}
 

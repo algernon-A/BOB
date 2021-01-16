@@ -115,9 +115,9 @@ namespace BOB
 				UpdateButtonStates();
 
 			}
-			catch (Exception exception)
+			catch (Exception e)
 			{
-				Debugging.LogException(exception);
+				Logging.LogException(e, "exception setting up InfoPanel");
 			}
 		}
 

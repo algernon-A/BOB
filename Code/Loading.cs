@@ -15,7 +15,7 @@ namespace BOB
         /// <param name="loading">Loading mode (e.g. game, editor, scenario, etc.)</param>
         public override void OnCreated(ILoading loading)
         {
-            Debugging.Message("loading");
+            Logging.KeyMessage("version ", BOBMod.Version, " loading");
 
             // Initialise data sets prior to savegame load.
             AllBuildingReplacement.Setup();
@@ -39,7 +39,7 @@ namespace BOB
             // Don't do anything if not in game.
             if (mode != LoadMode.NewGame && mode != LoadMode.LoadGame)
             {
-                Debugging.Message("not loading into game; exiting");
+                Logging.KeyMessage("not loading into game; exiting");
                 Patcher.UnpatchAll();
                 return;
             }
@@ -52,7 +52,7 @@ namespace BOB
 
             // Initialise select tool.
             ToolsModifierControl.toolController.gameObject.AddComponent<BOBTool>();
-            Debugging.Message("loading complete");
+            Logging.KeyMessage("loading complete");
 
             // Display update notification.
             WhatsNew.ShowWhatsNew();
