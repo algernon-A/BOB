@@ -117,7 +117,7 @@ namespace BOB
         /// </summary>
         public void UpdateUILanguage()
         {
-            Logging.Message("setting language to ", (currentIndex < 0 ? "system" : languages.Values[currentIndex].uniqueName));
+            Logging.Message("setting language to ", currentIndex < 0 ? "system" : languages.Values[currentIndex].uniqueName);
 
             // UI update code goes here.
 

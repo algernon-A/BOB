@@ -28,7 +28,7 @@ namespace BOB
                 // Ensure Harmony is ready before patching.
                 if (HarmonyHelper.IsHarmonyInstalled)
                 {
-                    Logging.Message("deploying Harmony patches");
+                    Logging.KeyMessage("deploying Harmony patches");
 
                     // Apply all annotated patches and update flag.
                     Harmony harmonyInstance = new Harmony(harmonyID);
@@ -37,7 +37,7 @@ namespace BOB
                 }
                 else
                 {
-                    Logging.Message("Harmony not ready");
+                    Logging.Error("Harmony not ready");
                 }
             }
         }
@@ -48,7 +48,7 @@ namespace BOB
             // Only unapply if patches appplied.
             if (_patched)
             {
-                Logging.Message("reverting Harmony patches");
+                Logging.KeyMessage("reverting Harmony patches");
 
                 // Unapply patches, but only with our HarmonyID.
                 Harmony harmonyInstance = new Harmony(harmonyID);
