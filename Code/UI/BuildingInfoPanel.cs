@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using ColossalFramework.UI;
 
@@ -30,44 +31,59 @@ namespace BOB
 		{
 			set
 			{
+				// Check for null.
+				if (value == null)
+				{
+					Logging.Error("null target item assigned at BuildingInfoPanel.CurrentTargetItem");
+					return;
+				}
+
 				// Call base.
 				base.CurrentTargetItem = value;
 
-				// If we've got an individuial building prop replacement, update the offset fields with the replacement values.
-				if (currentTargetItem.replacementPrefab != null)
+				try
 				{
-					angleField.text = IndividualReplacement.replacements[currentBuilding][currentTargetItem.index].angle.ToString();
-					xField.text = IndividualReplacement.replacements[currentBuilding][currentTargetItem.index].offsetX.ToString();
-					yField.text = IndividualReplacement.replacements[currentBuilding][currentTargetItem.index].offsetY.ToString();
-					zField.text = IndividualReplacement.replacements[currentBuilding][currentTargetItem.index].offsetZ.ToString();
-					probabilityField.text = IndividualReplacement.replacements[currentBuilding][currentTargetItem.index].probability.ToString();
+					// If we've got an individuial building prop replacement, update the offset fields with the replacement values.
+					if (currentTargetItem.replacementPrefab != null)
+					{
+						angleField.text = IndividualReplacement.replacements[currentBuilding][currentTargetItem.index].angle.ToString();
+						xField.text = IndividualReplacement.replacements[currentBuilding][currentTargetItem.index].offsetX.ToString();
+						yField.text = IndividualReplacement.replacements[currentBuilding][currentTargetItem.index].offsetY.ToString();
+						zField.text = IndividualReplacement.replacements[currentBuilding][currentTargetItem.index].offsetZ.ToString();
+						probabilityField.text = IndividualReplacement.replacements[currentBuilding][currentTargetItem.index].probability.ToString();
+					}
+					// Ditto for any building replacement.
+					else if (currentTargetItem.replacementPrefab != null)
+					{
+						angleField.text = BuildingReplacement.replacements[currentBuilding][currentTargetItem.originalPrefab].angle.ToString();
+						xField.text = BuildingReplacement.replacements[currentBuilding][currentTargetItem.originalPrefab].offsetX.ToString();
+						yField.text = BuildingReplacement.replacements[currentBuilding][currentTargetItem.originalPrefab].offsetY.ToString();
+						zField.text = BuildingReplacement.replacements[currentBuilding][currentTargetItem.originalPrefab].offsetZ.ToString();
+						probabilityField.text = BuildingReplacement.replacements[currentBuilding][currentTargetItem.originalPrefab].probability.ToString();
+					}
+					// Ditto for any all-building replacement.
+					else if (currentTargetItem.allPrefab != null)
+					{
+						angleField.text = AllBuildingReplacement.replacements[currentTargetItem.originalPrefab].angle.ToString();
+						xField.text = AllBuildingReplacement.replacements[currentTargetItem.originalPrefab].offsetX.ToString();
+						yField.text = AllBuildingReplacement.replacements[currentTargetItem.originalPrefab].offsetY.ToString();
+						zField.text = AllBuildingReplacement.replacements[currentTargetItem.originalPrefab].offsetZ.ToString();
+						probabilityField.text = AllBuildingReplacement.replacements[currentTargetItem.originalPrefab].probability.ToString();
+					}
+					else
+					{
+						// No current replacement; set all relative fields to zero, and absolute fields to final prop.
+						angleField.text = "0";
+						xField.text = "0";
+						yField.text = "0";
+						zField.text = "0";
+						probabilityField.text = value.originalProb.ToString();
+					}
 				}
-				// Ditto for any building replacement.
-				else if (currentTargetItem.replacementPrefab != null)
-				{
-					angleField.text = BuildingReplacement.replacements[currentBuilding][currentTargetItem.originalPrefab].angle.ToString();
-					xField.text = BuildingReplacement.replacements[currentBuilding][currentTargetItem.originalPrefab].offsetX.ToString();
-					yField.text = BuildingReplacement.replacements[currentBuilding][currentTargetItem.originalPrefab].offsetY.ToString();
-					zField.text = BuildingReplacement.replacements[currentBuilding][currentTargetItem.originalPrefab].offsetZ.ToString();
-					probabilityField.text = BuildingReplacement.replacements[currentBuilding][currentTargetItem.originalPrefab].probability.ToString();
-				}
-				// Ditto for any all-building replacement.
-				else if (currentTargetItem.allPrefab != null)
-				{
-					angleField.text = AllBuildingReplacement.replacements[currentTargetItem.originalPrefab].angle.ToString();
-					xField.text = AllBuildingReplacement.replacements[currentTargetItem.originalPrefab].offsetX.ToString();
-					yField.text = AllBuildingReplacement.replacements[currentTargetItem.originalPrefab].offsetY.ToString();
-					zField.text = AllBuildingReplacement.replacements[currentTargetItem.originalPrefab].offsetZ.ToString();
-					probabilityField.text = AllBuildingReplacement.replacements[currentTargetItem.originalPrefab].probability.ToString();				}
-				else
-				{
-					// No current replacement; set all relative fields to zero, and absolute fields to final prop.
-					angleField.text = "0";
-					xField.text = "0";
-					yField.text = "0";
-					zField.text = "0";
-					probabilityField.text = value.originalProb.ToString();
-				}
+				catch (Exception e)
+                {
+					Logging.LogException(e, "exception accessing current target item ");
+                }
 			}
 		}
 

@@ -102,7 +102,7 @@ namespace BOB.MessageBox
 
                 SetLabel();
             }
-            private void SetLabel() => Button.text = $"{(IsMinimize ? "►" : "▼")} {Label}";
+            private void SetLabel() => Button.text = $"{(IsMinimize ? "► " : "▼ ")} {Label}";
 
             protected override void OnSizeChanged()
             {
