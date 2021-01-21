@@ -10,13 +10,7 @@ namespace BOB.MessageBox
     public class ListMessageBox : MessageBoxBase
     {
         // Components.
-        private UIButton button;
-
-
-        /// <summary>
-        /// Sets button text.
-        /// </summary>
-        public string ButtonText { set => button.text = value; }
+        protected UIButton closeButton;
 
 
         /// <summary>
@@ -27,9 +21,19 @@ namespace BOB.MessageBox
             // Set title.
             Title = BOBMod.ModName;
 
+            // Add buttons.
+            AddButtons();
+        }
+
+
+        /// <summary>
+        /// Adds buttons to the message box.
+        /// </summary>
+        public virtual void AddButtons()
+        {
             // Add close button.
-            button = AddButton(1, 1, Close);
-            button.text = Translations.Translate("MES_CLS");
+            closeButton = AddButton(1, 1, Close);
+            closeButton.text = Translations.Translate("MES_CLS");
         }
 
 
@@ -60,6 +64,20 @@ namespace BOB.MessageBox
 
 
         /// <summary>
+        /// Creates a blank panel spacer.
+        /// </summary>
+        /// <param name="height">Spacer height (default 10)</param>
+        public void AddSpacer(float height = 10f)
+        {
+            UILabel spacer = ScrollableContent.AddUIComponent<UILabel>();
+
+            spacer.autoSize = false;
+            spacer.height = height;
+            spacer.width = 10f;
+        }
+
+
+        /// <summary>
         /// Add dot pointed list.
         /// </summary>
         /// <param name="listItems">Array of messages for display as separte dot points</param>
@@ -71,69 +89,72 @@ namespace BOB.MessageBox
                 ListItem listItem = ScrollableContent.AddUIComponent<ListItem>();
                 listItem.Text = listItems[i];
             }
-        }
-    }
 
-
-    /// <summary>
-    /// A dot point list item for display.
-    /// </summary>
-    public class ListItem : UIPanel
-    {
-        // Layout constants.
-        private const float DotPointX = 20f;
-        private const float MessageX = 35f;
-        private const float Padding = 3f;
-
-        // Panel components.
-        private UILabel dotPoint;
-        private UILabel textLabel;
-
-
-        // Text to display.
-        public string Text { get => textLabel.text; set => textLabel.text = value; }
-
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ListItem()
-        {
-            // Use manual sizing and layout to avoid issues.
-            autoLayout = false;
-            autoSize = false;
-
-            // Dot point.
-            dotPoint = AddUIComponent<UILabel>();
-            dotPoint.autoSize = true;
-            dotPoint.relativePosition = new Vector2(DotPointX, 0f);
-            dotPoint.text = ("-");
-
-            // Text label.
-            textLabel = AddUIComponent<UILabel>();
-            textLabel.relativePosition = new Vector2(MessageX, Padding);
-            textLabel.textScale = 0.8f;
-            textLabel.wordWrap = true;
-            textLabel.autoSize = false;
-            textLabel.autoHeight = true;
-
-            // Set list panel height.
-            textLabel.width = width - MessageX - Padding;
-            height = textLabel.height + (Padding * 2);
+            // Add spacer at end of list.
+            AddSpacer();
         }
 
 
         /// <summary>
-        /// Set width of textlabel and height of panel; called when size is changed, e.g. when text is set/changed.
+        /// A dot point list item for display.
         /// </summary>
-        protected override void OnSizeChanged()
+        public class ListItem : UIPanel
         {
-            base.OnSizeChanged();
+            // Layout constants.
+            private const float DotPointX = 20f;
+            private const float MessageX = 35f;
+            private const float Padding = 3f;
 
-            if (textLabel != null)
+            // Panel components.
+            private UILabel dotPoint;
+            private UILabel textLabel;
+
+
+            // Text to display.
+            public string Text { get => textLabel.text; set => textLabel.text = value; }
+
+
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            public ListItem()
             {
+                // Use manual sizing and layout to avoid issues.
+                autoLayout = false;
+                autoSize = false;
+
+                // Dot point.
+                dotPoint = AddUIComponent<UILabel>();
+                dotPoint.autoSize = true;
+                dotPoint.relativePosition = new Vector2(DotPointX, 0f);
+                dotPoint.text = ("-");
+
+                // Text label.
+                textLabel = AddUIComponent<UILabel>();
+                textLabel.relativePosition = new Vector2(MessageX, Padding);
+                textLabel.textScale = 0.8f;
+                textLabel.wordWrap = true;
+                textLabel.autoSize = false;
+                textLabel.autoHeight = true;
+
+                // Set list panel height.
                 textLabel.width = width - MessageX - Padding;
                 height = textLabel.height + (Padding * 2);
+            }
+
+
+            /// <summary>
+            /// Set width of textlabel and height of panel; called when size is changed, e.g. when text is set/changed.
+            /// </summary>
+            protected override void OnSizeChanged()
+            {
+                base.OnSizeChanged();
+
+                if (textLabel != null)
+                {
+                    textLabel.width = width - MessageX - Padding;
+                    height = textLabel.height + (Padding * 2);
+                }
             }
         }
     }
