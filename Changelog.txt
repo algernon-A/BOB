@@ -1,4 +1,5 @@
-﻿- Overhaul logging
+﻿- Fix building replacement panel exception caused by individual/building mixup when changing target item
+- Overhaul logging
 
 
 Version 0.4 -

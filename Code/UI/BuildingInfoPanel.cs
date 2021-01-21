@@ -44,31 +44,40 @@ namespace BOB
 				try
 				{
 					// If we've got an individuial building prop replacement, update the offset fields with the replacement values.
-					if (currentTargetItem.replacementPrefab != null)
+					if (currentTargetItem.individualPrefab != null)
 					{
-						angleField.text = IndividualReplacement.replacements[currentBuilding][currentTargetItem.index].angle.ToString();
-						xField.text = IndividualReplacement.replacements[currentBuilding][currentTargetItem.index].offsetX.ToString();
-						yField.text = IndividualReplacement.replacements[currentBuilding][currentTargetItem.index].offsetY.ToString();
-						zField.text = IndividualReplacement.replacements[currentBuilding][currentTargetItem.index].offsetZ.ToString();
-						probabilityField.text = IndividualReplacement.replacements[currentBuilding][currentTargetItem.index].probability.ToString();
+						Logging.Message("target changed: individual replacement for ", currentBuilding.name, " at index ", currentTargetItem.index.ToString());
+						BOBBuildingReplacement thisReplacement = IndividualReplacement.replacements[currentBuilding][currentTargetItem.index];
+
+						angleField.text = thisReplacement.angle.ToString();
+						xField.text = thisReplacement.offsetX.ToString();
+						yField.text = thisReplacement.offsetY.ToString();	
+						zField.text = thisReplacement.offsetZ.ToString();
+						probabilityField.text = thisReplacement.probability.ToString();
 					}
 					// Ditto for any building replacement.
 					else if (currentTargetItem.replacementPrefab != null)
 					{
-						angleField.text = BuildingReplacement.replacements[currentBuilding][currentTargetItem.originalPrefab].angle.ToString();
-						xField.text = BuildingReplacement.replacements[currentBuilding][currentTargetItem.originalPrefab].offsetX.ToString();
-						yField.text = BuildingReplacement.replacements[currentBuilding][currentTargetItem.originalPrefab].offsetY.ToString();
-						zField.text = BuildingReplacement.replacements[currentBuilding][currentTargetItem.originalPrefab].offsetZ.ToString();
-						probabilityField.text = BuildingReplacement.replacements[currentBuilding][currentTargetItem.originalPrefab].probability.ToString();
+						Logging.Message("target changed: getting building replacement for ", currentBuilding.name, " with original prefab ", currentTargetItem.originalPrefab.name);
+						BOBBuildingReplacement thisReplacement = BuildingReplacement.replacements[currentBuilding][currentTargetItem.originalPrefab];
+
+						angleField.text = thisReplacement.angle.ToString();
+						xField.text = thisReplacement.offsetX.ToString();
+						yField.text = thisReplacement.offsetY.ToString();
+						zField.text = thisReplacement.offsetZ.ToString();
+						probabilityField.text = thisReplacement.probability.ToString();
 					}
 					// Ditto for any all-building replacement.
 					else if (currentTargetItem.allPrefab != null)
 					{
-						angleField.text = AllBuildingReplacement.replacements[currentTargetItem.originalPrefab].angle.ToString();
-						xField.text = AllBuildingReplacement.replacements[currentTargetItem.originalPrefab].offsetX.ToString();
-						yField.text = AllBuildingReplacement.replacements[currentTargetItem.originalPrefab].offsetY.ToString();
-						zField.text = AllBuildingReplacement.replacements[currentTargetItem.originalPrefab].offsetZ.ToString();
-						probabilityField.text = AllBuildingReplacement.replacements[currentTargetItem.originalPrefab].probability.ToString();
+						Logging.Message("target changed: getting all-building replacement for ", currentBuilding.name, " with original prefab ", currentTargetItem.originalPrefab.name);
+						BOBBuildingReplacement thisReplacement = AllBuildingReplacement.replacements[currentTargetItem.originalPrefab];
+
+						angleField.text = thisReplacement.angle.ToString();
+						xField.text = thisReplacement.offsetX.ToString();
+						yField.text = thisReplacement.offsetY.ToString();
+						zField.text = thisReplacement.offsetZ.ToString();
+						probabilityField.text = thisReplacement.probability.ToString();
 					}
 					else
 					{
@@ -434,7 +443,7 @@ namespace BOB
 					propListItem.replacementProb = buildingReplacement.probability;
 				}
 
-				// Vuilding replacement and original probability (if any).
+				// Building replacement and original probability (if any).
 				BOBBuildingReplacement individualReplacement = IndividualReplacement.ActiveReplacement(currentBuilding, propIndex);
 				if (individualReplacement != null)
 				{
