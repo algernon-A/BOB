@@ -37,5 +37,6 @@
     <Translation ID="BOB_OPT_POS" String="Remember previous panel position" />
     <Translation ID="BOB_FIL_NAME" String="Search:" />
     <Translation ID="BOB_UPD_040_0" String="Introducing map tree replacment!  Activate the BOB tool as usual and click on a free-standing tree." />
+    <Translation ID="BOB_UPD_041_0" String="Fix intermittent building replacement panel exception when changing target item." />
   </Translations>
 </Language>
