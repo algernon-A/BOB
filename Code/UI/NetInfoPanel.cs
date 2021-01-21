@@ -335,6 +335,9 @@ namespace BOB
 						propListItem.replacementProb = netReplacement.probability;
 					}
 
+					// Replacement pack replacement and original probability (if any).
+					propListItem.packagePrefab = ReplacementPacks.GetOriginal(laneProps[propIndex].m_finalProp);
+
 					// Are we grouping?
 					if (propListItem.index == -1)
 					{

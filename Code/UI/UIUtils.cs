@@ -9,6 +9,23 @@ namespace BOB
 	/// </summary>
     internal static class UIUtils
     {
+        // Package icon texture atlas.
+        private static UITextureAtlas packageSprites;
+
+        internal static UITextureAtlas PackageSprites
+        {
+            get
+            {
+                if (packageSprites == null)
+                {
+                    packageSprites = FileUtils.LoadSpriteAtlas("bob_prop_pack_small");
+                }
+
+                return packageSprites;
+            }
+        }
+
+
         /// <summary>
         /// Adds a checkbox with a descriptive text label immediately to the right.
         /// </summary>

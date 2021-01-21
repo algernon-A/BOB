@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using ColossalFramework;
+using ColossalFramework.UI;
 using ColossalFramework.Plugins;
 using ICities;
 using UnityEngine;
@@ -59,12 +60,50 @@ namespace BOB
 		{
 			CursorInfo cursor = ScriptableObject.CreateInstance<CursorInfo>();
 
-
 			cursor.m_texture = LoadTexture(cursorName);
 			cursor.m_hotspot = new Vector2(5f, 0f);
 
 			return cursor;
 		}
+
+
+
+		/// <summary>
+		/// Loads a four-sprite texture atlas from a given .png file.
+		/// </summary>
+		/// <param name="atlasName">Atlas name (".png" will be appended fto make the filename)</param>
+		/// <returns>New texture atlas</returns>
+		internal static UITextureAtlas LoadSpriteAtlas(string atlasName)
+        {
+			// Create new texture atlas for button.
+			UITextureAtlas newAtlas = ScriptableObject.CreateInstance<UITextureAtlas>();
+			newAtlas.name = atlasName;
+			newAtlas.material = UnityEngine.Object.Instantiate<Material>(UIView.GetAView().defaultAtlas.material);
+
+			// Load texture from file.
+			Texture2D newTexture = FileUtils.LoadTexture(atlasName + ".png");
+			newAtlas.material.mainTexture = newTexture;
+
+			// Setup sprites.
+			string[] spriteNames = new string[] { "disabled", "normal", "pressed", "hovered" };
+			int numSprites = spriteNames.Length;
+			float spriteWidth = 1f / spriteNames.Length;
+
+			// Iterate through each sprite (counter increment is in region setup).
+			for (int i = 0; i < numSprites; ++i)
+			{
+				UITextureAtlas.SpriteInfo sprite = new UITextureAtlas.SpriteInfo
+				{
+					name = spriteNames[i],
+					texture = newTexture,
+					// Sprite regions are horizontally arranged, evenly spaced.
+					region = new Rect(i * spriteWidth, 0f, spriteWidth, 1f)
+				};
+				newAtlas.AddSprite(sprite);
+			}
+
+			return newAtlas;
+        }
 
 
 		/// <summary>

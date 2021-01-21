@@ -10,14 +10,18 @@ namespace BOB
     /// </summary>
     public class UIPropRow : UIPanel, UIFastListRow
     {
-        // Height of each row.
-        private const int rowHeight = 30;
+        // Layout constants.
+        private const float RowHeight = 30f;
+
+        // Layout variables.
+        private float labelX;
 
         // Panel components.
         private UIPanel panelBackground;
         private UILabel objectName;
+        private UISprite lineSprite;
 
-        // ObjectData
+        // ObjectData.
 		protected PrefabInfo thisPrefab;
 		protected PropListItem thisItem;
 		protected int index;
@@ -32,7 +36,7 @@ namespace BOB
                 {
                     panelBackground = AddUIComponent<UIPanel>();
                     panelBackground.width = width;
-                    panelBackground.height = rowHeight;
+                    panelBackground.height = RowHeight;
                     panelBackground.relativePosition = Vector2.zero;
 
                     panelBackground.zOrder = 0;
@@ -53,7 +57,7 @@ namespace BOB
             if (objectName != null)
             {
                 Background.width = width;
-                objectName.relativePosition = new Vector3(10f, 5f);
+                objectName.relativePosition = new Vector2(labelX, 5f);
             }
         }
 
@@ -91,11 +95,10 @@ namespace BOB
                 canFocus = true;
                 isInteractive = true;
                 width = parent.width;
-                height = rowHeight;
+                height = RowHeight;
 
                 // Add object name label.
                 objectName = AddUIComponent<UILabel>();
-                objectName.relativePosition = new Vector3(10f, 5f);
                 objectName.width = this.width - 10f;
             }
 
@@ -168,7 +171,7 @@ namespace BOB
                         displayText.Append(thisItem.replacementProb);
                         displayText.Append("%");
                     }
-
+                    
                     // Append closing bracket.
                     displayText.Append(")");
                 }
@@ -195,13 +198,29 @@ namespace BOB
 
                 // Set display text.
                 objectName.text = displayText.ToString();
+
+                // Add line item sprite for package replacements.
+                if (thisItem.packagePrefab != null)
+                {
+                    lineSprite = AddUIComponent<UISprite>();
+                    lineSprite.atlas = UIUtils.PackageSprites;
+                    lineSprite.spriteName = "normal";
+                    lineSprite.size = new Vector2(17f, 17f);
+                    lineSprite.relativePosition = new Vector2(6.5f, 6.5f);
+                }
+
+                // Indent label for line sprite.
+                labelX = 30f;
             }
             else
             {
                 // Attached data is a raw PropInfo; just display its (cleaned-up) name.
                 objectName.text = UIUtils.GetDisplayName(thisPrefab.name);
+                labelX = 10f;
             }
 
+            // Set label position
+            objectName.relativePosition = new Vector2(labelX, 5f);
 
             // Set initial background as deselected state.
             Deselect(isRowOdd);
