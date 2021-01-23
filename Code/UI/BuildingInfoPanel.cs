@@ -13,9 +13,11 @@ namespace BOB
 	{
 		// Current selection reference.
 		BuildingInfo currentBuilding;
+		BuildingInfo[] subBuildings;
 
 		// Panel components.
 		private UICheckBox indCheck;
+		private UIDropDown subBuildingMenu;
 
 
 		// Button labels.
@@ -112,6 +114,44 @@ namespace BOB
 
 			// Add group checkbox.
 			indCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_IND"), 155f, TitleHeight);
+
+			// Does this building have sub-buildings?
+			if (currentBuilding.m_subBuildings.Length > 0)
+            {
+				// Yes - create lists of sub-buildings (names and infos).
+				int numSubs = currentBuilding.m_subBuildings.Length;
+				int numChoices = numSubs + 1;
+				string[] subBuildingNames = new string[numChoices];
+				subBuildings = new BuildingInfo[numChoices];
+				subBuildingNames[0] = currentBuilding.name;
+				subBuildings[0] = currentBuilding;
+
+				for (int i = 0; i < numSubs; ++i)
+                {
+					subBuildingNames[i + 1] = currentBuilding.m_subBuildings[i].m_buildingInfo.name;
+					subBuildings[i + 1] = currentBuilding.m_subBuildings[i].m_buildingInfo;
+				}
+
+				// Add sub-building menu.
+				subBuildingMenu = UIControls.LabelledDropDown(this, Translations.Translate("BOB_PNL_SUB"), 155f, 65f);
+				subBuildingMenu.items = subBuildingNames;
+				subBuildingMenu.selectedIndex = 0;
+
+				// Sub-building menu event handler.
+				subBuildingMenu.eventSelectedIndexChanged += (control, index) =>
+				{
+					// Set current building.
+					currentBuilding = subBuildings[index];
+
+					// Reset current items.
+					currentTargetItem = null;
+					replacementPrefab = null;
+
+					// Reset loaded lists.
+					loadedList.rowsData = LoadedList(IsTree);
+					targetList.rowsData = TargetList(IsTree);
+				};
+			}
 
 			// Event handler for prop checkbox.
 			propCheck.eventCheckChanged += (control, isChecked) =>

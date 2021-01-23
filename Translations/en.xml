@@ -27,6 +27,7 @@
     <Translation ID="BOB_PNL_XOF" String="X offset" />
     <Translation ID="BOB_PNL_YOF" String="Y offset" />
     <Translation ID="BOB_PNL_ZOF" String="Z offset" />
+    <Translation ID="BOB_PNL_SUB" String="Sub-building" />
     <Translation ID="BOB_OPT_KEY" String="Hotkey" />
     <Translation ID="BOB_OPT_PRS" String="Press any key" />
     <Translation ID="BOB_NUKE" String="Reset configuration" />
