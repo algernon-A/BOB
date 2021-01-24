@@ -10,6 +10,79 @@ namespace BOB
     public static class UIControls
     {
         /// <summary>
+        /// Adds an input text field at the specified coordinates.
+        /// </summary>
+        /// <param name="textField">Textfield object</param>
+        /// <param name="parent">component to add to</param>
+        /// <param name="posX">Relative X postion</param>
+        /// <param name="posY">Relative Y position</param>
+        /// <param name="height">Textfield height (default 30)</param>
+        /// <param name="scale">Text scale (default 0.9)</param>
+        /// <param name="tooltip">Tooltip, if any</param>
+        public static UITextField AddTextField(UIComponent parent, float width, float posX, float posY, float height = 30f, float scale = 0.9f, string tooltip = null)
+        {
+            UITextField textField = parent.AddUIComponent<UITextField>();
+
+            // Size and position.
+            textField.size = new Vector2(width, height);
+            textField.relativePosition = new Vector2(posX, posY);
+
+            // Text settings.
+            textField.textScale = scale;
+            textField.padding = new RectOffset(6, 6, 3, 3);
+            textField.horizontalAlignment = UIHorizontalAlignment.Center;
+
+            // Behaviour.
+            textField.builtinKeyNavigation = true;
+            textField.isInteractive = true;
+            textField.readOnly = false;
+
+            // Appearance.
+            textField.color = new Color32(255, 255, 255, 255);
+            textField.textColor = new Color32(0, 0, 0, 255);
+            textField.disabledTextColor = new Color32(0, 0, 0, 128);
+            textField.selectionSprite = "EmptySprite";
+            textField.selectionBackgroundColor = new Color32(0, 172, 234, 255);
+            textField.normalBgSprite = "TextFieldPanelHovered";
+            textField.disabledBgSprite = "TextFieldPanel";
+
+            // Add tooltip.
+            if (tooltip != null)
+            {
+                textField.tooltip = tooltip;
+            }
+
+            return textField;
+        }
+
+
+        /// <summary>
+        /// Adds a plain text label to the specified UI panel.
+        /// </summary>
+        /// <param name="parent">Parent component</param>
+        /// <param name="text">Label text</param>
+        /// <param name="xPos">Relative x position)</param>
+        /// <param name="yPos">Relative y position</param>
+        /// <param name="width">Label width (default 700)</param>
+        /// <param name="width">Text scale (default 1.0)</param>
+        /// <returns></returns>
+        public static UILabel AddLabel(UIComponent parent, string text, float xPos, float yPos, float width = 700f, float textScale = 1.0f)
+        {
+            // Add label.
+            UILabel label = (UILabel)parent.AddUIComponent<UILabel>();
+            label.autoSize = false;
+            label.autoHeight = true;
+            label.wordWrap = true;
+            label.width = width;
+            label.textScale = textScale;
+            label.text = text;
+            label.relativePosition = new Vector2(xPos, yPos);
+
+            return label;
+        }
+
+
+        /// <summary>
         /// Creates a dropdown menu with an attached text label.
         /// </summary>
         /// <param name="parent">Parent component</param>

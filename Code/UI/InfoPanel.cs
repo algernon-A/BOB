@@ -12,6 +12,14 @@ namespace BOB
 	{
 		// Component locations.
 		protected const float ProbabilityY = 95f;
+		private const float LabelHeight = 18f;
+		private const float TextFieldHeight = 20f;
+		private const float Padding = 10f;
+		private const float FieldOffset = LabelHeight + TextFieldHeight + Padding;
+		private const float AngleY = 365f;
+		private const float XOffsetY = AngleY + FieldOffset;
+		private const float YOffsetY = XOffsetY + FieldOffset;
+		private const float ZOffsetY = YOffsetY + FieldOffset;
 
 		// Current selections.
 		protected int probability;
@@ -46,32 +54,20 @@ namespace BOB
 				replaceAllButton = UIUtils.CreateButton(this, ReplaceAllLabel, 190f, LeftWidth + (Margin * 2), ReplaceAllY);
 
 				// Angle label and textfield.
-				UILabel angleLabel = AddUIComponent<UILabel>();
-				angleLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 367f);
-				angleLabel.text = Translations.Translate("BOB_PNL_ANG");
-				angleField = UIUtils.AddTextField(this, 100f, 30f);
-				angleField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 360f);
+				UILabel angleLabel = UIControls.AddLabel(this, Translations.Translate("BOB_PNL_ANG"), LeftWidth + (Margin * 2), AngleY);
+				angleField = UIControls.AddTextField(this, 100f, LeftWidth + (Margin * 2), AngleY + LabelHeight, height: TextFieldHeight);
 
 				// Offset X position.
-				UILabel xLabel = AddUIComponent<UILabel>();
-				xLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 407f);
-				xLabel.text = Translations.Translate("BOB_PNL_XOF");
-				xField = UIUtils.AddTextField(this, 100f, 30f);
-				xField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 400f);
+				UILabel xLabel = UIControls.AddLabel(this, Translations.Translate("BOB_PNL_XOF"), LeftWidth + (Margin * 2), XOffsetY);
+				xField = UIControls.AddTextField(this, 100f, LeftWidth + (Margin * 2), XOffsetY + LabelHeight, height: TextFieldHeight);
 
 				// Offset Y position.
-				UILabel yLabel = AddUIComponent<UILabel>();
-				yLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 447f);
-				yLabel.text = Translations.Translate("BOB_PNL_YOF");
-				yField = UIUtils.AddTextField(this, 100f, 30f);
-				yField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 440f);
+				UILabel yLabel = UIControls.AddLabel(this, Translations.Translate("BOB_PNL_YOF"), LeftWidth + (Margin * 2), YOffsetY);
+				yField = UIControls.AddTextField(this, 100f, LeftWidth + (Margin * 2), YOffsetY + LabelHeight, height: TextFieldHeight);
 
 				// Offset Z position.
-				UILabel zLabel = AddUIComponent<UILabel>();
-				zLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 487f);
-				zLabel.text = Translations.Translate("BOB_PNL_ZOF");
-				zField = UIUtils.AddTextField(this, 100f, 30f);
-				zField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 480f);
+				UILabel zLabel = UIControls.AddLabel(this, Translations.Translate("BOB_PNL_ZOF"), LeftWidth + (Margin * 2), ZOffsetY);
+				zField = UIControls.AddTextField(this, 100f, LeftWidth + (Margin * 2), ZOffsetY + LabelHeight, height: TextFieldHeight);
 
 				// Add checkboxes.
 				propCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_PRP"), Margin, TitleHeight);
