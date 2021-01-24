@@ -112,6 +112,7 @@
     <Content Include="Resources\bob_cursor_light.png" />
     <Content Include="Resources\bob_prop_pack_small.png" />
     <Content Include="Translations\en.xml" />
+    <Content Include="Translations\es.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
