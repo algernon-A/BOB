@@ -26,7 +26,6 @@ namespace BOB
 		internal static Dictionary<BuildingInfo, Dictionary<PrefabInfo, BOBBuildingReplacement>> replacements;
 
 
-
 		/// <summary>
 		/// Performs setup and initialises the master dictionary.  Must be called prior to use.
 		/// </summary>

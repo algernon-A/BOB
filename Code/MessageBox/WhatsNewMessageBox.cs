@@ -1,117 +1,160 @@
-﻿// Copied from macsergey (NodeMarkup/Intersection Marking Tool)
-
-using ColossalFramework.UI;
+﻿using ColossalFramework.UI;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 namespace BOB.MessageBox
 {
-    public class WhatsNewMessageBox : MessageBoxBase
+    /// <summary>
+    /// 'What's new' message box.
+    /// </summary>
+    public class WhatsNewMessageBox : DontShowAgainMessageBox
     {
-        private UIButton CloseButton { get; set; }
-        private UIButton DontShowButton { get; set; }
-        private UIButton GetEarlyAccessButton { get; set; }
-        public Func<bool> OnButton1Click { get; set; }
-        public Func<bool> OnButton2Click { get; set; }
-
-        public WhatsNewMessageBox()
+        /// <summary>
+        /// Sets the 'what's new' messages to display.
+        /// </summary>
+        /// <param name="messages">Version update messages to display, in order (newest versions first), with a list of items (as translation keys) for each version</param>
+        /// <param name="lastNotifiedVersion">Last notified version (version messages equal to or earlier than this will be minimized</param>
+        public void SetMessages(Version lastNotifiedVersion, Dictionary<Version, List<string>> messages)
         {
-            CloseButton = AddButton(1, 2, OkClick);
-            CloseButton.text = Translations.Translate("MES_CLS");
-            DontShowButton = AddButton(2, 2, DontShowClick);
-            DontShowButton.text = Translations.Translate("MES_DSA");
-        }
-        protected virtual void OkClick()
-        {
-            if (OnButton1Click?.Invoke() != false)
-                Close();
-        }
-        protected virtual void DontShowClick()
-        {
-            if (OnButton2Click?.Invoke() != false)
-                Close();
-        }
-
-        public void Init(Dictionary<Version, string> messages)
-        {
-            var first = default(VersionMessage);
-            foreach (var message in messages)
+            // Iterate through each provided version and add it to the messagebox.
+            foreach (KeyValuePair<Version, List<string>> message in messages)
             {
-                var versionMessage = ScrollableContent.AddUIComponent<VersionMessage>();
+                VersionMessage versionMessage = ScrollableContent.AddUIComponent<VersionMessage>();
                 versionMessage.width = ScrollableContent.width;
-                versionMessage.Init(message.Key, message.Value);
+                versionMessage.SetText(message.Key, message.Value);
+                // Add spacer below.
+                AddSpacer();
 
-                if (first == null)
-                    first = versionMessage;
+                // Hide version messages that have already been notified.
+                if (message.Key <= lastNotifiedVersion)
+                {
+                    versionMessage.IsCollapsed = true;
+                }
             }
-            first.IsMinimize = false;
         }
 
+
+        /// <summary>
+        /// Update message for a given version.
+        /// </summary>
         public class VersionMessage : UIPanel
         {
-            public bool IsMinimize
-            {
-                get => !Message.isVisible;
-                set => Message.isVisible = !value;
-            }
-            UIButton Button { get; set; }
-            UILabel Message { get; set; }
-            string Label { get; set; }
+            // Components.
+            private UIButton minimizeButton;
+            public List<ListItem> listItems;
+
+            // Version title.
+            private string versionTitle;
+
+            // Visibility state.
+            private bool isExpanded;
+
+
+            /// <summary>
+            /// Sets message expanded/collapsed state.
+            /// </summary>
+            public bool IsCollapsed { set { isExpanded = value; ToggleExpanded(); } }
+
+
+            /// <summary>
+            /// Constructor - performs basic setup.
+            /// </summary>
             public VersionMessage()
             {
+                // Init list before we do anything else.
+                listItems = new List<ListItem>();
+
+                // Basic setup.
                 autoLayout = true;
                 autoLayoutDirection = LayoutDirection.Vertical;
                 autoFitChildrenVertically = true;
-                autoLayoutPadding = new RectOffset(0, 0, (int)Padding / 2, (int)Padding / 2);
+                autoLayoutPadding = new RectOffset(0, 0, 2, 2);
 
-                AddButton();
-                AddText();
+                // Add minimize button (which will also be the version label).
+                minimizeButton = AddUIComponent<UIButton>();
+                minimizeButton.height = 20f;
+                minimizeButton.horizontalAlignment = UIHorizontalAlignment.Left;
+                minimizeButton.color = Color.white;
+                minimizeButton.textHorizontalAlignment = UIHorizontalAlignment.Left;
+
+                // Toggle visible (minimized) state when clicked.
+                minimizeButton.eventClick += (component, eventParam) => ToggleExpanded();
             }
 
-            public void AddButton()
+
+            /// <summary>
+            /// Sets version message text.
+            /// </summary>
+            /// <param name="version">Version</param>
+            /// <param name="messageKeys">Message text as list of translation keys for individual points</param>
+            public void SetText(Version version, List<string> messageKeys)
             {
-                Button = AddUIComponent<UIButton>();
-                Button.height = 20;
-                Button.horizontalAlignment = UIHorizontalAlignment.Left;
-                Button.color = Color.white;
-                Button.textHorizontalAlignment = UIHorizontalAlignment.Left;
-                Button.eventClick += (UIComponent component, UIMouseEventParameter eventParam) => IsMinimize = !IsMinimize;
+                // Set version header and message text.
+                versionTitle = BOBMod.ModName + " " + version.ToString();
+
+                // Add messages as separate list items.
+                foreach (string messageKey in messageKeys)
+                {
+                    ListItem newMessageLabel = AddUIComponent<ListItem>();
+                    listItems.Add(newMessageLabel);
+                    newMessageLabel.Text = Translations.Translate(messageKey);
+                }
+
+                // Always start maximized.
+                isExpanded = true;
+
+                // Set state indictor.
+                UpdateState();
             }
 
-            public void AddText()
-            {
-                Message = AddUIComponent<UILabel>();
-                Message.textAlignment = UIHorizontalAlignment.Left;
-                Message.verticalAlignment = UIVerticalAlignment.Middle;
-                Message.textScale = 0.8f;
-                Message.wordWrap = true;
-                Message.autoHeight = true;
-                Message.size = new Vector2(width - 2 * Padding, 0);
-                Message.relativePosition = new Vector3(17, 7);
-                Message.anchor = UIAnchorStyle.CenterHorizontal | UIAnchorStyle.CenterVertical;
-                Message.eventTextChanged += (UIComponent component, string value) => Message.PerformLayout();
-                Message.eventVisibilityChanged += (UIComponent component, bool value) => SetLabel();
-            }
 
-            public void Init(Version version, string message)
-            {
-                Label = BOBMod.ModName + " " + version.ToString();
-                Message.text = message;
-                IsMinimize = true;
-
-                SetLabel();
-            }
-            private void SetLabel() => Button.text = $"{(IsMinimize ? "► " : "▼ ")} {Label}";
-
+            /// <summary>
+            /// Handles size changed events, for e.g. when visibility changes.  Called by game as needed.
+            /// </summary>
             protected override void OnSizeChanged()
             {
                 base.OnSizeChanged();
-                if (Button != null)
-                    Button.width = width;
-                if (Message != null)
-                    Message.width = width;
+
+                // Set width of button and label to match new width of list item (whose width has been set by the MessageBox).
+                if (minimizeButton != null)
+                {
+                    minimizeButton.width = width;
+                };
+
+                // Set width of each item label.
+                if (listItems != null)
+                {
+                    foreach (ListItem listItem in listItems)
+                    {
+                        listItem.width = width;
+                    }
+                };
             }
+
+
+            /// <summary>
+            /// Toggles expanded/collapsed state of the update messages.
+            /// </summary>
+            private void ToggleExpanded()
+            {
+                // Toggle state and update state indicator.
+                isExpanded = !isExpanded;
+                UpdateState();
+
+                // Show/hide each list item according to state.
+                foreach (ListItem listItem in listItems)
+                {
+                    listItem.isVisible = isExpanded;
+                }
+            }
+
+
+            /// <summary>
+            /// Sets expaned/collapsed state indicator.
+            /// </summary>
+            private void UpdateState() => minimizeButton.text = (isExpanded ? "▼ " : "► ") + versionTitle;
         }
     }
 }

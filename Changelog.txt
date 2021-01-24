@@ -1,4 +1,7 @@
-﻿- Fix building replacement panel exception caused by individual/building mixup when changing target item
+﻿Version 0.4.1 -
+
+- Fix building replacement panel exception caused by individual/building mixup when changing target item
+- Improve update notifications
 - Overhaul logging
 
 
