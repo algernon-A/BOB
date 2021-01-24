@@ -32,7 +32,8 @@ namespace BOB.MessageBox
         private UIScrollablePanel mainPanel;
         private UIPanel buttonPanel;
 
-        // Acessors.
+
+        // Accessors.
         public string Title { get => title.text; set => title.text = value; }
         public UIScrollablePanel ScrollableContent => mainPanel;
         public void Close() => CloseModal(this);
@@ -358,7 +359,14 @@ namespace BOB.MessageBox
         /// </summary>
         private void ChildResized()
         {
-            mainPanel.FitChildrenVertically();
+            try
+            {
+                mainPanel.FitChildrenVertically();
+            }
+            catch
+            {
+                Logging.Error("ChildResized exception");
+            }
 
             // Resize main panel, allowing for scrollbar width if scrollbar is visible.
             mainPanel.width = mainPanel.verticalScrollbar?.isVisible == true ? Width - mainPanel.verticalScrollbar.width - 3f : Width;
