@@ -133,7 +133,7 @@ namespace BOB
 				}
 
 				// Add sub-building menu.
-				subBuildingMenu = UIControls.LabelledDropDown(this, Translations.Translate("BOB_PNL_SUB"), 155f, 65f, 250f);
+				subBuildingMenu = UIControls.AddLabelledDropDown(this, Translations.Translate("BOB_PNL_SUB"), 155f, 65f, 250f);
 				subBuildingMenu.listBackground = "GenericPanelDark";
 				subBuildingMenu.items = subBuildingNames;
 				subBuildingMenu.selectedIndex = 0;

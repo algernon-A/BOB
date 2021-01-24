@@ -18,7 +18,7 @@ namespace BOB
         /// <param name="yPos">Relative y position (default 0)</param>
         /// <param name="width">Dropdown menu width, excluding label (default 220f)</param>
         /// <returns></returns>
-        public static UIDropDown LabelledDropDown(UIComponent parent, string text, float xPos = 20f, float yPos = 0f, float width = 220f)
+        public static UIDropDown AddLabelledDropDown(UIComponent parent, string text, float xPos = 20f, float yPos = 0f, float width = 220f)
         {
             // Create dropdown.
             UIDropDown dropDown = AddDropDown(parent, xPos, yPos, width);
@@ -71,7 +71,7 @@ namespace BOB
             dropDown.textFieldPadding = new RectOffset(8, 0, 8, 0);
             dropDown.itemPadding = new RectOffset(14, 0, 8, 0);
 
-            dropDown.relativePosition = new Vector3(xPos, yPos);
+            dropDown.relativePosition = new Vector2(xPos, yPos);
 
             // Dropdown size parameters.
             dropDown.size = new Vector2(width, Height);
