@@ -16,11 +16,12 @@ namespace BOB
         /// <param name="text">Text label</param>
         /// <param name="xPos">Relative x position (default 20)</param>
         /// <param name="yPos">Relative y position (default 0)</param>
+        /// <param name="width">Dropdown menu width, excluding label (default 220f)</param>
         /// <returns></returns>
-        public static UIDropDown LabelledDropDown(UIComponent parent, string text, float xPos = 20f, float yPos = 0f)
+        public static UIDropDown LabelledDropDown(UIComponent parent, string text, float xPos = 20f, float yPos = 0f, float width = 220f)
         {
             // Create dropdown.
-            UIDropDown dropDown = AddDropDown(parent, xPos, yPos);
+            UIDropDown dropDown = AddDropDown(parent, xPos, yPos, width);
 
             // Add label.
             UILabel label = dropDown.AddUIComponent<UILabel>();
