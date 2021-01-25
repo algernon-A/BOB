@@ -175,10 +175,10 @@ namespace BOB
 			replaceLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), ReplaceLabelY);
 
 			// Replace button.
-			replaceButton = UIUtils.CreateButton(this, ReplaceLabel, 190f, LeftWidth + (Margin * 2), ReplaceY);
+			replaceButton = UIControls.AddButton(this, LeftWidth + (Margin * 2), ReplaceY, ReplaceLabel, 190f);
 
 			// Revert button.
-			revertButton = UIUtils.CreateButton(this, Translations.Translate("BOB_PNL_REV"), 190f, LeftWidth + (Margin * 2), RevertY);
+			revertButton = UIControls.AddButton(this, LeftWidth + (Margin * 2), RevertY, Translations.Translate("BOB_PNL_REV"), 190f);
 
 			// Name filter.
 			nameFilter = UIControls.LabelledTextField(this, width - 200f - Margin, 40f, Translations.Translate("BOB_FIL_NAME"));

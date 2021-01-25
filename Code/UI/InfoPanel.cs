@@ -52,8 +52,7 @@ namespace BOB
 				base.Setup(parentTransform, targetPrefabInfo);
 
 				// Replace all button.
-				replaceAllButton = UIUtils.CreateButton(this, ReplaceAllLabel, 190f, LeftWidth + (Margin * 2), ReplaceAllY);
-				replaceAllButton = UIUtils.CreateButton(this, ReplaceAllLabel, 190f, LeftWidth + (Margin * 2), ReplaceAllY);
+				replaceAllButton = UIControls.AddButton(this, LeftWidth + (Margin * 2), ReplaceAllY, ReplaceAllLabel, 190f);
 
 				// Angle label and textfield.
 				UILabel angleLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), AngleY, Translations.Translate("BOB_PNL_ANG"));
