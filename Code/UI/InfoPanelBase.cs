@@ -181,7 +181,7 @@ namespace BOB
 			revertButton = UIControls.AddButton(this, LeftWidth + (Margin * 2), RevertY, Translations.Translate("BOB_PNL_REV"), 190f);
 
 			// Name filter.
-			nameFilter = UIControls.LabelledTextField(this, width - 200f - Margin, 40f, Translations.Translate("BOB_FIL_NAME"));
+			nameFilter = UIControls.BigLabelledTextField(this, width - 200f - Margin, 40f, Translations.Translate("BOB_FIL_NAME"));
 			// Event handlers for name filter textbox.
 			nameFilter.eventTextChanged += (control, text) =>
 			{

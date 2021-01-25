@@ -56,19 +56,19 @@ namespace BOB
 
 				// Angle label and textfield.
 				UILabel angleLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), AngleY, Translations.Translate("BOB_PNL_ANG"));
-				angleField = UIControls.AddTextField(this, LeftWidth + (Margin * 2), AngleY + LabelHeight, width: TextFieldWidth, height: TextFieldHeight);
+				angleField = UIControls.AddTextField(this, LeftWidth + (Margin * 2), AngleY + LabelHeight, width: TextFieldWidth);
 
 				// Offset X position.
 				UILabel xLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), XOffsetY, Translations.Translate("BOB_PNL_XOF"));
-				xField = UIControls.AddTextField(this, LeftWidth + (Margin * 2), XOffsetY + LabelHeight, width: TextFieldWidth, height: TextFieldHeight);
+				xField = UIControls.AddTextField(this, LeftWidth + (Margin * 2), XOffsetY + LabelHeight, width: TextFieldWidth);
 
 				// Offset Y position.
 				UILabel yLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), YOffsetY, Translations.Translate("BOB_PNL_YOF"));
-				yField = UIControls.AddTextField(this, LeftWidth + (Margin * 2), YOffsetY + LabelHeight, width: TextFieldWidth, height: TextFieldHeight);
+				yField = UIControls.AddTextField(this, LeftWidth + (Margin * 2), YOffsetY + LabelHeight, width: TextFieldWidth);
 
 				// Offset Z position.
 				UILabel zLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), ZOffsetY, Translations.Translate("BOB_PNL_ZOF"));
-				zField = UIControls.AddTextField(this, LeftWidth + (Margin * 2), ZOffsetY + LabelHeight, width: TextFieldWidth, height: TextFieldHeight);
+				zField = UIControls.AddTextField(this, LeftWidth + (Margin * 2), ZOffsetY + LabelHeight, width: TextFieldWidth);
 
 				// Add checkboxes.
 				propCheck = UIControls.AddCheckBox(this, Margin, TitleHeight, Translations.Translate("BOB_PNL_PRP"));
@@ -80,29 +80,6 @@ namespace BOB
 				probabilityLabel.text = Translations.Translate("BOB_PNL_PRB");
 
 				probabilityField = UIControls.AddTextField(this, LeftWidth + (Margin * 2), ProbabilityY + probabilityLabel.height, width: TextFieldWidth);
-
-				// Name filter.
-				nameFilter = UIControls.LabelledTextField(this, width - nameFilter.width - Margin, 40f, Translations.Translate("BOB_FIL_NAME"));
-				// Event handlers for name filter textbox.
-				nameFilter.eventTextChanged += (control, text) =>
-				{
-					loadedList.rowsData = LoadedList(IsTree);
-				};
-				nameFilter.eventTextSubmitted += (control, text) =>
-				{
-					loadedList.rowsData = LoadedList(IsTree);
-				};
-
-				// Vanilla filter.
-				hideVanilla = UIControls.AddCheckBox((UIComponent)(object)this, nameFilter.relativePosition.x, 75f, Translations.Translate("BOB_PNL_HDV"));
-				hideVanilla.eventCheckChanged += (control, isChecked) =>
-				{
-					// Filter list.
-					loadedList.rowsData = LoadedList(IsTree);
-
-					// Store state.
-					ModSettings.hideVanilla = isChecked;
-				};
 
 
 				// Set initial button and checkbox states.
