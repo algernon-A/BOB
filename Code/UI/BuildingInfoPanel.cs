@@ -113,7 +113,7 @@ namespace BOB
 			base.Setup(parentTransform, targetPrefabInfo);
 
 			// Add group checkbox.
-			indCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_IND"), 155f, TitleHeight);
+			indCheck = UIControls.AddCheckBox(this, 155f, TitleHeight, Translations.Translate("BOB_PNL_IND"));
 
 			// Does this building have sub-buildings?
 			if (currentBuilding.m_subBuildings.Length > 0)
@@ -123,17 +123,18 @@ namespace BOB
 				int numChoices = numSubs + 1;
 				string[] subBuildingNames = new string[numChoices];
 				subBuildings = new BuildingInfo[numChoices];
-				subBuildingNames[0] = currentBuilding.name;
+				subBuildingNames[0] = UIUtils.GetDisplayName(currentBuilding.name);
 				subBuildings[0] = currentBuilding;
 
 				for (int i = 0; i < numSubs; ++i)
                 {
-					subBuildingNames[i + 1] = currentBuilding.m_subBuildings[i].m_buildingInfo.name;
+					subBuildingNames[i + 1] = UIUtils.GetDisplayName(currentBuilding.m_subBuildings[i].m_buildingInfo.name);
 					subBuildings[i + 1] = currentBuilding.m_subBuildings[i].m_buildingInfo;
 				}
 
 				// Add sub-building menu.
-				subBuildingMenu = UIControls.LabelledDropDown(this, Translations.Translate("BOB_PNL_SUB"), 155f, 65f);
+				subBuildingMenu = UIControls.AddLabelledDropDown(this, 155f, 65f, Translations.Translate("BOB_PNL_SUB"), 250f);
+				subBuildingMenu.listBackground = "GenericPanelDark";
 				subBuildingMenu.items = subBuildingNames;
 				subBuildingMenu.selectedIndex = 0;
 

@@ -175,14 +175,13 @@ namespace BOB
 			replaceLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), ReplaceLabelY);
 
 			// Replace button.
-			replaceButton = UIUtils.CreateButton(this, ReplaceLabel, 190f, LeftWidth + (Margin * 2), ReplaceY);
+			replaceButton = UIControls.AddButton(this, LeftWidth + (Margin * 2), ReplaceY, ReplaceLabel, 190f);
 
 			// Revert button.
-			revertButton = UIUtils.CreateButton(this, Translations.Translate("BOB_PNL_REV"), 190f, LeftWidth + (Margin * 2), RevertY);
+			revertButton = UIControls.AddButton(this, LeftWidth + (Margin * 2), RevertY, Translations.Translate("BOB_PNL_REV"), 190f);
 
 			// Name filter.
-			nameFilter = UIUtils.LabelledTextField(this, Translations.Translate("BOB_FIL_NAME"));
-			nameFilter.relativePosition = new Vector2(width - nameFilter.width - Margin, 40f);
+			nameFilter = UIControls.BigLabelledTextField(this, width - 200f - Margin, 40f, Translations.Translate("BOB_FIL_NAME"));
 			// Event handlers for name filter textbox.
 			nameFilter.eventTextChanged += (control, text) =>
 			{
@@ -194,7 +193,7 @@ namespace BOB
 			};
 
 			// Vanilla filter.
-			hideVanilla = UIUtils.AddCheckBox((UIComponent)(object)this, Translations.Translate("BOB_PNL_HDV"), nameFilter.relativePosition.x, 75f);
+			hideVanilla = UIControls.AddCheckBox((UIComponent)(object)this, nameFilter.relativePosition.x, 75f, Translations.Translate("BOB_PNL_HDV"));
 			hideVanilla.eventCheckChanged += (control, isChecked) =>
 			{
 					// Filter list.

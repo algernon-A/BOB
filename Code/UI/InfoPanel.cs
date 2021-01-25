@@ -12,6 +12,15 @@ namespace BOB
 	{
 		// Component locations.
 		protected const float ProbabilityY = 95f;
+		private const float LabelHeight = 18f;
+		private const float TextFieldWidth = 100f;
+		private const float TextFieldHeight = 20f;
+		private const float Padding = 10f;
+		private const float FieldOffset = LabelHeight + TextFieldHeight + Padding;
+		private const float AngleY = 365f;
+		private const float XOffsetY = AngleY + FieldOffset;
+		private const float YOffsetY = XOffsetY + FieldOffset;
+		private const float ZOffsetY = YOffsetY + FieldOffset;
 
 		// Current selections.
 		protected int probability;
@@ -43,71 +52,34 @@ namespace BOB
 				base.Setup(parentTransform, targetPrefabInfo);
 
 				// Replace all button.
-				replaceAllButton = UIUtils.CreateButton(this, ReplaceAllLabel, 190f, LeftWidth + (Margin * 2), ReplaceAllY);
+				replaceAllButton = UIControls.AddButton(this, LeftWidth + (Margin * 2), ReplaceAllY, ReplaceAllLabel, 190f);
 
 				// Angle label and textfield.
-				UILabel angleLabel = AddUIComponent<UILabel>();
-				angleLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 367f);
-				angleLabel.text = Translations.Translate("BOB_PNL_ANG");
-				angleField = UIUtils.AddTextField(this, 100f, 30f);
-				angleField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 360f);
+				UILabel angleLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), AngleY, Translations.Translate("BOB_PNL_ANG"));
+				angleField = UIControls.AddTextField(this, LeftWidth + (Margin * 2), AngleY + LabelHeight, width: TextFieldWidth);
 
 				// Offset X position.
-				UILabel xLabel = AddUIComponent<UILabel>();
-				xLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 407f);
-				xLabel.text = Translations.Translate("BOB_PNL_XOF");
-				xField = UIUtils.AddTextField(this, 100f, 30f);
-				xField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 400f);
+				UILabel xLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), XOffsetY, Translations.Translate("BOB_PNL_XOF"));
+				xField = UIControls.AddTextField(this, LeftWidth + (Margin * 2), XOffsetY + LabelHeight, width: TextFieldWidth);
 
 				// Offset Y position.
-				UILabel yLabel = AddUIComponent<UILabel>();
-				yLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 447f);
-				yLabel.text = Translations.Translate("BOB_PNL_YOF");
-				yField = UIUtils.AddTextField(this, 100f, 30f);
-				yField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 440f);
+				UILabel yLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), YOffsetY, Translations.Translate("BOB_PNL_YOF"));
+				yField = UIControls.AddTextField(this, LeftWidth + (Margin * 2), YOffsetY + LabelHeight, width: TextFieldWidth);
 
 				// Offset Z position.
-				UILabel zLabel = AddUIComponent<UILabel>();
-				zLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), 487f);
-				zLabel.text = Translations.Translate("BOB_PNL_ZOF");
-				zField = UIUtils.AddTextField(this, 100f, 30f);
-				zField.relativePosition = new Vector2(LeftWidth + (Margin * 2) + 90f, 480f);
+				UILabel zLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), ZOffsetY, Translations.Translate("BOB_PNL_ZOF"));
+				zField = UIControls.AddTextField(this, LeftWidth + (Margin * 2), ZOffsetY + LabelHeight, width: TextFieldWidth);
 
 				// Add checkboxes.
-				propCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_PRP"), Margin, TitleHeight);
-				treeCheck = UIUtils.AddCheckBox(this, Translations.Translate("BOB_PNL_TRE"), Margin, TitleHeight + Margin + propCheck.height);
+				propCheck = UIControls.AddCheckBox(this, Margin, TitleHeight, Translations.Translate("BOB_PNL_PRP"));
+				treeCheck = UIControls.AddCheckBox(this, Margin, TitleHeight + Margin + propCheck.height, Translations.Translate("BOB_PNL_TRE"));
 
 				// Probability label and textfield.
 				UILabel probabilityLabel = AddUIComponent<UILabel>();
 				probabilityLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), ProbabilityY);
 				probabilityLabel.text = Translations.Translate("BOB_PNL_PRB");
 
-				probabilityField = UIUtils.AddTextField(this, 190f, 30f);
-				probabilityField.relativePosition = new Vector2(LeftWidth + (Margin * 2), ProbabilityY + probabilityLabel.height);
-
-				// Name filter.
-				nameFilter = UIUtils.LabelledTextField(this, Translations.Translate("BOB_FIL_NAME"));
-				nameFilter.relativePosition = new Vector2(width - nameFilter.width - Margin, 40f);
-				// Event handlers for name filter textbox.
-				nameFilter.eventTextChanged += (control, text) =>
-				{
-					loadedList.rowsData = LoadedList(IsTree);
-				};
-				nameFilter.eventTextSubmitted += (control, text) =>
-				{
-					loadedList.rowsData = LoadedList(IsTree);
-				};
-
-				// Vanilla filter.
-				hideVanilla = UIUtils.AddCheckBox((UIComponent)(object)this, Translations.Translate("BOB_PNL_HDV"), nameFilter.relativePosition.x, 75f);
-				hideVanilla.eventCheckChanged += (control, isChecked) =>
-				{
-					// Filter list.
-					loadedList.rowsData = LoadedList(IsTree);
-
-					// Store state.
-					ModSettings.hideVanilla = isChecked;
-				};
+				probabilityField = UIControls.AddTextField(this, LeftWidth + (Margin * 2), ProbabilityY + probabilityLabel.height, width: TextFieldWidth);
 
 
 				// Set initial button and checkbox states.
