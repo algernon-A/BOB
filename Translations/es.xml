@@ -27,6 +27,7 @@
     <Translation ID="BOB_PNL_XOF" String="Desplazamiento en eje X" />
     <Translation ID="BOB_PNL_YOF" String="Desplazamiento en eje Y" />
     <Translation ID="BOB_PNL_ZOF" String="Desplazamiento en eje Z" />
+    <Translation ID="BOB_PNL_SUB" String="Edificio Secundario" />
     <Translation ID="BOB_OPT_KEY" String="Acceso directo" />
     <Translation ID="BOB_OPT_PRS" String="Presiona cualquier tecla" />
     <Translation ID="BOB_NUKE" String="Restablecer configuración" />
@@ -37,5 +38,6 @@
     <Translation ID="BOB_OPT_POS" String="Recordar posición anterior del panel" />
     <Translation ID="BOB_FIL_NAME" String="Buscar:" />
     <Translation ID="BOB_UPD_040_0" String="Presentando reemplazo de árboles en el mapa!  Activa BOB como siempre y has clic en cualquier arbol." />
+    <Translation ID="BOB_UPD_041_0" String="Arreglada excepción en el panel de reemplazo del edificio al cambiar un detalle/artículo destino." />
   </Translations>
 </Language>
