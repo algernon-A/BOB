@@ -137,8 +137,11 @@ namespace BOB.MessageBox
                 textLabel.autoSize = false;
                 textLabel.autoHeight = true;
 
-                // Set list panel height.
+                // Set initial width.
+                width = parent.width;
                 textLabel.width = width - MessageX - Padding;
+
+                // Set list panel height.
                 height = textLabel.height + (Padding * 2);
             }
 
