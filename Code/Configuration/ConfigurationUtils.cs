@@ -239,6 +239,7 @@ namespace BOB
 				}
 
 				// If we got here, it's all good; apply the all-network replacement.
+				Logging.Message("applying all-building replacement ", targetPrefab.name, " to ", replacementPrefab.name);
 				AllBuildingReplacement.Apply(targetPrefab, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
 			}
 		}
@@ -279,6 +280,7 @@ namespace BOB
 				}
 
 				// If we got here, it's all good; apply the building replacement.
+				Logging.Message("applying building replacement ", targetPrefab.name, " to ", replacementPrefab.name, " in ", buildingInfo.name);
 				BuildingReplacement.Apply(buildingInfo, targetPrefab, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
 			}
 		}
