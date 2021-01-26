@@ -39,5 +39,7 @@
     <Translation ID="BOB_FIL_NAME" String="Search:" />
     <Translation ID="BOB_UPD_040_0" String="Introducing map tree replacement!  Activate the BOB tool as usual and click on a free-standing tree." />
     <Translation ID="BOB_UPD_041_0" String="Fix intermittent building replacement panel exception when changing target item." />
+    <Translation ID="BOB_UPD_042_0" String="Enable selection of sub-buildings" />
+    <Translation ID="BOB_UPD_042_1" String="Fix potential race conditions on game load" />
   </Translations>
 </Language>

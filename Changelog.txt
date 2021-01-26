@@ -1,4 +1,6 @@
-﻿- Add sub-building selection
+﻿Version 0.4.2 -
+
+- Add sub-building selection
 - Guard against level-loading race conditions
 
 
