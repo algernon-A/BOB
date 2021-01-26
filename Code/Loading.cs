@@ -29,13 +29,14 @@ namespace BOB
         }
 
 
-
         /// <summary>
         /// Called by the game when level loading is complete.
         /// </summary>
         /// <param name="mode">Loading mode (e.g. game, editor, scenario, etc.)</param>
         public override void OnLevelLoaded(LoadMode mode)
         {
+            base.OnLevelLoaded(mode);
+
             // Don't do anything if not in game.
             if (mode != LoadMode.NewGame && mode != LoadMode.LoadGame)
             {
@@ -43,6 +44,9 @@ namespace BOB
                 Patcher.UnpatchAll();
                 return;
             }
+
+            // Wait for loading to fully complete.
+            while (!LoadingManager.instance.m_loadingComplete) { }
 
             // Build lists of loaded prefabs.
             PrefabLists.BuildLists();
