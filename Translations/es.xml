@@ -38,6 +38,6 @@
     <Translation ID="BOB_OPT_POS" String="Recordar posición anterior del panel" />
     <Translation ID="BOB_FIL_NAME" String="Buscar:" />
     <Translation ID="BOB_UPD_040_0" String="Presentando reemplazo de árboles en el mapa!  Activa BOB como siempre y has clic en cualquier arbol." />
-    <Translation ID="BOB_UPD_041_0" String="Arreglada exepción en el panel de remplazo del edificio al cambiar el deatalle o artículo de destino." />
+    <Translation ID="BOB_UPD_041_0" String="Arreglada excepción en el panel de reemplazo del edificio al cambiar un detalle/artículo destino." />
   </Translations>
 </Language>
