@@ -94,8 +94,8 @@ namespace BOB
     public class Translator
     {
         private Language systemLanguage = null;
-        private SortedList<string, Language> languages;
-        private string defaultLanguage = "en";
+        private readonly SortedList<string, Language> languages;
+        private readonly string defaultLanguage = "en";
         private int currentIndex = -1;
 
 

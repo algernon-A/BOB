@@ -28,6 +28,8 @@
     <Translation ID="BOB_PNL_YOF" String="Y offset" />
     <Translation ID="BOB_PNL_ZOF" String="Z offset" />
     <Translation ID="BOB_PNL_SUB" String="Sub-building" />
+    <Translation ID="BOB_PCK_APP" String="Apply pack" />
+    <Translation ID="BOB_PCK_RVT" String="Revert pack" />
     <Translation ID="BOB_OPT_KEY" String="Hotkey" />
     <Translation ID="BOB_OPT_PRS" String="Press any key" />
     <Translation ID="BOB_NUKE" String="Reset configuration" />

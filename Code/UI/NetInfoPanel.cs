@@ -73,6 +73,14 @@ namespace BOB
 			// Base setup.
 			base.Setup(parentTransform, targetPrefabInfo);
 
+			// Add pack button.
+			ColossalFramework.UI.UIButton packButton = UIControls.AddButton(this, 250f, 50f, "Replacement packs");
+
+			packButton.eventClicked += (component, clickEvent) =>
+			{
+				PackPanelManager.Create();
+			};
+
 			// Event handler for prop checkbox.
 			propCheck.eventCheckChanged += (control, isChecked) =>
 			{
@@ -144,13 +152,11 @@ namespace BOB
 				if (currentTargetItem != null && replacementPrefab != null)
 				{
 					// Try to parse textfields.
-					float angle, xOffset, yOffset, zOffset;
-					int probability;
-					float.TryParse(angleField.text, out angle);
-					float.TryParse(xField.text, out xOffset);
-					float.TryParse(yField.text, out yOffset);
-					float.TryParse(zField.text, out zOffset);
-					int.TryParse(probabilityField.text, out probability);
+					float.TryParse(angleField.text, out float angle);
+					float.TryParse(xField.text, out float xOffset);
+					float.TryParse(yField.text, out float yOffset);
+					float.TryParse(zField.text, out float zOffset);
+					int.TryParse(probabilityField.text, out int probability);
 
 					// Update text fields to match parsed values.
 					angleField.text = angle.ToString();
@@ -163,8 +169,9 @@ namespace BOB
 					NetworkReplacement.Apply(currentNet, currentTargetItem.originalPrefab ?? currentTargetItem.replacementPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
 
 					// Update current target.
-					currentTargetItem.replacementPrefab = replacementPrefab;
-					currentTargetItem.replacementProb = probability;
+					//currentTargetItem.replacementPrefab = replacementPrefab;
+					//currentTargetItem.replacementProb = probability;
+					UpdateTargetItem(currentTargetItem as NetPropListItem);
 
 					// Save configuration file and refresh target list (to reflect our changes).
 					ConfigurationUtils.SaveConfig();
@@ -179,13 +186,11 @@ namespace BOB
 			replaceAllButton.eventClicked += (control, clickEvent) =>
 			{
 				// Try to parse text fields.
-				float angle, xOffset, yOffset, zOffset;
-				int probability;
-				float.TryParse(angleField.text, out angle);
-				float.TryParse(xField.text, out xOffset);
-				float.TryParse(yField.text, out yOffset);
-				float.TryParse(zField.text, out zOffset);
-				int.TryParse(probabilityField.text, out probability);
+				float.TryParse(angleField.text, out float angle);
+				float.TryParse(xField.text, out float xOffset);
+				float.TryParse(yField.text, out float yOffset);
+				float.TryParse(zField.text, out float zOffset);
+				int.TryParse(probabilityField.text, out int probability);
 
 				// Update text fields to match parsed values.
 				angleField.text = angle.ToString();
@@ -198,8 +203,9 @@ namespace BOB
 				AllNetworkReplacement.Apply(currentTargetItem.originalPrefab ?? currentTargetItem.replacementPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
 
 				// Update current target.
-				currentTargetItem.allPrefab = replacementPrefab;
-				currentTargetItem.allProb = probability;
+				//currentTargetItem.allPrefab = replacementPrefab;
+				//currentTargetItem.allProb = probability;
+				UpdateTargetItem(currentTargetItem as NetPropListItem);
 
 				// Save configuration file and refresh building list (to reflect our changes).
 				ConfigurationUtils.SaveConfig();
@@ -222,7 +228,8 @@ namespace BOB
 						NetworkReplacement.Revert(currentNet, currentTargetItem.originalPrefab, true);
 
 						// Clear current target replacement prefab.
-						currentTargetItem.replacementPrefab = null;
+						//currentTargetItem.replacementPrefab = null;
+						UpdateTargetItem(currentTargetItem as NetPropListItem);
 
 						// Save configuration file and refresh building list (to reflect our changes).
 						ConfigurationUtils.SaveConfig();
@@ -241,7 +248,8 @@ namespace BOB
 						AllNetworkReplacement.Revert(currentTargetItem.originalPrefab, true);
 
 						// Clear current target 'all' prefab.
-						currentTargetItem.allPrefab = null;
+						//currentTargetItem.allPrefab = null;
+						UpdateTargetItem(currentTargetItem as NetPropListItem);
 
 						// Save configuration file and refresh target list (to reflect our changes).
 						ConfigurationUtils.SaveConfig();
@@ -257,6 +265,56 @@ namespace BOB
 			propCheck.isChecked = !ModSettings.treeSelected;
 			treeCheck.isChecked = ModSettings.treeSelected;
 			UpdateButtonStates();
+		}
+
+
+		/// <summary>
+		/// Updates the target item record for changes in replacement status (e.g. after applying or reverting changes).
+		/// </summary>
+		/// <param name="propListItem">Target item</param>
+		protected void UpdateTargetItem(NetPropListItem propListItem)
+		{
+			// Determine lane and index to test - just grab first one from list.
+			int lane = propListItem.lanes[0];
+			int propIndex = propListItem.indexes[0];
+
+			// All-network replacement and original probability (if any).
+			BOBNetReplacement allNetReplacement = AllNetworkReplacement.ActiveReplacement(currentNet, lane, propIndex);
+			if (allNetReplacement != null)
+			{
+				propListItem.allPrefab = allNetReplacement.replacementInfo;
+				propListItem.allProb = allNetReplacement.probability;
+			}
+			else
+			{
+				// If no active current record, ensure that it's reset to null.
+				propListItem.allPrefab = null;
+			}
+
+			// Individual network replacement and original probability (if any).
+			BOBNetReplacement netReplacement = NetworkReplacement.ActiveReplacement(currentNet, lane, propIndex);
+			if (netReplacement != null)
+			{
+				propListItem.replacementPrefab = netReplacement.replacementInfo;
+				propListItem.replacementProb = netReplacement.probability;
+			}
+			else
+			{
+				// If no active current record, ensure that it's reset to null.
+				propListItem.replacementPrefab = null;
+			}
+
+			// Replacement pack replacement and original probability (if any).
+			BOBNetReplacement packReplacement = PackReplacement.ActiveReplacement(currentNet, lane, propIndex);
+			if (packReplacement != null)
+			{
+				propListItem.packagePrefab = packReplacement.replacementInfo;
+			}
+			else
+			{
+				// If no active current record, ensure that it's reset to null.
+				propListItem.packagePrefab = null;
+			}
 		}
 
 
@@ -315,7 +373,7 @@ namespace BOB
 					propListItem.lanes.Add(lane);
 
 					// Get original (pre-replacement) tree/prop prefab and current probability (as default original probability).
-					propListItem.originalPrefab = NetworkReplacement.GetOriginal(currentNet, lane, propIndex) ?? AllNetworkReplacement.GetOriginal(currentNet, lane, propIndex) ?? finalInfo;
+					propListItem.originalPrefab = NetworkReplacement.GetOriginal(currentNet, lane, propIndex) ?? AllNetworkReplacement.GetOriginal(currentNet, lane, propIndex) ?? PackReplacement.GetOriginal(currentNet, lane, propIndex) ?? finalInfo;
 					propListItem.originalProb = laneProps[propIndex].m_probability;
 					propListItem.originalAngle = laneProps[propIndex].m_angle;
 
@@ -336,7 +394,11 @@ namespace BOB
 					}
 
 					// Replacement pack replacement and original probability (if any).
-					propListItem.packagePrefab = ReplacementPacks.GetOriginal(laneProps[propIndex].m_finalProp);
+					BOBNetReplacement packReplacement = PackReplacement.ActiveReplacement(currentNet, lane, propIndex);
+					if (packReplacement != null)
+					{
+						propListItem.packagePrefab = packReplacement.replacementInfo;
+					}
 
 					// Are we grouping?
 					if (propListItem.index == -1)
@@ -374,9 +436,11 @@ namespace BOB
 			}
 
 			// Create return fastlist from our filtered list, ordering by name.
-			FastList<object> fastList = new FastList<object>();
-			fastList.m_buffer = propList.ToArray();
-			fastList.m_size = propList.Count;
+			FastList<object> fastList = new FastList<object>()
+			{
+				m_buffer = propList.ToArray(),
+				m_size = propList.Count
+			};
 
 			// If the list is empty, show the 'no props' label; otherwise, hide it.
 			if (fastList.m_size == 0)

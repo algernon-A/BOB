@@ -74,9 +74,9 @@ namespace BOB
 			foreach (BuildingPropReference propReference in replacements[building][target].references)
 			{
 				// Revert entry.
-				if (target is PropInfo)
+				if (target is PropInfo propTarget)
 				{
-					propReference.building.m_props[propReference.propIndex].m_finalProp = (PropInfo)target;
+					propReference.building.m_props[propReference.propIndex].m_finalProp = propTarget;
 				}
 				else
 				{
@@ -129,9 +129,9 @@ namespace BOB
 						if (propReference.building == buildingPrefab && propReference.propIndex == propIndex)
 						{
 							// Got a match!  Revert instance.
-							if (target is PropInfo)
+							if (target is PropInfo propTarget)
 							{
-								propReference.building.m_props[propReference.propIndex].m_finalProp = (PropInfo)target;
+								propReference.building.m_props[propReference.propIndex].m_finalProp = propTarget;
 							}
 							else
 							{
@@ -337,9 +337,9 @@ namespace BOB
 			};
 
 			// Apply replacement.
-			if (buildingElement.replacementInfo is PropInfo)
+			if (buildingElement.replacementInfo is PropInfo propInfo)
 			{
-				propReference.building.m_props[propReference.propIndex].m_finalProp = (PropInfo)buildingElement.replacementInfo;
+				propReference.building.m_props[propReference.propIndex].m_finalProp = propInfo;
 			}
 			else
 			{

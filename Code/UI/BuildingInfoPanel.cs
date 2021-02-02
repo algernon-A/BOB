@@ -116,8 +116,8 @@ namespace BOB
 			indCheck = UIControls.AddCheckBox(this, 155f, TitleHeight, Translations.Translate("BOB_PNL_IND"));
 
 			// Does this building have sub-buildings?
-			if (currentBuilding.m_subBuildings.Length > 0)
-            {
+			if (currentBuilding.m_subBuildings != null && currentBuilding.m_subBuildings.Length > 0)
+			{
 				// Yes - create lists of sub-buildings (names and infos).
 				int numSubs = currentBuilding.m_subBuildings.Length;
 				int numChoices = numSubs + 1;
@@ -245,13 +245,11 @@ namespace BOB
 				if (currentTargetItem != null && replacementPrefab != null)
 				{
 					// Try to parse textfields.
-					float angle, xOffset, yOffset, zOffset;
-					int probability;
-					float.TryParse(angleField.text, out angle);
-					float.TryParse(xField.text, out xOffset);
-					float.TryParse(yField.text, out yOffset);
-					float.TryParse(zField.text, out zOffset);
-					int.TryParse(probabilityField.text, out probability);
+					float.TryParse(angleField.text, out float angle);
+					float.TryParse(xField.text, out float xOffset);
+					float.TryParse(yField.text, out float yOffset);
+					float.TryParse(zField.text, out float zOffset);
+					int.TryParse(probabilityField.text, out int probability);
 
 					// Update text fields to match parsed values.
 					angleField.text = angle.ToString();
@@ -299,13 +297,11 @@ namespace BOB
                 }
 
 				// Try to parse text fields.
-				float angle, xOffset, yOffset, zOffset;
-				int probability;
-				float.TryParse(angleField.text, out angle);
-				float.TryParse(xField.text, out xOffset);
-				float.TryParse(yField.text, out yOffset);
-				float.TryParse(zField.text, out zOffset);
-				int.TryParse(probabilityField.text, out probability);
+				float.TryParse(angleField.text, out float angle);
+				float.TryParse(xField.text, out float xOffset);
+				float.TryParse(yField.text, out float yOffset);
+				float.TryParse(zField.text, out float zOffset);
+				int.TryParse(probabilityField.text, out int probability);
 
 				// Update text fields to match parsed values.
 				angleField.text = angle.ToString();
@@ -526,9 +522,11 @@ namespace BOB
 			}
 
 			// Create return fastlist from our filtered list, ordering by name.
-			FastList<object> fastList = new FastList<object>();
-			fastList.m_buffer = propList.ToArray();
-			fastList.m_size = propList.Count;
+			FastList<object> fastList = new FastList<object>
+			{
+				m_buffer = propList.ToArray(),
+				m_size = propList.Count
+			};
 
 			// If the list is empty, show the 'no props' label; otherwise, hide it.
 			if (fastList.m_size == 0)

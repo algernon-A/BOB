@@ -36,7 +36,7 @@ namespace BOB
 
 
 		// Trees or props?
-		protected override bool IsTree => treeCheck == null ? false : treeCheck.isChecked;
+		protected override bool IsTree => treeCheck?.isChecked ?? false;
 
 
 		/// <summary>
@@ -51,23 +51,26 @@ namespace BOB
 				// Perform basic panel setup.
 				base.Setup(parentTransform, targetPrefabInfo);
 
+				// Get text maximum width.
+				float textWidth = MiddleWidth - (Margin * 2);
+
 				// Replace all button.
 				replaceAllButton = UIControls.AddButton(this, LeftWidth + (Margin * 2), ReplaceAllY, ReplaceAllLabel, 190f);
 
 				// Angle label and textfield.
-				UILabel angleLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), AngleY, Translations.Translate("BOB_PNL_ANG"));
+				UILabel angleLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), AngleY, Translations.Translate("BOB_PNL_ANG"), textWidth);
 				angleField = UIControls.AddTextField(this, LeftWidth + (Margin * 2), AngleY + LabelHeight, width: TextFieldWidth);
 
 				// Offset X position.
-				UILabel xLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), XOffsetY, Translations.Translate("BOB_PNL_XOF"));
+				UILabel xLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), XOffsetY, Translations.Translate("BOB_PNL_XOF"), textWidth);
 				xField = UIControls.AddTextField(this, LeftWidth + (Margin * 2), XOffsetY + LabelHeight, width: TextFieldWidth);
 
 				// Offset Y position.
-				UILabel yLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), YOffsetY, Translations.Translate("BOB_PNL_YOF"));
+				UILabel yLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), YOffsetY, Translations.Translate("BOB_PNL_YOF"), textWidth);
 				yField = UIControls.AddTextField(this, LeftWidth + (Margin * 2), YOffsetY + LabelHeight, width: TextFieldWidth);
 
 				// Offset Z position.
-				UILabel zLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), ZOffsetY, Translations.Translate("BOB_PNL_ZOF"));
+				UILabel zLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), ZOffsetY, Translations.Translate("BOB_PNL_ZOF"), textWidth);
 				zField = UIControls.AddTextField(this, LeftWidth + (Margin * 2), ZOffsetY + LabelHeight, width: TextFieldWidth);
 
 				// Add checkboxes.
