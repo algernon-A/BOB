@@ -15,8 +15,9 @@ namespace BOB
 		// Master dictionary of replaced prop references.
 		internal static Dictionary<PrefabInfo, BOBNetReplacement> replacements;
 
-		// Pack status dictionary.
-		private static Dictionary<string, bool> packStatus;
+		// Pack status dictionaries.
+		private static Dictionary<string, bool> packEnabled;
+		private static Dictionary<string, bool> packNotAllLoaded;
 
 
 		/// <summary>
@@ -26,9 +27,9 @@ namespace BOB
 		/// <returns>True if enabled, false otherwise</returns>
 		internal static bool GetPackStatus(string packName)
         {
-			if (packStatus.ContainsKey(packName))
+			if (packEnabled.ContainsKey(packName))
             {
-				return packStatus[packName];
+				return packEnabled[packName];
             }
 
 			return false;
@@ -43,23 +44,41 @@ namespace BOB
 		internal static void SetPackStatus (string packName, bool status)
         {
 			// Only do stuff if there's an actual change.
-			if (status != packStatus[packName])
+			if (status != packEnabled[packName])
             {
 				// Enabling or disabling?
 				if (status == true)
                 {
 					// Enable the pack; leave packStatus as false if application wasn't successful.
-					packStatus[packName] = ApplyPack(packName);
+					packEnabled[packName] = ApplyPack(packName);
                 }
 				else
 				{
 					// Disable the pack.
 					RevertPack(packName);
-					packStatus[packName] = false;
+					packEnabled[packName] = false;
 				}
 
 				// Set status to new value.
 			}
+        }
+
+
+		/// <summary>
+		/// Checks to see if all replacement props are currently loaded for the specified pack.
+		/// </summary>
+		/// <param name="packName">Replacement pack name</param>
+		/// <returns>True if all replacement props are NOT loaded, false otherwise</returns>
+		internal static bool PackNotAllLoaded(string packName)
+        {
+			// Return dictionary entry, if we have one.
+			if (packNotAllLoaded.ContainsKey(packName))
+            {
+				return packNotAllLoaded[packName];
+            }
+
+			// If we got here, no 'not all loaded' flag was found.
+			return false;
         }
 
 
@@ -161,7 +180,7 @@ namespace BOB
 			List<string> activePacks = new List<string>();
 
 			// Iterate through all pack settings.
-			foreach (KeyValuePair<string, bool> entry in packStatus)
+			foreach (KeyValuePair<string, bool> entry in packEnabled)
             {
 				// Look for enabled packs (value is true).
 				if (entry.Value)
@@ -185,7 +204,7 @@ namespace BOB
 			foreach (string packName in activePacks)
 			{
 				// See if we currently have this pack loaded.
-				if (packStatus.ContainsKey(packName))
+				if (packEnabled.ContainsKey(packName))
                 {
 					// Yes - activate it.
 					SetPackStatus(packName, true);
@@ -206,8 +225,10 @@ namespace BOB
 			// Initialise dictionaries.
 			packRecords = new Dictionary<string, Dictionary<PrefabInfo, PropReplacement>>();
 			replacements = new Dictionary<PrefabInfo, BOBNetReplacement>();
-			packStatus = new Dictionary<string, bool>();
+			packEnabled = new Dictionary<string, bool>();
+			packNotAllLoaded = new Dictionary<string, bool>();
 
+			// Read config file.
 			BOBPackFile packFile = PackUtils.LoadPackFile();
 
 			if (packFile != null)
@@ -225,7 +246,7 @@ namespace BOB
 					{
 						// No - add pack to our records.
 						packRecords.Add(propPack.name, new Dictionary<PrefabInfo, PropReplacement>());
-						packStatus.Add(propPack.name, false);
+						packEnabled.Add(propPack.name, false);
 					}
 
 					// Iterate through each replacement in the pack.
@@ -240,12 +261,16 @@ namespace BOB
 						if (targetInfo == null)
 						{
 							// Target prop not found - log and continue.
-							Logging.Message("couldn't find pack prop");
+							Logging.Message("couldn't find pack target prop");
 						}
 						else if (propReplacement.replacementInfo == null)
 						{
-							// Replacement prop not found - log and continue.
-							Logging.Message("couldn't find pack prop");
+							// Replacement prop not found - log and and record that the replacement wasn't found.
+							Logging.Message("couldn't find pack replacement prop");
+							if (!packNotAllLoaded.ContainsKey(propPack.name))
+                            {
+								packNotAllLoaded.Add(propPack.name, true);
+                            }
 						}
 						else
 						{
@@ -272,7 +297,7 @@ namespace BOB
 		internal static void RevertAll()
 		{
 			// Iterate through each entry in the master pack dictionary.
-			foreach (string packName in packStatus.Keys)
+			foreach (string packName in packEnabled.Keys)
 			{
 				// Revert this replacement (but don't remove the entry, as the dictionary is currently immutable while we're iterating through it).
 				SetPackStatus(packName, false);

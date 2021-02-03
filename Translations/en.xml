@@ -35,6 +35,7 @@
     <Translation ID="BOB_PCK_RVT" String="Revert pack" />
     <Translation ID="BOB_PCK_RVT_A" String="Un-applies the selected replacement pack" />
     <Translation ID="BOB_PCK_RVT_I" String="Pack is not currently applied" />
+    <Translation ID="BOB_PCK_NAL" String="Not all replacements are available" />
     <Translation ID="BOB_OPT_KEY" String="Hotkey" />
     <Translation ID="BOB_OPT_PRS" String="Press any key" />
     <Translation ID="BOB_NUKE" String="Reset configuration" />

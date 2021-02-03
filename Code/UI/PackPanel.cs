@@ -27,14 +27,14 @@ namespace BOB
 		{
 			try
 			{
-				// If no instance already set, create one.
-				if (uiGameObject == null)
-				{
-						uiGameObject = new GameObject("BOBPackPanel");
-						uiGameObject.transform.parent = UIView.GetAView().transform;
+                // If no instance already set, create one.
+                if (uiGameObject == null)
+                {
+                    uiGameObject = new GameObject("BOBPackPanel");
+                    uiGameObject.transform.parent = UIView.GetAView().transform;
 
-						_panel = uiGameObject.AddComponent<BOBPackPanel>();
-				}
+                    _panel = uiGameObject.AddComponent<BOBPackPanel>();
+                }
 			}
 			catch (Exception e)
 			{
@@ -221,10 +221,13 @@ namespace BOB
     /// </summary>
     public class UIPackRow : UIPanel, IUIFastListRow
     {
+        // Layout constants.
+        private const float TextX = 60f;
+
         // Panel components.
         private UIPanel panelBackground;
         private UILabel packLabel;
-        private UISprite statusSprite;
+        private UISprite statusSprite, notLoadedSprite;
         private string thisPack;
 
 
@@ -258,7 +261,7 @@ namespace BOB
             if (packLabel != null)
             {
                 Background.width = width;
-                packLabel.relativePosition = new Vector3(30f, 6f);
+                packLabel.relativePosition = new Vector3(TextX, 6f);
             }
         }
 
@@ -292,20 +295,42 @@ namespace BOB
 
                 packLabel = AddUIComponent<UILabel>();
                 packLabel.width = BOBPackPanel.ListWidth;
-                packLabel.relativePosition = new Vector3(30f, 6f);
+                packLabel.relativePosition = new Vector3(TextX, 6f);
             }
 
             if (statusSprite == null)
             {
                 statusSprite = AddUIComponent<UISprite>();
-                statusSprite.size = new Vector2(20, 20);
+                statusSprite.size = new Vector2(20f, 20f);
                 statusSprite.relativePosition = new Vector3(5f, 5f);
+            }
+
+            if (notLoadedSprite == null)
+            {
+                notLoadedSprite = AddUIComponent<UISprite>();
+                notLoadedSprite.size = new Vector2(20f, 20f);
+                notLoadedSprite.relativePosition = new Vector3(30f, 5f);
+                notLoadedSprite.spriteName = "NotificationIconNotHappy";
             }
 
             // Set selected pack.
             thisPack = data as string;
             packLabel.text = thisPack;
-            statusSprite.spriteName = PackReplacement.GetPackStatus(thisPack) ? "AchievementCheckedTrue" : "AchievementCheckedFalse";
+
+            // Set sprite status.
+            bool packStatus = PackReplacement.GetPackStatus(thisPack);
+            bool notAllLoaded = PackReplacement.PackNotAllLoaded(thisPack);
+            statusSprite.spriteName = packStatus ? "AchievementCheckedTrue" : "AchievementCheckedFalse";
+            statusSprite.tooltip = packStatus ? Translations.Translate("BOB_PCK_APP_I") : Translations.Translate("BOB_PCK_RVT_I");
+            if (notAllLoaded)
+            {
+                notLoadedSprite.Show();
+                notLoadedSprite.tooltip = Translations.Translate("BOB_PCK_NAL");
+            }
+            else
+            {
+                notLoadedSprite.Hide();
+            }
 
             // Set initial background as deselected state.
             Deselect(isRowOdd);
