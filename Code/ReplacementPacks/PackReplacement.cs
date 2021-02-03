@@ -80,6 +80,30 @@ namespace BOB
 
 
 		/// <summary>
+		/// Checks to see if the given replacement pack conflicts with an active pack.
+		/// </summary>
+		/// <param name="packName">Pack name to check</param>
+		/// <returns>True if the pack conflicts with an active pack, false if no conflicts</returns>
+		internal static bool Conflicts(string packName)
+		{
+			// Check for conflicts - iterate through all prefabs in this pack.
+			foreach (PrefabInfo prefab in packRecords[packName].Keys)
+			{
+				// Check for a currently applied replacement of the same prefab.
+				if (replacements.ContainsKey(prefab))
+				{
+					// Found one!  Log message and return true to indicate conflict.
+					Logging.Message("replacement pack conflict with ", packName, " for prefab ", prefab.name);
+					return true;
+				}
+			}
+
+			// If we got here, then no conflict was detected.
+			return false;
+		}
+
+
+		/// <summary>
 		/// Applies a replacement pack.
 		/// </summary>
 		/// <returns>True if the pack was successfully applied, false otherwise</returns>
@@ -88,17 +112,12 @@ namespace BOB
 			// Check for valid value.
 			if (!string.IsNullOrEmpty(packName) && packRecords.ContainsKey(packName))
 			{
-				// Check for conflicts - iterate through all prefabs in this pack.
-				foreach(PrefabInfo prefab in packRecords[packName].Keys)
-                {
-					// Check for a currently applied replacement.
-					if (replacements.ContainsKey(prefab))
-                    {
-						// Found one!  Log message and return false to indicate no application.
-						Logging.Message("replacement pack conflict with ", packName, " for prefab ", prefab.name);
-						return false;
-                    }
-                }
+				// Check for conflicts with a currently applied replacement.
+				if (Conflicts(packName))
+				{
+					// Conflict detected - do nothing and return false to indicate no application.
+					return false;
+				}
 
 				// Iterate through each entry in pack and apply.
 				foreach (KeyValuePair<PrefabInfo, PropReplacement> entry in packRecords[packName])
@@ -272,8 +291,6 @@ namespace BOB
 		/// <returns>True if the entire network record was removed from the dictionary (due to no remaining replacements for that prefab), false if the prefab remains in the dictionary (has other active replacements)</returns>
 		private static void Revert(PrefabInfo target, bool removeEntries = true)
 		{
-			// List to track pack conflicts that have been freed up by this replacement.
-			//Dictionary<string, List<NetPropReference>> freedConflicts = new Dictionary<string, List<NetPropReference>>();
 			// Don't revert if there's no entry for this reference.
 			if (replacements.ContainsKey(target))
 			{

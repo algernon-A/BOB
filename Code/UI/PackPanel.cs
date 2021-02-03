@@ -66,11 +66,11 @@ namespace BOB
 	/// <summary>
 	/// Panel for replacement pack selection and application.
 	/// </summary>
-	public class BOBPackPanel : UIPanel
+	internal class BOBPackPanel : UIPanel
     {
         // Layout constants.
-        public const float RowHeight = 30f;
-        public const float ListWidth = 610f;
+        internal const float RowHeight = 30f;
+        internal const float ListWidth = 710f;
 		private const float Margin = 5f;
 		private const float PanelWidth = ListWidth + (Margin * 2f);
 		private const float ListHeight = 300f;
@@ -80,14 +80,60 @@ namespace BOB
         private const float PanelHeight = FooterX + FooterHeight + Margin;
 
 
+        // Panel components.
+        private readonly UIButton applyButton, revertButton;
+
         // Reference variables.
-        internal string selectedPack;
+        private string selectedPack;
+
+
+        /// <summary>
+        /// Handles changes to currently selected pack, updating panel button states accordingly.
+        /// </summary>
+        internal string SelectedPack
+        {
+            get => selectedPack;
+
+            set
+            {
+                selectedPack = value;
+
+                if (PackReplacement.GetPackStatus(value))
+                {
+                    // Pack is currently applied - enable revert button and disable apply button.
+                    revertButton.tooltip = Translations.Translate("BOB_PCK_RVT_A");
+                    revertButton.Enable();
+                    applyButton.tooltip = Translations.Translate("BOB_PCK_APP_I");
+                    applyButton.Disable();
+                }
+                else
+                {
+                    // Pack is not currently applied - check for pack conflicts.
+                    if (PackReplacement.Conflicts(value))
+                    {
+                        // Conflict detected - disable apply button and add explanatory tooltip.
+                        applyButton.tooltip = Translations.Translate("BOB_PCK_APP_C");
+                        applyButton.Disable();
+                    }
+                    else
+                    {
+                        // No conflicts - enable apply button and update tooltip.
+                        applyButton.tooltip = Translations.Translate("BOB_PCK_APP_A");
+                        applyButton.Enable();
+                    }
+
+                    // Disable revert button and update tooltip.
+                    revertButton.tooltip = Translations.Translate("BOB_PCK_RVT_I");
+                    revertButton.Disable();
+                }
+            }
+        }
 
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public BOBPackPanel()
+        internal BOBPackPanel()
         {
             // Basic behaviour.
             autoLayout = false;
@@ -125,13 +171,13 @@ namespace BOB
                 PackPanelManager.Close();
             };
 
-            // Speed sign list panel.
+            // Pack list panel.
             UIPanel packListPanel = AddUIComponent<UIPanel>();
             packListPanel.width = ListWidth;
             packListPanel.height = ListHeight;
             packListPanel.relativePosition = new Vector3(Margin, TitleBarHeight);
 
-            // Speed sign pack selection list.
+            // Pack selection list.
             UIFastList packSelection = UIFastList.Create<UIPackRow>(packListPanel);
             packSelection.backgroundSprite = "UnlockingPanel";
             packSelection.width = packListPanel.width;
@@ -144,8 +190,8 @@ namespace BOB
             packSelection.selectedIndex = -1;
 
             // Apply and revert button.
-            UIButton applyButton = UIControls.AddButton(this, Margin, FooterX, Translations.Translate("BOB_PCK_APP"));
-            UIButton revertButton = UIControls.AddButton(this, (ListWidth / 2) + (Margin * 2), FooterX, Translations.Translate("BOB_PCK_RVT"));
+            applyButton = UIControls.AddButton(this, Margin, FooterX, Translations.Translate("BOB_PCK_APP"));
+            revertButton = UIControls.AddButton(this, (ListWidth / 2) + (Margin * 2), FooterX, Translations.Translate("BOB_PCK_RVT"));
 
             applyButton.eventClicked += (control, clickEvent) =>
             {
@@ -159,6 +205,7 @@ namespace BOB
                 ConfigurationUtils.SaveConfig();
                 packSelection.Refresh();
             };
+
             // Populate list.
             packSelection.rowsData = PackReplacement.GetPackFastList();
 
@@ -223,7 +270,7 @@ namespace BOB
         protected override void OnClick(UIMouseEventParameter p)
         {
             base.OnClick(p);
-            PackPanelManager.Panel.selectedPack = thisPack;
+            PackPanelManager.Panel.SelectedPack = thisPack;
         }
 
 
