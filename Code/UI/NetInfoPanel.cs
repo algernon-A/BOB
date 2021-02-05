@@ -57,7 +57,27 @@ namespace BOB
 					probabilityField.text = value.originalProb.ToString();
 				}
             }
-        }
+		}
+
+
+		/// <summary>
+		/// Updates all items in the target list.
+		/// </summary>
+		internal override void UpdateTargetList()
+		{
+			// Iterate through each item in list.
+			foreach (object item in targetList.m_rowsData)
+			{
+				if (item is NetPropListItem propListItem)
+				{
+					// Update status.
+					UpdateTargetItem(propListItem);
+				}
+			}
+
+			// Refresh list display.
+			targetList.Refresh();
+		}
 
 
 		/// <summary>
@@ -168,14 +188,9 @@ namespace BOB
 					// Network replacements are always grouped.
 					NetworkReplacement.Apply(currentNet, currentTargetItem.originalPrefab ?? currentTargetItem.replacementPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
 
-					// Update current target.
-					//currentTargetItem.replacementPrefab = replacementPrefab;
-					//currentTargetItem.replacementProb = probability;
-					UpdateTargetItem(currentTargetItem as NetPropListItem);
-
 					// Save configuration file and refresh target list (to reflect our changes).
 					ConfigurationUtils.SaveConfig();
-					targetList.Refresh();
+					UpdateTargetList();
 
 					// Update button states.
 					UpdateButtonStates();
@@ -202,14 +217,9 @@ namespace BOB
 				// Apply replacement.
 				AllNetworkReplacement.Apply(currentTargetItem.originalPrefab ?? currentTargetItem.replacementPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
 
-				// Update current target.
-				//currentTargetItem.allPrefab = replacementPrefab;
-				//currentTargetItem.allProb = probability;
-				UpdateTargetItem(currentTargetItem as NetPropListItem);
-
 				// Save configuration file and refresh building list (to reflect our changes).
 				ConfigurationUtils.SaveConfig();
-				targetList.Refresh();
+				UpdateTargetList();
 
 				// Update button states.
 				UpdateButtonStates();
@@ -227,13 +237,9 @@ namespace BOB
 						// Network replacements are always grouped.
 						NetworkReplacement.Revert(currentNet, currentTargetItem.originalPrefab, true);
 
-						// Clear current target replacement prefab.
-						//currentTargetItem.replacementPrefab = null;
-						UpdateTargetItem(currentTargetItem as NetPropListItem);
-
 						// Save configuration file and refresh building list (to reflect our changes).
 						ConfigurationUtils.SaveConfig();
-						targetList.Refresh();
+						UpdateTargetList();
 
 						// Update button states.
 						UpdateButtonStates();
@@ -247,13 +253,9 @@ namespace BOB
 						// Apply all-network reversion.
 						AllNetworkReplacement.Revert(currentTargetItem.originalPrefab, true);
 
-						// Clear current target 'all' prefab.
-						//currentTargetItem.allPrefab = null;
-						UpdateTargetItem(currentTargetItem as NetPropListItem);
-
 						// Save configuration file and refresh target list (to reflect our changes).
 						ConfigurationUtils.SaveConfig();
-						targetList.Refresh();
+						UpdateTargetList();
 
 						// Update button states.
 						UpdateButtonStates();

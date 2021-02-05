@@ -91,6 +91,14 @@ namespace BOB
 
 
 		/// <summary>
+		/// Updates all items in the target list.
+		/// </summary>
+		internal virtual void UpdateTargetList()
+        {
+        }
+
+
+		/// <summary>
 		/// Performs initial setup 
 		/// </summary>
 		/// <param name="parentTransform">Parent transform</param>

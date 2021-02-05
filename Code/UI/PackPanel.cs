@@ -82,6 +82,7 @@ namespace BOB
 
         // Panel components.
         private readonly UIButton applyButton, revertButton;
+        private readonly UIFastList packSelection;
 
         // Reference variables.
         private string selectedPack;
@@ -98,34 +99,8 @@ namespace BOB
             {
                 selectedPack = value;
 
-                if (PackReplacement.GetPackStatus(value))
-                {
-                    // Pack is currently applied - enable revert button and disable apply button.
-                    revertButton.tooltip = Translations.Translate("BOB_PCK_RVT_A");
-                    revertButton.Enable();
-                    applyButton.tooltip = Translations.Translate("BOB_PCK_APP_I");
-                    applyButton.Disable();
-                }
-                else
-                {
-                    // Pack is not currently applied - check for pack conflicts.
-                    if (PackReplacement.Conflicts(value))
-                    {
-                        // Conflict detected - disable apply button and add explanatory tooltip.
-                        applyButton.tooltip = Translations.Translate("BOB_PCK_APP_C");
-                        applyButton.Disable();
-                    }
-                    else
-                    {
-                        // No conflicts - enable apply button and update tooltip.
-                        applyButton.tooltip = Translations.Translate("BOB_PCK_APP_A");
-                        applyButton.Enable();
-                    }
-
-                    // Disable revert button and update tooltip.
-                    revertButton.tooltip = Translations.Translate("BOB_PCK_RVT_I");
-                    revertButton.Disable();
-                }
+                // Update button states to reflect current selection.
+                UpdateButtonStates();
             }
         }
 
@@ -178,7 +153,7 @@ namespace BOB
             packListPanel.relativePosition = new Vector3(Margin, TitleBarHeight);
 
             // Pack selection list.
-            UIFastList packSelection = UIFastList.Create<UIPackRow>(packListPanel);
+            packSelection = UIFastList.Create<UIPackRow>(packListPanel);
             packSelection.backgroundSprite = "UnlockingPanel";
             packSelection.width = packListPanel.width;
             packSelection.height = packListPanel.height;
@@ -192,19 +167,8 @@ namespace BOB
             // Apply and revert button.
             applyButton = UIControls.AddButton(this, Margin, FooterX, Translations.Translate("BOB_PCK_APP"));
             revertButton = UIControls.AddButton(this, (ListWidth / 2) + (Margin * 2), FooterX, Translations.Translate("BOB_PCK_RVT"));
-
-            applyButton.eventClicked += (control, clickEvent) =>
-            {
-                PackReplacement.SetPackStatus(selectedPack, true);
-                ConfigurationUtils.SaveConfig();
-                packSelection.Refresh();
-            };
-            revertButton.eventClicked += (control, clickEvent) =>
-            {
-                PackReplacement.SetPackStatus(selectedPack, false);
-                ConfigurationUtils.SaveConfig();
-                packSelection.Refresh();
-            };
+            applyButton.eventClicked += (control, clickEvent) => SetPackStatus(true);
+            revertButton.eventClicked += (control, clickEvent) => SetPackStatus(false);
 
             // Populate list.
             packSelection.rowsData = PackReplacement.GetPackFastList();
@@ -212,6 +176,66 @@ namespace BOB
             // Focus.
             BringToFront();
             Focus();
+        }
+
+
+        /// <summary>
+        /// Sets the pack status of the currently selected pack.
+        /// </summary>
+        /// <param name="status">Status to set</param>
+        private void SetPackStatus(bool status)
+        {
+            // Set pack status,
+            PackReplacement.SetPackStatus(selectedPack, status);
+            ConfigurationUtils.SaveConfig();
+            packSelection.Refresh();
+
+            // Update buttons.
+            UpdateButtonStates();
+
+            // Update parent panel, if it's open.
+            if (InfoPanelManager.Panel != null)
+            {
+                InfoPanelManager.Panel.UpdateTargetList();
+            }
+        }
+
+
+
+        /// <summary>
+        /// Updating panel button states according ti the status of the current selection.
+        /// </summary>
+        private void UpdateButtonStates()
+        {
+            // Check status of current pack.
+            if (PackReplacement.GetPackStatus(selectedPack))
+            {
+                // Pack is currently applied - enable revert button and disable apply button.
+                revertButton.tooltip = Translations.Translate("BOB_PCK_RVT_A");
+                revertButton.Enable();
+                applyButton.tooltip = Translations.Translate("BOB_PCK_APP_I");
+                applyButton.Disable();
+            }
+            else
+            {
+                // Pack is not currently applied - check for pack conflicts.
+                if (PackReplacement.Conflicts(selectedPack))
+                {
+                    // Conflict detected - disable apply button and add explanatory tooltip.
+                    applyButton.tooltip = Translations.Translate("BOB_PCK_APP_C");
+                    applyButton.Disable();
+                }
+                else
+                {
+                    // No conflicts - enable apply button and update tooltip.
+                    applyButton.tooltip = Translations.Translate("BOB_PCK_APP_A");
+                    applyButton.Enable();
+                }
+
+                // Disable revert button and update tooltip.
+                revertButton.tooltip = Translations.Translate("BOB_PCK_RVT_I");
+                revertButton.Disable();
+            }
         }
     }
 
