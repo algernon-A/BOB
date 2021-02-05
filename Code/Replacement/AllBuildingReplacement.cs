@@ -280,7 +280,8 @@ namespace BOB
 					building = buildingPrefab,
 					propIndex = propIndex,
 					radAngle = buildingPrefab.m_props[propIndex].m_radAngle,
-					postion = buildingPrefab.m_props[propIndex].m_position
+					postion = buildingPrefab.m_props[propIndex].m_position,
+					probability = buildingPrefab.m_props[propIndex].m_probability
 				};
 
 				replacements[target].references.Add(newReference);
