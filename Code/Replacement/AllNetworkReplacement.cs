@@ -312,7 +312,8 @@ namespace BOB
 					laneIndex = laneIndex,
 					propIndex = propIndex,
 					angle = netPrefab.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_angle,
-					postion = netPrefab.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position
+					postion = netPrefab.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position,
+					probability = netPrefab.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_probability
 				};
 
 				replacements[target].references.Add(newReference);
