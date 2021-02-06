@@ -110,6 +110,7 @@
     <Content Include="Resources\bob_prop_pack_small.png" />
     <Content Include="Translations\en.xml" />
     <Content Include="Translations\es.xml" />
+    <Content Include="Translations\zh.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

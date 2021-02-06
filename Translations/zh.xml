@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Language UniqueName="zh" ReadableName="中文">
+  <Translations>
+    <Translation ID="BOB_NAM" String="BOB：樹木物體替換器" />
+    <Translation ID="BOB_DESC" String="持續開發中：替換樹木和物體。" />
+    <Translation ID="TRN_CHOICE" String="語言設置" />
+    <Translation ID="TRN_SYS" String="使用遊戲默認語言" />
+    <Translation ID="MES_CLS" String="關閉" />
+    <Translation ID="MES_DSA" String="不要在顯示" />
+    <Translation ID="BOB_MBX_OK" String="確定" />
+    <Translation ID="BOB_ROW_NOW" String="現在" />
+    <Translation ID="BOB_PNL_NOP" String="沒找到物體" />
+    <Translation ID="BOB_PNL_NOT" String="沒找到樹木" />
+    <Translation ID="BOB_PNL_TRE" String="樹木" />
+    <Translation ID="BOB_PNL_PRP" String="物體" />
+    <Translation ID="BOB_PNL_IND" String="顯示每一個單獨物體" />
+    <Translation ID="BOB_PNL_HDV" String="隱藏遊戲默認素材" />
+    <Translation ID="BOB_PNL_REP" String="替換" />
+    <Translation ID="BOB_PNL_RTB" String="此類建築" />
+    <Translation ID="BOB_PNL_RAB" String="所有建築" />
+    <Translation ID="BOB_PNL_RTN" String="此類道路" />
+    <Translation ID="BOB_PNL_RAN" String="所有道路" />
+    <Translation ID="BOB_PNL_RTT" String="地圖樹木" />
+    <Translation ID="BOB_PNL_REV" String="還原" />
+    <Translation ID="BOB_PNL_PRB" String="可見度" />
+    <Translation ID="BOB_PNL_ANG" String="角度" />
+    <Translation ID="BOB_PNL_XOF" String="X 軸偏移" />
+    <Translation ID="BOB_PNL_YOF" String="Y 軸偏移" />
+    <Translation ID="BOB_PNL_ZOF" String="Z 軸偏移" />
+    <Translation ID="BOB_OPT_KEY" String="快鍵" />
+    <Translation ID="BOB_OPT_PRS" String="按任意鍵" />
+    <Translation ID="BOB_NUKE" String="重置配置" />
+    <Translation ID="BOB_PER_IND" String="默認顯示單獨物體" />
+    <Translation ID="BOB_PER_SIN" String="始終關閉" />
+    <Translation ID="BOB_PER_GRP" String="始終開啟" />
+    <Translation ID="BOB_PER_LST" String="記住現有設置" />
+    <Translation ID="BOB_OPT_POS" String="記住現有面板位置" />
+    <Translation ID="BOB_FIL_NAME" String="搜尋" />
+    <Translation ID="BOB_UPD_040_0" String="包含地圖樹木替換！要開啟BOB：樹木物體替換器用於地圖樹木替換，點擊任意一顆在地圖上的樹木之後按Alt+B開啟面板。" />
+  </Translations>
+</Language>
