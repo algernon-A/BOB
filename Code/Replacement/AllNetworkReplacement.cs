@@ -78,6 +78,8 @@ namespace BOB
 				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.postion;
 				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_probability = propReference.probability;
 
+				// Refresh network render.
+				NetworkReplacement.RefreshBuilding(propReference.network);
 				// Restore any pack replacement.
 				PackReplacement.Restore(propReference.network, target, propReference.laneIndex, propReference.propIndex);
 			}
@@ -86,7 +88,7 @@ namespace BOB
 			if (removeEntries)
             {
 				replacements.Remove(target);
-            }
+			}
 		}
 
 

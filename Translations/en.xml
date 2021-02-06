@@ -49,5 +49,8 @@
     <Translation ID="BOB_UPD_041_0" String="Fix intermittent building replacement panel exception when changing target item." />
     <Translation ID="BOB_UPD_042_0" String="Enable selection of sub-buildings" />
     <Translation ID="BOB_UPD_042_1" String="Fix potential race conditions on game load" />
+    <Translation ID="BOB_UPD_043_0" String="Fix probability refresh when reverting TO an all-building or all-network replacement" />
+    <Translation ID="BOB_UPD_043_1" String="Fix LODs not refreshing after reverting all-network or all-building replacements" />
+    <Translation ID="BOB_UPD_043_2" String="Adjust info panel textfield labels to fit longer translation strings" />
   </Translations>
 </Language>
