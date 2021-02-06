@@ -37,5 +37,11 @@
     <Translation ID="BOB_OPT_POS" String="記住現有面板位置" />
     <Translation ID="BOB_FIL_NAME" String="搜尋" />
     <Translation ID="BOB_UPD_040_0" String="包含地圖樹木替換！要開啟BOB：樹木物體替換器用於地圖樹木替換，點擊任意一顆在地圖上的樹木之後按Alt+B開啟面板。" />
+    <Translation ID="BOB_UPD_041_0" String="修復了更改目標項目時間歇性建築替換面板異常的問題。" />
+    <Translation ID="BOB_UPD_042_0" String="啟用子建築選擇" />
+    <Translation ID="BOB_UPD_042_1" String="修正了在遊戲負載潛在的競爭條件" />
+    <Translation ID="BOB_UPD_043_0" String="修復概率刷新還原當使用 “所有建築” 或 ”所有道路“ 替換" />
+    <Translation ID="BOB_UPD_043_1" String="修復當使用 “所有建築” 或 ”所有道路“ 替換時LOD不刷新問題" />
+    <Translation ID="BOB_UPD_043_2" String="調整訊息面板文字標籤以符合更長的翻譯字段" />
   </Translations>
 </Language>
