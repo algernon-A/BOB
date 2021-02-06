@@ -66,9 +66,9 @@ namespace BOB
 			foreach (NetPropReference propReference in replacements[target].references)
 			{
 				// Revert entry.
-				if (target is PropInfo)
+				if (target is PropInfo propTarget)
 				{
-					propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = (PropInfo)target;
+					propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = propTarget;
 				}
 				else
                 {
@@ -80,6 +80,8 @@ namespace BOB
 
 				// Refresh network render.
 				NetworkReplacement.RefreshBuilding(propReference.network);
+				// Restore any pack replacement.
+				PackReplacement.Restore(propReference.network, target, propReference.laneIndex, propReference.propIndex);
 			}
 
 			// Remove entry from dictionary, if we're doing so.
@@ -110,9 +112,9 @@ namespace BOB
 					if (propReference.network == netPrefab && propReference.laneIndex == laneIndex && propReference.propIndex == propIndex)
                     {
 						// Got a match!  Revert instance.
-						if (target is PropInfo)
+						if (target is PropInfo propTarget)
 						{
-							propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = (PropInfo)target;
+							propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = propTarget;
 						}
 						else
 						{
@@ -207,8 +209,20 @@ namespace BOB
 							continue;
 						}
 
-						// Get this prop from network.
-						PrefabInfo thisProp = target is PropInfo ? (PrefabInfo)network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_finalProp : (PrefabInfo)network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_finalTree;
+						// Check for any existing pack replacement.
+						PrefabInfo thisProp = PackReplacement.GetOriginal(network, laneIndex, propIndex);
+						if (thisProp == null)
+						{
+							// No active replacement; use current PropInfo.
+							if (target is PropInfo)
+							{
+								thisProp = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_finalProp;
+							}
+							else
+							{
+								thisProp = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_finalTree;
+							}
+						}
 
 						// See if this prop matches our replacement.
 						if (thisProp != null && thisProp == target)
@@ -231,6 +245,9 @@ namespace BOB
 			// Now, iterate through each entry found and apply the replacement to each one.
 			foreach (NetPropReference propReference in replacements[target].references)
 			{
+				// Reset any pack replacements first.
+				PackReplacement.RemoveEntry(propReference.network, target, propReference.laneIndex, propReference.propIndex);
+
 				NetworkReplacement.ReplaceProp(replacements[target], propReference);
 			}
 		}
@@ -303,7 +320,8 @@ namespace BOB
 		/// <param name="target">Target prop info</param>
 		/// <param name="laneIndex">Lane index</param>
 		/// <param name="propIndex">Prop index</param>
-		internal static void Restore(NetInfo netPrefab, PrefabInfo target, int laneIndex, int propIndex)
+		/// <returns>True if a restoration was made, false otherwise</returns>
+		internal static bool Restore(NetInfo netPrefab, PrefabInfo target, int laneIndex, int propIndex)
 		{
 			// Check to see if we have an entry for this prefab.
 			if (replacements.ContainsKey(target))
@@ -321,9 +339,13 @@ namespace BOB
 
 				replacements[target].references.Add(newReference);
 
-				// Apply replacement.
+				// Apply replacement and return true to indicate restoration.
 				NetworkReplacement.ReplaceProp(replacements[target], newReference);
+				return true;
 			}
+
+			// If we got here, no restoration was made.
+			return false;
 		}
 	}
 }

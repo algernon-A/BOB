@@ -91,6 +91,14 @@ namespace BOB
 
 
 		/// <summary>
+		/// Updates all items in the target list.
+		/// </summary>
+		internal virtual void UpdateTargetList()
+        {
+        }
+
+
+		/// <summary>
 		/// Performs initial setup 
 		/// </summary>
 		/// <param name="parentTransform">Parent transform</param>
@@ -139,7 +147,7 @@ namespace BOB
 
 			// Close button.
 			UIButton closeButton = AddUIComponent<UIButton>();
-			closeButton.relativePosition = new Vector3(width - 35, 2);
+			closeButton.relativePosition = new Vector2(width - 35, 2);
 			closeButton.normalBgSprite = "buttonclose";
 			closeButton.hoveredBgSprite = "buttonclosehover";
 			closeButton.pressedBgSprite = "buttonclosepressed";

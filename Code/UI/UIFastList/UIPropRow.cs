@@ -8,7 +8,7 @@ namespace BOB
     /// <summary>
     /// An individual prop row.
     /// </summary>
-    public class UIPropRow : UIPanel, UIFastListRow
+    public class UIPropRow : UIPanel, IUIFastListRow
     {
         // Layout constants.
         private const float RowHeight = 30f;
@@ -106,6 +106,12 @@ namespace BOB
             thisPrefab = data as PrefabInfo;
             if (thisPrefab == null)
             {
+                // Hide any existing line sprites; it will be re-shown as necessary.
+                if (lineSprite != null)
+                {
+                    lineSprite.Hide();
+                }
+
                 // Text to display - StringBuilder due to the amount of manipulation we're doing.
                 StringBuilder displayText = new StringBuilder();
 
@@ -155,7 +161,7 @@ namespace BOB
                     // Append closing bracket.
                     displayText.Append(")");
                 }
-                // If no current individual replacement, check to see if there's a currently active building replacement.
+                // If no current individual replacement, check to see if there's a currently active building/network replacement.
                 else if (thisItem.replacementPrefab != null)
                 {
                     // A replacement is currently active - include it in the text.
@@ -175,7 +181,7 @@ namespace BOB
                     // Append closing bracket.
                     displayText.Append(")");
                 }
-                // If no current building replacement, check to see if any all- replacement is currently active.
+                // If no current building/network replacement, check to see if any all- replacement is currently active.
                 else if (thisItem.allPrefab != null)
                 {
                     // An all- replacement is currently active; append name to the label.
@@ -184,7 +190,7 @@ namespace BOB
                     displayText.Append(" ");
                     displayText.Append(UIUtils.GetDisplayName(thisItem.allPrefab.name));
 
-                    // Append probability if this is not a network item and we're shoing probs.
+                    // Append probability if this is not a network item and we're showing probs.
                     if (thisNetItem == null && thisItem.showProbs)
                     {
                         displayText.Append(" ");
@@ -195,19 +201,39 @@ namespace BOB
                     // Closing bracket.
                     displayText.Append(")");
                 }
+                // If no other replacements, chek to see if any pack replacement is currently active
+                else if (thisItem.packagePrefab != null)
+                {
+                    Logging.Message("UIPropRow displaying packagePrefab");
+
+                    // Yes; append name to the label.
+                    displayText.Append(" (");
+                    displayText.Append(thisNetItem == null ? Translations.Translate("BOB_PNL_RAB") : Translations.Translate("BOB_PNL_RAN"));
+                    displayText.Append(" ");
+                    displayText.Append(UIUtils.GetDisplayName(thisItem.packagePrefab.name));
+
+                    // Closing bracket.
+                    displayText.Append(")");
+
+                    // Show package replacement sprite.
+                    // If we don't already have a sprite, create one.
+                    if (lineSprite == null)
+                    {
+                        lineSprite = AddUIComponent<UISprite>();
+                        lineSprite.atlas = UIUtils.PackageSprites;
+                        lineSprite.spriteName = "normal";
+                        lineSprite.size = new Vector2(17f, 17f);
+                        lineSprite.relativePosition = new Vector2(6.5f, 6.5f);
+                    }
+                    else
+                    {
+                        // Sprite already exists - just show it.
+                        lineSprite.Show();
+                    }
+                }
 
                 // Set display text.
                 objectName.text = displayText.ToString();
-
-                // Add line item sprite for package replacements.
-                if (thisItem.packagePrefab != null)
-                {
-                    lineSprite = AddUIComponent<UISprite>();
-                    lineSprite.atlas = UIUtils.PackageSprites;
-                    lineSprite.spriteName = "normal";
-                    lineSprite.size = new Vector2(17f, 17f);
-                    lineSprite.relativePosition = new Vector2(6.5f, 6.5f);
-                }
 
                 // Indent label for line sprite.
                 labelX = 30f;

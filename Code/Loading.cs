@@ -51,6 +51,9 @@ namespace BOB
             // Build lists of loaded prefabs.
             PrefabLists.BuildLists();
 
+            // Load prop packs.
+            PackReplacement.Setup();
+
             // Load configuration file.
             ConfigurationUtils.LoadConfig();
 

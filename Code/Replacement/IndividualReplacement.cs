@@ -64,9 +64,9 @@ namespace BOB
 				PrefabInfo target = replacements[building][targetIndex].targetInfo;
 
 				// Revert entry.
-				if (target is PropInfo)
+				if (target is PropInfo propTarget)
 				{
-					propReference.building.m_props[targetIndex].m_finalProp = (PropInfo)target;
+					propReference.building.m_props[targetIndex].m_finalProp = propTarget;
 				}
 				else
 				{

@@ -60,6 +60,9 @@
     <Compile Include="Code\Configuration\ConfigurationUtils.cs" />
     <Compile Include="Code\Configuration\ConfigurationXML.cs" />
     <Compile Include="Code\Logging.cs" />
+    <Compile Include="Code\ReplacementPacks\PackUtils.cs" />
+    <Compile Include="Code\ReplacementPacks\PackXML.cs" />
+    <Compile Include="Code\UI\PackPanel.cs" />
     <Compile Include="Code\Utils\FileUtils.cs" />
     <Compile Include="Code\MessageBox\DontShowAgainMessageBox.cs" />
     <Compile Include="Code\MessageBox\ListMessageBox.cs" />
@@ -75,7 +78,7 @@
     <Compile Include="Code\Replacement\NetworkReplacement.cs" />
     <Compile Include="Code\Replacement\PrefabLists.cs" />
     <Compile Include="Code\Replacement\Replacement.cs" />
-    <Compile Include="Code\Replacement\ReplacementPacks.cs" />
+    <Compile Include="Code\ReplacementPacks\PackReplacement.cs" />
     <Compile Include="Code\Replacement\ReplacementUtils.cs" />
     <Compile Include="Code\Replacement\IndividualReplacement.cs" />
     <Compile Include="Code\Serialization.cs" />
@@ -104,6 +107,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Changelog.txt" />
+    <Content Include="Code\ReplacementPacks\BOBPacks.xml" />
     <Content Include="License.txt" />
     <Content Include="Resources\bob_cursor_dark.png" />
     <Content Include="Resources\bob_cursor_light.png" />
@@ -127,6 +131,8 @@ del "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName
 xcopy /y "$(ProjectDir)\Translations\" "$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\Translations" /s /e
 mkdir "$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\Resources"
 del "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\Resources\*"
-xcopy /y "$(ProjectDir)\Resources\" "$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\Resources" /s /e</PostBuildEvent>
+xcopy /y "$(ProjectDir)\Resources\" "$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\Resources" /s /e
+del "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\*.xml"
+xcopy /y "$(ProjectDir)\Code\ReplacementPacks\*.xml" "$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\" /s /e</PostBuildEvent>
   </PropertyGroup>
 </Project>

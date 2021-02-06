@@ -28,6 +28,14 @@
     <Translation ID="BOB_PNL_YOF" String="Y offset" />
     <Translation ID="BOB_PNL_ZOF" String="Z offset" />
     <Translation ID="BOB_PNL_SUB" String="Sub-building" />
+    <Translation ID="BOB_PCK_APP" String="Apply pack" />
+    <Translation ID="BOB_PCK_APP_A" String="Applies the selected replacement pack" />
+    <Translation ID="BOB_PCK_APP_C" String="Pack cannot be applied as it conflicts with an already-applied pack" />
+    <Translation ID="BOB_PCK_APP_I" String="Pack is currently applied" />
+    <Translation ID="BOB_PCK_RVT" String="Revert pack" />
+    <Translation ID="BOB_PCK_RVT_A" String="Un-applies the selected replacement pack" />
+    <Translation ID="BOB_PCK_RVT_I" String="Pack is not currently applied" />
+    <Translation ID="BOB_PCK_NAL" String="Not all replacements are available" />
     <Translation ID="BOB_OPT_KEY" String="Hotkey" />
     <Translation ID="BOB_OPT_PRS" String="Press any key" />
     <Translation ID="BOB_NUKE" String="Reset configuration" />

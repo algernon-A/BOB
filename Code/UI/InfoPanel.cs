@@ -36,7 +36,7 @@ namespace BOB
 
 
 		// Trees or props?
-		protected override bool IsTree => treeCheck == null ? false : treeCheck.isChecked;
+		protected override bool IsTree => treeCheck?.isChecked ?? false;
 
 
 		/// <summary>

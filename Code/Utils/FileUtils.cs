@@ -116,9 +116,11 @@ namespace BOB
 			using (Stream stream = OpenResourceFile(fileName))
 			{
 				// New texture.
-				Texture2D texture = new Texture2D(1, 1, TextureFormat.ARGB32, false);
-				texture.filterMode = FilterMode.Bilinear;
-				texture.wrapMode = TextureWrapMode.Clamp;
+				Texture2D texture = new Texture2D(1, 1, TextureFormat.ARGB32, false)
+				{
+					filterMode = FilterMode.Bilinear,
+					wrapMode = TextureWrapMode.Clamp
+				};
 
 				// Read texture as byte stream from file.
 				byte[] array = new byte[stream.Length];

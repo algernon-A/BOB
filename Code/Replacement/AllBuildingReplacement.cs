@@ -12,7 +12,6 @@ namespace BOB
 		internal static Dictionary<PrefabInfo, BOBBuildingReplacement> replacements;
 
 
-
 		/// <summary>
 		/// Performs setup and initialises the master dictionary.  Must be called prior to use.
 		/// </summary>
@@ -51,9 +50,9 @@ namespace BOB
 			foreach (BuildingPropReference propReference in replacements[target].references)
 			{
 				// Revert entry.
-				if (target is PropInfo)
+				if (target is PropInfo propTarget)
 				{
-					propReference.building.m_props[propReference.propIndex].m_finalProp = (PropInfo)target;
+					propReference.building.m_props[propReference.propIndex].m_finalProp = propTarget;
 				}
 				else
 				{
@@ -95,9 +94,9 @@ namespace BOB
 					if (propReference.building == buildingPrefab && propReference.propIndex == propIndex)
 					{
 						// Got a match!  Revert instance.
-						if (target is PropInfo)
+						if (target is PropInfo propTarget)
 						{
-							propReference.building.m_props[propReference.propIndex].m_finalProp = (PropInfo)target;
+							propReference.building.m_props[propReference.propIndex].m_finalProp = propTarget;
 						}
 						else
 						{

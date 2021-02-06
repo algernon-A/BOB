@@ -28,8 +28,7 @@ namespace BOB
 					// Read it.
 					using (StreamReader reader = new StreamReader(SettingsFileName))
 					{
-						XmlSerializer xmlSerializer = new XmlSerializer(typeof(BOBConfigurationFile));
-						BOBConfigurationFile configFile = xmlSerializer.Deserialize(reader) as BOBConfigurationFile;
+						BOBConfigurationFile configFile = (BOBConfigurationFile)new XmlSerializer(typeof(BOBConfigurationFile)).Deserialize(reader);
 
 						if (configFile == null)
 						{
@@ -60,11 +59,14 @@ namespace BOB
                         {
 							DeserializeNetwork(network);
 						}
+
+						// Deserialise active replacement packs.
+						PackReplacement.DeserializeActivePacks(configFile.activePacks);
 					}
 				}
 				else
 				{
-					Logging.Message("no configuration file found");
+					Logging.Message("no settings file found");
 				}
 			}
 			catch (Exception e)
@@ -84,10 +86,11 @@ namespace BOB
 				using (StreamWriter textWriter = new StreamWriter(SettingsFileName, append: false))
 				{
 					XmlSerializer xmlSerializer = new XmlSerializer(typeof(BOBConfigurationFile));
-					BOBConfigurationFile configFile = new BOBConfigurationFile();
-
-					// Version 1.
-					configFile.version = 1;
+					BOBConfigurationFile configFile = new BOBConfigurationFile
+					{
+						// Version 1.
+						version = 1
+					};
 
 					// Serialise all-building replacements.
 					configFile.allBuildingProps = AllBuildingReplacement.replacements.Values.ToList();
@@ -130,6 +133,9 @@ namespace BOB
 							replacements = NetworkReplacement.replacements[network].Values.ToList()
 						});
 					}
+
+					// Serialise active replacement packs.
+					configFile.activePacks = PackReplacement.SerializeActivePacks();
 
 					// Write to file.
 					xmlSerializer.Serialize(textWriter, configFile);

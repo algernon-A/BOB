@@ -13,25 +13,29 @@ namespace BOB
 		[XmlAttribute("version")]
 		public int version = 1;
 
-		[XmlArray("buildprops", IsNullable = true)]
-		[XmlArrayItem("buildprop", IsNullable = true)]
-		public List<BOBBuildingReplacement> allBuildingProps { get; set; }
+		[XmlArray("buildprops")]
+		[XmlArrayItem("buildprop")]
+		public List<BOBBuildingReplacement> allBuildingProps;
 
-		[XmlArray("buildings", IsNullable = false)]
-		[XmlArrayItem("building", IsNullable = false)]
-		public List<BOBBuildingElement> buildings { get; set; }
+		[XmlArray("buildings")]
+		[XmlArrayItem("building")]
+		public List<BOBBuildingElement> buildings;
 
-		[XmlArray("individuals", IsNullable = false)]
-		[XmlArrayItem("individual", IsNullable = false)]
-		public List<BOBBuildingElement> indBuildings { get; set; }
+		[XmlArray("individuals")]
+		[XmlArrayItem("individual")]
+		public List<BOBBuildingElement> indBuildings;
 
-		[XmlArray("netprops", IsNullable = true)]
-		[XmlArrayItem("netprop", IsNullable = true)]
-		public List<BOBNetReplacement> allNetworkProps { get; set; }
+		[XmlArray("netprops")]
+		[XmlArrayItem("netprop")]
+		public List<BOBNetReplacement> allNetworkProps;
 
-		[XmlArray("networks", IsNullable = false)]
-		[XmlArrayItem("network", IsNullable = false)]
-		public List<BOBNetworkElement> networks { get; set; }
+		[XmlArray("networks")]
+		[XmlArrayItem("network")]
+		public List<BOBNetworkElement> networks;
+
+		[XmlArray("activePacks")]
+		[XmlArrayItem("activePacks")]
+		public List<string> activePacks;
 	}
 
 

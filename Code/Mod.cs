@@ -76,6 +76,10 @@ namespace BOB
                 // Revert all-building and building settings.
                 AllBuildingReplacement.RevertAll();
                 BuildingReplacement.RevertAll();
+                IndividualReplacement.RevertAll();
+                PackReplacement.RevertAll();
+                AllNetworkReplacement.RevertAll();
+                NetworkReplacement.RevertAll();
 
                 // Save configuration.
                 ConfigurationUtils.SaveConfig();

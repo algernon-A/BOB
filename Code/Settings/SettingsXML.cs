@@ -12,7 +12,7 @@ namespace BOB
 
 		// Language.
 		[XmlElement("Language")]
-		public string language
+		public string Language
 		{
 			get => Translations.Language;
 			

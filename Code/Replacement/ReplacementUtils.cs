@@ -16,17 +16,18 @@ namespace BOB
 		internal static Replacement Clone(Replacement replacement)
 		{
 			// Create new record instance.
-			Replacement clone = new Replacement();
-
-			// Copy original records to the clone.
-			clone.isTree = replacement.isTree;
-			clone.targetIndex = replacement.targetIndex;
-			clone.targetName = replacement.targetName;
-			clone.replaceName = replacement.replaceName;
-			clone.probability = replacement.probability;
-			clone.angle = replacement.angle;
-			clone.replacementInfo = replacement.replacementInfo;
-			clone.targetInfo = replacement.targetInfo;
+			Replacement clone = new Replacement
+			{
+				// Copy original records to the clone.
+				isTree = replacement.isTree,
+				targetIndex = replacement.targetIndex,
+				targetName = replacement.targetName,
+				replaceName = replacement.replaceName,
+				probability = replacement.probability,
+				angle = replacement.angle,
+				replacementInfo = replacement.replacementInfo,
+				targetInfo = replacement.targetInfo
+			};
 
 			return clone;
 		}

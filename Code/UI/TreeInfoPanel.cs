@@ -126,22 +126,22 @@ namespace BOB
 				}
 
 				// Create new list item, hiding probabilities.
-				PropListItem propListItem = new PropListItem { showProbs = false } ;
+				PropListItem propListItem = new PropListItem { showProbs = false };
 
 				// Try to get any tree replacement.
 				propListItem.originalPrefab = MapTreeReplacement.GetOriginal(tree.Info);
 
 				// DId we find a current replacment?
 				if (propListItem.originalPrefab == null)
-                {
+				{
 					// No - set current item as the original tree.
 					propListItem.originalPrefab = tree.Info;
-                }
+				}
 				else
-                {
+				{
 					// Yes - record current item as replacement.
 					propListItem.replacementPrefab = tree.Info;
-                }				
+				}
 
 				// Check to see if we were succesful - if not (e.g. we only want trees and this is a prop), continue on to next building prop.
 				if (propListItem.originalPrefab?.name == null)
@@ -185,9 +185,11 @@ namespace BOB
 			}
 
 			// Create return fastlist from our filtered list, ordering by name.
-			FastList<object> fastList = new FastList<object>();
-			fastList.m_buffer = treeList.ToArray();
-			fastList.m_size = treeList.Count;
+			FastList<object> fastList = new FastList<object>
+			{
+				m_buffer = treeList.ToArray(),
+				m_size = treeList.Count
+			};
 
 			// If the list is empty, show the 'no props' label; otherwise, hide it.
 			if (fastList.m_size == 0)

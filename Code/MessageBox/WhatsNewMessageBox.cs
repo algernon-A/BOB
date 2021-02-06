@@ -42,7 +42,7 @@ namespace BOB.MessageBox
         public class VersionMessage : UIPanel
         {
             // Components.
-            private UIButton minimizeButton;
+            private readonly UIButton minimizeButton;
             public List<ListItem> listItems;
 
             // Version title.
@@ -100,6 +100,9 @@ namespace BOB.MessageBox
                     ListItem newMessageLabel = AddUIComponent<ListItem>();
                     listItems.Add(newMessageLabel);
                     newMessageLabel.Text = Translations.Translate(messageKey);
+
+                    // Make sure initial width is set properly.
+                    newMessageLabel.width = width;
                 }
 
                 // Always start maximized.

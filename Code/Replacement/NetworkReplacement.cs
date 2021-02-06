@@ -62,9 +62,9 @@ namespace BOB
 			foreach (NetPropReference propReference in replacements[network][target].references)
 			{
 				// Revert entry.
-				if (target is PropInfo)
+				if (target is PropInfo propTarget)
 				{
-					propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = (PropInfo)target;
+					propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = propTarget;
 				}
 				else
                 {
@@ -75,7 +75,11 @@ namespace BOB
 				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_probability = propReference.probability;
 
 				// Restore any all-network replacement.
-				AllNetworkReplacement.Restore(network, target, propReference.laneIndex, propReference.propIndex);
+				if (!AllNetworkReplacement.Restore(network, target, propReference.laneIndex, propReference.propIndex))
+				{
+					// No all-network restoration occured - restore any pack replacement.
+					PackReplacement.Restore(network, target, propReference.laneIndex, propReference.propIndex);
+				}
 
 				// Refresh network render.
 				RefreshBuilding(network);
@@ -165,8 +169,8 @@ namespace BOB
 				// Iterate through each prop in lane.
 				for (int propIndex = 0; propIndex < network.m_lanes[laneIndex].m_laneProps.m_props.Length; ++propIndex)
 				{
-					// Check for any existing all-network replacement.
-					PrefabInfo thisProp = AllNetworkReplacement.GetOriginal(network, laneIndex, propIndex);
+					// Check for any existing pack or all-network replacement.
+					PrefabInfo thisProp = PackReplacement.GetOriginal(network, laneIndex, propIndex) ?? AllNetworkReplacement.GetOriginal(network, laneIndex, propIndex);
 					if (thisProp == null)
                     {
 						// No active replacement; use current PropInfo.
@@ -200,10 +204,12 @@ namespace BOB
 			// Now, iterate through each entry found.
 			foreach (NetPropReference propReference in replacements[network][target].references)
 			{
-				// Reset any all-network replacements first.
+				// Reset any pack or all-network replacements first.
+				PackReplacement.RemoveEntry(network, target, propReference.laneIndex, propReference.propIndex);
 				AllNetworkReplacement.RemoveEntry(network, target, propReference.laneIndex, propReference.propIndex);
 
 				// Apply the replacement.
+				Logging.Message("replacing ", target.name, " with ", replacement.name, " in ", network.name);
 				ReplaceProp(replacements[network][target], propReference);
 			}
 		}
@@ -293,9 +299,9 @@ namespace BOB
 			};
 
 			// Apply replacement.
-			if (netElement.replacementInfo is PropInfo)
+			if (netElement.replacementInfo is PropInfo propInfo)
 			{
-				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = (PropInfo)netElement.replacementInfo;
+				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = propInfo;
 			}
 			else
 			{

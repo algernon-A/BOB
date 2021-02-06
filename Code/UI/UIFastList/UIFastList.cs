@@ -2,6 +2,8 @@
 using ColossalFramework.UI;
 using System;
 
+#pragma warning disable IDE1006 // Naming Styles
+
 
 namespace BOB
 {
@@ -9,7 +11,7 @@ namespace BOB
     /// From SamSamTS's work with Building Themes mod, via AJ3D's Ploppable RICO and algernon's Realistic Population Revisited.
     /// Code and comments are unchanged, except for FindItem added by algernon.
     /// </summary>
-    public interface UIFastListRow
+    public interface IUIFastListRow
     {
         #region Methods to implement
         /// <summary>
@@ -77,8 +79,8 @@ namespace BOB
         #region Private members
         private UIPanel m_panel;
         private UIScrollbar m_scrollbar;
-        private FastList<UIFastListRow> m_rows;
-        private FastList<object> m_rowsData;
+        private FastList<IUIFastListRow> m_rows;
+        public FastList<object> m_rowsData;
 
         private Type m_rowType;
         private string m_backgroundSprite;
@@ -104,7 +106,7 @@ namespace BOB
         /// <param name="parent"></param>
         /// <returns></returns>
         public static UIFastList Create<T>(UIComponent parent)
-            where T : UIPanel, UIFastListRow
+            where T : UIPanel, IUIFastListRow
         {
             UIFastList list = parent.AddUIComponent<UIFastList>();
             list.m_rowType = typeof(T);
@@ -326,31 +328,32 @@ namespace BOB
             // Iterate through the rows list.
             for (int i = 0; i < m_rowsData.m_size; ++i)
             {
-                PropListItem propListItem = m_rowsData.m_buffer[i] as PropListItem;
-
-                // Look for an index match; individual or grouped (contained within propListItem.indexes list).
-                if (propListItem != null && ((item.index >= 0 && item.index == propListItem.index) || (item.index < 0 && propListItem.indexes.Contains(item.indexes[0]))))
+                if (m_rowsData.m_buffer[i] is PropListItem propListItem)
                 {
-                    // Found a match; set the selected index to this one.
-                    selectedIndex = i;
-
-                    // Set current panel selection.
-                    InfoPanelManager.Panel.CurrentTargetItem = propListItem;
-
-                    // If the selected index is outside the current visibility range, move the to show it.
-                    if (selectedIndex < listPosition || selectedIndex > listPosition + m_rows.m_size)
+                    // Look for an index match; individual or grouped (contained within propListItem.indexes list).
+                    if (item.index >= 0 && (item.index == propListItem.index) || (item.index < 0 && propListItem.indexes.Contains(item.indexes[0])))
                     {
-                        listPosition = selectedIndex;
+                        // Found a match; set the selected index to this one.
+                        selectedIndex = i;
+
+                        // Set current panel selection.
+                        InfoPanelManager.Panel.CurrentTargetItem = propListItem;
+
+                        // If the selected index is outside the current visibility range, move the to show it.
+                        if (selectedIndex < listPosition || selectedIndex > listPosition + m_rows.m_size)
+                        {
+                            listPosition = selectedIndex;
+                        }
+
+                        // Done here; return.
+                        return;
                     }
 
-                    // Done here; return.
-                    return;
+                    // If we got here, we didn't find a match; clear the selection and reset the list position.
+                    selectedIndex = -1;
+                    listPosition = 0f;
                 }
             }
-
-            // If we got here, we didn't find a match; clear the selection and reset the list position.
-            selectedIndex = -1;
-            listPosition = 0f;
         }
 
 
@@ -403,38 +406,35 @@ namespace BOB
             for (int i = 0; i < m_rowsData.m_size; ++i)
             {
                 // Skip anything that's not a valid item.
-                PropListItem propListItem = m_rowsData.m_buffer[i] as PropListItem;
-                if (propListItem == null)
+                if (m_rowsData.m_buffer[i] is PropListItem propListItem)
                 {
-                    continue;
-                }
+                    // Match to replacement prefab if any, if none then match against original prefab.
+                    PrefabInfo targetInfo = propListItem.replacementPrefab ?? propListItem.originalPrefab;
 
-                // Match to replacement prefab if any, if none then match against original prefab.
-                PrefabInfo targetInfo = propListItem.replacementPrefab ?? propListItem.originalPrefab;
-
-                // Look for a prefab match.
-                if (targetInfo != null && targetInfo == item)
-                {
-                    // Found a match; set the selected index to this one.
-                    selectedIndex = i;
-
-                    // Set current panel selection.
-                    InfoPanelManager.Panel.CurrentTargetItem = propListItem;
-
-                    // If the selected index is outside the current visibility range, move the to show it.
-                    if (selectedIndex < listPosition || selectedIndex > listPosition + m_rows.m_size)
+                    // Look for a prefab match.
+                    if (targetInfo != null && targetInfo == item)
                     {
-                        listPosition = selectedIndex;
+                        // Found a match; set the selected index to this one.
+                        selectedIndex = i;
+
+                        // Set current panel selection.
+                        InfoPanelManager.Panel.CurrentTargetItem = propListItem;
+
+                        // If the selected index is outside the current visibility range, move the to show it.
+                        if (selectedIndex < listPosition || selectedIndex > listPosition + m_rows.m_size)
+                        {
+                            listPosition = selectedIndex;
+                        }
+
+                        // Done here; return.
+                        return;
                     }
-
-                    // Done here; return.
-                    return;
                 }
-            }
 
-            // If we got here, we didn't find a match; clear the selection and reset the list position.
-            selectedIndex = -1;
-            listPosition = 0f;
+                // If we got here, we didn't find a match; clear the selection and reset the list position.
+                selectedIndex = -1;
+                listPosition = 0f;
+            }
         }
 
 
@@ -581,7 +581,7 @@ namespace BOB
 
             if (m_rows == null)
             {
-                m_rows = new FastList<UIFastListRow>();
+                m_rows = new FastList<IUIFastListRow>();
                 m_rows.SetCapacity(nbRows);
             }
 
@@ -590,7 +590,7 @@ namespace BOB
                 // Adding missing rows
                 for (int i = m_rows.m_size; i < nbRows; i++)
                 {
-                    m_rows.Add(m_panel.AddUIComponent(m_rowType) as UIFastListRow);
+                    m_rows.Add(m_panel.AddUIComponent(m_rowType) as IUIFastListRow);
                     if (m_canSelect && !selectOnMouseEnter) m_rows[i].eventClick += OnRowClicked;
                     else if (m_canSelect) m_rows[i].eventMouseEnter += OnRowClicked;
                 }
@@ -626,7 +626,6 @@ namespace BOB
                 m_scrollbar.isVisible = isVisible;
             }
 
-            float H = m_rowHeight * m_rowsData.m_size;
             float scrollSize = height * height / (m_rowHeight * m_rowsData.m_size);
             float amount = stepSize * height / (m_rowHeight * m_rowsData.m_size);
 
@@ -710,3 +709,5 @@ namespace BOB
         #endregion
     }
 }
+
+#pragma warning restore IDE1006 // Naming Styles
