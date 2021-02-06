@@ -170,6 +170,10 @@ namespace BOB
             applyButton.eventClicked += (control, clickEvent) => SetPackStatus(true);
             revertButton.eventClicked += (control, clickEvent) => SetPackStatus(false);
 
+            // Buttons are disabled to start with.
+            applyButton.Disable();
+            revertButton.Disable();
+
             // Populate list.
             packSelection.rowsData = PackReplacement.GetPackFastList();
 
@@ -207,6 +211,18 @@ namespace BOB
         /// </summary>
         private void UpdateButtonStates()
         {
+            // No pack selection.
+            if (selectedPack == null)
+            {
+                // Disable all buttons and cancel tooltips.
+                applyButton.tooltip = "";
+                revertButton.tooltip = "";
+                applyButton.Disable();
+                revertButton.Disable();
+
+                return;
+            }    
+
             // Check status of current pack.
             if (PackReplacement.GetPackStatus(selectedPack))
             {
