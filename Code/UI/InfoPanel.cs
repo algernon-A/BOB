@@ -52,25 +52,25 @@ namespace BOB
 				base.Setup(parentTransform, targetPrefabInfo);
 
 				// Get text maximum width.
-				float textWidth = MiddleWidth - (Margin * 2);
+				float textWidth = MiddleWidth - Margin;
 
 				// Replace all button.
 				replaceAllButton = UIControls.AddButton(this, LeftWidth + (Margin * 2), ReplaceAllY, ReplaceAllLabel, 190f);
 
 				// Angle label and textfield.
-				UILabel angleLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), AngleY, Translations.Translate("BOB_PNL_ANG"), textWidth);
+				UILabel angleLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), AngleY, Translations.Translate("BOB_PNL_ANG"), textWidth, 0.9f);
 				angleField = UIControls.AddTextField(this, LeftWidth + (Margin * 2), AngleY + LabelHeight, width: TextFieldWidth);
 
 				// Offset X position.
-				UILabel xLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), XOffsetY, Translations.Translate("BOB_PNL_XOF"), textWidth);
+				UILabel xLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), XOffsetY, Translations.Translate("BOB_PNL_XOF"), textWidth, 0.9f);
 				xField = UIControls.AddTextField(this, LeftWidth + (Margin * 2), XOffsetY + LabelHeight, width: TextFieldWidth);
 
 				// Offset Y position.
-				UILabel yLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), YOffsetY, Translations.Translate("BOB_PNL_YOF"), textWidth);
+				UILabel yLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), YOffsetY, Translations.Translate("BOB_PNL_YOF"), textWidth, 0.9f);
 				yField = UIControls.AddTextField(this, LeftWidth + (Margin * 2), YOffsetY + LabelHeight, width: TextFieldWidth);
 
 				// Offset Z position.
-				UILabel zLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), ZOffsetY, Translations.Translate("BOB_PNL_ZOF"), textWidth);
+				UILabel zLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), ZOffsetY, Translations.Translate("BOB_PNL_ZOF"), textWidth, 0.9f);
 				zField = UIControls.AddTextField(this, LeftWidth + (Margin * 2), ZOffsetY + LabelHeight, width: TextFieldWidth);
 
 				// Add checkboxes.
