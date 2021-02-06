@@ -2,7 +2,7 @@
 
 - Fix replacement probability not always being properly restored when reverting to an all-building or all-network replacement
 - Fix textfield widths in info panel
-- Fix network LODs not refreshing after reverting all-network replacements
+- Fix LODs not refreshing after reverting all-network replacements
 
 
 Version 0.4.2 -

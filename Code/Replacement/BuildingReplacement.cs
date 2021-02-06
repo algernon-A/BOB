@@ -399,7 +399,7 @@ namespace BOB
 		/// Refreshes a building prefab's render (e.g. to regenerate a LOD with new props).
 		/// </summary>
 		/// <param name="buildingPrefab">Building prefab to refresh</param>
-		private static void RefreshBuilding(BuildingInfo buildingPrefab)
+		internal static void RefreshBuilding(BuildingInfo buildingPrefab)
         {
 			// Need to do this for each building instance, so iterate through all buildings.
 			Building[] buildings = BuildingManager.instance.m_buildings.m_buffer;

@@ -62,6 +62,9 @@ namespace BOB
 				propReference.building.m_props[propReference.propIndex].m_radAngle = propReference.radAngle;
 				propReference.building.m_props[propReference.propIndex].m_position = propReference.postion;
 				propReference.building.m_props[propReference.propIndex].m_probability = propReference.probability;
+
+				// Refresh network render.
+				BuildingReplacement.RefreshBuilding(propReference.building);
 			}
 
 			// Remove entry from dictionary, if we're doing so.
