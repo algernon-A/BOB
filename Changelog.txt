@@ -1,4 +1,10 @@
-﻿Version 0.4.2 -
+﻿Version 0.4.3 -
+
+- Fix replacement probability not always being properly restored when reverting to an all-building or all-network replacement
+- Fix textfield widths in info panel
+
+
+Version 0.4.2 -
 
 - Add sub-building selection
 - Guard against level-loading race conditions
