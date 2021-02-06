@@ -1,6 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BOBPackFile>
   <propPacks>
+    <replacementpack name="Tree replacement test">
+      <propReplacements>
+        <replacement isTree ="true" target="Tree2variant" replacement="2278667930.Hazel Tree Street_Data" />
+      </propReplacements>
+    </replacementpack>
     <replacementpack name="US DOT regulatory signs by Spence!">
       <propReplacements>
         <replacement target="Stop Sign" replacement="1779508928.R2 R1-1 Stop Sign_Data" rotation="90" />

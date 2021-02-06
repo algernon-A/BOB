@@ -36,12 +36,14 @@ namespace BOB
     [XmlType("replacement")]
     public struct PropReplacement
     {
+        [XmlAttribute("isTree")]
+        [DefaultValue(false)]
+        public bool isTree;
+
         [XmlAttribute("target")]
-        [DefaultValue("")]
         public string targetName;
 
         [XmlAttribute("replacement")]
-        [DefaultValue("")]
         public string replacementName;
 
         [XmlIgnore]

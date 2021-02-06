@@ -138,6 +138,8 @@ namespace BOB
 					return false;
 				}
 
+				Logging.Message("applying pack ", packName);
+
 				// Iterate through each entry in pack and apply.
 				foreach (KeyValuePair<PrefabInfo, PropReplacement> entry in packRecords[packName])
 				{
@@ -256,8 +258,8 @@ namespace BOB
 						PropReplacement propReplacement = propPack.propReplacements[i];
 
 						// Can we find both target and replacment?
-						PrefabInfo targetInfo = PrefabCollection<PropInfo>.FindLoaded(propReplacement.targetName);
-						propReplacement.replacementInfo = PrefabCollection<PropInfo>.FindLoaded(propReplacement.replacementName);
+						PrefabInfo targetInfo = propReplacement.isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(propReplacement.targetName) : PrefabCollection<PropInfo>.FindLoaded(propReplacement.targetName);
+						propReplacement.replacementInfo = propReplacement.isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(propReplacement.replacementName) : PrefabCollection<PropInfo>.FindLoaded(propReplacement.replacementName);
 						if (targetInfo == null)
 						{
 							// Target prop not found - log and continue.
@@ -404,6 +406,8 @@ namespace BOB
 				return;
 			}
 
+			Logging.Message("applying pack replacement for ", target.name);
+
 			// Check to see if we already have a replacement entry for this prop - if so, revert the replacement first.
 			if (replacements.ContainsKey(target))
 			{
@@ -501,6 +505,7 @@ namespace BOB
 			// Now, iterate through each entry found and apply the replacement to each one.
 			foreach (NetPropReference propReference in replacements[target].references)
 			{
+				Logging.Message("replacing prop ", target.name, " with ", replacements[target].replacementInfo.name);
 				NetworkReplacement.ReplaceProp(replacements[target], propReference);
 			}
 		}
