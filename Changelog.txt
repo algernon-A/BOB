@@ -1,8 +1,8 @@
 ﻿Version 0.4.3 -
 
 - Fix replacement probability not always being properly restored when reverting to an all-building or all-network replacement
+- Fix LODs not refreshing after reverting all-network or all-building replacements
 - Adjust info panel textfield labels to fit longer translation strings
-- Fix LODs not refreshing after reverting all-network replacements
 
 
 Version 0.4.2 -
