@@ -3,6 +3,7 @@
 - Fix replacement probability not always being properly restored when reverting to an all-building or all-network replacement
 - Fix LODs not refreshing after reverting all-network or all-building replacements
 - Adjust info panel textfield labels to fit longer translation strings
+- Update bundled CitiesHarmony to 1.0.6
 
 
 Version 0.4.2 -
