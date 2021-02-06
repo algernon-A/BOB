@@ -77,13 +77,16 @@ namespace BOB
 				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle;
 				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.postion;
 				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_probability = propReference.probability;
+
+				// Refresh network render.
+				NetworkReplacement.RefreshBuilding(propReference.network);
 			}
 
 			// Remove entry from dictionary, if we're doing so.
 			if (removeEntries)
             {
 				replacements.Remove(target);
-            }
+			}
 		}
 
 

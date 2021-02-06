@@ -336,7 +336,7 @@ namespace BOB
 		/// Refreshes a network prefab's render (e.g. to regenerate a LOD with new props).
 		/// </summary>
 		/// <param name="netPrefab">Network prefab to refresh</param>
-		private static void RefreshBuilding(NetInfo netPrefab)
+		internal static void RefreshBuilding(NetInfo netPrefab)
 		{
 			// Need to do this for each segment instance, so iterate through all segments.
 			NetSegment[] segments = NetManager.instance.m_segments.m_buffer;
