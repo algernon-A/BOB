@@ -49,6 +49,18 @@ namespace BOB
         [XmlIgnore]
         public PrefabInfo replacementInfo;
 
+        [XmlAttribute("xOffset")]
+        [DefaultValue(0)]
+        public float xOffset;
+
+        [XmlAttribute("yOffset")]
+        [DefaultValue(0)]
+        public float yOffset;
+
+        [XmlAttribute("zOffset")]
+        [DefaultValue(0)]
+        public float zOffset;
+
         [XmlAttribute("rotation")]
         [DefaultValue(0)]
         public float rotation;

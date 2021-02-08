@@ -6,6 +6,11 @@
         <replacement isTree ="true" target="Tree2variant" replacement="2278667930.Hazel Tree Street_Data" />
       </propReplacements>
     </replacementpack>
+    <replacementpack name="Floating street name signs">
+      <propReplacements>
+        <replacement target="Street Name Sign" replacement="Street Name Sign" yOffset="3.0"/>
+      </propReplacements>
+    </replacementpack>
     <replacementpack name="US DOT regulatory signs by Spence!">
       <propReplacements>
         <replacement target="Stop Sign" replacement="1779508928.R2 R1-1 Stop Sign_Data" rotation="90" />
