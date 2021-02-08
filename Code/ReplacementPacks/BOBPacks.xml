@@ -18,6 +18,9 @@
         <replacement target="Road Arrow F" replacement="2071057587.AU Arrow Straight_Data" />
         <replacement target="Road Arrow LF" replacement="2071057587.AU Arrow Straight Left_Data" />
         <replacement target="Road Arrow FR" replacement="2071057587.AU Arrow Straight Right_Data" />
+        <replacement target="Road Arrow FR" replacement="2071057587.AU Arrow Straight Right_Data" />
+        <replacement target="Road Arrow LFR" replacement="Road Arrow LR" hide="true" />
+        <replacement target="Road Arrow LR" replacement="Road Arrow LFR" hide="true" />
       </propReplacements>
     </replacementpack>
     <replacementpack name="German road arrows">
@@ -27,6 +30,8 @@
         <replacement target="Road Arrow F" replacement="1866391549.DE Arrow Straight_Data" />
         <replacement target="Road Arrow LF" replacement="1866391549.DE Arrow Straight Left_Data" />
         <replacement target="Road Arrow FR" replacement="1866391549.DE Arrow Straight Right_Data" />
+        <replacement target="Road Arrow LFR" replacement="Road Arrow LR" hide="true" />
+        <replacement target="Road Arrow LR" replacement="Road Arrow LFR" hide="true" />
       </propReplacements>
     </replacementpack>
     <replacementpack name="US DOT regulatory signs by Spence!">

@@ -64,5 +64,9 @@ namespace BOB
         [XmlAttribute("rotation")]
         [DefaultValue(0)]
         public float rotation;
+
+        [XmlAttribute("hide")]
+        [DefaultValue(false)]
+        public bool hide;
     }
 }

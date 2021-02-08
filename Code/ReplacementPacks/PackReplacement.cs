@@ -143,7 +143,7 @@ namespace BOB
 				// Iterate through each entry in pack and apply.
 				foreach (KeyValuePair<PrefabInfo, PropReplacement> entry in packRecords[packName])
 				{
-					Apply(entry.Key, entry.Value.replacementInfo, entry.Value.rotation, entry.Value.xOffset, entry.Value.yOffset, entry.Value.zOffset, 100);
+					Apply(entry.Key, entry.Value.replacementInfo, entry.Value.rotation, entry.Value.xOffset, entry.Value.yOffset, entry.Value.zOffset, entry.Value.hide ? 0 : 100);
 				}
 
 				// Return true to indicate sucessful application.
