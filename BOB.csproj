@@ -60,6 +60,7 @@
     <Compile Include="Code\Configuration\ConfigurationUtils.cs" />
     <Compile Include="Code\Configuration\ConfigurationXML.cs" />
     <Compile Include="Code\Logging.cs" />
+    <Compile Include="Code\Patches\OnLevelLoaded.cs" />
     <Compile Include="Code\ReplacementPacks\PackUtils.cs" />
     <Compile Include="Code\ReplacementPacks\PackXML.cs" />
     <Compile Include="Code\UI\PackPanel.cs" />

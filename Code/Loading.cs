@@ -9,6 +9,9 @@ namespace BOB
     /// </summary>
     public class Loading : LoadingExtensionBase
     {
+        // Internal flags.
+        internal static bool isModEnabled = false;
+
         /// <summary>
         /// Called by the game when the mod is initialised at the start of the loading process.
         /// </summary>
@@ -16,6 +19,20 @@ namespace BOB
         public override void OnCreated(ILoading loading)
         {
             Logging.KeyMessage("version ", BOBMod.Version, " loading");
+
+            // Don't do anything if not in game (e.g. if we're going into an editor).
+            if (loading.currentMode != AppMode.Game)
+            {
+                isModEnabled = false;
+                Logging.KeyMessage("not loading into game, skipping activation");
+
+                // Unload Harmony patches and exit before doing anything further.
+                Patcher.UnpatchAll();
+                return;
+            }
+
+            // All good to go at this point.
+            isModEnabled = true;
 
             // Initialise data sets prior to savegame load.
             AllBuildingReplacement.Setup();
@@ -37,38 +54,34 @@ namespace BOB
         {
             base.OnLevelLoaded(mode);
 
-            // Don't do anything if not in game.
-            if (mode != LoadMode.NewGame && mode != LoadMode.LoadGame)
+            // Don't do anything further if we're not operating.
+            if (!isModEnabled)
             {
-                Logging.KeyMessage("not loading into game; exiting");
-                Patcher.UnpatchAll();
+                Logging.Message("exiting");
                 return;
             }
 
-            // Wait for loading to fully complete.
-            while (!LoadingManager.instance.m_loadingComplete) { }
-
-            // Build lists of loaded prefabs.
-            PrefabLists.BuildLists();
-
-            // Load prop packs.
-            PackReplacement.Setup();
-
-            // Load configuration file.
-            ConfigurationUtils.LoadConfig();
-
-            // Initialise select tool.
-            ToolsModifierControl.toolController.gameObject.AddComponent<BOBTool>();
-            Logging.KeyMessage("loading complete");
-
-            // Display update notification.
-            WhatsNew.ShowWhatsNew();
-
-            // Warning message box for 0.3 update if a configuration file exists without the 0.3 notification flag.
-            if (System.IO.File.Exists("TreePropReplacer-config.xml") && !System.IO.File.Exists("BOB-config.xml"))
+            // Check to see that Harmony 2 was properly loaded.
+            if (!Patcher.Patched)
             {
-                ListMessageBox messageBox = MessageBoxBase.ShowModal<ListMessageBox>();
-                messageBox.AddParas("BOB, the Tree and Prop Replacer, has been updated to version 0.3.  As part of this update the configuration file format has changed in order to support expanded functionality.  These changes are NOT backwards-compatible.", "IMPORTANT", "This means that your existing replacements will be lost and will need to be redone.", "The new configuration file format (BOB-config.xml) is now final and will be supported in all future releases.  Your old configuration file (TreePropReplacer-config.xml) has been left unaltered for use as a reference.");
+                // Harmony 2 wasn't loaded; abort.
+                Logging.Error("Harmony patches not applied; aborting");
+                isModEnabled = false;
+
+                // Display warning message.
+                ListMessageBox harmonyBox = MessageBoxBase.ShowModal<ListMessageBox>();
+
+                // Key text items.
+                harmonyBox.AddParas(Translations.Translate("ERR_HAR0"), Translations.Translate("BOB_ERR_HAR"), Translations.Translate("BOB_ERR_FAT"), Translations.Translate("ERR_HAR1"));
+
+                // List of dot points.
+                harmonyBox.AddList(Translations.Translate("ERR_HAR2"), Translations.Translate("ERR_HAR3"));
+
+                // Closing para.
+                harmonyBox.AddParas(Translations.Translate("MES_PAGE"));
+
+                // Don't do anything further.
+                return;
             }
         }
     }
