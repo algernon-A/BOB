@@ -40,7 +40,7 @@ namespace BOB
                         }
 
                         // Got it!  Return.
-                        return plugin.modPath + Path.DirectorySeparatorChar;
+                        return plugin.modPath + Path.DirectorySeparatorChar + "ReplacementPacks" + Path.DirectorySeparatorChar;
                     }
                     catch
                     {
@@ -59,18 +59,19 @@ namespace BOB
         /// Loads an XML configuration file.
         /// </summary>
         /// <returns>Loaded XML configuration file instance (null if failed)</returns>
-        internal static BOBPackFile LoadPackFile()
+        internal static List<BOBPackFile> LoadPackFiles()
         {
-            string filePath = AssemblyPath + PackFileName;
+            // Return list.
+            List<BOBPackFile> fileList = new List<BOBPackFile>();
 
-
-            try
+            // Iterate through each xml file in directory.
+            string[] fileNames = Directory.GetFiles(AssemblyPath, "*.xml", SearchOption.AllDirectories);
+            foreach (string fileName in fileNames)
             {
-                // Check to see if configuration file exists.
-                if (File.Exists(filePath))
+                try
                 {
                     // Read it.
-                    using (StreamReader reader = new StreamReader(filePath))
+                    using (StreamReader reader = new StreamReader(fileName))
                     {
                         XmlSerializer xmlSerializer = new XmlSerializer(typeof(BOBPackFile));
                         if (!(xmlSerializer.Deserialize(reader) is BOBPackFile configurationFile))
@@ -79,22 +80,17 @@ namespace BOB
                         }
                         else
                         {
-                            return configurationFile;
+                            fileList.Add(configurationFile);
                         }
                     }
                 }
-                else
+                catch (Exception e)
                 {
-                    Logging.Message("no pack file found at ", filePath);
+                    Logging.LogException(e, "exception reading XML pack file ", fileName);
                 }
             }
-            catch (Exception e)
-            {
-                Logging.LogException(e, "exception reading XML pack file");
-            }
 
-            // If we got here, we failed; return.
-            return null;
+            return fileList;
         }
     }
 }

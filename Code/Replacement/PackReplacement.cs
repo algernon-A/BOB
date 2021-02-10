@@ -91,7 +91,7 @@ namespace BOB
 			// Create return list from signPacks array.
 			FastList<object> fastList = new FastList<object>()
 			{
-				m_buffer = packRecords.Keys.ToArray(),
+				m_buffer = packRecords.Keys.OrderBy(x => x).ToArray(),
 				m_size = packRecords.Count()
 			};
 			return fastList;
@@ -230,10 +230,10 @@ namespace BOB
 			packEnabled = new Dictionary<string, bool>();
 			packNotAllLoaded = new Dictionary<string, bool>();
 
-			// Read config file.
-			BOBPackFile packFile = PackUtils.LoadPackFile();
+			// Read config files.
+			List<BOBPackFile> packFiles = PackUtils.LoadPackFiles();
 
-			if (packFile != null)
+			foreach (BOBPackFile packFile in packFiles)
 			{
 				// Iterate through each prop pack loaded from the settings file.
 				foreach (PropPack propPack in packFile.propPacks)
