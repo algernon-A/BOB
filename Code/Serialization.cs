@@ -95,7 +95,7 @@ namespace BOB
 
             // Serialize tree replacement dictionary.
             List<string> treeNames = new List<string>();
-            foreach (KeyValuePair<TreeInfo, TreeInfo> replacement in MapTreeReplacement.replacements)
+            foreach (KeyValuePair<TreeInfo, TreeInfo> replacement in MapTreeReplacement.instance.replacements)
             {
                 treeNames.Add(replacement.Key.name);
                 treeNames.Add(replacement.Value.name);
@@ -158,7 +158,7 @@ namespace BOB
                     }
 
                     // If we got here, success!  Add to dictionary.
-                    MapTreeReplacement.replacements.Add(targetTree, replacementTree);
+                    MapTreeReplacement.instance.replacements.Add(targetTree, replacementTree);
                 }
             }
         }

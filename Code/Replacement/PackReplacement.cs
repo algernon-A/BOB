@@ -7,17 +7,30 @@ namespace BOB
 	/// <summary>
 	/// Static class to manage replacement packs.
 	/// </summary>
-	internal static class PackReplacement
+	internal class PackReplacement
 	{
+		// Instance reference.
+		internal static PackReplacement instance;
+
 		// Master dictionary of prop pack replacements.
-		private static Dictionary<string, Dictionary<PrefabInfo, PropReplacement>> packRecords;
+		private Dictionary<string, Dictionary<PrefabInfo, PropReplacement>> packRecords;
 
 		// Master dictionary of replaced prop references.
-		internal static Dictionary<PrefabInfo, BOBNetReplacement> replacements;
+		internal Dictionary<PrefabInfo, BOBNetReplacement> replacements;
 
 		// Pack status dictionaries.
-		private static Dictionary<string, bool> packEnabled;
-		private static Dictionary<string, bool> packNotAllLoaded;
+		private Dictionary<string, bool> packEnabled;
+		private Dictionary<string, bool> packNotAllLoaded;
+
+
+		/// <summary>
+		/// Constructor - initializes instance reference and calls initial setup.
+		/// </summary>
+		internal PackReplacement()
+		{
+			instance = this;
+			Setup();
+		}
 
 
 		/// <summary>
@@ -25,7 +38,7 @@ namespace BOB
 		/// </summary>
 		/// <param name="packName">Replacement pack name</param>
 		/// <returns>True if enabled, false otherwise</returns>
-		internal static bool GetPackStatus(string packName)
+		internal bool GetPackStatus(string packName)
         {
 			if (packEnabled.ContainsKey(packName))
             {
@@ -41,7 +54,7 @@ namespace BOB
 		/// </summary>
 		/// <param name="packName">Replacement pack name</param>
 		/// <param name="status">True to enable, false to disable</param>
-		internal static void SetPackStatus (string packName, bool status)
+		internal void SetPackStatus (string packName, bool status)
         {
 			// Only do stuff if there's an actual change.
 			if (status != packEnabled[packName])
@@ -69,7 +82,7 @@ namespace BOB
 		/// </summary>
 		/// <param name="packName">Replacement pack name</param>
 		/// <returns>True if all replacement props are NOT loaded, false otherwise</returns>
-		internal static bool PackNotAllLoaded(string packName)
+		internal bool PackNotAllLoaded(string packName)
         {
 			// Return dictionary entry, if we have one.
 			if (packNotAllLoaded.ContainsKey(packName))
@@ -86,7 +99,7 @@ namespace BOB
 		/// Returns a list of currently installed packs as a FastList for display.
 		/// </summary>
 		/// <returns>FastList of installed prop packs</returns>
-		internal static FastList<object> GetPackFastList()
+		internal FastList<object> GetPackFastList()
 		{
 			// Create return list from signPacks array.
 			FastList<object> fastList = new FastList<object>()
@@ -103,7 +116,7 @@ namespace BOB
 		/// </summary>
 		/// <param name="packName">Pack name to check</param>
 		/// <returns>True if the pack conflicts with an active pack, false if no conflicts</returns>
-		internal static bool Conflicts(string packName)
+		internal bool Conflicts(string packName)
 		{
 			// Check for conflicts - iterate through all prefabs in this pack.
 			foreach (PrefabInfo prefab in packRecords[packName].Keys)
@@ -126,7 +139,7 @@ namespace BOB
 		/// Applies a replacement pack.
 		/// </summary>
 		/// <returns>True if the pack was successfully applied, false otherwise</returns>
-		private static bool ApplyPack(string packName)
+		private bool ApplyPack(string packName)
 		{
 			// Check for valid value.
 			if (!string.IsNullOrEmpty(packName) && packRecords.ContainsKey(packName))
@@ -161,7 +174,7 @@ namespace BOB
 		/// <summary>
 		/// Reverts a replacement pack.
 		/// </summary>
-		private static void RevertPack(string packName)
+		private void RevertPack(string packName)
 		{
 			// Check for valid value.
 			if (!string.IsNullOrEmpty(packName) && packRecords.ContainsKey(packName))
@@ -182,7 +195,7 @@ namespace BOB
 		/// Serializes the list of active replacement packs into a string list suitable for XML serialization.
 		/// </summary>
 		/// <returns>New string list of active replacement pack names</returns>
-		internal static List<string> SerializeActivePacks()
+		internal List<string> SerializeActivePacks()
         {
 			// Return list.
 			List<string> activePacks = new List<string>();
@@ -206,7 +219,7 @@ namespace BOB
 		/// Deserializes a list of active replacement packs into a list of active
 		/// </summary>
 		/// <param name="activePacks">List of pack names to deserialize</param>
-		internal static void DeserializeActivePacks(List<string> activePacks)
+		internal void DeserializeActivePacks(List<string> activePacks)
 		{
 			// Iterate through the list of active packs.
 			foreach (string packName in activePacks)
@@ -228,7 +241,7 @@ namespace BOB
 		/// <summary>
 		/// Performs setup, loads pack files, and initialises the dictionaries.  Must be called prior to use.
 		/// </summary>
-		internal static void Setup()
+		internal void Setup()
 		{
 			// Initialise dictionaries.
 			packRecords = new Dictionary<string, Dictionary<PrefabInfo, PropReplacement>>();
@@ -302,7 +315,7 @@ namespace BOB
 		/// <summary>
 		/// Reverts all active pack replacements and re-initialises the master dictionaries.
 		/// </summary>
-		internal static void RevertAll()
+		internal void RevertAll()
 		{
 			// Iterate through each entry in the master pack dictionary.
 			foreach (string packName in packEnabled.Keys)
@@ -322,7 +335,7 @@ namespace BOB
 		/// <param name="target">Targeted (original) tree/prop prefab</param>
 		/// <param name="removeEntries">True (default) to remove the reverted entries from the master dictionary, false to leave the dictionary unchanged</param>
 		/// <returns>True if the entire network record was removed from the dictionary (due to no remaining replacements for that prefab), false if the prefab remains in the dictionary (has other active replacements)</returns>
-		private static void Revert(PrefabInfo target, bool removeEntries = true)
+		private void Revert(PrefabInfo target, bool removeEntries = true)
 		{
 			// Don't revert if there's no entry for this reference.
 			if (replacements.ContainsKey(target))
@@ -360,7 +373,7 @@ namespace BOB
 		/// <param name="target">Target prop info</param>
 		/// <param name="laneIndex">Lane index</param>
 		/// <param name="propIndex">Prop index</param>
-		internal static void RemoveEntry(NetInfo netPrefab, PrefabInfo target, int laneIndex, int propIndex)
+		internal void RemoveEntry(NetInfo netPrefab, PrefabInfo target, int laneIndex, int propIndex)
 		{
 			// Check to see if we have an entry for this prefab.
 			if (replacements.ContainsKey(target))
@@ -404,7 +417,7 @@ namespace BOB
 		/// <param name="offsetY">Replacment Y position offset</param>
 		/// <param name="offsetZ">Replacment Z position offset</param>
 		/// <param name="probability">Replacement probability</param>
-		private static void Apply(PrefabInfo target, PrefabInfo replacement, float angle, float offsetX, float offsetY, float offsetZ, int probability)
+		private void Apply(PrefabInfo target, PrefabInfo replacement, float angle, float offsetX, float offsetY, float offsetZ, int probability)
 		{
 			// Make sure that target and replacement are the same type before doing anything.
 			if (target == null || replacement == null || (target is TreeInfo && !(replacement is TreeInfo)) || (target is PropInfo) && !(replacement is PropInfo))
@@ -466,12 +479,12 @@ namespace BOB
 					for (int propIndex = 0; propIndex < network.m_lanes[laneIndex].m_laneProps.m_props.Length; ++propIndex)
 					{
 						// Check for any currently active conflicting replacements.
-						if (NetworkReplacement.GetOriginal(network, laneIndex, propIndex) != null)
+						if (NetworkReplacement.instance.GetOriginal(network, laneIndex, propIndex) != null)
 						{
 							// Active network replacement; skip this one.
 							continue;
 						}
-						else if (AllNetworkReplacement.GetOriginal(network, laneIndex, propIndex) != null)
+						else if (AllNetworkReplacement.instance.GetOriginal(network, laneIndex, propIndex) != null)
 						{
 							// Active all-network replacement; skip this one.
 							continue;
@@ -512,7 +525,7 @@ namespace BOB
 			foreach (NetPropReference propReference in replacements[target].references)
 			{
 				Logging.Message("replacing prop ", target.name, " with ", replacements[target].replacementInfo.name);
-				NetworkReplacement.ReplaceProp(replacements[target], propReference);
+				NetworkReplacement.instance.ReplaceProp(replacements[target], propReference);
 			}
 		}
 
@@ -524,7 +537,7 @@ namespace BOB
 		/// <param name="laneIndex">Lane index to check</param>
 		/// <param name="propIndex">Prop index to check</param>
 		/// <returns>Replacement record if an all-network replacement is currently applied, null if no all-network replacement is currently applied</returns>
-		internal static PrefabInfo GetOriginal(NetInfo netPrefab, int laneIndex, int propIndex)
+		internal PrefabInfo GetOriginal(NetInfo netPrefab, int laneIndex, int propIndex)
 		{
 			// Iterate through each entry in master dictionary.
 			foreach (PrefabInfo target in replacements.Keys)
@@ -554,7 +567,7 @@ namespace BOB
 		/// <param name="laneIndex">Lane index to check</param>
 		/// <param name="propIndex">Prop index to check</param>
 		/// <returns>Replacement record if a all-network replacement is currently applied, null if no all-network replacement is currently applied</returns>
-		internal static BOBNetReplacement ActiveReplacement(NetInfo netPrefab, int laneIndex, int propIndex)
+		internal BOBNetReplacement ActiveReplacement(NetInfo netPrefab, int laneIndex, int propIndex)
 		{
 			// Iterate through each entry in master dictionary.
 			foreach (PrefabInfo target in replacements.Keys)
@@ -585,7 +598,7 @@ namespace BOB
 		/// <param name="laneIndex">Lane index</param>
 		/// <param name="propIndex">Prop index</param>
 		/// <returns>True if a restoration was made, false otherwise</returns>
-		internal static bool Restore(NetInfo netPrefab, PrefabInfo target, int laneIndex, int propIndex)
+		internal bool Restore(NetInfo netPrefab, PrefabInfo target, int laneIndex, int propIndex)
 		{
 			// Check to see if we have an entry for this prefab.
 			if (replacements.ContainsKey(target))
@@ -603,7 +616,7 @@ namespace BOB
 				replacements[target].references.Add(newReference);
 
 				// Apply replacement and return true to indicate restoration.
-				NetworkReplacement.ReplaceProp(replacements[target], newReference);
+				NetworkReplacement.instance.ReplaceProp(replacements[target], newReference);
 				return true;
 			}
 

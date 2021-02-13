@@ -32,7 +32,7 @@ namespace BOB
 			replaceButton.eventClicked += (control, clickEvent) =>
 			{
 				// Apply replacement.
-				MapTreeReplacement.Apply((currentTargetItem.replacementPrefab ?? currentTargetItem.originalPrefab) as TreeInfo, replacementPrefab as TreeInfo);
+				MapTreeReplacement.instance.Apply((currentTargetItem.replacementPrefab ?? currentTargetItem.originalPrefab) as TreeInfo, replacementPrefab as TreeInfo);
 
 				// Update current target.
 				currentTargetItem.replacementPrefab = replacementPrefab;
@@ -51,7 +51,7 @@ namespace BOB
 				if (currentTargetItem != null && currentTargetItem is PropListItem currentItem)
 				{
 					// Individual reversion.
-					MapTreeReplacement.Revert(currentTargetItem.replacementPrefab as TreeInfo);
+					MapTreeReplacement.instance.Revert(currentTargetItem.replacementPrefab as TreeInfo);
 
 					// Clear current target replacement prefab.
 					currentTargetItem.replacementPrefab = null;
@@ -129,7 +129,7 @@ namespace BOB
 				PropListItem propListItem = new PropListItem { showProbs = false };
 
 				// Try to get any tree replacement.
-				propListItem.originalPrefab = MapTreeReplacement.GetOriginal(tree.Info);
+				propListItem.originalPrefab = MapTreeReplacement.instance.GetOriginal(tree.Info);
 
 				// DId we find a current replacment?
 				if (propListItem.originalPrefab == null)

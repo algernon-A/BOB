@@ -74,12 +74,12 @@ namespace BOB
             UIButton nukeButton = (UIButton)helper.AddButton(Translations.Translate("BOB_NUKE"), delegate
             {
                 // Revert all-building and building settings.
-                AllBuildingReplacement.RevertAll();
-                BuildingReplacement.RevertAll();
-                IndividualReplacement.RevertAll();
-                PackReplacement.RevertAll();
-                AllNetworkReplacement.RevertAll();
-                NetworkReplacement.RevertAll();
+                AllBuildingReplacement.instance.RevertAll();
+                BuildingReplacement.instance.RevertAll();
+                IndividualReplacement.instance.RevertAll();
+                PackReplacement.instance.RevertAll();
+                AllNetworkReplacement.instance.RevertAll();
+                NetworkReplacement.instance.RevertAll();
 
                 // Save configuration.
                 ConfigurationUtils.SaveConfig();

@@ -61,7 +61,7 @@ namespace BOB
 						}
 
 						// Deserialise active replacement packs.
-						PackReplacement.DeserializeActivePacks(configFile.activePacks);
+						PackReplacement.instance.DeserializeActivePacks(configFile.activePacks);
 					}
 				}
 				else
@@ -97,45 +97,45 @@ namespace BOB
 
 					// Serialise building replacements, per building.
 					configFile.buildings = new List<BOBBuildingElement>();
-					foreach (BuildingInfo building in BuildingReplacement.replacements.Keys)
+					foreach (BuildingInfo building in BuildingReplacement.instance.replacements.Keys)
 					{
 						// Create new element.
 						configFile.buildings.Add(new BOBBuildingElement
 						{
 							building = building.name,
-							replacements = BuildingReplacement.replacements[building].Values.ToList()
+							replacements = BuildingReplacement.instance.replacements[building].Values.ToList()
 						});
 					}
 
 					// Serialise individual building prop replacements, per building.
 					configFile.indBuildings = new List<BOBBuildingElement>();
-					foreach (BuildingInfo building in IndividualReplacement.replacements.Keys)
+					foreach (BuildingInfo building in IndividualReplacement.instance.replacements.Keys)
 					{
 						// Create new element.
 						configFile.indBuildings.Add(new BOBBuildingElement
 						{
 							building = building.name,
-							replacements = IndividualReplacement.replacements[building].Values.ToList()
+							replacements = IndividualReplacement.instance.replacements[building].Values.ToList()
 						});
 					}
 
 					// Serialise all-network replacements.
-					configFile.allNetworkProps = AllNetworkReplacement.replacements.Values.ToList();
+					configFile.allNetworkProps = AllNetworkReplacement.instance.replacements.Values.ToList();
 
 					// Serialise network replacements, per network.
 					configFile.networks = new List<BOBNetworkElement>();
-					foreach (NetInfo network in NetworkReplacement.replacements.Keys)
+					foreach (NetInfo network in NetworkReplacement.instance.replacements.Keys)
 					{
 						// Create new element.
 						configFile.networks.Add(new BOBNetworkElement
 						{
 							network = network.name,
-							replacements = NetworkReplacement.replacements[network].Values.ToList()
+							replacements = NetworkReplacement.instance.replacements[network].Values.ToList()
 						});
 					}
 
 					// Serialise active replacement packs.
-					configFile.activePacks = PackReplacement.SerializeActivePacks();
+					configFile.activePacks = PackReplacement.instance.SerializeActivePacks();
 
 					// Write to file.
 					xmlSerializer.Serialize(textWriter, configFile);
@@ -174,7 +174,7 @@ namespace BOB
 				}
 
 				// If we got here, it's all good; apply the all-network replacement.
-				AllNetworkReplacement.Apply(targetPrefab, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
+				AllNetworkReplacement.instance.Apply(targetPrefab, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
 			}
 		}
 
@@ -214,7 +214,7 @@ namespace BOB
 				}
 
 				// If we got here, it's all good; apply the network replacement.
-				NetworkReplacement.Apply(networkInfo, targetPrefab, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
+				NetworkReplacement.instance.Apply(networkInfo, targetPrefab, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
 			}
 		}
 
@@ -246,7 +246,7 @@ namespace BOB
 
 				// If we got here, it's all good; apply the all-network replacement.
 				Logging.Message("applying all-building replacement ", targetPrefab.name, " to ", replacementPrefab.name);
-				AllBuildingReplacement.Apply(targetPrefab, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
+				AllBuildingReplacement.instance.Apply(targetPrefab, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
 			}
 		}
 
@@ -287,7 +287,7 @@ namespace BOB
 
 				// If we got here, it's all good; apply the building replacement.
 				Logging.Message("applying building replacement ", targetPrefab.name, " to ", replacementPrefab.name, " in ", buildingInfo.name);
-				BuildingReplacement.Apply(buildingInfo, targetPrefab, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
+				BuildingReplacement.instance.Apply(buildingInfo, targetPrefab, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
 			}
 		}
 
@@ -326,7 +326,7 @@ namespace BOB
 				}
 
 				// If we got here, it's all good; apply the building replacement.
-				IndividualReplacement.Apply(buildingInfo, targetPrefab, replacement.index, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
+				IndividualReplacement.instance.Apply(buildingInfo, targetPrefab, replacement.index, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
 			}
 		}
 	}

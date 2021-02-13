@@ -35,12 +35,12 @@ namespace BOB
             isModEnabled = true;
 
             // Initialise data sets prior to savegame load.
-            AllBuildingReplacement.Setup();
-            AllNetworkReplacement.Setup();
-            BuildingReplacement.Setup();
-            NetworkReplacement.Setup();
-            IndividualReplacement.Setup();
-            MapTreeReplacement.Setup();
+            new AllBuildingReplacement();
+            new AllNetworkReplacement();
+            new BuildingReplacement();
+            new NetworkReplacement();
+            new IndividualReplacement();
+            new MapTreeReplacement();
 
             base.OnCreated(loading);
         }

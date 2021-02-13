@@ -175,7 +175,7 @@ namespace BOB
             revertButton.Disable();
 
             // Populate list.
-            packSelection.rowsData = PackReplacement.GetPackFastList();
+            packSelection.rowsData = PackReplacement.instance.GetPackFastList();
 
             // Focus.
             BringToFront();
@@ -190,7 +190,7 @@ namespace BOB
         private void SetPackStatus(bool status)
         {
             // Set pack status,
-            PackReplacement.SetPackStatus(selectedPack, status);
+            PackReplacement.instance.SetPackStatus(selectedPack, status);
             ConfigurationUtils.SaveConfig();
             packSelection.Refresh();
 
@@ -224,7 +224,7 @@ namespace BOB
             }    
 
             // Check status of current pack.
-            if (PackReplacement.GetPackStatus(selectedPack))
+            if (PackReplacement.instance.GetPackStatus(selectedPack))
             {
                 // Pack is currently applied - enable revert button and disable apply button.
                 revertButton.tooltip = Translations.Translate("BOB_PCK_RVT_A");
@@ -235,7 +235,7 @@ namespace BOB
             else
             {
                 // Pack is not currently applied - check for pack conflicts.
-                if (PackReplacement.Conflicts(selectedPack))
+                if (PackReplacement.instance.Conflicts(selectedPack))
                 {
                     // Conflict detected - disable apply button and add explanatory tooltip.
                     applyButton.tooltip = Translations.Translate("BOB_PCK_APP_C");
@@ -358,8 +358,8 @@ namespace BOB
             packLabel.text = thisPack;
 
             // Set sprite status.
-            bool packStatus = PackReplacement.GetPackStatus(thisPack);
-            bool notAllLoaded = PackReplacement.PackNotAllLoaded(thisPack);
+            bool packStatus = PackReplacement.instance.GetPackStatus(thisPack);
+            bool notAllLoaded = PackReplacement.instance.PackNotAllLoaded(thisPack);
             statusSprite.spriteName = packStatus ? "AchievementCheckedTrue" : "AchievementCheckedFalse";
             statusSprite.tooltip = packStatus ? Translations.Translate("BOB_PCK_APP_I") : Translations.Translate("BOB_PCK_RVT_I");
             if (notAllLoaded)

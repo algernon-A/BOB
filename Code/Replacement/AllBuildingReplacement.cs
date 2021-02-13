@@ -6,16 +6,29 @@ namespace BOB
 	/// <summary>
 	/// Static class to manage all-builing prop and tree replacements.
 	/// </summary>
-	internal static class AllBuildingReplacement
+	internal class AllBuildingReplacement
 	{
+		// Instance reference.
+		internal static AllBuildingReplacement instance;
+
 		// Master dictionary of replaced prop references.
 		internal static Dictionary<PrefabInfo, BOBBuildingReplacement> replacements;
 
 
 		/// <summary>
+		/// Constructor - initializes instance reference and calls initial setup.
+		/// </summary>
+		internal AllBuildingReplacement()
+		{
+			instance = this;
+			Setup();
+		}
+
+
+		/// <summary>
 		/// Performs setup and initialises the master dictionary.  Must be called prior to use.
 		/// </summary>
-		internal static void Setup()
+		internal void Setup()
 		{
 			replacements = new Dictionary<PrefabInfo, BOBBuildingReplacement>();
 		}
@@ -24,7 +37,7 @@ namespace BOB
 		/// <summary>
 		/// Reverts all active all-building replacements and re-initialises the master dictionary.
 		/// </summary>
-		internal static void RevertAll()
+		internal void RevertAll()
 		{
 			// Iterate through each entry in the master prop dictionary.
 			foreach (PrefabInfo prop in replacements.Keys)
@@ -44,7 +57,7 @@ namespace BOB
 		/// <param name="target">Targeted (original) tree/prop prefab</param>
 		/// <param name="removeEntries">True (default) to remove the reverted entries from the master dictionary, false to leave the dictionary unchanged</param>
 		/// <returns>True if the entire building record was removed from the dictionary (due to no remaining replacements for that prefab), false if the prefab remains in the dictionary (has other active replacements)</returns>
-		internal static void Revert(PrefabInfo target, bool removeEntries = true)
+		internal void Revert(PrefabInfo target, bool removeEntries = true)
 		{
 			// Iterate through each entry in our dictionary.
 			foreach (BuildingPropReference propReference in replacements[target].references)
@@ -63,7 +76,7 @@ namespace BOB
 				propReference.building.m_props[propReference.propIndex].m_probability = propReference.probability;
 
 				// Refresh network render.
-				BuildingReplacement.RefreshBuilding(propReference.building);
+				BuildingReplacement.instance.RefreshBuilding(propReference.building);
 			}
 
 			// Remove entry from dictionary, if we're doing so.
@@ -81,7 +94,7 @@ namespace BOB
 		/// <param name="target">Target prop info</param>
 		/// <param name="laneIndex">Lane index</param>
 		/// <param name="propIndex">Prop index</param>
-		internal static void RemoveEntry(BuildingInfo buildingPrefab, PrefabInfo target, int propIndex)
+		internal void RemoveEntry(BuildingInfo buildingPrefab, PrefabInfo target, int propIndex)
 		{
 			// Check to see if we have an entry for this prefab.
 			if (replacements.ContainsKey(target))
@@ -125,7 +138,7 @@ namespace BOB
 		/// <param name="offsetY">Replacment Y position offset</param>
 		/// <param name="offsetZ">Replacment Z position offset</param>
 		/// <param name="probability">Replacement probability</param>
-		internal static void Apply(PrefabInfo target, PrefabInfo replacement, float angle, float offsetX, float offsetY, float offsetZ, int probability)
+		internal void Apply(PrefabInfo target, PrefabInfo replacement, float angle, float offsetX, float offsetY, float offsetZ, int probability)
 		{
 			// Make sure that target and replacement are the same type before doing anything.
 			if (target == null || replacement == null || (target is TreeInfo && !(replacement is TreeInfo)) || (target is PropInfo) && !(replacement is PropInfo))
@@ -175,7 +188,7 @@ namespace BOB
 				for (int propIndex = 0; propIndex < building.m_props.Length; ++propIndex)
 				{
 					// Check for any currently active building or individual building prop replacement.
-					if (BuildingReplacement.GetOriginal(building, propIndex) != null || IndividualReplacement.GetOriginal(building, propIndex) != null)
+					if (BuildingReplacement.instance.GetOriginal(building, propIndex) != null || IndividualReplacement.instance.GetOriginal(building, propIndex) != null)
 					{
 						// Active building replacement; skip this one.
 						continue;
@@ -203,7 +216,7 @@ namespace BOB
 			// Now, iterate through each entry found and apply the replacement to each one.
 			foreach (BuildingPropReference propReference in replacements[target].references)
 			{
-				BuildingReplacement.ReplaceProp(replacements[target], propReference);
+				BuildingReplacement.instance.ReplaceProp(replacements[target], propReference);
 			}
 		}
 
@@ -214,7 +227,7 @@ namespace BOB
 		/// <param name="buildingPrefab">Building prefab to check</param>
 		/// <param name="propIndex">Prop index to check</param>
 		/// <returns>Replacement record if an all-building replacement is currently applied, null if no all-building replacement is currently applied</returns>
-		internal static PrefabInfo GetOriginal(BuildingInfo buildingPrefab, int propIndex)
+		internal PrefabInfo GetOriginal(BuildingInfo buildingPrefab, int propIndex)
 		{
 			// Iterate through each entry in master dictionary.
 			foreach (PrefabInfo target in replacements.Keys)
@@ -243,7 +256,7 @@ namespace BOB
 		/// <param name="buildingPrefab">Building prefab to check</param>
 		/// <param name="propIndex">Prop index to check</param>
 		/// <returns>Replacement record if an all-building replacement is currently applied, null if no all-building replacement is currently applied</returns>
-		internal static BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingPrefab, int propIndex)
+		internal BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingPrefab, int propIndex)
 		{
 			// Iterate through each entry in master dictionary.
 			foreach (PrefabInfo target in replacements.Keys)
@@ -272,7 +285,7 @@ namespace BOB
 		/// <param name="buildingPrefab">Building prefab</param>
 		/// <param name="target">Target prop info</param>
 		/// <param name="propIndex">Prop index</param>
-		internal static void Restore(BuildingInfo buildingPrefab, PrefabInfo target, int propIndex)
+		internal void Restore(BuildingInfo buildingPrefab, PrefabInfo target, int propIndex)
 		{
 			// Check to see if we have an entry for this prefab.
 			if (replacements.ContainsKey(target))
@@ -290,7 +303,7 @@ namespace BOB
 				replacements[target].references.Add(newReference);
 
 				// Apply replacement.
-				BuildingReplacement.ReplaceProp(replacements[target], newReference);
+				BuildingReplacement.instance.ReplaceProp(replacements[target], newReference);
 			}
 		}
 	}

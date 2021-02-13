@@ -21,17 +21,29 @@ namespace BOB
 	/// <summary>
 	/// Static class to manage all-network prop and tree replacements.
 	/// </summary>
-	internal static class AllNetworkReplacement
+	internal class AllNetworkReplacement
 	{
-		// Master dictionary of replaced prop references.
-		internal static Dictionary<PrefabInfo, BOBNetReplacement> replacements;
+		// Instance reference.
+		internal static AllNetworkReplacement instance;
 
+		// Master dictionary of replaced prop references.
+		internal Dictionary<PrefabInfo, BOBNetReplacement> replacements;
+
+
+		/// <summary>
+		/// Constructor - initializes instance reference and calls initial setup.
+		/// </summary>
+		internal AllNetworkReplacement()
+		{
+			instance = this;
+			Setup();
+		}
 
 
 		/// <summary>
 		/// Performs setup and initialises the master dictionary.  Must be called prior to use.
 		/// </summary>
-		internal static void Setup()
+		internal void Setup()
 		{
 			replacements = new Dictionary<PrefabInfo, BOBNetReplacement>();
 		}
@@ -40,7 +52,7 @@ namespace BOB
 		/// <summary>
 		/// Reverts all active all-network replacements and re-initialises the master dictionary.
 		/// </summary>
-		internal static void RevertAll()
+		internal void RevertAll()
 		{
 			// Iterate through each entry in the master prop dictionary.
 			foreach (PrefabInfo prop in replacements.Keys)
@@ -60,7 +72,7 @@ namespace BOB
 		/// <param name="target">Targeted (original) tree/prop prefab</param>
 		/// <param name="removeEntries">True (default) to remove the reverted entries from the master dictionary, false to leave the dictionary unchanged</param>
 		/// <returns>True if the entire network record was removed from the dictionary (due to no remaining replacements for that prefab), false if the prefab remains in the dictionary (has other active replacements)</returns>
-		internal static void Revert(PrefabInfo target, bool removeEntries = true)
+		internal void Revert(PrefabInfo target, bool removeEntries = true)
 		{
 			// Iterate through each entry in our dictionary.
 			foreach (NetPropReference propReference in replacements[target].references)
@@ -79,9 +91,9 @@ namespace BOB
 				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_probability = propReference.probability;
 
 				// Refresh network render.
-				NetworkReplacement.RefreshBuilding(propReference.network);
+				NetworkReplacement.instance.RefreshBuilding(propReference.network);
 				// Restore any pack replacement.
-				PackReplacement.Restore(propReference.network, target, propReference.laneIndex, propReference.propIndex);
+				PackReplacement.instance.Restore(propReference.network, target, propReference.laneIndex, propReference.propIndex);
 			}
 
 			// Remove entry from dictionary, if we're doing so.
@@ -102,7 +114,7 @@ namespace BOB
 		/// <param name="target">Target prop info</param>
 		/// <param name="laneIndex">Lane index</param>
 		/// <param name="propIndex">Prop index</param>
-		internal static void RemoveEntry(NetInfo netPrefab, PrefabInfo target, int laneIndex, int propIndex)
+		internal void RemoveEntry(NetInfo netPrefab, PrefabInfo target, int laneIndex, int propIndex)
 		{
 			// Check to see if we have an entry for this prefab.
 			if (replacements.ContainsKey(target))
@@ -146,7 +158,7 @@ namespace BOB
 		/// <param name="offsetY">Replacment Y position offset</param>
 		/// <param name="offsetZ">Replacment Z position offset</param>
 		/// <param name="probability">Replacement probability</param>
-		internal static void Apply(PrefabInfo target, PrefabInfo replacement, float angle, float offsetX, float offsetY, float offsetZ, int probability)
+		internal void Apply(PrefabInfo target, PrefabInfo replacement, float angle, float offsetX, float offsetY, float offsetZ, int probability)
 		{
 			// Make sure that target and replacement are the same type before doing anything.
 			if (target == null || replacement == null || (target is TreeInfo && !(replacement is TreeInfo)) || (target is PropInfo) && !(replacement is PropInfo))
@@ -206,14 +218,14 @@ namespace BOB
 					for (int propIndex = 0; propIndex < network.m_lanes[laneIndex].m_laneProps.m_props.Length; ++propIndex)
 					{
 						// Check for any currently active network replacement.
-						if (NetworkReplacement.GetOriginal(network, laneIndex, propIndex) != null)
+						if (NetworkReplacement.instance.GetOriginal(network, laneIndex, propIndex) != null)
 						{
 							// Active network replacement; skip this one.
 							continue;
 						}
 
 						// Check for any existing pack replacement.
-						PrefabInfo thisProp = PackReplacement.GetOriginal(network, laneIndex, propIndex);
+						PrefabInfo thisProp = PackReplacement.instance.GetOriginal(network, laneIndex, propIndex);
 						if (thisProp == null)
 						{
 							// No active replacement; use current PropInfo.
@@ -249,9 +261,9 @@ namespace BOB
 			foreach (NetPropReference propReference in replacements[target].references)
 			{
 				// Reset any pack replacements first.
-				PackReplacement.RemoveEntry(propReference.network, target, propReference.laneIndex, propReference.propIndex);
+				PackReplacement.instance.RemoveEntry(propReference.network, target, propReference.laneIndex, propReference.propIndex);
 
-				NetworkReplacement.ReplaceProp(replacements[target], propReference);
+				NetworkReplacement.instance.ReplaceProp(replacements[target], propReference);
 			}
 
 			// Finally, call a recalculation of NS2 skins.
@@ -266,7 +278,7 @@ namespace BOB
 		/// <param name="laneIndex">Lane index to check</param>
 		/// <param name="propIndex">Prop index to check</param>
 		/// <returns>Replacement record if an all-network replacement is currently applied, null if no all-network replacement is currently applied</returns>
-		internal static PrefabInfo GetOriginal(NetInfo netPrefab, int laneIndex, int propIndex)
+		internal PrefabInfo GetOriginal(NetInfo netPrefab, int laneIndex, int propIndex)
 		{
 			// Iterate through each entry in master dictionary.
 			foreach (PrefabInfo target in replacements.Keys)
@@ -296,7 +308,7 @@ namespace BOB
 		/// <param name="laneIndex">Lane index to check</param>
 		/// <param name="propIndex">Prop index to check</param>
 		/// <returns>Replacement record if a all-network replacement is currently applied, null if no all-network replacement is currently applied</returns>
-		internal static BOBNetReplacement ActiveReplacement(NetInfo netPrefab, int laneIndex, int propIndex)
+		internal BOBNetReplacement ActiveReplacement(NetInfo netPrefab, int laneIndex, int propIndex)
 		{
 			// Iterate through each entry in master dictionary.
 			foreach (PrefabInfo target in replacements.Keys)
@@ -327,7 +339,7 @@ namespace BOB
 		/// <param name="laneIndex">Lane index</param>
 		/// <param name="propIndex">Prop index</param>
 		/// <returns>True if a restoration was made, false otherwise</returns>
-		internal static bool Restore(NetInfo netPrefab, PrefabInfo target, int laneIndex, int propIndex)
+		internal bool Restore(NetInfo netPrefab, PrefabInfo target, int laneIndex, int propIndex)
 		{
 			// Check to see if we have an entry for this prefab.
 			if (replacements.ContainsKey(target))
@@ -346,7 +358,7 @@ namespace BOB
 				replacements[target].references.Add(newReference);
 
 				// Apply replacement and return true to indicate restoration.
-				NetworkReplacement.ReplaceProp(replacements[target], newReference);
+				NetworkReplacement.instance.ReplaceProp(replacements[target], newReference);
 				return true;
 			}
 

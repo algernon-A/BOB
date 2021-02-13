@@ -4,20 +4,32 @@ using ColossalFramework;
 
 namespace BOB
 {
-	internal static class MapTreeReplacement
+	internal class MapTreeReplacement
 	{
+		// Instance reference.
+		internal static MapTreeReplacement instance;
+
 		// Master dictionary of replaced tree prefabs.
-		internal static Dictionary<TreeInfo, TreeInfo> replacements;
+		internal Dictionary<TreeInfo, TreeInfo> replacements;
+
+
+		/// <summary>
+		/// Constructor - initializes instance reference and calls initial setup.
+		/// </summary>
+		internal MapTreeReplacement()
+		{
+			instance = this;
+			Setup();
+		}
 
 
 		/// <summary>
 		/// Performs setup and initialises the master dictionary.  Must be called prior to use.
 		/// </summary>
-		internal static void Setup()
+		internal void Setup()
 		{
 			replacements = new Dictionary<TreeInfo, TreeInfo>();
 		}
-
 
 
 		/// <summary>
@@ -25,7 +37,7 @@ namespace BOB
 		/// </summary>
 		/// <param name="target">Tree to replace</param>
 		/// <param name="replacement">Replacement tree</param>
-		internal static void Apply(TreeInfo target, TreeInfo replacement)
+		internal void Apply(TreeInfo target, TreeInfo replacement)
 		{
 			// Check to see if we already have a replacement entry for this tree - if so, revert the replacement first.
 			if (replacements.ContainsKey(target))
@@ -49,7 +61,7 @@ namespace BOB
 		/// </summary>
 		/// <param name="tree">Applied replacment tree prefab</param>
 		/// <returns>True if the entire building record was removed from the dictionary (due to no remaining replacements for that prefab), false if the prefab remains in the dictionary (has other active replacements)</returns>
-		internal static void Revert(TreeInfo tree)
+		internal void Revert(TreeInfo tree)
 		{
 			// Safety check.
 			if (tree == null || !replacements.ContainsKey(tree))
@@ -70,7 +82,7 @@ namespace BOB
 		/// </summary>
 		/// <param name="treePrefab">Tree prefab to check</param>
 		/// <returns>Original prefab if a map tree replacement is currently recorded, null if no map tree replacement is currently recorded</returns>
-		internal static TreeInfo GetOriginal(TreeInfo treePrefab)
+		internal TreeInfo GetOriginal(TreeInfo treePrefab)
 		{
 			// Safety check.
 			if (treePrefab != null && replacements.ContainsKey(treePrefab))
@@ -89,7 +101,7 @@ namespace BOB
 		/// </summary>
 		/// <param name="target">Tree to replace</param>
 		/// <param name="replacement">Replacement tree</param>
-		private static void ReplaceTrees(TreeInfo target, TreeInfo replacement)
+		private void ReplaceTrees(TreeInfo target, TreeInfo replacement)
 		{
 			// Check for valid parameters.
 			if (target != null && replacement != null)

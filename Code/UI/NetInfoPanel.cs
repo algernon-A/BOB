@@ -32,20 +32,20 @@ namespace BOB
 				// If we've got a replacement, update the offset fields with the replacement vlues
 				if (currentTargetItem.replacementPrefab != null)
 				{
-					angleField.text = NetworkReplacement.replacements[currentNet][currentTargetItem.originalPrefab].angle.ToString();
-					xField.text = NetworkReplacement.replacements[currentNet][currentTargetItem.originalPrefab].offsetX.ToString();
-					yField.text = NetworkReplacement.replacements[currentNet][currentTargetItem.originalPrefab].offsetY.ToString();
-					zField.text = NetworkReplacement.replacements[currentNet][currentTargetItem.originalPrefab].offsetZ.ToString();
-					probabilityField.text = NetworkReplacement.replacements[currentNet][currentTargetItem.originalPrefab].probability.ToString();
+					angleField.text = NetworkReplacement.instance.replacements[currentNet][currentTargetItem.originalPrefab].angle.ToString();
+					xField.text = NetworkReplacement.instance.replacements[currentNet][currentTargetItem.originalPrefab].offsetX.ToString();
+					yField.text = NetworkReplacement.instance.replacements[currentNet][currentTargetItem.originalPrefab].offsetY.ToString();
+					zField.text = NetworkReplacement.instance.replacements[currentNet][currentTargetItem.originalPrefab].offsetZ.ToString();
+					probabilityField.text = NetworkReplacement.instance.replacements[currentNet][currentTargetItem.originalPrefab].probability.ToString();
 				}
 				// Ditto for any all-network replacement.
 				else if (currentTargetItem.allPrefab != null)
 				{
-					angleField.text = AllNetworkReplacement.replacements[currentTargetItem.originalPrefab].angle.ToString();
-					xField.text = AllNetworkReplacement.replacements[currentTargetItem.originalPrefab].offsetX.ToString();
-					yField.text = AllNetworkReplacement.replacements[currentTargetItem.originalPrefab].offsetY.ToString();
-					zField.text = AllNetworkReplacement.replacements[currentTargetItem.originalPrefab].offsetZ.ToString();
-					probabilityField.text = AllNetworkReplacement.replacements[currentTargetItem.originalPrefab].probability.ToString();
+					angleField.text = AllNetworkReplacement.instance.replacements[currentTargetItem.originalPrefab].angle.ToString();
+					xField.text = AllNetworkReplacement.instance.replacements[currentTargetItem.originalPrefab].offsetX.ToString();
+					yField.text = AllNetworkReplacement.instance.replacements[currentTargetItem.originalPrefab].offsetY.ToString();
+					zField.text = AllNetworkReplacement.instance.replacements[currentTargetItem.originalPrefab].offsetZ.ToString();
+					probabilityField.text = AllNetworkReplacement.instance.replacements[currentTargetItem.originalPrefab].probability.ToString();
 				}
 				else
                 {
@@ -186,7 +186,7 @@ namespace BOB
 					probabilityField.text = probability.ToString();
 
 					// Network replacements are always grouped.
-					NetworkReplacement.Apply(currentNet, currentTargetItem.originalPrefab ?? currentTargetItem.replacementPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
+					NetworkReplacement.instance.Apply(currentNet, currentTargetItem.originalPrefab ?? currentTargetItem.replacementPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
 
 					// Save configuration file and refresh target list (to reflect our changes).
 					ConfigurationUtils.SaveConfig();
@@ -215,7 +215,7 @@ namespace BOB
 				probabilityField.text = probability.ToString();
 
 				// Apply replacement.
-				AllNetworkReplacement.Apply(currentTargetItem.originalPrefab ?? currentTargetItem.replacementPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
+				AllNetworkReplacement.instance.Apply(currentTargetItem.originalPrefab ?? currentTargetItem.replacementPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
 
 				// Save configuration file and refresh building list (to reflect our changes).
 				ConfigurationUtils.SaveConfig();
@@ -235,7 +235,7 @@ namespace BOB
 					if (currentTargetItem != null && currentTargetItem is NetPropListItem currentNetItem)
 					{
 						// Network replacements are always grouped.
-						NetworkReplacement.Revert(currentNet, currentTargetItem.originalPrefab, true);
+						NetworkReplacement.instance.Revert(currentNet, currentTargetItem.originalPrefab, true);
 
 						// Save configuration file and refresh building list (to reflect our changes).
 						ConfigurationUtils.SaveConfig();
@@ -251,7 +251,7 @@ namespace BOB
 					if (currentTargetItem.originalPrefab)
 					{
 						// Apply all-network reversion.
-						AllNetworkReplacement.Revert(currentTargetItem.originalPrefab, true);
+						AllNetworkReplacement.instance.Revert(currentTargetItem.originalPrefab, true);
 
 						// Save configuration file and refresh target list (to reflect our changes).
 						ConfigurationUtils.SaveConfig();
@@ -281,7 +281,7 @@ namespace BOB
 			int propIndex = propListItem.indexes[0];
 
 			// All-network replacement and original probability (if any).
-			BOBNetReplacement allNetReplacement = AllNetworkReplacement.ActiveReplacement(currentNet, lane, propIndex);
+			BOBNetReplacement allNetReplacement = AllNetworkReplacement.instance.ActiveReplacement(currentNet, lane, propIndex);
 			if (allNetReplacement != null)
 			{
 				propListItem.allPrefab = allNetReplacement.replacementInfo;
@@ -294,7 +294,7 @@ namespace BOB
 			}
 
 			// Individual network replacement and original probability (if any).
-			BOBNetReplacement netReplacement = NetworkReplacement.ActiveReplacement(currentNet, lane, propIndex);
+			BOBNetReplacement netReplacement = NetworkReplacement.instance.ActiveReplacement(currentNet, lane, propIndex);
 			if (netReplacement != null)
 			{
 				propListItem.replacementPrefab = netReplacement.replacementInfo;
@@ -307,7 +307,7 @@ namespace BOB
 			}
 
 			// Replacement pack replacement and original probability (if any).
-			BOBNetReplacement packReplacement = PackReplacement.ActiveReplacement(currentNet, lane, propIndex);
+			BOBNetReplacement packReplacement = PackReplacement.instance.ActiveReplacement(currentNet, lane, propIndex);
 			if (packReplacement != null)
 			{
 				propListItem.packagePrefab = packReplacement.replacementInfo;
@@ -375,12 +375,12 @@ namespace BOB
 					propListItem.lanes.Add(lane);
 
 					// Get original (pre-replacement) tree/prop prefab and current probability (as default original probability).
-					propListItem.originalPrefab = NetworkReplacement.GetOriginal(currentNet, lane, propIndex) ?? AllNetworkReplacement.GetOriginal(currentNet, lane, propIndex) ?? PackReplacement.GetOriginal(currentNet, lane, propIndex) ?? finalInfo;
+					propListItem.originalPrefab = NetworkReplacement.instance.GetOriginal(currentNet, lane, propIndex) ?? AllNetworkReplacement.instance.GetOriginal(currentNet, lane, propIndex) ?? PackReplacement.instance.GetOriginal(currentNet, lane, propIndex) ?? finalInfo;
 					propListItem.originalProb = laneProps[propIndex].m_probability;
 					propListItem.originalAngle = laneProps[propIndex].m_angle;
 
 					// All-network replacement and original probability (if any).
-					BOBNetReplacement allNetReplacement = AllNetworkReplacement.ActiveReplacement(currentNet, lane, propIndex);
+					BOBNetReplacement allNetReplacement = AllNetworkReplacement.instance.ActiveReplacement(currentNet, lane, propIndex);
 					if (allNetReplacement != null)
 					{
 						propListItem.allPrefab = allNetReplacement.replacementInfo;
@@ -388,7 +388,7 @@ namespace BOB
 					}
 
 					// Individual network replacement and original probability (if any).
-					BOBNetReplacement netReplacement = NetworkReplacement.ActiveReplacement(currentNet, lane, propIndex);
+					BOBNetReplacement netReplacement = NetworkReplacement.instance.ActiveReplacement(currentNet, lane, propIndex);
 					if (netReplacement != null)
 					{
 						propListItem.replacementPrefab = netReplacement.replacementInfo;
@@ -396,7 +396,7 @@ namespace BOB
 					}
 
 					// Replacement pack replacement and original probability (if any).
-					BOBNetReplacement packReplacement = PackReplacement.ActiveReplacement(currentNet, lane, propIndex);
+					BOBNetReplacement packReplacement = PackReplacement.instance.ActiveReplacement(currentNet, lane, propIndex);
 					if (packReplacement != null)
 					{
 						propListItem.packagePrefab = packReplacement.replacementInfo;

@@ -26,7 +26,7 @@ namespace BOB
             PrefabLists.BuildLists();
 
             // Load prop packs.
-            PackReplacement.Setup();
+            new PackReplacement();
 
             // Load configuration file.
             ConfigurationUtils.LoadConfig();
