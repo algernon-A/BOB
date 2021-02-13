@@ -96,6 +96,9 @@ namespace BOB
 					replacements.Remove(network);
                 }
 			}
+
+			// Finally, call a recalculation of NS2 skins.
+			ModUtils.NS2Recalculate();
 		}
 
 
@@ -212,6 +215,9 @@ namespace BOB
 				Logging.Message("replacing ", target.name, " with ", replacement.name, " in ", network.name);
 				ReplaceProp(replacements[network][target], propReference);
 			}
+
+			// Finally, call a recalculation of NS2 skins.
+			ModUtils.NS2Recalculate();
 		}
 
 

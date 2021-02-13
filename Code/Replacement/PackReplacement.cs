@@ -146,6 +146,9 @@ namespace BOB
 					Apply(entry.Key, entry.Value.replacementInfo, entry.Value.rotation, entry.Value.xOffset, entry.Value.yOffset, entry.Value.zOffset, entry.Value.hide ? 0 : 100);
 				}
 
+				// Call a recalculation of NS2 skins.
+				ModUtils.NS2Recalculate();
+
 				// Return true to indicate sucessful application.
 				return true;
 			}
@@ -168,6 +171,9 @@ namespace BOB
 				{
 					Revert(entry.Key);
 				}
+
+				// Finally, call a recalculation of NS2 skins.
+				ModUtils.NS2Recalculate();
 			}
 		}
 

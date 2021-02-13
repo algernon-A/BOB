@@ -89,6 +89,9 @@ namespace BOB
             {
 				replacements.Remove(target);
 			}
+
+			// Finally, call a recalculation of NS2 skins.
+			ModUtils.NS2Recalculate();
 		}
 
 
@@ -250,6 +253,9 @@ namespace BOB
 
 				NetworkReplacement.ReplaceProp(replacements[target], propReference);
 			}
+
+			// Finally, call a recalculation of NS2 skins.
+			ModUtils.NS2Recalculate();
 		}
 
 

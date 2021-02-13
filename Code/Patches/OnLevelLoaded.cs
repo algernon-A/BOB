@@ -44,6 +44,13 @@ namespace BOB
                 ListMessageBox messageBox = MessageBoxBase.ShowModal<ListMessageBox>();
                 messageBox.AddParas("BOB, the Tree and Prop Replacer, has been updated to version 0.3.  As part of this update the configuration file format has changed in order to support expanded functionality.  These changes are NOT backwards-compatible.", "IMPORTANT", "This means that your existing replacements will be lost and will need to be redone.", "The new configuration file format (BOB-config.xml) is now final and will be supported in all future releases.  Your old configuration file (TreePropReplacer-config.xml) has been left unaltered for use as a reference.");
             }
+
+
+            // Set up Network Skins 2 reflection.
+            ModUtils.NS2Reflection();
+
+            // Force NS2 recalculate now.
+            ModUtils.NS2Recalculate();
         }
     }
 }
