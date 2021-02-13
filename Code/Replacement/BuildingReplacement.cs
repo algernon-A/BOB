@@ -102,8 +102,8 @@ namespace BOB
 				// Restore any all-building replacement.
 				AllBuildingReplacement.instance.Restore(building, target, propReference.propIndex);
 
-				// Refresh builidng render.
-				RefreshBuilding(building);
+				// Add building to dirty list.
+				BuildingData.DirtyList.Add(propReference.building);
 			}
 
 			// Remove entry from dictionary, if we're doing so.
@@ -366,8 +366,8 @@ namespace BOB
 			// Probability.
 			propReference.building.m_props[propReference.propIndex].m_probability = buildingElement.probability;
 
-			// Refresh builidng render.
-			RefreshBuilding(propReference.building);
+			// Add building to dirty list.
+			BuildingData.DirtyList.Add(propReference.building);
 		}
 
 
@@ -405,29 +405,6 @@ namespace BOB
 
 			// If we got here, no restoration was made.
 			return false;
-		}
-
-
-		/// <summary>
-		/// Refreshes a building prefab's render (e.g. to regenerate a LOD with new props).
-		/// </summary>
-		/// <param name="buildingPrefab">Building prefab to refresh</param>
-		internal void RefreshBuilding(BuildingInfo buildingPrefab)
-        {
-			// Need to do this for each building instance, so iterate through all buildings.
-			Building[] buildings = BuildingManager.instance.m_buildings.m_buffer;
-			for (ushort i = 0; i < buildings.Length; ++i)
-			{
-				// Local reference.
-				Building building = buildings[i];
-
-				// Make sure that this is a valid building, and one that matches our target.
-				if (building.m_flags != Building.Flags.None && building.Info == buildingPrefab)
-				{
-					// Match - update building render.
-					BuildingManager.instance.UpdateBuildingRenderer(i, true);
-				}
-			}
 		}
 	}
 }

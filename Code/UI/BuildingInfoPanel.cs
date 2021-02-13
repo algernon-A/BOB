@@ -278,12 +278,8 @@ namespace BOB
 						currentTargetItem.individualProb = probability;
 					}
 
-					// Save configuration file and refresh target list (to reflect our changes).
-					ConfigurationUtils.SaveConfig();
-					targetList.Refresh();
-
-					// Update button states.
-					UpdateButtonStates();
+					// Perform post-replacment updates.
+					FinishUpdate();
 				}
 			};
 
@@ -317,12 +313,8 @@ namespace BOB
 				currentTargetItem.allPrefab = replacementPrefab;
 				currentTargetItem.allProb = probability;
 
-				// Save configuration file and refresh building list (to reflect our changes).
-				ConfigurationUtils.SaveConfig();
-				targetList.Refresh();
-
-				// Update button states.
-				UpdateButtonStates();
+				// Perform post-replacment updates.
+				FinishUpdate();
 			};
 
 			// Revert button event handler.
@@ -341,12 +333,8 @@ namespace BOB
 						currentTargetItem.individualPrefab = null;
 					}
 
-					// Save configuration file and refresh building list (to reflect our changes).
-					ConfigurationUtils.SaveConfig();
-					targetList.Refresh();
-
-					// Update button states.
-					UpdateButtonStates();
+					// Perform post-replacment updates.
+					FinishUpdate();
 				}
 				else if (currentTargetItem.replacementPrefab != null)
 				{
@@ -360,12 +348,8 @@ namespace BOB
 						currentTargetItem.replacementPrefab = null;
 					}
 
-					// Save configuration file and refresh building list (to reflect our changes).
-					ConfigurationUtils.SaveConfig();
-					targetList.Refresh();
-
-					// Update button states.
-					UpdateButtonStates();
+					// Perform post-replacment updates.
+					FinishUpdate();
 				}
 				else if (currentTargetItem.allPrefab != null)
 				{
@@ -378,12 +362,8 @@ namespace BOB
 						// Clear current target 'all' prefab.
 						currentTargetItem.allPrefab = null;
 
-						// Save configuration file and refresh target list (to reflect our changes).
-						ConfigurationUtils.SaveConfig();
-						targetList.Refresh();
-
-						// Update button states.
-						UpdateButtonStates();
+						// Perform post-replacment updates.
+						FinishUpdate();
 					}
 				}
 			};
@@ -539,6 +519,23 @@ namespace BOB
 			}
 
 			return fastList;
+		}
+
+
+		/// <summary>
+		/// Performs actions to be taken once an update (application or reversion) has been applied, including saving data, updating button states, and refreshing renders.
+		/// </summary>
+		private void FinishUpdate()
+		{
+			// Save configuration file and refresh target list (to reflect our changes).
+			ConfigurationUtils.SaveConfig();
+			UpdateTargetList();
+
+			// Update button states.
+			UpdateButtonStates();
+
+			// Update any dirty building renders.
+			BuildingData.Update();
 		}
 	}
 }

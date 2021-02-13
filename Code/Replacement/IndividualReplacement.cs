@@ -89,6 +89,9 @@ namespace BOB
 				propReference.building.m_props[targetIndex].m_position = propReference.postion;
 				propReference.building.m_props[targetIndex].m_probability = propReference.probability;
 
+				// Add building to dirty list.
+				BuildingData.DirtyList.Add(propReference.building);
+
 				// Restore any building replacement.
 				if (!BuildingReplacement.instance.Restore(building, target, propReference.propIndex))
 				{

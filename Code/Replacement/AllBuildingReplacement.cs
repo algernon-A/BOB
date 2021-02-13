@@ -75,8 +75,8 @@ namespace BOB
 				propReference.building.m_props[propReference.propIndex].m_position = propReference.postion;
 				propReference.building.m_props[propReference.propIndex].m_probability = propReference.probability;
 
-				// Refresh network render.
-				BuildingReplacement.instance.RefreshBuilding(propReference.building);
+				// Add building to dirty list.
+				BuildingData.DirtyList.Add(propReference.building);
 			}
 
 			// Remove entry from dictionary, if we're doing so.

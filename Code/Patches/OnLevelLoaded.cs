@@ -49,7 +49,7 @@ namespace BOB
             ModUtils.NS2Reflection();
 
             // Force update of any dirty net prefabs from replacement process.
-            NetData.UpdateNets();
+            NetData.Update();
         }
     }
 }

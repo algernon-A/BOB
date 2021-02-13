@@ -204,7 +204,7 @@ namespace BOB
             }
 
             // Update renders.
-            NetData.UpdateNets();
+            NetData.Update();
         }
 
 

@@ -459,7 +459,7 @@ namespace BOB
 			UpdateButtonStates();
 
 			// Update any dirty net renders.
-			NetData.UpdateNets();
+			NetData.Update();
 		}
 	}
 }

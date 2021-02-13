@@ -32,7 +32,7 @@ namespace BOB
         /// <summary>
         /// Refreshes network prefab renders for all 'dirty' networks and calls a recalculation of any Network Skins 2 skins.
         /// </summary>
-        internal static void UpdateNets()
+        internal static void Update()
         {
             // Need to do this for each segment instance, so iterate through all segments.
             NetSegment[] segments = NetManager.instance.m_segments.m_buffer;

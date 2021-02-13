@@ -63,6 +63,7 @@
     <Compile Include="Code\Patches\OnLevelLoaded.cs" />
     <Compile Include="Code\PackUtils\PackUtils.cs" />
     <Compile Include="Code\PackUtils\PackXML.cs" />
+    <Compile Include="Code\Replacement\BuildingData.cs" />
     <Compile Include="Code\Replacement\NetData.cs" />
     <Compile Include="Code\UI\PackPanel.cs" />
     <Compile Include="Code\Utils\FileUtils.cs" />
