@@ -188,12 +188,8 @@ namespace BOB
 					// Network replacements are always grouped.
 					NetworkReplacement.instance.Apply(currentNet, currentTargetItem.originalPrefab ?? currentTargetItem.replacementPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
 
-					// Save configuration file and refresh target list (to reflect our changes).
-					ConfigurationUtils.SaveConfig();
-					UpdateTargetList();
-
-					// Update button states.
-					UpdateButtonStates();
+					// Perform post-replacment updates.
+					FinishUpdate();
 				}
 			};
 
@@ -217,12 +213,8 @@ namespace BOB
 				// Apply replacement.
 				AllNetworkReplacement.instance.Apply(currentTargetItem.originalPrefab ?? currentTargetItem.replacementPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
 
-				// Save configuration file and refresh building list (to reflect our changes).
-				ConfigurationUtils.SaveConfig();
-				UpdateTargetList();
-
-				// Update button states.
-				UpdateButtonStates();
+				// Perform post-replacment updates.
+				FinishUpdate();
 			};
 
 			// Revert button event handler.
@@ -237,12 +229,8 @@ namespace BOB
 						// Network replacements are always grouped.
 						NetworkReplacement.instance.Revert(currentNet, currentTargetItem.originalPrefab, true);
 
-						// Save configuration file and refresh building list (to reflect our changes).
-						ConfigurationUtils.SaveConfig();
-						UpdateTargetList();
-
-						// Update button states.
-						UpdateButtonStates();
+						// Perform post-reversion updates.
+						FinishUpdate();
 					}
 				}
 				else if (currentTargetItem.allPrefab != null)
@@ -257,8 +245,8 @@ namespace BOB
 						ConfigurationUtils.SaveConfig();
 						UpdateTargetList();
 
-						// Update button states.
-						UpdateButtonStates();
+						// Perform post-reversion updates.
+						FinishUpdate();
 					}
 				}
 			};
@@ -455,6 +443,23 @@ namespace BOB
 			}
 
 			return fastList;
+		}
+
+
+		/// <summary>
+		/// Performs actions to be taken once an update (application or reversion) has been applied, including saving data, updating button states, and refreshing renders.
+		/// </summary>
+		private void FinishUpdate()
+        {
+			// Save configuration file and refresh target list (to reflect our changes).
+			ConfigurationUtils.SaveConfig();
+			UpdateTargetList();
+
+			// Update button states.
+			UpdateButtonStates();
+
+			// Update any dirty net renders.
+			NetData.UpdateNets();
 		}
 	}
 }

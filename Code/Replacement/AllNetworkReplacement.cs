@@ -90,8 +90,9 @@ namespace BOB
 				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.postion;
 				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_probability = propReference.probability;
 
-				// Refresh network render.
-				NetworkReplacement.instance.RefreshBuilding(propReference.network);
+				// Add network to dirty list.
+				NetData.DirtyList.Add(propReference.network);
+
 				// Restore any pack replacement.
 				PackReplacement.instance.Restore(propReference.network, target, propReference.laneIndex, propReference.propIndex);
 			}
@@ -101,9 +102,6 @@ namespace BOB
             {
 				replacements.Remove(target);
 			}
-
-			// Finally, call a recalculation of NS2 skins.
-			ModUtils.NS2Recalculate();
 		}
 
 
@@ -265,9 +263,6 @@ namespace BOB
 
 				NetworkReplacement.instance.ReplaceProp(replacements[target], propReference);
 			}
-
-			// Finally, call a recalculation of NS2 skins.
-			ModUtils.NS2Recalculate();
 		}
 
 

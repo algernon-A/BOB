@@ -93,8 +93,8 @@ namespace BOB
 					PackReplacement.instance.Restore(network, target, propReference.laneIndex, propReference.propIndex);
 				}
 
-				// Refresh network render.
-				RefreshBuilding(network);
+				// Add network to dirty list.
+				NetData.DirtyList.Add(propReference.network);
 			}
 
 			// Remove entry from dictionary, if we're doing so.
@@ -108,9 +108,6 @@ namespace BOB
 					replacements.Remove(network);
                 }
 			}
-
-			// Finally, call a recalculation of NS2 skins.
-			ModUtils.NS2Recalculate();
 		}
 
 
@@ -227,9 +224,6 @@ namespace BOB
 				Logging.Message("replacing ", target.name, " with ", replacement.name, " in ", network.name);
 				ReplaceProp(replacements[network][target], propReference);
 			}
-
-			// Finally, call a recalculation of NS2 skins.
-			ModUtils.NS2Recalculate();
 		}
 
 

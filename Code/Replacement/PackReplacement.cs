@@ -159,9 +159,6 @@ namespace BOB
 					Apply(entry.Key, entry.Value.replacementInfo, entry.Value.rotation, entry.Value.xOffset, entry.Value.yOffset, entry.Value.zOffset, entry.Value.hide ? 0 : 100);
 				}
 
-				// Call a recalculation of NS2 skins.
-				ModUtils.NS2Recalculate();
-
 				// Return true to indicate sucessful application.
 				return true;
 			}
@@ -184,9 +181,6 @@ namespace BOB
 				{
 					Revert(entry.Key);
 				}
-
-				// Finally, call a recalculation of NS2 skins.
-				ModUtils.NS2Recalculate();
 			}
 		}
 
@@ -355,6 +349,9 @@ namespace BOB
 					propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle;
 					propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.postion;
 					propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_probability = propReference.probability;
+
+					// Add network to dirty list.
+					NetData.DirtyList.Add(propReference.network);
 				}
 
 				// Remove entry from dictionary, if we're doing so.

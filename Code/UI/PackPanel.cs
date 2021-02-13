@@ -202,6 +202,9 @@ namespace BOB
             {
                 InfoPanelManager.Panel.UpdateTargetList();
             }
+
+            // Update renders.
+            NetData.UpdateNets();
         }
 
 
