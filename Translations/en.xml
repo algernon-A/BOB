@@ -59,5 +59,8 @@
     <Translation ID="BOB_UPD_043_0" String="Fix probability refresh when reverting TO an all-building or all-network replacement" />
     <Translation ID="BOB_UPD_043_1" String="Fix LODs not refreshing after reverting all-network or all-building replacements" />
     <Translation ID="BOB_UPD_043_2" String="Adjust info panel textfield labels to fit longer translation strings" />
+    <Translation ID="BOB_UPD_050_0" String="Initial implementation of network replacement packs" />
+    <Translation ID="BOB_UPD_050_1" String="Now properly compatible with Network Skins 2" />
+    <Translation ID="BOB_UPD_050_2" String="Faster replacement processing" />
   </Translations>
 </Language>

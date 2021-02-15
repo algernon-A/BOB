@@ -1,4 +1,13 @@
-﻿Version 0.4.3 -
+﻿Version 0.5 -
+
+- Initial implementation of network replacement packs
+- Network Skins 2 compatibility
+- Implement batch processing of render updates for faster replacement times
+- Code cleanups and updates
+- Update bundled CitiesHarmony to 2.0
+
+
+Version 0.4.3 -
 
 - Fix replacement probability not always being properly restored when reverting to an all-building or all-network replacement
 - Fix LODs not refreshing after reverting all-network or all-building replacements

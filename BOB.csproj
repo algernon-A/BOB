@@ -111,6 +111,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Changelog.txt" />
+    <Content Include="Images\PreviewImage-Beta.png" />
+    <Content Include="Images\PreviewImage-Prod.png" />
     <Content Include="ReplacementPacks\TestPacks.xml" />
     <Content Include="ReplacementPacks\RoadArrows.xml" />
     <Content Include="ReplacementPacks\RoadSigns.xml" />
