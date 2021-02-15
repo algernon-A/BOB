@@ -61,26 +61,6 @@ namespace BOB
 
 
 		/// <summary>
-		/// Updates all items in the target list.
-		/// </summary>
-		internal override void UpdateTargetList()
-		{
-			// Iterate through each item in list.
-			foreach (object item in targetList.m_rowsData)
-			{
-				if (item is NetPropListItem propListItem)
-				{
-					// Update status.
-					UpdateTargetItem(propListItem);
-				}
-			}
-
-			// Refresh list display.
-			targetList.Refresh();
-		}
-
-
-		/// <summary>
 		/// Performs initial setup 
 		/// </summary>
 		/// <param name="parentTransform">Parent transform</param>
@@ -243,7 +223,6 @@ namespace BOB
 
 						// Save configuration file and refresh target list (to reflect our changes).
 						ConfigurationUtils.SaveConfig();
-						UpdateTargetList();
 
 						// Perform post-reversion updates.
 						FinishUpdate();
@@ -262,48 +241,51 @@ namespace BOB
 		/// Updates the target item record for changes in replacement status (e.g. after applying or reverting changes).
 		/// </summary>
 		/// <param name="propListItem">Target item</param>
-		protected void UpdateTargetItem(NetPropListItem propListItem)
+		protected override void UpdateTargetItem(PropListItem propListItem)
 		{
-			// Determine lane and index to test - just grab first one from list.
-			int lane = propListItem.lanes[0];
-			int propIndex = propListItem.indexes[0];
+			if (propListItem is NetPropListItem netItem)
+			{
+				// Determine lane and index to test - just grab first one from list.
+				int lane = netItem.lanes[0];
+				int propIndex = netItem.indexes[0];
 
-			// All-network replacement and original probability (if any).
-			BOBNetReplacement allNetReplacement = AllNetworkReplacement.instance.ActiveReplacement(currentNet, lane, propIndex);
-			if (allNetReplacement != null)
-			{
-				propListItem.allPrefab = allNetReplacement.replacementInfo;
-				propListItem.allProb = allNetReplacement.probability;
-			}
-			else
-			{
-				// If no active current record, ensure that it's reset to null.
-				propListItem.allPrefab = null;
-			}
+				// All-network replacement and original probability (if any).
+				BOBNetReplacement allNetReplacement = AllNetworkReplacement.instance.ActiveReplacement(currentNet, lane, propIndex);
+				if (allNetReplacement != null)
+				{
+					propListItem.allPrefab = allNetReplacement.replacementInfo;
+					propListItem.allProb = allNetReplacement.probability;
+				}
+				else
+				{
+					// If no active current record, ensure that it's reset to null.
+					propListItem.allPrefab = null;
+				}
 
-			// Individual network replacement and original probability (if any).
-			BOBNetReplacement netReplacement = NetworkReplacement.instance.ActiveReplacement(currentNet, lane, propIndex);
-			if (netReplacement != null)
-			{
-				propListItem.replacementPrefab = netReplacement.replacementInfo;
-				propListItem.replacementProb = netReplacement.probability;
-			}
-			else
-			{
-				// If no active current record, ensure that it's reset to null.
-				propListItem.replacementPrefab = null;
-			}
+				// Individual network replacement and original probability (if any).
+				BOBNetReplacement netReplacement = NetworkReplacement.instance.ActiveReplacement(currentNet, lane, propIndex);
+				if (netReplacement != null)
+				{
+					propListItem.replacementPrefab = netReplacement.replacementInfo;
+					propListItem.replacementProb = netReplacement.probability;
+				}
+				else
+				{
+					// If no active current record, ensure that it's reset to null.
+					propListItem.replacementPrefab = null;
+				}
 
-			// Replacement pack replacement and original probability (if any).
-			BOBNetReplacement packReplacement = PackReplacement.instance.ActiveReplacement(currentNet, lane, propIndex);
-			if (packReplacement != null)
-			{
-				propListItem.packagePrefab = packReplacement.replacementInfo;
-			}
-			else
-			{
-				// If no active current record, ensure that it's reset to null.
-				propListItem.packagePrefab = null;
+				// Replacement pack replacement and original probability (if any).
+				BOBNetReplacement packReplacement = PackReplacement.instance.ActiveReplacement(currentNet, lane, propIndex);
+				if (packReplacement != null)
+				{
+					propListItem.packagePrefab = packReplacement.replacementInfo;
+				}
+				else
+				{
+					// If no active current record, ensure that it's reset to null.
+					propListItem.packagePrefab = null;
+				}
 			}
 		}
 

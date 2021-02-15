@@ -93,9 +93,21 @@ namespace BOB
 		/// <summary>
 		/// Updates all items in the target list.
 		/// </summary>
-		internal virtual void UpdateTargetList()
-        {
-        }
+		internal void UpdateTargetList()
+		{
+			// Iterate through each item in list.
+			foreach (object item in targetList.m_rowsData)
+			{
+				if (item is PropListItem propListItem)
+				{
+					// Update status.
+					UpdateTargetItem(propListItem);
+				}
+			}
+
+			// Refresh list display.
+			targetList.Refresh();
+		}
 
 
 		/// <summary>
@@ -215,6 +227,15 @@ namespace BOB
 			// Set initial checkbox state.
 			hideVanilla.isChecked = ModSettings.hideVanilla;
 		}
+
+
+		/// <summary>
+		/// Updates the target item record for changes in replacement status (e.g. after applying or reverting changes).
+		/// </summary>
+		/// <param name="propListItem">Target item</param>
+		protected virtual void UpdateTargetItem(PropListItem propListItem)
+        {
+        }
 
 
 		/// <summary>

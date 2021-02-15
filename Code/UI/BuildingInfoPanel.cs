@@ -393,6 +393,60 @@ namespace BOB
 
 
 		/// <summary>
+		/// Updates the target item record for changes in replacement status (e.g. after applying or reverting changes).
+		/// </summary>
+		/// <param name="propListItem">Target item</param>
+		protected override void UpdateTargetItem(PropListItem propListItem)
+		{
+			// Determine index to test - if no individaul index, just grab first one from list.
+			int propIndex = propListItem.index;
+			if (propIndex < 0)
+            {
+				propIndex = propListItem.indexes[0];
+            }
+
+			// All-building replacement and original probability (if any).
+			BOBBuildingReplacement allBuildingReplacement = AllBuildingReplacement.instance.ActiveReplacement(currentBuilding, propIndex);
+			if (allBuildingReplacement != null)
+			{
+				propListItem.allPrefab = allBuildingReplacement.replacementInfo;
+				propListItem.allProb = allBuildingReplacement.probability;
+			}
+			else
+			{
+				// If no active current record, ensure that it's reset to null.
+				propListItem.allPrefab = null;
+			}
+
+			// Building replacement and original probability (if any).
+			BOBBuildingReplacement buildingReplacement = BuildingReplacement.instance.ActiveReplacement(currentBuilding, propIndex);
+			if (buildingReplacement != null)
+			{
+				propListItem.replacementPrefab = buildingReplacement.replacementInfo;
+				propListItem.replacementProb = buildingReplacement.probability;
+			}
+			else
+			{
+				// If no active current record, ensure that it's reset to null.
+				propListItem.replacementPrefab = null;
+			}
+
+			// Individual replacement and original probability (if any).
+			BOBBuildingReplacement individualReplacement = IndividualReplacement.instance.ActiveReplacement(currentBuilding, propIndex);
+			if (individualReplacement != null)
+			{
+				propListItem.individualPrefab = individualReplacement.replacementInfo;
+				propListItem.individualProb = individualReplacement.probability;
+			}
+			else
+			{
+				// If no active current record, ensure that it's reset to null.
+				propListItem.individualPrefab = null;
+			}
+		}
+
+
+		/// <summary>
 		/// Populates a fastlist with a list of building-specific trees or props.
 		/// </summary>
 		/// <param name="isTree">True for a list of trees, false for props</param>
@@ -460,7 +514,7 @@ namespace BOB
 					propListItem.replacementProb = buildingReplacement.probability;
 				}
 
-				// Building replacement and original probability (if any).
+				// Individual replacement and original probability (if any).
 				BOBBuildingReplacement individualReplacement = IndividualReplacement.instance.ActiveReplacement(currentBuilding, propIndex);
 				if (individualReplacement != null)
 				{
