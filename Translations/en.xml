@@ -67,5 +67,6 @@
     <Translation ID="BOB_UPD_050_0" String="Initial implementation of network replacement packs" />
     <Translation ID="BOB_UPD_050_1" String="Now properly compatible with Network Skins 2" />
     <Translation ID="BOB_UPD_050_2" String="Faster replacement processing" />
+    <Translation ID="BOB_UPD_051_0" String="New tree/prop list layout, with icons to indicate which type of replacement is active" />
   </Translations>
 </Language>

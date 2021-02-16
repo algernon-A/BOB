@@ -16,6 +16,13 @@ namespace BOB
         private static Dictionary<Version, List<string>> Versions => new Dictionary<Version, List<String>>
         {
             {
+                new Version("0.5.1"),
+                new List<string>
+                {
+                    "BOB_UPD_051_0"
+                }
+            },
+            {
                 new Version("0.5"),
                 new List<string>
                 {

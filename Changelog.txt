@@ -1,4 +1,11 @@
-﻿Version 0.5 -
+﻿Version 0.5.1 -
+
+- Add icons to indicate which type of replacement is active
+- Change orignal/replacement name display order
+- Fix building panel not updating after replacement or reversion
+
+
+Version 0.5 -
 
 - Initial implementation of network replacement packs
 - Network Skins 2 compatibility
