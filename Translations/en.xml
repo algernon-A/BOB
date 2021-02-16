@@ -8,7 +8,7 @@
     <Translation ID="MES_CLS" String="Close" />
     <Translation ID="MES_DSA" String="Don't show again" />
     <Translation ID="BOB_MBX_OK" String="OK" />
-    <Translation ID="BOB_ROW_NOW" String="now" />
+    <Translation ID="BOB_ROW_WAS" String="was" />
     <Translation ID="BOB_PNL_NOP" String="No props found" />
     <Translation ID="BOB_PNL_NOT" String="No trees found" />
     <Translation ID="BOB_PNL_TRE" String="Trees" />
