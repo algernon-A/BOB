@@ -11,7 +11,7 @@ using UnityEngine;
 namespace BOB
 {
 	/// <summary>
-	/// Static class for file management utilities.
+	/// Static class for texture management utilities.
 	/// </summary>
 	internal static class FileUtils
 	{
@@ -65,7 +65,6 @@ namespace BOB
 
 			return cursor;
 		}
-
 
 
 		/// <summary>

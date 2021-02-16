@@ -66,7 +66,7 @@
     <Compile Include="Code\Replacement\BuildingData.cs" />
     <Compile Include="Code\Replacement\NetData.cs" />
     <Compile Include="Code\UI\PackPanel.cs" />
-    <Compile Include="Code\Utils\FileUtils.cs" />
+    <Compile Include="Code\Utils\TextureUtils.cs" />
     <Compile Include="Code\MessageBox\DontShowAgainMessageBox.cs" />
     <Compile Include="Code\MessageBox\ListMessageBox.cs" />
     <Compile Include="Code\MessageBox\WhatsNew.cs" />
@@ -117,9 +117,13 @@
     <Content Include="ReplacementPacks\RoadArrows.xml" />
     <Content Include="ReplacementPacks\RoadSigns.xml" />
     <Content Include="License.txt" />
+    <Content Include="Resources\bob_all_roads_small.png" />
+    <Content Include="Resources\bob_buildings_small.png" />
     <Content Include="Resources\bob_cursor_dark.png" />
     <Content Include="Resources\bob_cursor_light.png" />
     <Content Include="Resources\bob_prop_pack_small.png" />
+    <Content Include="Resources\bob_roads_small.png" />
+    <Content Include="Resources\bob_single_building_small.png" />
     <Content Include="Translations\en.xml" />
     <Content Include="Translations\es.xml" />
     <Content Include="Translations\zh.xml" />

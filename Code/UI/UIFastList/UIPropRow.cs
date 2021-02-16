@@ -102,6 +102,16 @@ namespace BOB
                 objectName.width = this.width - 10f;
             }
 
+            // Add line sprite if we need to (initially hidden).
+            if (lineSprite == null)
+            {
+                lineSprite = AddUIComponent<UISprite>();
+                lineSprite.size = new Vector2(17f, 17f);
+                lineSprite.relativePosition = new Vector2(6.5f, 6.5f);
+                lineSprite.Hide();
+            }
+
+
             // See if our attached data is a raw PropInfo (e.g an available prop item as opposed to a PropListItem replacment record).
             thisPrefab = data as PrefabInfo;
             if (thisPrefab == null)
@@ -177,9 +187,15 @@ namespace BOB
                         displayText.Append(thisItem.replacementProb);
                         displayText.Append("%");
                     }
-                    
+
                     // Append closing bracket.
                     displayText.Append(")");
+
+                    // Show building replacement sprite.
+                    lineSprite.atlas = thisNetItem == null ? UIUtils.SingleBuildingSprites : UIUtils.SingleNetworkSprites;
+                    lineSprite.spriteName = "normal";
+                    lineSprite.tooltip = Translations.Translate(thisNetItem == null ? "BOB_SPR_SBL" : "BOB_SPR_SNT");
+                    lineSprite.Show();
                 }
                 // If no current building/network replacement, check to see if any all- replacement is currently active.
                 else if (thisItem.allPrefab != null)
@@ -200,6 +216,12 @@ namespace BOB
 
                     // Closing bracket.
                     displayText.Append(")");
+
+                    // Show all- replacement sprite.
+                    lineSprite.atlas = thisNetItem == null ? UIUtils.AllBuildingSprites : UIUtils.AllNetworkSprites;
+                    lineSprite.spriteName = "normal";
+                    lineSprite.tooltip = Translations.Translate(thisNetItem == null ? "BOB_SPR_ABL" : "BOB_SPR_ANT");
+                    lineSprite.Show();
                 }
                 // If no other replacements, chek to see if any pack replacement is currently active
                 else if (thisItem.packagePrefab != null)
@@ -216,20 +238,10 @@ namespace BOB
                     displayText.Append(")");
 
                     // Show package replacement sprite.
-                    // If we don't already have a sprite, create one.
-                    if (lineSprite == null)
-                    {
-                        lineSprite = AddUIComponent<UISprite>();
-                        lineSprite.atlas = UIUtils.PackageSprites;
-                        lineSprite.spriteName = "normal";
-                        lineSprite.size = new Vector2(17f, 17f);
-                        lineSprite.relativePosition = new Vector2(6.5f, 6.5f);
-                    }
-                    else
-                    {
-                        // Sprite already exists - just show it.
-                        lineSprite.Show();
-                    }
+                    lineSprite.atlas = UIUtils.PackageSprites;
+                    lineSprite.spriteName = "normal";
+                    lineSprite.tooltip = Translations.Translate("BOB_SPR_PCK");
+                    lineSprite.Show();
                 }
 
                 // Set display text.

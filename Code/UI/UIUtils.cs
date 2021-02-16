@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using ColossalFramework.UI;
+﻿using ColossalFramework.UI;
 
 
 namespace BOB
@@ -11,7 +10,6 @@ namespace BOB
     {
         // Package icon texture atlas.
         private static UITextureAtlas packageSprites;
-
         internal static UITextureAtlas PackageSprites
         {
             get
@@ -22,6 +20,70 @@ namespace BOB
                 }
 
                 return packageSprites;
+            }
+        }
+
+
+        // Single-building icon texture atlas.
+        private static UITextureAtlas singleBuildingSprites;
+        internal static UITextureAtlas SingleBuildingSprites
+        {
+            get
+            {
+                if (singleBuildingSprites == null)
+                {
+                    singleBuildingSprites = FileUtils.LoadSpriteAtlas("bob_single_building_small");
+                }
+
+                return singleBuildingSprites;
+            }
+        }
+
+
+        // All-building icon texture atlas.
+        private static UITextureAtlas allBuildingSprites;
+        internal static UITextureAtlas AllBuildingSprites
+        {
+            get
+            {
+                if (allBuildingSprites == null)
+                {
+                    allBuildingSprites = FileUtils.LoadSpriteAtlas("bob_buildings_small");
+                }
+
+                return allBuildingSprites;
+            }
+        }
+
+
+        // Single-network icon texture atlas.
+        private static UITextureAtlas singleNetworkSprites;
+        internal static UITextureAtlas SingleNetworkSprites
+        {
+            get
+            {
+                if (singleNetworkSprites == null)
+                {
+                    singleNetworkSprites = FileUtils.LoadSpriteAtlas("bob_roads_small");
+                }
+
+                return singleNetworkSprites;
+            }
+        }
+
+
+        // All-building icon texture atlas.
+        private static UITextureAtlas allNetworkSprites;
+        internal static UITextureAtlas AllNetworkSprites
+        {
+            get
+            {
+                if (allNetworkSprites == null)
+                {
+                    allNetworkSprites = FileUtils.LoadSpriteAtlas("bob_all_roads_small");
+                }
+
+                return allNetworkSprites;
             }
         }
 
