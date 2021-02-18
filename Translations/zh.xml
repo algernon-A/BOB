@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Language UniqueName="zh" ReadableName="中文">
   <Translations>
-    <Translation ID="BOB_NAM" String="BOB：樹木物體替換器" />
+    <Translation ID="BOB_NAM" String="BOB：樹木物體替換器(BOB The Tree And Prop Replacer)" />
     <Translation ID="BOB_DESC" String="持續開發中：替換樹木和物體。" />
     <Translation ID="TRN_CHOICE" String="語言設置" />
     <Translation ID="TRN_SYS" String="使用遊戲默認語言" />
@@ -27,6 +27,15 @@
     <Translation ID="BOB_PNL_XOF" String="X 軸偏移" />
     <Translation ID="BOB_PNL_YOF" String="Y 軸偏移" />
     <Translation ID="BOB_PNL_ZOF" String="Z 軸偏移" />
+    <Translation ID="BOB_PNL_SUB" String="子建築" />
+    <Translation ID="BOB_PCK_APP" String="應用替換包" />
+    <Translation ID="BOB_PCK_APP_A" String="應用已選中的替換包" />
+    <Translation ID="BOB_PCK_APP_C" String="替換包不能應用，因為已經應用了別的替換包" />
+    <Translation ID="BOB_PCK_APP_I" String="替換包現在已經應用" />
+    <Translation ID="BOB_PCK_RVT" String="重置替換包" />
+    <Translation ID="BOB_PCK_RVT_A" String="取消應用已選替換包" />
+    <Translation ID="BOB_PCK_RVT_I" String="替換包現在沒有應用" />
+    <Translation ID="BOB_PCK_NAL" String="並非所有替換品都可用" />
     <Translation ID="BOB_OPT_KEY" String="快鍵" />
     <Translation ID="BOB_OPT_PRS" String="按任意鍵" />
     <Translation ID="BOB_NUKE" String="重置配置" />
@@ -36,6 +45,13 @@
     <Translation ID="BOB_PER_LST" String="記住現有設置" />
     <Translation ID="BOB_OPT_POS" String="記住現有面板位置" />
     <Translation ID="BOB_FIL_NAME" String="搜尋" />
+    <Translation ID="MES_PAGE" String="請參閱模組(Mod)在Steam工作坊的頁面以獲得更多資訊。" />
+    <Translation ID="BOB_ERR_FAT" String="這意味著模組(Mod)將無法正常使用，並且已關閉。" />
+    <Translation ID="BOB_ERR_HAR" String="“BOB：樹木物體替換器(BOB The Tree And Prop Replacer)” 模組(Mod) 無法完成因為它須要 “Harmony” 擴展文檔。" />
+    <Translation ID="ERR_HAR0" String="“Harmony” 擴展文檔錯誤" />
+    <Translation ID="ERR_HAR1" String="此問題有可能包括的原因：" />
+    <Translation ID="ERR_HAR2" String="“Harmony 2” 擴展文檔模組(Mod)沒有訂閱。" />
+    <Translation ID="ERR_HAR3" String="一些老的或壞的模組(Mod)導致 “Harmony 2” 擴展文檔模組(Mod)無法正常運轉。" />
     <Translation ID="BOB_UPD_040_0" String="包含地圖樹木替換！要開啟BOB：樹木物體替換器用於地圖樹木替換，點擊任意一顆在地圖上的樹木之後按Alt+B開啟面板。" />
     <Translation ID="BOB_UPD_041_0" String="修復了更改目標項目時間歇性建築替換面板異常的問題。" />
     <Translation ID="BOB_UPD_042_0" String="啟用子建築選擇" />
@@ -43,5 +59,8 @@
     <Translation ID="BOB_UPD_043_0" String="修復概率刷新還原當使用 “所有建築” 或 ”所有道路“ 替換" />
     <Translation ID="BOB_UPD_043_1" String="修復當使用 “所有建築” 或 ”所有道路“ 替換時LOD不刷新問題" />
     <Translation ID="BOB_UPD_043_2" String="調整訊息面板文字標籤以符合更長的翻譯字段" />
+    <Translation ID="BOB_UPD_050_0" String="初步實現道路替換包" />
+    <Translation ID="BOB_UPD_050_1" String="現在已完全相容 ”Network Skins 2“ 模組(Mod)" />
+    <Translation ID="BOB_UPD_050_2" String="快速替換進程處理" />
   </Translations>
 </Language>

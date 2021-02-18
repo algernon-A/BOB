@@ -38,7 +38,7 @@ namespace BOB
 		protected UILabel noPropsLabel;
 		protected UICheckBox hideVanilla;
 		protected UITextField nameFilter;
-		protected UIButton replaceButton,revertButton;
+		protected UIButton replaceButton, revertButton;
 
 
 		// Button labels.
