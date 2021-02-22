@@ -66,12 +66,12 @@ namespace BOB
 				}
 				else
 				{
-					Logging.Message("no settings file found");
+					Logging.Message("no configuration file found");
 				}
 			}
 			catch (Exception e)
 			{
-				Logging.LogException(e, "exception reading XML settings file");
+				Logging.LogException(e, "exception reading XML configuration file");
 			}
 		}
 
@@ -143,7 +143,7 @@ namespace BOB
 			}
 			catch (Exception e)
 			{
-				Logging.LogException(e, "exception saving XML settings file");
+				Logging.LogException(e, "exception saving XML configuration file");
 			}
 		}
 

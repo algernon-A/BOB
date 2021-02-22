@@ -22,6 +22,7 @@
     <Translation ID="BOB_PNL_RAN" String="All networks" />
     <Translation ID="BOB_PNL_RTT" String="Map trees" />
     <Translation ID="BOB_PNL_REV" String="Revert" />
+    <Translation ID="BOB_PNL_PKB" String="Replacement packs" />
     <Translation ID="BOB_PNL_PRB" String="Probability" />
     <Translation ID="BOB_PNL_ANG" String="Angle" />
     <Translation ID="BOB_PNL_XOF" String="X offset" />

@@ -19,7 +19,7 @@ namespace BOB
 			set => Translations.Language = value;
 		}
 
-		// New building details panel hotkey element.
+		// Hotkey element.
 		[XmlElement("PanelKey")]
 		public KeyBinding PanelKey
 		{

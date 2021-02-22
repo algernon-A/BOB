@@ -74,12 +74,8 @@ namespace BOB
 			base.Setup(parentTransform, targetPrefabInfo);
 
 			// Add pack button.
-			ColossalFramework.UI.UIButton packButton = UIControls.AddButton(this, 250f, 50f, "Replacement packs");
-
-			packButton.eventClicked += (component, clickEvent) =>
-			{
-				PackPanelManager.Create();
-			};
+			ColossalFramework.UI.UIButton packButton = UIControls.AddButton(this, 250f, 50f, Translations.Translate("BOB_PNL_PKB"));
+			packButton.eventClicked += (component, clickEvent) => PackPanelManager.Create();
 
 			// Event handler for prop checkbox.
 			propCheck.eventCheckChanged += (control, isChecked) =>

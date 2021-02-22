@@ -163,10 +163,7 @@ namespace BOB
 			closeButton.normalBgSprite = "buttonclose";
 			closeButton.hoveredBgSprite = "buttonclosehover";
 			closeButton.pressedBgSprite = "buttonclosepressed";
-			closeButton.eventClick += (component, clickEvent) =>
-			{
-				InfoPanelManager.Close();
-			};
+			closeButton.eventClick += (component, clickEvent) => InfoPanelManager.Close();
 
 			// Target prop list.
 			UIPanel leftPanel = AddUIComponent<UIPanel>();
@@ -203,14 +200,8 @@ namespace BOB
 			// Name filter.
 			nameFilter = UIControls.BigLabelledTextField(this, width - 200f - Margin, 40f, Translations.Translate("BOB_FIL_NAME"));
 			// Event handlers for name filter textbox.
-			nameFilter.eventTextChanged += (control, text) =>
-			{
-				loadedList.rowsData = LoadedList(IsTree);
-			};
-			nameFilter.eventTextSubmitted += (control, text) =>
-			{
-				loadedList.rowsData = LoadedList(IsTree);
-			};
+			nameFilter.eventTextChanged += (control, text) => loadedList.rowsData = LoadedList(IsTree);
+			nameFilter.eventTextSubmitted += (control, text) => loadedList.rowsData = LoadedList(IsTree);
 
 			// Vanilla filter.
 			hideVanilla = UIControls.AddCheckBox((UIComponent)(object)this, nameFilter.relativePosition.x, 75f, Translations.Translate("BOB_PNL_HDV"));
