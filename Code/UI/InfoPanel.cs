@@ -26,7 +26,7 @@ namespace BOB
 		protected int probability;
 
 		// Panel components.
-		protected UIButton replaceAllButton;
+		protected UIButton replaceAllButton, configButton;
 		protected UICheckBox treeCheck, propCheck;
 		internal UITextField probabilityField;
 		internal UITextField angleField, xField, yField, zField;
@@ -81,9 +81,11 @@ namespace BOB
 				UILabel probabilityLabel = AddUIComponent<UILabel>();
 				probabilityLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), ProbabilityY);
 				probabilityLabel.text = Translations.Translate("BOB_PNL_PRB");
-
 				probabilityField = UIControls.AddTextField(this, LeftWidth + (Margin * 2), ProbabilityY + probabilityLabel.height, width: TextFieldWidth);
 
+				// Configuration manager button.
+				UIButton packButton = UIControls.AddButton(this, 460f, 50f, Translations.Translate("BOB_PNL_CFB"));
+				packButton.eventClicked += (component, clickEvent) => BOBConfigPanel.Create();
 
 				// Set initial button and checkbox states.
 				hideVanilla.isChecked = ModSettings.hideVanilla;

@@ -65,7 +65,9 @@
     <Compile Include="Code\PackUtils\PackXML.cs" />
     <Compile Include="Code\Replacement\BuildingData.cs" />
     <Compile Include="Code\Replacement\NetData.cs" />
+    <Compile Include="Code\UI\ConfigPanel.cs" />
     <Compile Include="Code\UI\PackPanel.cs" />
+    <Compile Include="Code\UI\UIFastList\UIBasicRow.cs" />
     <Compile Include="Code\Utils\TextureUtils.cs" />
     <Compile Include="Code\MessageBox\DontShowAgainMessageBox.cs" />
     <Compile Include="Code\MessageBox\ListMessageBox.cs" />

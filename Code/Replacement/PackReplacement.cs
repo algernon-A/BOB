@@ -71,8 +71,6 @@ namespace BOB
 					RevertPack(packName);
 					packEnabled[packName] = false;
 				}
-
-				// Set status to new value.
 			}
         }
 
@@ -314,8 +312,11 @@ namespace BOB
 			// Iterate through each entry in the master pack dictionary.
 			foreach (string packName in packEnabled.Keys)
 			{
-				// Revert this replacement (but don't remove the entry, as the dictionary is currently immutable while we're iterating through it).
-				SetPackStatus(packName, false);
+				// Directly revert any applied packs (don't worry about properly processing dictionaries since we'll be wiping them anyway, and besides, if we try to change them while doing this it'll lead to out-of-sync errors).
+				if (packEnabled[packName])
+				{
+					RevertPack(packName);
+				}
 			}
 
 			// Re-initialise the dictionaries.
@@ -327,9 +328,8 @@ namespace BOB
 		/// Reverts a pack replacement.
 		/// </summary>
 		/// <param name="target">Targeted (original) tree/prop prefab</param>
-		/// <param name="removeEntries">True (default) to remove the reverted entries from the master dictionary, false to leave the dictionary unchanged</param>
 		/// <returns>True if the entire network record was removed from the dictionary (due to no remaining replacements for that prefab), false if the prefab remains in the dictionary (has other active replacements)</returns>
-		private void Revert(PrefabInfo target, bool removeEntries = true)
+		private void Revert(PrefabInfo target)
 		{
 			// Don't revert if there's no entry for this reference.
 			if (replacements.ContainsKey(target))
@@ -354,11 +354,8 @@ namespace BOB
 					NetData.DirtyList.Add(propReference.network);
 				}
 
-				// Remove entry from dictionary, if we're doing so.
-				if (removeEntries)
-				{
-					replacements.Remove(target);
-				}
+				// Remove entry from dictionary.
+				replacements.Remove(target);
 			}
 		}
 

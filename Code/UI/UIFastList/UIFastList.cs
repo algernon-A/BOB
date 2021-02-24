@@ -362,6 +362,41 @@ namespace BOB
         /// If no item is found, clears the selection and resets the list.
         /// </summary>
         /// <param name="item">The item to find</param>
+        public string FindItem(string item)
+        {
+            // Iterate through the rows list.
+            for (int i = 0; i < m_rowsData.m_buffer.Length; ++i)
+            {
+                // Look for a string match.
+                if (m_rowsData.m_buffer[i] is string itemString && itemString.Equals(item))
+                {
+                    // Found a match; set the selected index to this one.
+                    selectedIndex = i;
+
+
+                    // If the selected index is outside the current visibility range, move the to show it.
+                    if (selectedIndex < listPosition || selectedIndex > listPosition + m_rows.m_size)
+                    {
+                        listPosition = selectedIndex;
+                    }
+
+                    // Done here; return.
+                    return itemString;
+                }
+            }
+
+            // If we got here, we didn't find a match; clear the selection and reset the list position.
+            selectedIndex = -1;
+            listPosition = 0f;
+            return null;
+        }
+
+
+        /// <summary>
+        /// Sets the selection to the given prefab item.
+        /// If no item is found, clears the selection and resets the list.
+        /// </summary>
+        /// <param name="item">The item to find</param>
         public void FindItem(PrefabInfo prefab)
         {
             // Iterate through the rows list.

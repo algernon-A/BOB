@@ -9,27 +9,17 @@ namespace BOB
 	internal static class ReplacementUtils
 	{
 		/// <summary>
-		/// Creates a clone of the given replacement record.
+		/// Reverts all current settings and clears replacement dictionaries.
 		/// </summary>
-		/// <param name="replacement">Record to clone</param>
-		/// <returns>Clone of the original record</returns>
-		internal static Replacement Clone(Replacement replacement)
-		{
-			// Create new record instance.
-			Replacement clone = new Replacement
-			{
-				// Copy original records to the clone.
-				isTree = replacement.isTree,
-				targetIndex = replacement.targetIndex,
-				targetName = replacement.targetName,
-				replaceName = replacement.replaceName,
-				probability = replacement.probability,
-				angle = replacement.angle,
-				replacementInfo = replacement.replacementInfo,
-				targetInfo = replacement.targetInfo
-			};
-
-			return clone;
+		internal static void NukeSettings()
+        {
+			// Revert all-building and building settings.
+			AllBuildingReplacement.instance.RevertAll();
+			BuildingReplacement.instance.RevertAll();
+			IndividualReplacement.instance.RevertAll();
+			PackReplacement.instance.RevertAll();
+			AllNetworkReplacement.instance.RevertAll();
+			NetworkReplacement.instance.RevertAll();
 		}
 	}
 }
