@@ -28,6 +28,18 @@ namespace BOB
 
             // Load the settings file.
             SettingsUtils.LoadSettings();
+
+            // Attaching options panel event hook - check to see if UIView is ready.
+            if (UIView.GetAView() != null)
+            {
+                // It's ready - attach the hook now.
+                OptionsPanel.OptionsEventHook();
+            }
+            else
+            {
+                // Otherwise, queue the hook for when the intro's finished loading.
+                LoadingManager.instance.m_introLoaded += OptionsPanel.OptionsEventHook;
+            }
         }
 
 
@@ -49,36 +61,9 @@ namespace BOB
         /// </summary>
         public void OnSettingsUI(UIHelperBase helper)
         {
-            // Language drop down.
-            UIDropDown languageDropDown = (UIDropDown)helper.AddDropdown(Translations.Translate("TRN_CHOICE"), Translations.LanguageList, Translations.Index, (index) => { Translations.Index = index; SettingsUtils.SaveSettings(); });
-            languageDropDown.autoSize = false;
-            languageDropDown.width = 270f;
-
-            // Hotkey control.
-            languageDropDown.parent.parent.gameObject.AddComponent<OptionsKeymapping>();
-
-            // Default grouping behaviour.
-            string[] groupItems = new string[]
-            {
-                Translations.Translate("BOB_PER_LST"),
-                Translations.Translate("BOB_PER_SIN"),
-                Translations.Translate("BOB_PER_GRP")
-            };
-            UIDropDown groupDropDown = (UIDropDown)helper.AddDropdown(Translations.Translate("BOB_PER_IND"), groupItems, ModSettings.indDefault, (index) => { ModSettings.indDefault = index; SettingsUtils.SaveSettings(); });
-            groupDropDown.width = 350f;
-
-            // Rember last position.
-            UICheckBox rememberPosCheck = (UICheckBox)helper.AddCheckbox(Translations.Translate("BOB_OPT_POS"), ModSettings.rememberPosition, (isChecked) => { ModSettings.rememberPosition = isChecked; SettingsUtils.SaveSettings(); });
-
-            // Nuke all settings button.
-            UIButton nukeButton = (UIButton)helper.AddButton(Translations.Translate("BOB_NUKE"), delegate
-            {
-                // Revert all-building and building settings.
-                ReplacementUtils.NukeSettings();
-
-                // Save configuration.
-                ConfigurationUtils.SaveConfig();
-            });
+            // Setup options panel reference.
+            OptionsPanel.optionsPanel = ((UIHelper)helper).self as UIScrollablePanel;
+            OptionsPanel.optionsPanel.autoLayout = false;
         }
     }
 }

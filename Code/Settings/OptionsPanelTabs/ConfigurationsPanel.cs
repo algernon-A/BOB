@@ -1,14 +1,13 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using ColossalFramework.UI;
 
 
 namespace BOB
 {
     /// <summary>
-    /// Panel for configuration presets.
+    /// Options panel for setting basic mod options.
     /// </summary>
-    internal class BOBConfigPanel : UIPanel
+    internal class ConfigurationsPanel
     {
         // Layout constants - general.
         private const float Margin = 5f;
@@ -18,22 +17,14 @@ namespace BOB
         private const float ListHeight = 300f;
         private const float TitleBarHeight = 40f;
         private const float ToolBarHeight = 30f;
-        private const float FooterHeight = 35f;
         private const float ListY = TitleBarHeight;
         private const float ToolBarY = ListY + ListHeight + Margin;
         private const float FooterY = ToolBarY + ToolBarHeight + Margin;
-        private const float PanelHeight = FooterY + FooterHeight + Margin;
 
         // Layout constants - X values.
         internal const float ListWidth = 400f;
-        private const float ControlPanelWidth = 310f;
         private const float ControlPanelX = ListWidth + (Margin * 2f);
-        private const float PanelWidth = ControlPanelX + ControlPanelWidth + Margin;
 
-
-        // Instance references.
-        private static GameObject uiGameObject;
-        internal static BOBConfigPanel Panel { get; private set; }
 
         // Panel components.
         private readonly UIFastList configList;
@@ -42,123 +33,37 @@ namespace BOB
         private readonly UIButton activeCopyButton, selectedCopyButton, newCleanButton, deleteButton;
 
         // Current selection.
-        private string selectedConfig;
-
-
-        /// <summary>
-        /// Accessor for currently selected configuration name.
-        /// </summary>
-        internal string SelectedConfig
+        private static string selectedConfig;
+        internal static string SelectedConfig
         {
-            get => selectedConfig;
-
             set
             {
-                // Don't do anything if value hasn't changed.
-                if (selectedConfig != value)
+                if (value != selectedConfig)
                 {
-                    // The value has changed; update it and refresh button states.
                     selectedConfig = value;
-                    UpdateButtonStates();
                 }
             }
         }
 
 
-
         /// <summary>
-        /// Creates the panel object in-game and displays it.
+        /// Adds configurations panel tab to tabstrip.
         /// </summary>
-        internal static void Create()
+        /// <param name="tabStrip">Tab strip to add to</param>
+        /// <param name="tabIndex">Index number of tab</param>
+        internal ConfigurationsPanel(UITabstrip tabStrip, int tabIndex)
         {
-            try
-            {
-                // If no GameObject instance already set, create one.
-                if (uiGameObject == null)
-                {
-                    // Give it a unique name for easy finding with ModTools.
-                    uiGameObject = new GameObject("BOBConfigPanel");
-                    uiGameObject.transform.parent = UIView.GetAView().transform;
-
-                    // Create new panel instance and add it to GameObject.
-                    Panel = uiGameObject.AddComponent<BOBConfigPanel>();
-                    Panel.transform.parent = uiGameObject.transform.parent;
-                }
-            }
-            catch (Exception e)
-            {
-                Logging.LogException(e, "exception creating ConfigPanel");
-            }
-        }
-
-
-        /// <summary>
-        /// Closes the panel by destroying the object (removing any ongoing UI overhead).
-        /// </summary>
-        internal static void Close()
-        {
-            // Don't do anything if no panel.
-            if (Panel == null)
-            {
-                return;
-            }
-
-            // Destroy game objects.
-            GameObject.Destroy(Panel);
-            GameObject.Destroy(uiGameObject);
-
-            // Let the garbage collector do its work (and also let us know that we've closed the object).
-            Panel = null;
-            uiGameObject = null;
-        }
-
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        internal BOBConfigPanel()
-        {
-            // Basic behaviour.
-            autoLayout = false;
-            canFocus = true;
-            isInteractive = true;
-
-            // Appearance.
-            backgroundSprite = "MenuPanel2";
-            opacity = 1f;
-
-            // Size.
-            size = new Vector2(PanelWidth, PanelHeight);
-
-            // Default position - centre in screen.
-            relativePosition = new Vector2(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
-
-            // Drag bar.
-            UIDragHandle dragHandle = AddUIComponent<UIDragHandle>();
-            dragHandle.width = this.width - 50f;
-            dragHandle.height = this.height;
-            dragHandle.relativePosition = Vector3.zero;
-            dragHandle.target = this;
-
-            // Title label.
-            UILabel titleLabel = AddUIComponent<UILabel>();
-            titleLabel.relativePosition = new Vector2(50f, 13f);
-            titleLabel.text = Translations.Translate("BOB_NAM") + " " + Translations.Translate("BOB_PNL_CFB");
-
-            // Close button.
-            UIButton closeButton = AddUIComponent<UIButton>();
-            closeButton.relativePosition = new Vector2(width - 35, 2);
-            closeButton.normalBgSprite = "buttonclose";
-            closeButton.hoveredBgSprite = "buttonclosehover";
-            closeButton.pressedBgSprite = "buttonclosepressed";
-            closeButton.eventClick += (component, clickEvent) => Close();
+            // Add tab and helper.
+            UIPanel panel = PanelUtils.AddTab(tabStrip, Translations.Translate("BOB_OPT_CFG"), tabIndex);
+            UIHelper helper = new UIHelper(panel);
+            panel.autoLayout = false;
 
             // Use custom check box.
-            customCheck = UIControls.AddCheckBox(this, Margin, ToolBarY, Translations.Translate("BOB_CFG_UCS"));
+            customCheck = UIControls.AddCheckBox(panel, Margin, ToolBarY, Translations.Translate("BOB_CFG_UCS"));
             customCheck.isChecked = !string.IsNullOrEmpty(ConfigurationUtils.currentConfig);
 
             // Config list panel.
-            UIPanel configListPanel = AddUIComponent<UIPanel>();
+            UIPanel configListPanel = panel.AddUIComponent<UIPanel>();
             configListPanel.width = ListWidth;
             configListPanel.height = ListHeight;
             configListPanel.relativePosition = new Vector3(Margin, ListY);
@@ -175,23 +80,21 @@ namespace BOB
             configList.rowsData = new FastList<object>();
 
             // File name textfield.
-            UILabel fileTextLabel = UIControls.AddLabel(this, ControlPanelX, ListY, "New configuration name:");
-            fileNameField = UIControls.AddTextField(this, ControlPanelX, ListY + fileTextLabel.height);
+            UILabel fileTextLabel = UIControls.AddLabel(panel, ControlPanelX, ListY, "New configuration name:");
+            fileNameField = UIControls.AddTextField(panel, ControlPanelX, ListY + fileTextLabel.height);
             fileNameField.eventTextChanged += (control, text) => UpdateButtonStates();
 
             // Buttons.
-            activeCopyButton = UIControls.AddButton(this, ControlPanelX, ListY + 70f, Translations.Translate("BOB_CFG_SAC"), 300f, scale: 0.8f);
+            activeCopyButton = UIControls.AddButton(panel, ControlPanelX, ListY + 70f, Translations.Translate("BOB_CFG_SAC"), 300f, scale: 0.8f);
             activeCopyButton.eventClicked += NewCurrent;
-            selectedCopyButton = UIControls.AddButton(this, ControlPanelX, ListY + 105f, Translations.Translate("BOB_CFG_SSC"), 300f, scale: 0.8f);
+            selectedCopyButton = UIControls.AddButton(panel, ControlPanelX, ListY + 105f, Translations.Translate("BOB_CFG_SSC"), 300f, scale: 0.8f);
             selectedCopyButton.eventClicked += CopySelected;
-            newCleanButton = UIControls.AddButton(this, ControlPanelX, ListY + 140f, Translations.Translate("BOB_CFG_SEC"), 300f, scale: 0.8f);
+            newCleanButton = UIControls.AddButton(panel, ControlPanelX, ListY + 140f, Translations.Translate("BOB_CFG_SEC"), 300f, scale: 0.8f);
             newCleanButton.eventClicked += NewClean;
-            deleteButton = UIControls.AddButton(this, ControlPanelX, ListY + 210f, Translations.Translate("BOB_CFG_DEL"), 300f, scale: 0.8f);
+            deleteButton = UIControls.AddButton(panel, ControlPanelX, ListY + 210f, Translations.Translate("BOB_CFG_DEL"), 300f, scale: 0.8f);
             deleteButton.eventClicked += Delete;
 
-            UIButton cancelButton = UIControls.AddButton(this, Margin, FooterY, "Cancel", 300f, scale: 0.8f);
-            cancelButton.eventClicked += (control, clickEvent) => Close();
-            UIButton applyButton = UIControls.AddButton(this, (PanelWidth / 2) + (Margin * 2), FooterY, "Save and apply", 300f, scale: 0.8f);
+            UIButton applyButton = UIControls.AddButton(panel, Margin, FooterY, "Save and apply", 300f, scale: 0.8f);
             applyButton.eventClicked += Apply;
 
             // Populate selection list and set initial button states.
@@ -211,12 +114,20 @@ namespace BOB
                 }
             }
 
+
+            // Nuke all settings button.
+            UIButton nukeButton = UIControls.AddButton(panel, Margin, FooterY + 50f, Translations.Translate("BOB_NUKE"));
+            nukeButton.eventClicked += (control, clickEvent) =>
+            {
+                // Revert all-building and building settings.
+                ReplacementUtils.NukeSettings();
+
+                // Save configuration.
+                ConfigurationUtils.SaveConfig();
+            };
+
             // Set initial button states.
             UpdateButtonStates();
-
-            // Focus.
-            BringToFront();
-            Focus();
         }
 
 
@@ -343,9 +254,6 @@ namespace BOB
                     ConfigurationUtils.LoadConfig();
                 }
             }
-
-            // Close and exit.
-            Close();
         }
 
 
@@ -392,7 +300,7 @@ namespace BOB
         {
             base.OnClick(p);
 
-            BOBConfigPanel.Panel.SelectedConfig = thisConfigName;
+            ConfigurationsPanel.SelectedConfig = thisConfigName;
         }
 
 
@@ -413,7 +321,7 @@ namespace BOB
                 height = BOBPackPanel.RowHeight;
 
                 rowLabel = AddUIComponent<UILabel>();
-                rowLabel.width = BOBConfigPanel.ListWidth;
+                rowLabel.width = ConfigurationsPanel.ListWidth;
                 rowLabel.relativePosition = new Vector3(TextX, 6f);
             }
 

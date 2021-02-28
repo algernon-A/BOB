@@ -83,10 +83,6 @@ namespace BOB
 				probabilityLabel.text = Translations.Translate("BOB_PNL_PRB");
 				probabilityField = UIControls.AddTextField(this, LeftWidth + (Margin * 2), ProbabilityY + probabilityLabel.height, width: TextFieldWidth);
 
-				// Configuration manager button.
-				UIButton packButton = UIControls.AddButton(this, 460f, 50f, Translations.Translate("BOB_PNL_CFB"));
-				packButton.eventClicked += (component, clickEvent) => BOBConfigPanel.Create();
-
 				// Set initial button and checkbox states.
 				hideVanilla.isChecked = ModSettings.hideVanilla;
 				UpdateButtonStates();

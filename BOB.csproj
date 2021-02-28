@@ -65,7 +65,10 @@
     <Compile Include="Code\PackUtils\PackXML.cs" />
     <Compile Include="Code\Replacement\BuildingData.cs" />
     <Compile Include="Code\Replacement\NetData.cs" />
-    <Compile Include="Code\UI\ConfigPanel.cs" />
+    <Compile Include="Code\Settings\OptionsPanel.cs" />
+    <Compile Include="Code\Settings\OptionsPanelTabs\ConfigurationsPanel.cs" />
+    <Compile Include="Code\Settings\OptionsPanelTabs\GeneralOptions.cs" />
+    <Compile Include="Code\Settings\PanelUtils.cs" />
     <Compile Include="Code\UI\PackPanel.cs" />
     <Compile Include="Code\UI\UIFastList\UIBasicRow.cs" />
     <Compile Include="Code\Utils\TextureUtils.cs" />

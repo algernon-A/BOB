@@ -198,6 +198,23 @@ namespace BOB
 
 
         /// <summary>
+        /// Creates a plain checkbox using the game's option panel checkbox template.
+        /// </summary>
+        /// <param name="parent">Parent component</param>
+        /// <param name="text">Descriptive label text</param>
+        /// <returns>New checkbox using the game's option panel template</returns>
+        public static UICheckBox AddPlainCheckBox(UIComponent parent, string text)
+        {
+            UICheckBox checkBox = parent.AttachUIComponent(UITemplateManager.GetAsGameObject("OptionsCheckBoxTemplate")) as UICheckBox;
+
+            // Set text.
+            checkBox.text = text;
+
+            return checkBox;
+        }
+
+
+        /// <summary>
         /// Adds a plain text label to the specified UI panel.
         /// </summary>
         /// <param name="parent">Parent component</param>
@@ -313,6 +330,35 @@ namespace BOB
             button.horizontalAlignment = UIHorizontalAlignment.Right;
             button.verticalAlignment = UIVerticalAlignment.Middle;
             button.zOrder = 0;
+
+            return dropDown;
+        }
+
+
+        /// <summary>
+        /// Creates a plain dropdown using the game's option panel dropdown template.
+        /// </summary>
+        /// <param name="parent">Parent component</param>
+        /// <param name="text">Descriptive label text</param>
+        /// <param name="items">Dropdown menu item list</param>
+        /// <param name="selectedIndex">Initially selected index (default 0)</param>
+        /// <param name="width">Width of dropdown (default 60)</param>
+        /// <returns>New dropdown menu using game's option panel template</returns>
+        public static UIDropDown AddPlainDropDown(UIComponent parent, string text, string[] items, int selectedIndex = 0, float width = 270f)
+        {
+            UIPanel panel = parent.AttachUIComponent(UITemplateManager.GetAsGameObject("OptionsDropdownTemplate")) as UIPanel;
+            UIDropDown dropDown = panel.Find<UIDropDown>("Dropdown");
+
+            // Set text.
+            panel.Find<UILabel>("Label").text = text;
+
+            // Slightly increase width.
+            dropDown.autoSize = false;
+            dropDown.width = width;
+
+            // Add items.
+            dropDown.items = items;
+            dropDown.selectedIndex = selectedIndex;
 
             return dropDown;
         }

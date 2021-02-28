@@ -23,7 +23,6 @@
     <Translation ID="BOB_PNL_RTT" String="Map trees" />
     <Translation ID="BOB_PNL_REV" String="Revert" />
     <Translation ID="BOB_PNL_PKB" String="Replacement packs" />
-    <Translation ID="BOB_PNL_CFB" String="Configurations" />
     <Translation ID="BOB_PNL_PRB" String="Probability" />
     <Translation ID="BOB_PNL_ANG" String="Angle" />
     <Translation ID="BOB_PNL_XOF" String="X offset" />
@@ -48,6 +47,8 @@
     <Translation ID="BOB_CFG_SSC" String="Copy selected configuration" />
     <Translation ID="BOB_CFG_SEC" String="New empty configuration" />
     <Translation ID="BOB_CFG_DEL" String="Delete selected configuration" />
+    <Translation ID="BOB_OPT_GEN" String="General options" />
+    <Translation ID="BOB_OPT_CFG" String="Configuration" />
     <Translation ID="BOB_OPT_KEY" String="Hotkey" />
     <Translation ID="BOB_OPT_PRS" String="Press any key" />
     <Translation ID="BOB_NUKE" String="Reset configuration" />

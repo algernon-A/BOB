@@ -83,6 +83,9 @@ namespace BOB
                 // Don't do anything further.
                 return;
             }
+
+            // Set up options panel event handler.
+            OptionsPanel.OptionsEventHook();
         }
     }
 }
