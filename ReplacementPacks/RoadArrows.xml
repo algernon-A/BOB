@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <BOBPackFile>
   <propPacks>
  
@@ -42,7 +42,7 @@
         <replacement target="Road Arrow F" replacement="2071058348.DK Arrow Straight_Data" />
         <replacement target="Road Arrow LF" replacement="2071058348.DK Arrow Straight Left_Data" />
         <replacement target="Road Arrow FR" replacement="2071058348.DK Arrow Straight Right_Data" />
-        <replacement target="Road Arrow LR" replacement="Road Arrow LFR" hide="true" />
+        <replacement target="Road Arrow LR" replacement="Road Arrow LR" hide="true" />
         <replacement target="Road Arrow LFR" replacement="Road Arrow LFR" hide="true" />
       </propReplacements>
     </replacementpack>
@@ -53,7 +53,7 @@
         <replacement target="Road Arrow F" replacement="1083162158.FR arrow straight_Data" />
         <replacement target="Road Arrow LF" replacement="1083162158.FR arrow straight left_Data" />
         <replacement target="Road Arrow FR" replacement="1083162158.FR arrow straight right_Data" />
-        <replacement target="Road Arrow LR" replacement="Road Arrow LFR" hide="true" />
+        <replacement target="Road Arrow LR" replacement="Road Arrow LR" hide="true" />
         <replacement target="Road Arrow LFR" replacement="Road Arrow LFR" hide="true" />
       </propReplacements>
     </replacementpack>
@@ -64,7 +64,7 @@
         <replacement target="Road Arrow F" replacement="1866391549.DE Arrow Straight_Data" />
         <replacement target="Road Arrow LF" replacement="1866391549.DE Arrow Straight Left_Data" />
         <replacement target="Road Arrow FR" replacement="1866391549.DE Arrow Straight Right_Data" />
-        <replacement target="Road Arrow LR" replacement="Road Arrow LFR" hide="true" />
+        <replacement target="Road Arrow LR" replacement="Road Arrow LR" hide="true" />
         <replacement target="Road Arrow LFR" replacement="Road Arrow LFR" hide="true" />
       </propReplacements>
     </replacementpack>
@@ -75,10 +75,21 @@
         <replacement target="Road Arrow F" replacement="1787627069.tdb Straight Arrow_Data" />
         <replacement target="Road Arrow LF" replacement="1787627069.tdb Left Straight Arrow_Data" />
         <replacement target="Road Arrow FR" replacement="1787627069.tdb Right Straight Arrow_Data" />
-        <replacement target="Road Arrow LR" replacement="Road Arrow LFR" hide="true" />
+        <replacement target="Road Arrow LR" replacement="Road Arrow LR" hide="true" />
         <replacement target="Road Arrow LFR" replacement="Road Arrow LFR" hide="true" />
       </propReplacements>
     </replacementpack>
+    <replacementpack name="Japanese replacer Arrows">
+      <propReplacements>
+        <replacement target="Road Arrow R" replacement="1568009578.JP Arrow Right_Data" />
+        <replacement target="Road Arrow L" replacement="1568009578.JP Arrow Left_Data" />
+        <replacement target="Road Arrow F" replacement="1568009578.JP Arrow Forward_Data" />
+        <replacement target="Road Arrow LF" replacement="1568009578.JP Arrow Forward Left_Data" />
+        <replacement target="Road Arrow FR" replacement="1568009578.JP Arrow Forward Right_Data" />
+        <replacement target="Road Arrow LR" replacement="1568009578.JP Arrow Left Right_Data"/>
+        <replacement target="Road Arrow LFR" replacement="Road Arrow LFR" hide="true" />
+      </propReplacements>
+    </replacementpack>	
     <replacementpack name="Malaysian Road Arrows">
       <propReplacements>
         <replacement target="Road Arrow R" replacement="2013521990.MY Arrow Right 2_Data" />
@@ -86,10 +97,32 @@
         <replacement target="Road Arrow F" replacement="2013521990.MY Arrow Straight_Data" />
         <replacement target="Road Arrow LF" replacement="2013521990.MY Arrow Straight Left_Data" />
         <replacement target="Road Arrow FR" replacement="2013521990.MY Arrow Straight Right_Data" />
-        <replacement target="Road Arrow LR" replacement="Road Arrow LFR" hide="true" />
+        <replacement target="Road Arrow LR" replacement="Road Arrow LR" hide="true" />
         <replacement target="Road Arrow LFR" replacement="Road Arrow LFR" hide="true" />
       </propReplacements>
     </replacementpack>
+    <replacementpack name="Spanish Road Arrows">
+	  <propReplacements>
+        <replacement target="Road Arrow R" replacement="2008960441.Spanish Arrow Right_Data" />
+        <replacement target="Road Arrow L" replacement="2008960441.Spanish Arrow Left_Data" />
+        <replacement target="Road Arrow F" replacement="2008960441.Spanish Arrow Forward_Data" />
+        <replacement target="Road Arrow LF" replacement="2008960441.Spanish Arrow Forward Left_Data" />
+        <replacement target="Road Arrow FR" replacement="2008960441.Spanish Arrow Forward Right_Data" />
+        <replacement target="Road Arrow LR" replacement="2008960441.Spanish Arrow Left Right_Data" />
+        <replacement target="Road Arrow LFR" replacement="2008960441.Spanish Arrow Forward Left Right_Data" />
+      </propReplacements>
+    </replacementpack>
+    <replacementpack name="Swedish Road Arrows">
+	  <propReplacements>
+        <replacement target="Road Arrow R" replacement="2412512876.Swedish Arrow Right_Data" />
+        <replacement target="Road Arrow L" replacement="2412512876.Swedish Arrow Left_Data" />
+        <replacement target="Road Arrow F" replacement="2412512876.Swedish Arrow Forward_Data" />
+        <replacement target="Road Arrow LF" replacement="2412512876.Swedish Arrow Forward Left_Data" />
+        <replacement target="Road Arrow FR" replacement="2412512876.Swedish Arrow Forward Right_Data" />
+        <replacement target="Road Arrow LR" replacement="2412512876.Swedish Arrow Left Right_Data" />
+        <replacement target="Road Arrow LFR" replacement="2412512876.Swedish Arrow Forward Left Right_Data" />
+      </propReplacements>
+    </replacementpack>	
     <replacementpack name="USRP US Road Project Road Arrows">
       <propReplacements>
         <replacement target="Road Arrow R" replacement="2088550283.USRP Arrow Right_Data" />
@@ -97,7 +130,7 @@
         <replacement target="Road Arrow F" replacement="2088550283.USRP Arrow Forward_Data" />
         <replacement target="Road Arrow LF" replacement="2088550283.USRP Arrow Left-Forward_Data" />
         <replacement target="Road Arrow FR" replacement="2088550283.USRP Arrow Forward-Right_Data" />
-        <replacement target="Road Arrow LR" replacement="Road Arrow LFR" hide="true" />
+        <replacement target="Road Arrow LR" replacement="Road Arrow LR" hide="true" />
         <replacement target="Road Arrow LFR" replacement="Road Arrow LFR" hide="true" />
       </propReplacements>
     </replacementpack>
