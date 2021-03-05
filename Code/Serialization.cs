@@ -14,7 +14,7 @@ namespace BOB
     {
         // Unique data ID.
         private readonly string dataID = "BOB";
-        private const uint DataVersion = 0;
+        public const int DataVersion = 1;
 
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace BOB
     /// </summary>
     public class BOBSerializer : IDataContainer
     {
-        private const int CurrentDataVersion = 0;
+        private const int CurrentDataVersion = Serializer.DataVersion;
         string[] treeNames;
 
         /// <summary>
@@ -103,8 +103,12 @@ namespace BOB
 
             // Write tree replacement lists to savegame.
             serializer.WriteUniqueStringArray(treeNames.ToArray());
-
             Logging.Message("wrote trees length ", treeNames.Count.ToString());
+
+            // Write current configuration name.
+            serializer.WriteSharedString(ConfigurationUtils.currentConfig);
+            Logging.Message("wrote current configuration name ", ConfigurationUtils.currentConfig ?? "null");
+
         }
 
 
@@ -126,6 +130,13 @@ namespace BOB
                 treeNames = serializer.ReadUniqueStringArray();
 
                 Logging.Message("read trees length ", treeNames.Length.ToString());
+
+                // Read custom config name if we're using version 1 or greater.
+                if (dataVersion > 0)
+                {
+                    ConfigurationUtils.currentConfig = serializer.ReadSharedString();
+                    Logging.Message("read current configuration name ", (ConfigurationUtils.currentConfig ?? "null"));
+                }
             }
             catch
             {

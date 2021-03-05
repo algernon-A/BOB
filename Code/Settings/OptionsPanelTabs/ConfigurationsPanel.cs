@@ -238,6 +238,8 @@ namespace BOB
 
                 // Load config file.
                 ConfigurationUtils.LoadConfig();
+
+                Logging.KeyMessage("current configuration set to ", ConfigurationUtils.currentConfig);
             }
             else
             {
@@ -252,6 +254,8 @@ namespace BOB
 
                     // Load config file.
                     ConfigurationUtils.LoadConfig();
+
+                    Logging.KeyMessage("current configuration set to default");
                 }
             }
         }
