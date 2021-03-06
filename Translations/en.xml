@@ -76,5 +76,6 @@
     <Translation ID="BOB_UPD_050_1" String="Now properly compatible with Network Skins 2" />
     <Translation ID="BOB_UPD_050_2" String="Faster replacement processing" />
     <Translation ID="BOB_UPD_051_0" String="New tree/prop list layout, with icons to indicate which type of replacement is active" />
+    <Translation ID="BOB_UPD_052_0" String="Add configurations management for handling multiple different configuration files, accessible through the options panel" />
   </Translations>
 </Language>

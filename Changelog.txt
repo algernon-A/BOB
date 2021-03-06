@@ -1,4 +1,10 @@
-﻿Version 0.5.1 -
+﻿Version 0.5.2 -
+
+- Add configurations management system
+- Update bundled road arrow packs
+
+
+Version 0.5.1 -
 
 - Add icons to indicate which type of replacement is active
 - Change orignal/replacement name display order
