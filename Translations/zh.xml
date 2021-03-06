@@ -8,7 +8,7 @@
     <Translation ID="MES_CLS" String="關閉" />
     <Translation ID="MES_DSA" String="不要在顯示" />
     <Translation ID="BOB_MBX_OK" String="確定" />
-    <Translation ID="BOB_ROW_NOW" String="現在" />
+    <Translation ID="BOB_ROW_WAS" String="曾經" />
     <Translation ID="BOB_PNL_NOP" String="沒找到物體" />
     <Translation ID="BOB_PNL_NOT" String="沒找到樹木" />
     <Translation ID="BOB_PNL_TRE" String="樹木" />
@@ -28,6 +28,11 @@
     <Translation ID="BOB_PNL_YOF" String="Y 軸偏移" />
     <Translation ID="BOB_PNL_ZOF" String="Z 軸偏移" />
     <Translation ID="BOB_PNL_SUB" String="子建築" />
+    <Translation ID="BOB_SPR_SBL" String="當前這些建築被替換" />
+    <Translation ID="BOB_SPR_ABL" String="當前所有建築被替換" />
+    <Translation ID="BOB_SPR_SNT" String="當前這些道路被替換" />
+    <Translation ID="BOB_SPR_ANT" String="當前所有道路被替換" />
+    <Translation ID="BOB_SPR_PCK" String="當前一個替換包已被應用" />
     <Translation ID="BOB_PCK_APP" String="應用替換包" />
     <Translation ID="BOB_PCK_APP_A" String="應用已選中的替換包" />
     <Translation ID="BOB_PCK_APP_C" String="替換包不能應用，因為已經應用了別的替換包" />
@@ -62,5 +67,6 @@
     <Translation ID="BOB_UPD_050_0" String="初步實現道路替換包" />
     <Translation ID="BOB_UPD_050_1" String="現在已完全相容 ”Network Skins 2“ 模組(Mod)" />
     <Translation ID="BOB_UPD_050_2" String="快速替換進程處理" />
+    <Translation ID="BOB_UPD_051_0" String="新的樹木和物體表列佈局，並帶有圖標以提示哪種替換類型處於激活狀態" />
   </Translations>
 </Language>
