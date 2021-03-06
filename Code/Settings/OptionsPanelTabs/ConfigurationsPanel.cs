@@ -32,6 +32,13 @@ namespace BOB
         private readonly UITextField fileNameField;
         private readonly UIButton activeCopyButton, selectedCopyButton, newCleanButton, deleteButton;
 
+        // Status flag.
+        private readonly bool inGame;
+
+        // Instance reference.
+        private static ConfigurationsPanel instance;
+
+
         // Current selection.
         private static string selectedConfig;
         internal static string SelectedConfig
@@ -41,6 +48,7 @@ namespace BOB
                 if (value != selectedConfig)
                 {
                     selectedConfig = value;
+                    instance?.UpdateButtonStates();
                 }
             }
         }
@@ -53,14 +61,16 @@ namespace BOB
         /// <param name="tabIndex">Index number of tab</param>
         internal ConfigurationsPanel(UITabstrip tabStrip, int tabIndex)
         {
+            // Set reference.
+            instance = this;
+
+            // Determine if we're in-game or not; use status of replacer managers to determine.
+            inGame = BuildingReplacement.instance != null && NetworkReplacement.instance != null;
+
             // Add tab and helper.
             UIPanel panel = PanelUtils.AddTab(tabStrip, Translations.Translate("BOB_OPT_CFG"), tabIndex);
             UIHelper helper = new UIHelper(panel);
             panel.autoLayout = false;
-
-            // Use custom check box.
-            customCheck = UIControls.AddCheckBox(panel, Margin, ToolBarY, Translations.Translate("BOB_CFG_UCS"));
-            customCheck.isChecked = !string.IsNullOrEmpty(ConfigurationUtils.currentConfig);
 
             // Config list panel.
             UIPanel configListPanel = panel.AddUIComponent<UIPanel>();
@@ -94,14 +104,34 @@ namespace BOB
             deleteButton = UIControls.AddButton(panel, ControlPanelX, ListY + 210f, Translations.Translate("BOB_CFG_DEL"), 300f, scale: 0.8f);
             deleteButton.eventClicked += Delete;
 
-            UIButton applyButton = UIControls.AddButton(panel, Margin, FooterY, "Save and apply", 300f, scale: 0.8f);
-            applyButton.eventClicked += Apply;
+            // Ingame buttons - 'use custom' check and apply and nuke buttons.
+            if (inGame)
+            {
+                // Use custom check box.
+                customCheck = UIControls.AddCheckBox(panel, Margin, ToolBarY, Translations.Translate("BOB_CFG_UCS"));
+                customCheck.isChecked = !string.IsNullOrEmpty(ConfigurationUtils.currentConfig);
+
+                // Apply button.
+                UIButton applyButton = UIControls.AddButton(panel, Margin, FooterY, "Save and apply", 300f, scale: 0.8f);
+                applyButton.eventClicked += Apply;
+
+                // Nuke all settings button.
+                UIButton nukeButton = UIControls.AddButton(panel, Margin, FooterY + 50f, Translations.Translate("BOB_NUKE"));
+                nukeButton.eventClicked += (control, clickEvent) =>
+                {
+                    // Revert all-building and building settings.
+                    ReplacementUtils.NukeSettings();
+
+                    // Save clean configuration.
+                    ConfigurationUtils.SaveConfig(ConfigurationUtils.currentConfig, true);
+                };
+            }
 
             // Populate selection list and set initial button states.
             RefreshList();
 
             // Select current pack if we've got one.
-            if (customCheck.isChecked)
+            if (customCheck != null && customCheck.isChecked)
             {
                 // Try to select current config name.
                 selectedConfig = configList.FindItem(ConfigurationUtils.currentConfig);
@@ -113,18 +143,6 @@ namespace BOB
                     customCheck.isChecked = false;
                 }
             }
-
-
-            // Nuke all settings button.
-            UIButton nukeButton = UIControls.AddButton(panel, Margin, FooterY + 50f, Translations.Translate("BOB_NUKE"));
-            nukeButton.eventClicked += (control, clickEvent) =>
-            {
-                // Revert all-building and building settings.
-                ReplacementUtils.NukeSettings();
-
-                // Save clean configuration.
-                ConfigurationUtils.SaveConfig(ConfigurationUtils.currentConfig, true);
-            };
 
             // Set initial button states.
             UpdateButtonStates();
@@ -221,12 +239,18 @@ namespace BOB
 
 
         /// <summary>
-        /// 'Save and apply' button event handler.
+        /// 'Save and apply' button event handler.  Should onl be called ingame.
         /// </summary>
 		/// <param name="control">Calling component (unused)</param>
 		/// <param name="mouseEvent">Mouse event (unused)</param>
         private void Apply(UIComponent control, UIMouseEventParameter mouseEvent)
         {
+            // Safety check.
+            if (!inGame)
+            {
+                return;
+            }
+
             // Are we using custom settings for this savegame, and have a valid current selection?
             if (customCheck.isChecked && !string.IsNullOrEmpty(selectedConfig))
             {
@@ -236,11 +260,8 @@ namespace BOB
                 // Clear current replacements.
                 ReplacementUtils.NukeSettings();
 
-                // Load config file if we're in-game.
-                if (BuildingReplacement.instance != null)
-                {
-                    ConfigurationUtils.LoadConfig();
-                }
+                // Load config file.
+                ConfigurationUtils.LoadConfig();
 
                 Logging.KeyMessage("current configuration set to ", ConfigurationUtils.currentConfig);
             }
@@ -255,11 +276,8 @@ namespace BOB
                     // Clear current replacements.
                     ReplacementUtils.NukeSettings();
 
-                    // Load config file if we're in-game.
-                    if (BuildingReplacement.instance != null)
-                    {
-                        ConfigurationUtils.LoadConfig();
-                    }
+                    // Load config file.
+                    ConfigurationUtils.LoadConfig();
 
                     Logging.KeyMessage("current configuration set to default");
                 }
