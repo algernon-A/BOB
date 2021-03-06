@@ -103,6 +103,7 @@ namespace BOB
 
 		/// <summary>
 		/// Saves current configuration to the current configuration file.
+		/// <param name="clean">Set to true to generate a blank file (default false)</param>
 		/// </summary>
 		internal static void SaveConfig() => SaveConfig(currentConfig);
 

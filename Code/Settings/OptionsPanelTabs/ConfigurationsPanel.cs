@@ -122,8 +122,8 @@ namespace BOB
                 // Revert all-building and building settings.
                 ReplacementUtils.NukeSettings();
 
-                // Save configuration.
-                ConfigurationUtils.SaveConfig();
+                // Save clean configuration.
+                ConfigurationUtils.SaveConfig(ConfigurationUtils.currentConfig, true);
             };
 
             // Set initial button states.
@@ -236,8 +236,11 @@ namespace BOB
                 // Clear current replacements.
                 ReplacementUtils.NukeSettings();
 
-                // Load config file.
-                ConfigurationUtils.LoadConfig();
+                // Load config file if we're in-game.
+                if (BuildingReplacement.instance != null)
+                {
+                    ConfigurationUtils.LoadConfig();
+                }
 
                 Logging.KeyMessage("current configuration set to ", ConfigurationUtils.currentConfig);
             }
@@ -252,8 +255,11 @@ namespace BOB
                     // Clear current replacements.
                     ReplacementUtils.NukeSettings();
 
-                    // Load config file.
-                    ConfigurationUtils.LoadConfig();
+                    // Load config file if we're in-game.
+                    if (BuildingReplacement.instance != null)
+                    {
+                        ConfigurationUtils.LoadConfig();
+                    }
 
                     Logging.KeyMessage("current configuration set to default");
                 }
