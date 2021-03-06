@@ -221,7 +221,6 @@ namespace BOB
 				AllNetworkReplacement.instance.RemoveEntry(network, target, propReference.laneIndex, propReference.propIndex);
 
 				// Apply the replacement.
-				Logging.Message("replacing ", target.name, " with ", replacement.name, " in ", network.name);
 				ReplaceProp(replacements[network][target], propReference);
 			}
 		}
