@@ -1,4 +1,9 @@
-﻿Version 0.5.2 -
+﻿Version 0.5.2.1 hotfix -
+
+- Fix custom configs not being creatable when no configs already exist
+
+
+Version 0.5.2 -
 
 - Add configurations management system
 - Update bundled road arrow packs
