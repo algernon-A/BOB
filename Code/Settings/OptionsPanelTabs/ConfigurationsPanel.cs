@@ -198,7 +198,7 @@ namespace BOB
         private void NewClean(UIComponent control, UIMouseEventParameter mouseEvent)
         {
             // Ensure valid current selection and new filename before proceeding.
-            if (!string.IsNullOrEmpty(selectedConfig) && !string.IsNullOrEmpty(fileNameField.text))
+            if (!string.IsNullOrEmpty(fileNameField.text))
             {
                 ConfigurationUtils.SaveConfig(fileNameField.text, true);
                 RefreshList();
@@ -214,7 +214,7 @@ namespace BOB
         private void NewCurrent(UIComponent control, UIMouseEventParameter mouseEvent)
         {
             // Ensure valid current selection and new filename before proceeding.
-            if (!string.IsNullOrEmpty(selectedConfig) && !string.IsNullOrEmpty(fileNameField.text))
+            if (!string.IsNullOrEmpty(fileNameField.text))
             {
                 ConfigurationUtils.SaveConfig(fileNameField.text, false);
                 RefreshList();

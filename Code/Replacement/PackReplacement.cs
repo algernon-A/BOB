@@ -518,7 +518,6 @@ namespace BOB
 			// Now, iterate through each entry found and apply the replacement to each one.
 			foreach (NetPropReference propReference in replacements[target].references)
 			{
-				Logging.Message("replacing prop ", target.name, " with ", replacements[target].replacementInfo.name);
 				NetworkReplacement.instance.ReplaceProp(replacements[target], propReference);
 			}
 		}
