@@ -177,7 +177,7 @@ namespace BOB
                     hasReplacement = true;
 
                     // Show building replacement sprite.
-                    lineSprite.atlas = thisNetItem == null ? UIUtils.SingleBuildingSprites : UIUtils.SingleNetworkSprites;
+                    lineSprite.atlas = thisNetItem == null ? Textures.SingleBuildingSprites : Textures.SingleNetworkSprites;
                     lineSprite.spriteName = "normal";
                     lineSprite.tooltip = Translations.Translate(thisNetItem == null ? "BOB_SPR_SBL" : "BOB_SPR_SNT");
                     lineSprite.Show();
@@ -200,7 +200,7 @@ namespace BOB
                     hasReplacement = true;
 
                     // Show all- replacement sprite.
-                    lineSprite.atlas = thisNetItem == null ? UIUtils.AllBuildingSprites : UIUtils.AllNetworkSprites;
+                    lineSprite.atlas = thisNetItem == null ? Textures.AllBuildingSprites : Textures.AllNetworkSprites;
                     lineSprite.spriteName = "normal";
                     lineSprite.tooltip = Translations.Translate(thisNetItem == null ? "BOB_SPR_ABL" : "BOB_SPR_ANT");
                     lineSprite.Show();
@@ -217,7 +217,7 @@ namespace BOB
                     hasReplacement = true;
 
                     // Show package replacement sprite.
-                    lineSprite.atlas = UIUtils.PackageSprites;
+                    lineSprite.atlas = Textures.PackageSprites;
                     lineSprite.spriteName = "normal";
                     lineSprite.tooltip = Translations.Translate("BOB_SPR_PCK");
                     lineSprite.Show();

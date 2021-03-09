@@ -35,8 +35,8 @@ namespace BOB
 		protected override void Awake()
 		{
 			base.Awake();
-			lightCursor = FileUtils.LoadCursor("bob_cursor_light.png");
-			darkCursor = FileUtils.LoadCursor("bob_cursor_dark.png");
+			lightCursor = TextureUtils.LoadCursor("bob_cursor_light.png");
+			darkCursor = TextureUtils.LoadCursor("bob_cursor_dark.png");
 			m_cursor = darkCursor;
 		}
 

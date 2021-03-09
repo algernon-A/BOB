@@ -389,7 +389,7 @@ namespace BOB
             languages.Clear();
 
             // Get the current assembly path and append our locale directory name.
-            string assemblyPath = FileUtils.GetAssemblyPath();
+            string assemblyPath = ModUtils.GetAssemblyPath();
             if (!assemblyPath.IsNullOrWhiteSpace())
             {
                 string localePath = Path.Combine(assemblyPath, "Translations");
