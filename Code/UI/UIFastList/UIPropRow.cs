@@ -208,8 +208,6 @@ namespace BOB
                 // If no other replacements, chek to see if any pack replacement is currently active
                 else if (thisItem.packagePrefab != null)
                 {
-                    Logging.Message("UIPropRow displaying packagePrefab");
-
                     // Yes; append name to the label.
                     displayText.Append(UIUtils.GetDisplayName(thisItem.packagePrefab.name));
 
