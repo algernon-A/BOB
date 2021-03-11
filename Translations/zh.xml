@@ -22,6 +22,7 @@
     <Translation ID="BOB_PNL_RAN" String="所有道路" />
     <Translation ID="BOB_PNL_RTT" String="地圖樹木" />
     <Translation ID="BOB_PNL_REV" String="還原" />
+    <Translation ID="BOB_PNL_PKB" String="替換包" />
     <Translation ID="BOB_PNL_PRB" String="可見度" />
     <Translation ID="BOB_PNL_ANG" String="角度" />
     <Translation ID="BOB_PNL_XOF" String="X 軸偏移" />
@@ -41,6 +42,13 @@
     <Translation ID="BOB_PCK_RVT_A" String="取消應用已選替換包" />
     <Translation ID="BOB_PCK_RVT_I" String="替換包現在沒有應用" />
     <Translation ID="BOB_PCK_NAL" String="並非所有替換品都可用" />
+    <Translation ID="BOB_CFG_UCS" String="對此存檔使用已選配置(非全局配置)" />
+    <Translation ID="BOB_CFG_SAC" String="保存現有配置" />
+    <Translation ID="BOB_CFG_SSC" String="複製已選配置" />
+    <Translation ID="BOB_CFG_SEC" String="新建空白配置" />
+    <Translation ID="BOB_CFG_DEL" String="刪除已選配置" />
+    <Translation ID="BOB_OPT_GEN" String="常規選項" />
+    <Translation ID="BOB_OPT_CFG" String="配置" />
     <Translation ID="BOB_OPT_KEY" String="快鍵" />
     <Translation ID="BOB_OPT_PRS" String="按任意鍵" />
     <Translation ID="BOB_NUKE" String="重置配置" />
@@ -68,5 +76,6 @@
     <Translation ID="BOB_UPD_050_1" String="現在已完全相容 ”Network Skins 2“ 模組(Mod)" />
     <Translation ID="BOB_UPD_050_2" String="快速替換進程處理" />
     <Translation ID="BOB_UPD_051_0" String="新的樹木和物體表列佈局，並帶有圖標以提示哪種替換類型處於激活狀態" />
+    <Translation ID="BOB_UPD_052_0" String="添加配置管理以處理多個不同的配置文檔，可通過選項面板進行訪問更改" />
   </Translations>
 </Language>
