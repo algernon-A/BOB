@@ -278,8 +278,7 @@ namespace BOB
 						}
 						else if (propReplacement.replacementInfo == null)
 						{
-							// Replacement prop not found - log and and record that the replacement wasn't found.
-							Logging.Message("couldn't find pack replacement prop");
+							// Replacement prop not found - flag that pack wasn't all loaded.
 							if (!packNotAllLoaded.ContainsKey(propPack.name))
                             {
 								packNotAllLoaded.Add(propPack.name, true);
@@ -298,6 +297,14 @@ namespace BOB
 								packRecords[propPack.name].Add(targetInfo, propReplacement);
 							}
 						}
+					}
+
+					// Check to make sure we have at least one replacement; if not, remove the pack from our records.
+					if (packRecords[propPack.name].Count == 0)
+					{
+						Logging.Message("replacement pack ", propPack.name, " has no valid replacements; removing from list");
+						packRecords.Remove(propPack.name);
+						packEnabled.Remove(propPack.name);
 					}
 				}
 			}
