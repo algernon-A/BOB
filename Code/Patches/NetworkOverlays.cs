@@ -14,7 +14,7 @@ namespace BOB
     public static class NetOverlays
     {
         // List of positions to highlight.
-        private readonly static List<Vector3> effectPositions = new List<Vector3>();
+        private readonly static List<OverlayData> overlays = new List<OverlayData>();
 
 
         // Props and trees to highlight.
@@ -42,14 +42,14 @@ namespace BOB
             Color effectColor = new Color(circleColor.r, circleColor.g, circleColor.b, (Distance - effectRadius) * (1f / Distance));
 
             // Draw circle and effect at each position in list.
-            foreach (Vector3 position in effectPositions)
+            foreach (OverlayData data in overlays)
             {
-                renderManager.OverlayEffect.DrawCircle(cameraInfo, circleColor, position, 2f, -1f, 1280f, false, true);
-                renderManager.OverlayEffect.DrawCircle(cameraInfo, effectColor, position, 2f + effectRadius, -1f, 1280f, false, true);
+                renderManager.OverlayEffect.DrawCircle(cameraInfo, circleColor, data.position, data.radius, -1f, 1280f, false, true);
+                renderManager.OverlayEffect.DrawCircle(cameraInfo, effectColor, data.position, data.radius + effectRadius, -1f, 1280f, false, true);
             }
 
             // All done - clear the list.
-            effectPositions.Clear();
+            overlays.Clear();
         }
 
 
@@ -64,7 +64,9 @@ namespace BOB
             {
                 if (CurrentProp != null && CurrentProp == prop)
                 {
-                    effectPositions.Add(position);
+                    // Calculate radius of effect - largest of x and z size of props (minimum of 1 in any case).
+                    Vector3 size = prop.m_mesh.bounds.size;
+                    overlays.Add(new OverlayData { position = position, radius = Mathf.Max(2f, size.x, size.z) });
                 }
             }
         }
@@ -81,7 +83,9 @@ namespace BOB
             {
                 if (CurrentTree != null && CurrentTree == tree)
                 {
-                    effectPositions.Add(position);
+                    // Calculate radius of effect - largest of x and z size of props (minimum of 1 in any case).
+                    Vector3 size = tree.m_mesh.bounds.size;
+                    overlays.Add(new OverlayData { position = position, radius = Mathf.Max(2f, size.x, size.z) });
                 }
             }
         }

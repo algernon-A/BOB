@@ -37,9 +37,6 @@ namespace BOB
                     Harmony harmonyInstance = new Harmony(harmonyID);
                     harmonyInstance.PatchAll();
 
-                    PatchNetworkOverlays(true);
-                    PatchBuildingOverlays(true);
-
                     patched = true;
                 }
                 else
