@@ -8,16 +8,22 @@ using HarmonyLib;
 
 namespace BOB
 {
+    public struct OverlayData
+    {
+        public Vector3 position;
+        public float radius;
+    }
+
     /// <summary>
     /// Harmony patches and associated methods for rendering selection overlays for buildings.
     /// </summary>
     public static class BuildingOverlays
     {
         // List of positions to highlight.
-        private readonly static List<Vector3> effectPositions = new List<Vector3>();
+        private readonly static List<OverlayData> overlays = new List<OverlayData>();
 
 
-        // Prop to highlight.
+        // Props and trees to highlight.
         internal static int CurrentIndex { get; set; }
         internal static PropInfo CurrentProp { get; set; }
         internal static TreeInfo CurrentTree { get; set; }
@@ -32,25 +38,25 @@ namespace BOB
         {
             // 'Contracting circle' effect constants.
             const float Lifetime = 0.5f;
-            const float Distance = 4f;
+            const float EffectDistance = 4f;
             Color circleColor = new Color(1f, 0f, 1f, 1f);
 
             // Instance reference.
             RenderManager renderManager = Singleton<RenderManager>.instance;
 
             // 'Contracting circle' outside actual highlighted circle.  Alpha increases as it moves inwards.
-            float effectRadius = Mathf.Lerp(Distance, 0f, (Singleton<SimulationManager>.instance.m_realTimer % Lifetime) / Lifetime);
-            Color effectColor = new Color(circleColor.r, circleColor.g, circleColor.b, (Distance - effectRadius) * (1f / Distance));
+            float effectRadius = Mathf.Lerp(EffectDistance, 0f, (Singleton<SimulationManager>.instance.m_realTimer % Lifetime) / Lifetime);
+            Color effectColor = new Color(circleColor.r, circleColor.g, circleColor.b, (EffectDistance - effectRadius) * (1f / EffectDistance));
 
             // Draw circle and effect at each position in list.
-            foreach (Vector3 position in effectPositions)
+            foreach (OverlayData data in overlays)
             {
-                renderManager.OverlayEffect.DrawCircle(cameraInfo, circleColor, position, 2f, -1f, 1280f, false, true);
-                renderManager.OverlayEffect.DrawCircle(cameraInfo, effectColor, position, 2f + effectRadius, -1f, 1280f, false, true);
+                renderManager.OverlayEffect.DrawCircle(cameraInfo, circleColor, data.position, data.radius, -1f, 1280f, false, true);
+                renderManager.OverlayEffect.DrawCircle(cameraInfo, effectColor, data.position, data.radius + effectRadius, -1f, 1280f, false, true);
             }
 
             // All done - clear the list.
-            effectPositions.Clear();
+            overlays.Clear();
         }
 
 
@@ -68,7 +74,9 @@ namespace BOB
             {
                 if (CurrentProp != null && CurrentProp == prop && (CurrentIndex < 0 || CurrentIndex == index))
                 {
-                    effectPositions.Add(position);
+                    // Calculate radius of effect - largest of x and z size of props (minimum of 1 in any case).
+                    Vector3 size = prop.m_mesh.bounds.size;
+                    overlays.Add(new OverlayData { position = position, radius = Mathf.Max(2f, size.x, size.z) });
                 }
             }
         }
@@ -87,7 +95,9 @@ namespace BOB
             {
                 if (CurrentTree != null && CurrentTree == tree && (CurrentIndex < 0 || CurrentIndex == index))
                 {
-                    effectPositions.Add(position);
+                    // Calculate radius of effect - largest of x and z size of props (minimum of 1 in any case).
+                    Vector3 size = tree.m_mesh.bounds.size;
+                    overlays.Add(new OverlayData { position = position, radius = Mathf.Max(1f, size.x, size.z) });
                 }
             }
         }

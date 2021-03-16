@@ -64,10 +64,6 @@ namespace BOB
 
 					// Set up panel with selected prefab.
 					Panel.Setup(uiGameObject.transform.parent, selectedPrefab);
-
-					// Apply overlay patches.
-					Patcher.PatchBuildingOverlays(true);
-					Patcher.PatchNetworkOverlays(true);
 				}
 			}
 			catch (Exception e)

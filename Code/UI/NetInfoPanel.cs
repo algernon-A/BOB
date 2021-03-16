@@ -233,6 +233,9 @@ namespace BOB
 			propCheck.isChecked = !ModSettings.treeSelected;
 			treeCheck.isChecked = ModSettings.treeSelected;
 			UpdateButtonStates();
+
+			// Apply Harmony rendering patches.
+			Patcher.PatchNetworkOverlays(true);
 		}
 
 

@@ -17,7 +17,7 @@ namespace BOB
         private readonly static List<Vector3> effectPositions = new List<Vector3>();
 
 
-        // Prop to highlight.
+        // Props and trees to highlight.
         internal static PropInfo CurrentProp => BuildingOverlays.CurrentProp;
         internal static TreeInfo CurrentTree => BuildingOverlays.CurrentTree;
 

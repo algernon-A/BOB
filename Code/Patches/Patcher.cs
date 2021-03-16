@@ -17,7 +17,7 @@ namespace BOB
         // Flag.
         internal static bool Patched => patched;
         private static bool patched = false;
-        private static bool buildingOverlaysPatched, netOverlaysPatched = false;
+        private static bool buildingOverlaysPatched = false, netOverlaysPatched = false;
 
 
         /// <summary>
@@ -36,6 +36,9 @@ namespace BOB
                     // Apply all annotated patches and update flag.
                     Harmony harmonyInstance = new Harmony(harmonyID);
                     harmonyInstance.PatchAll();
+
+                    PatchNetworkOverlays(true);
+                    PatchBuildingOverlays(true);
 
                     patched = true;
                 }
