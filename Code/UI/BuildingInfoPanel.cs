@@ -33,23 +33,22 @@ namespace BOB
 		{
 			set
 			{
+				// Call base.
+				base.CurrentTargetItem = value;
+
 				// Check for null.
 				if (value == null)
 				{
-					Logging.Error("null target item assigned at BuildingInfoPanel.CurrentTargetItem");
 					return;
 				}
-
-				// Call base.
-				base.CurrentTargetItem = value;
 
 				try
 				{
 					// If we've got an individuial building prop replacement, update the offset fields with the replacement values.
-					if (currentTargetItem.individualPrefab != null)
+					if (CurrentTargetItem.individualPrefab != null)
 					{
-						Logging.Message("target changed: individual replacement for ", currentBuilding.name, " at index ", currentTargetItem.index.ToString());
-						BOBBuildingReplacement thisReplacement = IndividualReplacement.instance.replacements[currentBuilding][currentTargetItem.index];
+						Logging.Message("target changed: individual replacement for ", currentBuilding.name, " at index ", CurrentTargetItem.index.ToString());
+						BOBBuildingReplacement thisReplacement = IndividualReplacement.instance.replacements[currentBuilding][CurrentTargetItem.index];
 
 						angleField.text = thisReplacement.angle.ToString();
 						xField.text = thisReplacement.offsetX.ToString();
@@ -58,10 +57,10 @@ namespace BOB
 						probabilityField.text = thisReplacement.probability.ToString();
 					}
 					// Ditto for any building replacement.
-					else if (currentTargetItem.replacementPrefab != null)
+					else if (CurrentTargetItem.replacementPrefab != null)
 					{
-						Logging.Message("target changed: getting building replacement for ", currentBuilding.name, " with original prefab ", currentTargetItem.originalPrefab.name);
-						BOBBuildingReplacement thisReplacement = BuildingReplacement.instance.replacements[currentBuilding][currentTargetItem.originalPrefab];
+						Logging.Message("target changed: getting building replacement for ", currentBuilding.name, " with original prefab ", CurrentTargetItem.originalPrefab.name);
+						BOBBuildingReplacement thisReplacement = BuildingReplacement.instance.replacements[currentBuilding][CurrentTargetItem.originalPrefab];
 
 						angleField.text = thisReplacement.angle.ToString();
 						xField.text = thisReplacement.offsetX.ToString();
@@ -70,10 +69,10 @@ namespace BOB
 						probabilityField.text = thisReplacement.probability.ToString();
 					}
 					// Ditto for any all-building replacement.
-					else if (currentTargetItem.allPrefab != null)
+					else if (CurrentTargetItem.allPrefab != null)
 					{
-						Logging.Message("target changed: getting all-building replacement for ", currentBuilding.name, " with original prefab ", currentTargetItem.originalPrefab.name);
-						BOBBuildingReplacement thisReplacement = AllBuildingReplacement.replacements[currentTargetItem.originalPrefab];
+						Logging.Message("target changed: getting all-building replacement for ", currentBuilding.name, " with original prefab ", CurrentTargetItem.originalPrefab.name);
+						BOBBuildingReplacement thisReplacement = AllBuildingReplacement.replacements[CurrentTargetItem.originalPrefab];
 
 						angleField.text = thisReplacement.angle.ToString();
 						xField.text = thisReplacement.offsetX.ToString();
@@ -145,7 +144,7 @@ namespace BOB
 					currentBuilding = subBuildings[index];
 
 					// Reset current items.
-					currentTargetItem = null;
+					CurrentTargetItem = null;
 					replacementPrefab = null;
 
 					// Reset loaded lists.
@@ -163,7 +162,7 @@ namespace BOB
 					treeCheck.isChecked = false;
 
 					// Reset current items.
-					currentTargetItem = null;
+					CurrentTargetItem = null;
 					replacementPrefab = null;
 
 					// Set loaded lists to 'props'.
@@ -195,7 +194,7 @@ namespace BOB
 					propCheck.isChecked = false;
 
 					// Reset current items.
-					currentTargetItem = null;
+					CurrentTargetItem = null;
 					replacementPrefab = null;
 
 					// Set loaded lists to 'trees'.
@@ -224,6 +223,10 @@ namespace BOB
 				// Rebuild target list.
 				targetList.rowsData = TargetList(treeCheck.isChecked);
 
+				// Clear selection.
+				targetList.selectedIndex = -1;
+				CurrentTargetItem = null;
+
 				// Store current group state as most recent state.
 				ModSettings.lastInd = isChecked;
 
@@ -242,7 +245,7 @@ namespace BOB
 			replaceButton.eventClicked += (control, clickEvent) =>
 			{
 				// Make sure we have valid a target and replacement.
-				if (currentTargetItem != null && replacementPrefab != null)
+				if (CurrentTargetItem != null && replacementPrefab != null)
 				{
 					// Try to parse textfields.
 					float.TryParse(angleField.text, out float angle);
@@ -259,23 +262,23 @@ namespace BOB
 					probabilityField.text = probability.ToString();
 
 					// Grouped or individual?
-					if (currentTargetItem.index < 0)
+					if (CurrentTargetItem.index < 0)
 					{
 						// Grouped replacement.
-						BuildingReplacement.instance.Apply(currentBuilding, currentTargetItem.originalPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
+						BuildingReplacement.instance.Apply(currentBuilding, CurrentTargetItem.originalPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
 
 						// Update current target.
-						currentTargetItem.replacementPrefab = replacementPrefab;
-						currentTargetItem.replacementProb = probability;
+						CurrentTargetItem.replacementPrefab = replacementPrefab;
+						CurrentTargetItem.replacementProb = probability;
 					}
 					else
 					{
 						// Individual replacement.
-						IndividualReplacement.instance.Apply(currentBuilding, currentTargetItem.originalPrefab, currentTargetItem.index, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
+						IndividualReplacement.instance.Apply(currentBuilding, CurrentTargetItem.originalPrefab, CurrentTargetItem.index, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
 
 						// Update current target.
-						currentTargetItem.individualPrefab = replacementPrefab;
-						currentTargetItem.individualProb = probability;
+						CurrentTargetItem.individualPrefab = replacementPrefab;
+						CurrentTargetItem.individualProb = probability;
 					}
 
 					// Perform post-replacment updates.
@@ -307,11 +310,11 @@ namespace BOB
 				probabilityField.text = probability.ToString();
 
 				// Apply replacement.
-				AllBuildingReplacement.instance.Apply(currentTargetItem.originalPrefab ?? currentTargetItem.replacementPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
+				AllBuildingReplacement.instance.Apply(CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
 
 				// Update current target.
-				currentTargetItem.allPrefab = replacementPrefab;
-				currentTargetItem.allProb = probability;
+				CurrentTargetItem.allPrefab = replacementPrefab;
+				CurrentTargetItem.allProb = probability;
 
 				// Perform post-replacment updates.
 				FinishUpdate();
@@ -321,46 +324,46 @@ namespace BOB
 			revertButton.eventClicked += (control, clickEvent) =>
 			{
 				// Individual building prop reversion?
-				if (currentTargetItem.individualPrefab != null)
+				if (CurrentTargetItem.individualPrefab != null)
 				{
 					// Individual building prop reversion - ensuire that we've got a current selection before doing anything.
-					if (currentTargetItem != null && currentTargetItem is PropListItem currentItem)
+					if (CurrentTargetItem != null && CurrentTargetItem is PropListItem currentItem)
 					{
 						// Individual reversion.
-						IndividualReplacement.instance.Revert(currentBuilding, currentTargetItem.index, true);
+						IndividualReplacement.instance.Revert(currentBuilding, CurrentTargetItem.index, true);
 
 						// Clear current target replacement prefab.
-						currentTargetItem.individualPrefab = null;
+						CurrentTargetItem.individualPrefab = null;
 					}
 
 					// Perform post-replacment updates.
 					FinishUpdate();
 				}
-				else if (currentTargetItem.replacementPrefab != null)
+				else if (CurrentTargetItem.replacementPrefab != null)
 				{
 					// Building reversion - ensuire that we've got a current selection before doing anything.
-					if (currentTargetItem != null && currentTargetItem is PropListItem currentItem)
+					if (CurrentTargetItem != null && CurrentTargetItem is PropListItem currentItem)
 					{
 						// Grouped reversion.
-						BuildingReplacement.instance.Revert(currentBuilding, currentTargetItem.originalPrefab, true);
+						BuildingReplacement.instance.Revert(currentBuilding, CurrentTargetItem.originalPrefab, true);
 
 						// Clear current target replacement prefab.
-						currentTargetItem.replacementPrefab = null;
+						CurrentTargetItem.replacementPrefab = null;
 					}
 
 					// Perform post-replacment updates.
 					FinishUpdate();
 				}
-				else if (currentTargetItem.allPrefab != null)
+				else if (CurrentTargetItem.allPrefab != null)
 				{
 					// All-building reversion - make sure we've got a currently active replacement before doing anything.
-					if (currentTargetItem.originalPrefab)
+					if (CurrentTargetItem.originalPrefab)
 					{
 						// Apply all-building reversion.
-						AllBuildingReplacement.instance.Revert(currentTargetItem.originalPrefab, true);
+						AllBuildingReplacement.instance.Revert(CurrentTargetItem.originalPrefab, true);
 
 						// Clear current target 'all' prefab.
-						currentTargetItem.allPrefab = null;
+						CurrentTargetItem.allPrefab = null;
 
 						// Perform post-replacment updates.
 						FinishUpdate();

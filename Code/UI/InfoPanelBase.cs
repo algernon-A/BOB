@@ -29,7 +29,7 @@ namespace BOB
 
 		// Current selections.
 		protected PrefabInfo selectedPrefab;
-		protected PropListItem currentTargetItem;
+		private PropListItem currentTargetItem;
 		protected PrefabInfo replacementPrefab;
 
 		// Panel components.
@@ -65,12 +65,34 @@ namespace BOB
 		/// </summary>
 		internal virtual PropListItem CurrentTargetItem
 		{
+			get => currentTargetItem;
+
 			set
 			{
 				currentTargetItem = value;
 
-				// Select current replacement prefab.
-				loadedList.FindItem(currentTargetItem.replacementPrefab ?? currentTargetItem.allPrefab ?? currentTargetItem.originalPrefab);
+				// Check if actual item has been set.
+				if (currentTargetItem != null)
+				{
+					PrefabInfo effectivePrefab = currentTargetItem.replacementPrefab ?? currentTargetItem.allPrefab ?? currentTargetItem.originalPrefab;
+
+					// Select current replacement prefab.
+					loadedList.FindItem(effectivePrefab);
+
+					// Set highlighting.
+					Logging.Message("setting highlighting");
+					BuildingOverlays.CurrentIndex = currentTargetItem.index;
+					BuildingOverlays.CurrentProp = effectivePrefab as PropInfo;
+					BuildingOverlays.CurrentTree = effectivePrefab as TreeInfo;
+				}
+				else
+				{
+					Logging.Message("clearing highlighting");
+					// Null target item set - unset highlighting.
+					BuildingOverlays.CurrentIndex = -1;
+					BuildingOverlays.CurrentProp = null;
+					BuildingOverlays.CurrentTree = null;
+				}
 
 				UpdateButtonStates();
 			}

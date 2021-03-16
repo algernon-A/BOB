@@ -29,32 +29,35 @@ namespace BOB
 				// Call base.
 				base.CurrentTargetItem = value;
 
-				// If we've got a replacement, update the offset fields with the replacement vlues
-				if (currentTargetItem.replacementPrefab != null)
+				if (value != null)
 				{
-					angleField.text = NetworkReplacement.instance.replacements[currentNet][currentTargetItem.originalPrefab].angle.ToString();
-					xField.text = NetworkReplacement.instance.replacements[currentNet][currentTargetItem.originalPrefab].offsetX.ToString();
-					yField.text = NetworkReplacement.instance.replacements[currentNet][currentTargetItem.originalPrefab].offsetY.ToString();
-					zField.text = NetworkReplacement.instance.replacements[currentNet][currentTargetItem.originalPrefab].offsetZ.ToString();
-					probabilityField.text = NetworkReplacement.instance.replacements[currentNet][currentTargetItem.originalPrefab].probability.ToString();
-				}
-				// Ditto for any all-network replacement.
-				else if (currentTargetItem.allPrefab != null)
-				{
-					angleField.text = AllNetworkReplacement.instance.replacements[currentTargetItem.originalPrefab].angle.ToString();
-					xField.text = AllNetworkReplacement.instance.replacements[currentTargetItem.originalPrefab].offsetX.ToString();
-					yField.text = AllNetworkReplacement.instance.replacements[currentTargetItem.originalPrefab].offsetY.ToString();
-					zField.text = AllNetworkReplacement.instance.replacements[currentTargetItem.originalPrefab].offsetZ.ToString();
-					probabilityField.text = AllNetworkReplacement.instance.replacements[currentTargetItem.originalPrefab].probability.ToString();
-				}
-				else
-                {
-					// No current replacement; set all offset fields to original prop.
-					angleField.text = value.originalAngle.ToString();
-					xField.text = "0";
-					yField.text = "0";
-					zField.text = "0";
-					probabilityField.text = value.originalProb.ToString();
+					// If we've got a replacement, update the offset fields with the replacement vlues
+					if (CurrentTargetItem.replacementPrefab != null)
+					{
+						angleField.text = NetworkReplacement.instance.replacements[currentNet][CurrentTargetItem.originalPrefab].angle.ToString();
+						xField.text = NetworkReplacement.instance.replacements[currentNet][CurrentTargetItem.originalPrefab].offsetX.ToString();
+						yField.text = NetworkReplacement.instance.replacements[currentNet][CurrentTargetItem.originalPrefab].offsetY.ToString();
+						zField.text = NetworkReplacement.instance.replacements[currentNet][CurrentTargetItem.originalPrefab].offsetZ.ToString();
+						probabilityField.text = NetworkReplacement.instance.replacements[currentNet][CurrentTargetItem.originalPrefab].probability.ToString();
+					}
+					// Ditto for any all-network replacement.
+					else if (CurrentTargetItem.allPrefab != null)
+					{
+						angleField.text = AllNetworkReplacement.instance.replacements[CurrentTargetItem.originalPrefab].angle.ToString();
+						xField.text = AllNetworkReplacement.instance.replacements[CurrentTargetItem.originalPrefab].offsetX.ToString();
+						yField.text = AllNetworkReplacement.instance.replacements[CurrentTargetItem.originalPrefab].offsetY.ToString();
+						zField.text = AllNetworkReplacement.instance.replacements[CurrentTargetItem.originalPrefab].offsetZ.ToString();
+						probabilityField.text = AllNetworkReplacement.instance.replacements[CurrentTargetItem.originalPrefab].probability.ToString();
+					}
+					else
+					{
+						// No current replacement; set all offset fields to original prop.
+						angleField.text = value.originalAngle.ToString();
+						xField.text = "0";
+						yField.text = "0";
+						zField.text = "0";
+						probabilityField.text = value.originalProb.ToString();
+					}
 				}
             }
 		}
@@ -86,7 +89,7 @@ namespace BOB
 					treeCheck.isChecked = false;
 
 					// Reset current items.
-					currentTargetItem = null;
+					CurrentTargetItem = null;
 					replacementPrefab = null;
 
 					// Set loaded lists to 'props'.
@@ -118,7 +121,7 @@ namespace BOB
 					propCheck.isChecked = false;
 
 					// Reset current items.
-					currentTargetItem = null;
+					CurrentTargetItem = null;
 					replacementPrefab = null;
 
 					// Set loaded lists to 'trees'.
@@ -145,7 +148,7 @@ namespace BOB
 			replaceButton.eventClicked += (control, clickEvent) =>
 			{
 				// Make sure we have valid a target and replacement.
-				if (currentTargetItem != null && replacementPrefab != null)
+				if (CurrentTargetItem != null && replacementPrefab != null)
 				{
 					// Try to parse textfields.
 					float.TryParse(angleField.text, out float angle);
@@ -162,7 +165,7 @@ namespace BOB
 					probabilityField.text = probability.ToString();
 
 					// Network replacements are always grouped.
-					NetworkReplacement.instance.Apply(currentNet, currentTargetItem.originalPrefab ?? currentTargetItem.replacementPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
+					NetworkReplacement.instance.Apply(currentNet, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
 
 					// Perform post-replacment updates.
 					FinishUpdate();
@@ -187,7 +190,7 @@ namespace BOB
 				probabilityField.text = probability.ToString();
 
 				// Apply replacement.
-				AllNetworkReplacement.instance.Apply(currentTargetItem.originalPrefab ?? currentTargetItem.replacementPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
+				AllNetworkReplacement.instance.Apply(CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
 
 				// Perform post-replacment updates.
 				FinishUpdate();
@@ -197,25 +200,25 @@ namespace BOB
 			revertButton.eventClicked += (control, clickEvent) =>
 			{
 				// Network or all-network reversion?
-				if (currentTargetItem.replacementPrefab != null)
+				if (CurrentTargetItem.replacementPrefab != null)
 				{
 					// Individual network reversion - ensuire that we've got a current selection before doing anything.
-					if (currentTargetItem != null && currentTargetItem is NetPropListItem currentNetItem)
+					if (CurrentTargetItem != null && CurrentTargetItem is NetPropListItem currentNetItem)
 					{
 						// Network replacements are always grouped.
-						NetworkReplacement.instance.Revert(currentNet, currentTargetItem.originalPrefab, true);
+						NetworkReplacement.instance.Revert(currentNet, CurrentTargetItem.originalPrefab, true);
 
 						// Perform post-reversion updates.
 						FinishUpdate();
 					}
 				}
-				else if (currentTargetItem.allPrefab != null)
+				else if (CurrentTargetItem.allPrefab != null)
 				{
 					// All-network reversion - make sure we've got a currently active replacement before doing anything.
-					if (currentTargetItem.originalPrefab)
+					if (CurrentTargetItem.originalPrefab)
 					{
 						// Apply all-network reversion.
-						AllNetworkReplacement.instance.Revert(currentTargetItem.originalPrefab, true);
+						AllNetworkReplacement.instance.Revert(CurrentTargetItem.originalPrefab, true);
 
 						// Save configuration file and refresh target list (to reflect our changes).
 						ConfigurationUtils.SaveConfig();

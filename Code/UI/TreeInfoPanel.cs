@@ -32,10 +32,10 @@ namespace BOB
 			replaceButton.eventClicked += (control, clickEvent) =>
 			{
 				// Apply replacement.
-				MapTreeReplacement.instance.Apply((currentTargetItem.replacementPrefab ?? currentTargetItem.originalPrefab) as TreeInfo, replacementPrefab as TreeInfo);
+				MapTreeReplacement.instance.Apply((CurrentTargetItem.replacementPrefab ?? CurrentTargetItem.originalPrefab) as TreeInfo, replacementPrefab as TreeInfo);
 
 				// Update current target.
-				currentTargetItem.replacementPrefab = replacementPrefab;
+				CurrentTargetItem.replacementPrefab = replacementPrefab;
 
 				// Refresh target list (to reflect our changes).
 				targetList.Refresh();
@@ -48,13 +48,13 @@ namespace BOB
 			revertButton.eventClicked += (control, clickEvent) =>
 			{
 				// Individual building prop reversion - ensuire that we've got a current selection before doing anything.
-				if (currentTargetItem != null && currentTargetItem is PropListItem currentItem)
+				if (CurrentTargetItem != null && CurrentTargetItem is PropListItem currentItem)
 				{
 					// Individual reversion.
-					MapTreeReplacement.instance.Revert(currentTargetItem.replacementPrefab as TreeInfo);
+					MapTreeReplacement.instance.Revert(CurrentTargetItem.replacementPrefab as TreeInfo);
 
 					// Clear current target replacement prefab.
-					currentTargetItem.replacementPrefab = null;
+					CurrentTargetItem.replacementPrefab = null;
 				}
 
 				// Refresh target list (to reflect our changes).
@@ -86,7 +86,7 @@ namespace BOB
 			revertButton.Disable();
 
 			// Buttons are only enabled if a current target item is selected.
-			if (currentTargetItem != null)
+			if (CurrentTargetItem != null)
 			{
 				// Replacement requires a valid replacement selection.
 				if (replacementPrefab != null)
@@ -95,7 +95,7 @@ namespace BOB
 				}
 
 				// Reversion requires a currently active replacement.
-				if (currentTargetItem.replacementPrefab != null)
+				if (CurrentTargetItem.replacementPrefab != null)
 				{
 					revertButton.Enable();
 				}

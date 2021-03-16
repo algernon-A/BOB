@@ -12,8 +12,8 @@ namespace BOB
 	{
 		// Instance references.
 		private static GameObject uiGameObject;
-		private static BOBInfoPanelBase _panel;
-		internal static BOBInfoPanelBase Panel => _panel;
+		private static BOBInfoPanelBase panel;
+		internal static BOBInfoPanelBase Panel => panel;
 
 		// Recent state.
 		internal static float lastX, lastY;
@@ -36,7 +36,7 @@ namespace BOB
 						uiGameObject = new GameObject("BOBBuildingPanel");
 						uiGameObject.transform.parent = UIView.GetAView().transform;
 
-						_panel = uiGameObject.AddComponent<BOBBuildingInfoPanel>();
+						panel = uiGameObject.AddComponent<BOBBuildingInfoPanel>();
 					}
 					else if (selectedPrefab is NetInfo)
 					{
@@ -45,7 +45,7 @@ namespace BOB
 						uiGameObject = new GameObject("BOBNetPanel");
 						uiGameObject.transform.parent = UIView.GetAView().transform;
 
-						_panel = uiGameObject.AddComponent<BOBNetInfoPanel>();
+						panel = uiGameObject.AddComponent<BOBNetInfoPanel>();
 					}
 					else if (selectedPrefab is TreeInfo)
 					{
@@ -54,7 +54,7 @@ namespace BOB
 						uiGameObject = new GameObject("BOBTreePanel");
 						uiGameObject.transform.parent = UIView.GetAView().transform;
 
-						_panel = uiGameObject.AddComponent<BOBTreeInfoPanel>();
+						panel = uiGameObject.AddComponent<BOBTreeInfoPanel>();
 					}
 					else
                     {
@@ -64,6 +64,10 @@ namespace BOB
 
 					// Set up panel with selected prefab.
 					Panel.Setup(uiGameObject.transform.parent, selectedPrefab);
+
+					// Apply overlay patches.
+					Patcher.PatchBuildingOverlays(true);
+					Patcher.PatchNetworkOverlays(true);
 				}
 			}
 			catch (Exception e)
@@ -78,16 +82,23 @@ namespace BOB
 		/// </summary>
 		internal static void Close()
 		{
+			// Stop highlighting.
+			panel.CurrentTargetItem = null;
+
+			// Revert overlay patches.
+			Patcher.PatchBuildingOverlays(false);
+			Patcher.PatchNetworkOverlays(false);
+
 			// Store previous position.
-			lastX = _panel.relativePosition.x;
-			lastY = _panel.relativePosition.y;
+			lastX = Panel.relativePosition.x;
+			lastY = Panel.relativePosition.y;
 
 			// Destroy game objects.
-			GameObject.Destroy(_panel);
+			GameObject.Destroy(Panel);
 			GameObject.Destroy(uiGameObject);
 
 			// Let the garbage collector do its work (and also let us know that we've closed the object).
-			_panel = null;
+			panel = null;
 			uiGameObject = null;
 		}
 	}

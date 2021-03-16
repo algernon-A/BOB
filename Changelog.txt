@@ -1,4 +1,7 @@
-﻿Version 0.5.2.1 hotfix -
+﻿- Highlight selected props or trees in buildings or networks
+
+
+Version 0.5.2.1 hotfix -
 
 - Fix custom configs not being creatable when no configs already exist
 

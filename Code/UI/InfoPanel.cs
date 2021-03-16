@@ -106,10 +106,10 @@ namespace BOB
 			revertButton.Disable();
 
 			// Buttons are only enabled if a current target item is selected.
-			if (currentTargetItem != null)
+			if (CurrentTargetItem != null)
 			{
 				// Reversion requires a currently active replacement (for the relevant target/all-building setting).
-				if (currentTargetItem.individualPrefab != null || currentTargetItem.replacementPrefab != null || currentTargetItem.allPrefab != null)
+				if (CurrentTargetItem.individualPrefab != null || CurrentTargetItem.replacementPrefab != null || CurrentTargetItem.allPrefab != null)
 				{
 					revertButton.Enable();
 				}
