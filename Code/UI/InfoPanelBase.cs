@@ -13,19 +13,25 @@ namespace BOB
 	public abstract class BOBInfoPanelBase : UIPanel
 	{
 		// Layout constants.
-		protected const float LeftWidth = 500f;
-		protected const float MiddleWidth = 200f;
-		protected const float RightWidth = 400f;
-		protected const float PanelHeight = 490f;
+		protected const float Margin = 5f;
+		protected const float LeftWidth = 400f;
+		protected const float ButtonWidth = 150f;
+		protected const float MiddleX = LeftWidth + Margin;
+		protected const float MiddleWidth = ButtonWidth + (Margin * 2f);
+		protected const float RightX = MiddleX + MiddleWidth;
+		protected const float RightWidth = 320f;
 		protected const float TitleHeight = 45f;
 		protected const float ToolbarHeight = 50f;
-		protected const float Margin = 5f;
+		protected const float ListY = TitleHeight + ToolbarHeight;
+		protected const float ListHeight = UIPropRow.RowHeight * 16f;
+		protected const float PanelWidth = RightX + RightWidth + Margin;
+		protected const float PanelHeight = ListY + ListHeight + (Margin * 2f);
 
 		// Component locations.
-		protected const float ReplaceLabelY = 185f;
-		protected const float ReplaceY = ReplaceLabelY + 35f;
-		protected const float ReplaceAllY = ReplaceY + 35f;
-		protected const float RevertY = ReplaceAllY + 50f;
+		protected const float ReplaceLabelY = ListY;
+		protected const float ReplaceY = ReplaceLabelY + 25f;
+		protected const float ReplaceAllY = ReplaceY + 30f;
+		protected const float RevertY = ReplaceAllY + 45f;
 
 		// Current selections.
 		protected PrefabInfo selectedPrefab;
@@ -151,7 +157,8 @@ namespace BOB
 			opacity = 0.8f;
 
 			// Size.
-			size = new Vector2(LeftWidth + MiddleWidth + RightWidth + (Margin * 4), PanelHeight + TitleHeight + ToolbarHeight + (Margin * 3));
+			width = PanelWidth;
+			height = PanelHeight;
 
 			// Position - are we restoring the previous position?.
 			if (ModSettings.rememberPosition && (InfoPanelManager.lastX != 0f || InfoPanelManager.lastY != 0f))
@@ -188,16 +195,16 @@ namespace BOB
 			// Target prop list.
 			UIPanel leftPanel = AddUIComponent<UIPanel>();
 			leftPanel.width = LeftWidth;
-			leftPanel.height = PanelHeight;
-			leftPanel.relativePosition = new Vector2(Margin, TitleHeight + ToolbarHeight);
+			leftPanel.height = ListHeight;
+			leftPanel.relativePosition = new Vector2(Margin, ListY);
 			targetList = UIFastList.Create<UIPrefabPropRow>(leftPanel);
 			ListSetup(targetList);
 
 			// Loaded prop list.
 			UIPanel rightPanel = AddUIComponent<UIPanel>();
 			rightPanel.width = RightWidth;
-			rightPanel.height = PanelHeight;
-			rightPanel.relativePosition = new Vector2(LeftWidth + MiddleWidth + (Margin * 3), TitleHeight + ToolbarHeight);
+			rightPanel.height = ListHeight;
+			rightPanel.relativePosition = new Vector2(RightX, ListY);
 			loadedList = UIFastList.Create<UILoadedPropRow>(rightPanel);
 			ListSetup(loadedList);
 
@@ -212,10 +219,10 @@ namespace BOB
 			replaceLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), ReplaceLabelY);
 
 			// Replace button.
-			replaceButton = UIControls.AddButton(this, LeftWidth + (Margin * 2), ReplaceY, ReplaceLabel, 190f);
+			replaceButton = UIControls.AddSmallerButton(this, LeftWidth + (Margin * 2), ReplaceY, ReplaceLabel, ButtonWidth);
 
 			// Revert button.
-			revertButton = UIControls.AddButton(this, LeftWidth + (Margin * 2), RevertY, Translations.Translate("BOB_PNL_REV"), 190f);
+			revertButton = UIControls.AddSmallerButton(this, LeftWidth + (Margin * 2), RevertY, Translations.Translate("BOB_PNL_REV"), ButtonWidth);
 
 			// Name filter.
 			nameFilter = UIControls.BigLabelledTextField(this, width - 200f - Margin, 40f, Translations.Translate("BOB_FIL_NAME"));
@@ -323,7 +330,7 @@ namespace BOB
 			fastList.width = fastList.parent.width;
 			fastList.height = fastList.parent.height;
 			fastList.relativePosition = Vector2.zero;
-			fastList.rowHeight = 30f;
+			fastList.rowHeight = UIPropRow.RowHeight;
 
 			// Behaviour.
 			fastList.canSelect = true;

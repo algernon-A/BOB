@@ -45,6 +45,28 @@ namespace BOB
 
 
         /// <summary>
+        /// Adds a simple pushbutton, slightly smaller than the standard.
+        /// </summary>
+        /// <param name="parent">Parent component</param>
+        /// <param name="posX">Relative X postion</param>
+        /// <param name="posY">Relative Y position</param>
+        /// <param name="text">Button text</param>
+        /// <param name="width">Button width (default 200)</param>
+        /// <param name="height">Button height (default 30)</param>
+        /// <param name="scale">Text scale (default 0.9)</param>
+        /// <returns></returns>
+        public static UIButton AddSmallerButton(UIComponent parent, float posX, float posY, string text, float width = 200f, float height = 28f, float scale = 0.8f)
+        {
+            UIButton button = AddButton(parent, posX, posY, text, width, height, scale);
+
+            // Adjust bounding box to center 0.8 text in a 28-high button.
+            button.textPadding = new RectOffset(4, 4, 4, 0);
+
+            return button;
+        }
+
+
+        /// <summary>
         /// Adds a large textfield with an attached label to the left.
         /// </summary>
         /// <param name="parent">Parent component</param>
@@ -85,6 +107,17 @@ namespace BOB
 
             return textField;
         }
+
+
+        /// <summary>
+        /// Adds a small input text field at the specified coordinates.
+        /// </summary>
+        /// <param name="parent">Parent component</param>
+        /// <param name="posX">Relative X postion</param>
+        /// <param name="posY">Relative Y position</param>
+        /// <param name="width">Textfield width (default 200)</param>
+        /// <returns>New large textfield with attached label</returns>
+        public static UITextField SmallTextField(UIComponent parent, float posX, float posY, float width = 200f) => AddTextField(parent, posX, posY, width, 18f, 0.9f, 3);
 
 
         /// <summary>
@@ -221,19 +254,36 @@ namespace BOB
         /// <param name="xPos">Relative x position)</param>
         /// <param name="yPos">Relative y position</param>
         /// <param name="text">Label text</param>
-        /// <param name="width">Label width (default 700)</param>
+        /// <param name="width">Label width (-1 (default) for autosize)</param>
         /// <param name="width">Text scale (default 1.0)</param>
         /// <returns>New text label</returns>
-        public static UILabel AddLabel(UIComponent parent, float xPos, float yPos, string text, float width = 700f, float textScale = 1.0f)
+        public static UILabel AddLabel(UIComponent parent, float xPos, float yPos, string text, float width = -1f, float textScale = 1.0f)
         {
             // Add label.
             UILabel label = (UILabel)parent.AddUIComponent<UILabel>();
-            label.autoSize = false;
-            label.autoHeight = true;
-            label.wordWrap = true;
-            label.width = width;
+
+            // Set sizing options.
+            if (width > 0f)
+            {
+                // Fixed width.
+                label.autoSize = false;
+                label.width = width;
+                label.autoHeight = true;
+                label.wordWrap = true;
+            }
+            else
+            {
+                // Autosize.
+                label.autoSize = true;
+                label.autoHeight = false;
+                label.wordWrap = false;
+            }
+
+            // Text.
             label.textScale = textScale;
             label.text = text;
+
+            // Position.
             label.relativePosition = new Vector2(xPos, yPos);
 
             return label;
@@ -365,11 +415,11 @@ namespace BOB
 
 
         /// <summary>
-        /// Creates a vertical scrollbar.
+        /// Creates a vertical scrollbar
         /// </summary>
         /// <param name="parent">Parent component</param>
         /// <param name="scrollPanel">Panel to scroll</param>
-        /// <returns>New vertical scrollbar linked to the specified scrollable panel</returns>
+        /// <returns>New vertical scrollbar linked to the specified scrollable panel, immediately to the right</returns>
         public static UIScrollbar AddScrollbar(UIComponent parent, UIScrollablePanel scrollPanel)
         {
             // Basic setup.
@@ -380,7 +430,11 @@ namespace BOB
             newScrollbar.value = 0;
             newScrollbar.incrementAmount = 50f;
             newScrollbar.autoHide = true;
+
+            // Location and size.
             newScrollbar.width = 10f;
+            newScrollbar.relativePosition = new Vector2(scrollPanel.relativePosition.x + scrollPanel.width, scrollPanel.relativePosition.y);
+            newScrollbar.height = scrollPanel.height;
 
             // Tracking sprite.
             UISlicedSprite trackSprite = newScrollbar.AddUIComponent<UISlicedSprite>();
@@ -401,17 +455,10 @@ namespace BOB
             thumbSprite.spriteName = "ScrollbarThumb";
             newScrollbar.thumbObject = thumbSprite;
 
-            // Event handler - scroll panel.
-            newScrollbar.eventValueChanged += (component, value) => scrollPanel.scrollPosition = new Vector2(0, value);
-
-            // Event handler - mouse wheel (scrollbar and panel).
-            parent.eventMouseWheel += (component, mouseEvent) => newScrollbar.value -= mouseEvent.wheelDelta * newScrollbar.incrementAmount;
-            scrollPanel.eventMouseWheel += (component, mouseEvent) => newScrollbar.value -= mouseEvent.wheelDelta * newScrollbar.incrementAmount;
-
             // Event handler to handle resize of scroll panel.
             scrollPanel.eventSizeChanged += (component, newSize) =>
             {
-                newScrollbar.relativePosition += new Vector3(scrollPanel.width, 0);
+                newScrollbar.relativePosition = new Vector2(scrollPanel.relativePosition.x + scrollPanel.width, scrollPanel.relativePosition.y);
                 newScrollbar.height = scrollPanel.height;
             };
 

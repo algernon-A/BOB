@@ -11,7 +11,9 @@ namespace BOB
     public class UIPropRow : UIPanel, IUIFastListRow
     {
         // Layout constants.
-        private const float RowHeight = 30f;
+        public const float RowHeight = 23f;
+        private const float PaddingY = 5f;
+        private const float TextScale = 0.8f;
 
         // Layout variables.
         private float labelX;
@@ -57,7 +59,7 @@ namespace BOB
             if (objectName != null)
             {
                 Background.width = width;
-                objectName.relativePosition = new Vector2(labelX, 5f);
+                objectName.relativePosition = new Vector2(labelX, PaddingY);
             }
         }
 
@@ -100,6 +102,7 @@ namespace BOB
                 // Add object name label.
                 objectName = AddUIComponent<UILabel>();
                 objectName.width = this.width - 10f;
+                objectName.textScale = TextScale;
             }
 
             // Add line sprite if we need to (initially hidden).
@@ -107,7 +110,7 @@ namespace BOB
             {
                 lineSprite = AddUIComponent<UISprite>();
                 lineSprite.size = new Vector2(17f, 17f);
-                lineSprite.relativePosition = new Vector2(6.5f, 6.5f);
+                lineSprite.relativePosition = new Vector2(3f, 3f);
                 lineSprite.Hide();
             }
 
@@ -255,7 +258,7 @@ namespace BOB
             }
 
             // Set label position
-            objectName.relativePosition = new Vector2(labelX, 5f);
+            objectName.relativePosition = new Vector2(labelX, PaddingY);
 
             // Set initial background as deselected state.
             Deselect(isRowOdd);
