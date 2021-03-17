@@ -80,10 +80,12 @@ namespace BOB
 		{
 			// Stop highlighting.
 			panel.CurrentTargetItem = null;
+			RenderOverlays.CurrentBuilding = null;
 
 			// Revert overlay patches.
 			Patcher.PatchBuildingOverlays(false);
 			Patcher.PatchNetworkOverlays(false);
+			Patcher.PatchTreeOverlays(false);
 
 			// Store previous position.
 			lastX = Panel.relativePosition.x;

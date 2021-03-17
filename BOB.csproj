@@ -59,8 +59,8 @@
   <ItemGroup>
     <Compile Include="Code\Configuration\ConfigurationUtils.cs" />
     <Compile Include="Code\Configuration\ConfigurationXML.cs" />
-    <Compile Include="Code\Patches\BuildingOverlays.cs" />
-    <Compile Include="Code\Patches\NetworkOverlays.cs" />
+    <Compile Include="Code\Patches\OverlayTranspilers.cs" />
+    <Compile Include="Code\Patches\RenderOverlay.cs" />
     <Compile Include="Code\Utils\Logging.cs" />
     <Compile Include="Code\Patches\OnLevelLoaded.cs" />
     <Compile Include="Code\PackUtils\PackUtils.cs" />

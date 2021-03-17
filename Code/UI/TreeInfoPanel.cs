@@ -73,6 +73,9 @@ namespace BOB
 
 			// Update button states.
 			UpdateButtonStates();
+
+			// Apply Harmony rendering patches.
+			Patcher.PatchTreeOverlays(true);
 		}
 
 

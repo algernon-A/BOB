@@ -80,18 +80,16 @@ namespace BOB
 					loadedList.FindItem(effectivePrefab);
 
 					// Set highlighting.
-					Logging.Message("setting highlighting");
-					BuildingOverlays.CurrentIndex = currentTargetItem.index;
-					BuildingOverlays.CurrentProp = effectivePrefab as PropInfo;
-					BuildingOverlays.CurrentTree = effectivePrefab as TreeInfo;
+					RenderOverlays.CurrentIndex = currentTargetItem.index;
+					RenderOverlays.CurrentProp = effectivePrefab as PropInfo;
+					RenderOverlays.CurrentTree = effectivePrefab as TreeInfo;
 				}
 				else
 				{
-					Logging.Message("clearing highlighting");
-					// Null target item set - unset highlighting.
-					BuildingOverlays.CurrentIndex = -1;
-					BuildingOverlays.CurrentProp = null;
-					BuildingOverlays.CurrentTree = null;
+					loadedList.selectedIndex = -1;
+					RenderOverlays.CurrentIndex = -1;
+					RenderOverlays.CurrentProp = null;
+					RenderOverlays.CurrentTree = null;
 				}
 
 				UpdateButtonStates();

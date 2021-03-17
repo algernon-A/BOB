@@ -394,6 +394,7 @@ namespace BOB
 			UpdateButtonStates();
 
 			// Apply Harmony rendering patches.
+			RenderOverlays.CurrentBuilding = selectedPrefab as BuildingInfo;
 			Patcher.PatchBuildingOverlays(true);
 		}
 

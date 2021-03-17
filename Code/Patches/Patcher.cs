@@ -17,7 +17,7 @@ namespace BOB
         // Flag.
         internal static bool Patched => patched;
         private static bool patched = false;
-        private static bool buildingOverlaysPatched = false, netOverlaysPatched = false;
+        private static bool buildingOverlaysPatched = false, netOverlaysPatched = false, treeOverlaysPatched = false;
 
 
         /// <summary>
@@ -36,7 +36,6 @@ namespace BOB
                     // Apply all annotated patches and update flag.
                     Harmony harmonyInstance = new Harmony(harmonyID);
                     harmonyInstance.PatchAll();
-
                     patched = true;
                 }
                 else
@@ -66,7 +65,7 @@ namespace BOB
 
 
         /// <summary>
-        /// Applies or unapplies overlayer patches
+        /// Applies or unapplies overlayer patches for buildings.
         /// </summary>
         /// <param name="active">True to enable patches; false to disable</param>
         internal static void PatchBuildingOverlays(bool active)
@@ -84,9 +83,9 @@ namespace BOB
                     // Manually patch building overlay renderer.
                     Harmony harmonyInstance = new Harmony(harmonyID);
                     MethodInfo overlayTargetMethod = typeof(BuildingManager).GetMethod("EndOverlay");
-                    MethodInfo overlayPatchMethod = typeof(BuildingOverlays).GetMethod(nameof(BuildingOverlays.RenderOverlay));
+                    MethodInfo overlayPatchMethod = typeof(RenderOverlays).GetMethod(nameof(RenderOverlays.RenderOverlay));
                     MethodInfo renderTargetMethod = typeof(BuildingAI).GetMethod("RenderProps", BindingFlags.NonPublic | BindingFlags.Instance, null, buildingRenderPropsTypes, null);
-                    MethodInfo renderPatchMethod = typeof(BuildingOverlays).GetMethod(nameof(BuildingOverlays.Transpiler));
+                    MethodInfo renderPatchMethod = typeof(OverlayTranspilers).GetMethod(nameof(OverlayTranspilers.BuildingTranspiler));
 
                     // Safety check.
                     if (overlayTargetMethod == null || overlayPatchMethod == null || renderTargetMethod == null || renderPatchMethod == null)
@@ -119,7 +118,7 @@ namespace BOB
 
 
         /// <summary>
-        /// Applies or unapplies overlayer patches
+        /// Applies or unapplies overlayer patches for networks.
         /// </summary>
         /// <param name="active">True to enable patches; false to disable</param>
         internal static void PatchNetworkOverlays(bool active)
@@ -135,9 +134,9 @@ namespace BOB
                     // Manually patch building overlay renderer.
                     Harmony harmonyInstance = new Harmony(harmonyID);
                     MethodInfo overlayTargetMethod = typeof(NetManager).GetMethod("EndOverlay");
-                    MethodInfo overlayPatchMethod = typeof(NetOverlays).GetMethod(nameof(NetOverlays.RenderOverlay));
+                    MethodInfo overlayPatchMethod = typeof(RenderOverlays).GetMethod(nameof(RenderOverlays.RenderOverlay));
                     MethodInfo renderTargetMethod = typeof(NetLane).GetMethod(nameof(NetLane.RenderInstance));
-                    MethodInfo renderPatchMethod = typeof(NetOverlays).GetMethod(nameof(NetOverlays.Transpiler));
+                    MethodInfo renderPatchMethod = typeof(OverlayTranspilers).GetMethod(nameof(OverlayTranspilers.NetTranspiler));
 
                     // Safety check.
                     if (overlayTargetMethod == null || overlayPatchMethod == null || renderTargetMethod == null || renderPatchMethod == null)
@@ -160,6 +159,59 @@ namespace BOB
 
                     // Update status flag.
                     netOverlaysPatched = active;
+                }
+                else
+                {
+                    Logging.Error("Harmony not ready");
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Applies or unapplies overlayer patches for trees.
+        /// </summary>
+        /// <param name="active">True to enable patches; false to disable</param>
+        internal static void PatchTreeOverlays(bool active)
+        {
+            Type[] treeRenderTypes = { typeof(RenderManager.CameraInfo), typeof(uint), typeof(int) };
+
+            // Don't do anything if we're already at the current state.
+            if (treeOverlaysPatched != active)
+            {
+                // Ensure Harmony is ready before patching.
+                if (HarmonyHelper.IsHarmonyInstalled)
+                {
+                    Logging.KeyMessage(active ? "deploying" : "reverting", " tree overlay Harmony patches");
+
+                    // Manually patch building overlay renderer.
+                    Harmony harmonyInstance = new Harmony(harmonyID);
+                    MethodInfo overlayTargetMethod = typeof(TreeManager).GetMethod("EndOverlay");
+                    MethodInfo overlayPatchMethod = typeof(RenderOverlays).GetMethod(nameof(RenderOverlays.RenderOverlay));
+                    MethodInfo renderTargetMethod = typeof(TreeInstance).GetMethod(nameof(TreeInstance.RenderInstance), BindingFlags.Public | BindingFlags.Instance);
+                    MethodInfo renderPatchMethod = typeof(OverlayTranspilers).GetMethod(nameof(OverlayTranspilers.TreeTranspiler));
+
+                    // Safety check.
+                    if (overlayTargetMethod == null || overlayPatchMethod == null || renderTargetMethod == null || renderPatchMethod == null)
+                    {
+                        Logging.Error("couldn't find required render overlay method");
+                        return;
+                    }
+
+                    // Apply or remove patches according to flag.
+                    if (active)
+                    {
+                        harmonyInstance.Patch(overlayTargetMethod, postfix: new HarmonyMethod(overlayPatchMethod));
+                        harmonyInstance.Patch(renderTargetMethod, transpiler: new HarmonyMethod(renderPatchMethod));
+                    }
+                    else
+                    {
+                        harmonyInstance.Unpatch(overlayTargetMethod, overlayPatchMethod);
+                        harmonyInstance.Unpatch(renderTargetMethod, renderPatchMethod);
+                    }
+
+                    // Update status flag.
+                    treeOverlaysPatched = active;
                 }
                 else
                 {
