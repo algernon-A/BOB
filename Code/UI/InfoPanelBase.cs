@@ -182,7 +182,7 @@ namespace BOB
 			// Title label.
 			UILabel titleLabel = AddUIComponent<UILabel>();
 			titleLabel.relativePosition = new Vector2(50f, 13f);
-			titleLabel.text = Translations.Translate("BOB_NAM");
+			titleLabel.text = Translations.Translate("BOB_NAM") + ": " + GetDisplayName(targetPrefabInfo.name);
 
 			// Close button.
 			UIButton closeButton = AddUIComponent<UIButton>();
@@ -340,5 +340,15 @@ namespace BOB
 			fastList.rowsData = new FastList<object>();
 			fastList.selectedIndex = -1;
 		}
+
+
+
+
+		/// <summary>
+		/// Returns a cleaned-up display name for the given prefab.
+		/// </summary>
+		/// <param name="prefabName">Raw prefab name</param>
+		/// <returns>Cleaned display name</returns>
+		private string GetDisplayName(string prefabName) => prefabName.Substring(prefabName.IndexOf('.') + 1).Replace("_Data", "");
 	}
 }
