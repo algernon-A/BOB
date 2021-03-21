@@ -466,7 +466,7 @@ namespace BOB
 		protected override FastList<object> TargetList(bool isTree)
 		{
 			// Clear current selection.
-			loadedList.selectedIndex = -1;
+			targetList.selectedIndex = -1;
 
 			// List of prefabs that have passed filtering.
 			List<PropListItem> propList = new List<PropListItem>();
