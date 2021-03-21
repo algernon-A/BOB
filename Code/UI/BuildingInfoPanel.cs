@@ -20,10 +20,15 @@ namespace BOB
 		private UIDropDown subBuildingMenu;
 
 
-		// Button labels.
-		protected override string ReplaceLabel => Translations.Translate("BOB_PNL_RTB");
+		// Button tooltips.
+		protected override string ReplaceTooltipKey => "BOB_PNL_RTB";
+		protected override string ReplaceAllTooltipKey => "BOB_PNL_RAB";
 
-		protected override string ReplaceAllLabel => Translations.Translate("BOB_PNL_RAB");
+
+		// Replace button atlases.
+		protected override UITextureAtlas ReplaceAtlas => TextureUtils.LoadSpriteAtlas("bob_single_building");
+		protected override UITextureAtlas ReplaceAllAtlas => TextureUtils.LoadSpriteAtlas("bob_buildings");
+
 
 
 		/// <summary>
@@ -112,7 +117,7 @@ namespace BOB
 			base.Setup(parentTransform, targetPrefabInfo);
 
 			// Add group checkbox.
-			indCheck = UIControls.AddCheckBox(this, 155f, TitleHeight, Translations.Translate("BOB_PNL_IND"));
+			indCheck = UIControls.LabelledCheckBox(this, 155f, TitleHeight + Margin, Translations.Translate("BOB_PNL_IND"), 12f, 0.7f);
 
 			// Does this building have sub-buildings?
 			if (currentBuilding.m_subBuildings != null && currentBuilding.m_subBuildings.Length > 0)
@@ -132,7 +137,7 @@ namespace BOB
 				}
 
 				// Add sub-building menu.
-				subBuildingMenu = UIControls.AddLabelledDropDown(this, 155f, 65f, Translations.Translate("BOB_PNL_SUB"), 250f);
+				subBuildingMenu = UIControls.AddLabelledDropDown(this, 155f, indCheck.relativePosition.y + indCheck.height + (Margin / 2f), Translations.Translate("BOB_PNL_SUB"), 250f, 20f, 0.7f, 15, 4);
 				subBuildingMenu.listBackground = "GenericPanelDark";
 				subBuildingMenu.items = subBuildingNames;
 				subBuildingMenu.selectedIndex = 0;
@@ -460,6 +465,9 @@ namespace BOB
 		/// <returns>Populated fastlist of loaded prefabs</returns>
 		protected override FastList<object> TargetList(bool isTree)
 		{
+			// Clear current selection.
+			loadedList.selectedIndex = -1;
+
 			// List of prefabs that have passed filtering.
 			List<PropListItem> propList = new List<PropListItem>();
 
@@ -586,14 +594,9 @@ namespace BOB
 		/// <summary>
 		/// Performs actions to be taken once an update (application or reversion) has been applied, including saving data, updating button states, and refreshing renders.
 		/// </summary>
-		private void FinishUpdate()
+		protected override void FinishUpdate()
 		{
-			// Save configuration file and refresh target list (to reflect our changes).
-			ConfigurationUtils.SaveConfig();
-			UpdateTargetList();
-
-			// Update button states.
-			UpdateButtonStates();
+			base.FinishUpdate();
 
 			// Update any dirty building renders.
 			BuildingData.Update();

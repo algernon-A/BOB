@@ -31,8 +31,11 @@ namespace BOB
 		internal UITextField probabilityField;
 		internal UITextField angleField, xField, yField, zField;
 
-		// Button labels.
-		protected abstract string ReplaceAllLabel { get; }
+		// Button tooltips.
+		protected abstract string ReplaceAllTooltipKey { get; }
+
+		// Replace all button atlas.
+		protected abstract UITextureAtlas ReplaceAllAtlas { get; }
 
 
 		// Trees or props?
@@ -51,8 +54,12 @@ namespace BOB
 				// Perform basic panel setup.
 				base.Setup(parentTransform, targetPrefabInfo);
 
+				// Add checkboxes.
+				propCheck = IconToggleCheck(this, Margin, TitleHeight + Margin, "bob_props3", "BOB_PNL_PRP");
+				treeCheck = IconToggleCheck(this, Margin + propCheck.width, TitleHeight + Margin, "bob_trees_small", "BOB_PNL_TRE");
+
 				// Replace all button.
-				replaceAllButton = UIControls.AddSmallerButton(this, LeftWidth + (Margin * 2), ReplaceAllY, ReplaceAllLabel, ButtonWidth);
+				replaceAllButton = AddIconButton(this, LeftWidth + (Margin * 2) + 64f, ReplaceY, BigIconSize, ReplaceAllTooltipKey, ReplaceAllAtlas);
 
 				// Probability label and textfield.
 				UILabel probabilityLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), ProbabilityY, Translations.Translate("BOB_PNL_PRB"), textScale: 0.7f);
@@ -74,9 +81,6 @@ namespace BOB
 				UILabel zLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), ZOffsetY, Translations.Translate("BOB_PNL_ZOF"), textScale: 0.7f);
 				zField = UIControls.SmallTextField(this, LeftWidth + (Margin * 2), ZOffsetY + zLabel.height, width: TextFieldWidth);
 
-				// Add checkboxes.
-				propCheck = UIControls.AddCheckBox(this, Margin, TitleHeight, Translations.Translate("BOB_PNL_PRP"));
-				treeCheck = UIControls.AddCheckBox(this, Margin, TitleHeight + Margin + propCheck.height, Translations.Translate("BOB_PNL_TRE"));
 
 				// Set initial button and checkbox states.
 				hideVanilla.isChecked = ModSettings.hideVanilla;
@@ -108,6 +112,10 @@ namespace BOB
 				{
 					revertButton.Enable();
 				}
+				else
+                {
+					revertButton.tooltip = "Revert is not available as there is no active replacement for this item";
+                }
 
 				// Replacement requires a valid replacement selection.
 				if (replacementPrefab != null)
@@ -115,7 +123,51 @@ namespace BOB
 					replaceButton.Enable();
 					replaceAllButton.Enable();
 				}
+                else
+                {
+					replaceButton.tooltip = "No valid replacement selected";
+					replaceAllButton.tooltip = "No valid replacement selected";
+                }
 			}
+		}
+
+
+		/// <summary>
+		/// Adds an icon toggle checkbox.
+		/// </summary>
+		/// <param name="parent">Parent component</param>
+		/// <param name="xPos">Relative X position</param>
+		/// <param name="yPos">Relative Y position</param>
+		/// <param name="atlasName">Atlas name (for loading from file)</param>
+		/// <param name="tooltipKey">Tooltip translation key</param>
+		/// <returns>New checkbox</returns>
+		private UICheckBox IconToggleCheck(UIComponent parent, float xPos, float yPos, string atlasName, string tooltipKey)
+        {
+			const float ToggleSpriteSize = 32f;
+
+			// Size and position.
+			UICheckBox checkBox = parent.AddUIComponent<UICheckBox>();
+			checkBox.width = ToggleSpriteSize;
+			checkBox.height = ToggleSpriteSize;
+			checkBox.clipChildren = true;
+			checkBox.relativePosition = new Vector2(xPos, yPos);
+
+			// Checkbox sprites.
+			UISprite sprite = checkBox.AddUIComponent<UISprite>();
+			sprite.atlas = TextureUtils.LoadSpriteAtlas(atlasName);
+			sprite.spriteName = "disabled";
+			sprite.size = new Vector2(ToggleSpriteSize, ToggleSpriteSize);
+			sprite.relativePosition = Vector3.zero;
+
+			checkBox.checkedBoxObject = sprite.AddUIComponent<UISprite>();
+			((UISprite)checkBox.checkedBoxObject).atlas = TextureUtils.LoadSpriteAtlas(atlasName);
+			((UISprite)checkBox.checkedBoxObject).spriteName = "pressed";
+			checkBox.checkedBoxObject.size = new Vector2(ToggleSpriteSize, ToggleSpriteSize);
+			checkBox.checkedBoxObject.relativePosition = Vector3.zero;
+
+			checkBox.tooltip = Translations.Translate(tooltipKey);
+
+			return checkBox;
 		}
 	}
 }

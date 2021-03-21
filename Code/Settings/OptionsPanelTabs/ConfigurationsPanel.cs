@@ -108,7 +108,7 @@ namespace BOB
             if (inGame)
             {
                 // Use custom check box.
-                customCheck = UIControls.AddCheckBox(panel, Margin, ToolBarY, Translations.Translate("BOB_CFG_UCS"));
+                customCheck = UIControls.AddCheckBox(panel, Margin, ToolBarY, tooltip: Translations.Translate("BOB_CFG_UCS"));
                 customCheck.isChecked = !string.IsNullOrEmpty(ConfigurationUtils.currentConfig);
 
                 // Apply button.

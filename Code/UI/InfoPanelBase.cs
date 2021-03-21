@@ -15,17 +15,18 @@ namespace BOB
 		// Layout constants.
 		protected const float Margin = 5f;
 		protected const float LeftWidth = 400f;
-		protected const float ButtonWidth = 150f;
+		protected const float ButtonWidth = 128f;
 		protected const float MiddleX = LeftWidth + Margin;
 		protected const float MiddleWidth = ButtonWidth + (Margin * 2f);
 		protected const float RightX = MiddleX + MiddleWidth;
 		protected const float RightWidth = 320f;
-		protected const float TitleHeight = 45f;
-		protected const float ToolbarHeight = 50f;
+		protected const float TitleHeight = 40f;
+		protected const float ToolbarHeight = 42f;
 		protected const float ListY = TitleHeight + ToolbarHeight;
 		protected const float ListHeight = UIPropRow.RowHeight * 16f;
 		protected const float PanelWidth = RightX + RightWidth + Margin;
 		protected const float PanelHeight = ListY + ListHeight + (Margin * 2f);
+		protected const float BigIconSize = 64f;
 
 		// Component locations.
 		protected const float ReplaceLabelY = ListY;
@@ -47,11 +48,15 @@ namespace BOB
 		protected UIButton replaceButton, revertButton;
 
 
-		// Button labels.
-		protected abstract string ReplaceLabel { get; }
+		// Button tooltips.
+		protected abstract string ReplaceTooltipKey { get; }
 
 		// Trees or props?
 		protected abstract bool IsTree { get; }
+
+		// Replace button atlas.
+		protected abstract UITextureAtlas ReplaceAtlas { get; }
+
 
 		/// <summary>
 		/// Populates a fastlist with a list of target-specific trees or props.
@@ -181,8 +186,8 @@ namespace BOB
 
 			// Title label.
 			UILabel titleLabel = AddUIComponent<UILabel>();
-			titleLabel.relativePosition = new Vector2(50f, 13f);
 			titleLabel.text = Translations.Translate("BOB_NAM") + ": " + GetDisplayName(targetPrefabInfo.name);
+			titleLabel.relativePosition = new Vector2(50f, (TitleHeight - titleLabel.height) / 2f);
 
 			// Close button.
 			UIButton closeButton = AddUIComponent<UIButton>();
@@ -219,26 +224,26 @@ namespace BOB
 			replaceLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), ReplaceLabelY);
 
 			// Replace button.
-			replaceButton = UIControls.AddSmallerButton(this, LeftWidth + (Margin * 2), ReplaceY, ReplaceLabel, ButtonWidth);
+			replaceButton = AddIconButton(this, LeftWidth + (Margin * 2), ReplaceY, BigIconSize, ReplaceTooltipKey, ReplaceAtlas);
 
 			// Revert button.
 			revertButton = UIControls.AddSmallerButton(this, LeftWidth + (Margin * 2), RevertY, Translations.Translate("BOB_PNL_REV"), ButtonWidth);
 
 			// Name filter.
-			nameFilter = UIControls.BigLabelledTextField(this, width - 200f - Margin, 40f, Translations.Translate("BOB_FIL_NAME"));
+			nameFilter = UIControls.SmallLabelledTextField(this, width - 200f - Margin, TitleHeight + Margin, Translations.Translate("BOB_FIL_NAME"));
 			// Event handlers for name filter textbox.
 			nameFilter.eventTextChanged += (control, text) => loadedList.rowsData = LoadedList(IsTree);
 			nameFilter.eventTextSubmitted += (control, text) => loadedList.rowsData = LoadedList(IsTree);
 
 			// Vanilla filter.
-			hideVanilla = UIControls.AddCheckBox((UIComponent)(object)this, nameFilter.relativePosition.x, 75f, Translations.Translate("BOB_PNL_HDV"));
+			hideVanilla = UIControls.LabelledCheckBox((UIComponent)(object)this, nameFilter.relativePosition.x, nameFilter.relativePosition.y + nameFilter.height + (Margin / 2f), Translations.Translate("BOB_PNL_HDV"), 12f, 0.7f);
 			hideVanilla.eventCheckChanged += (control, isChecked) =>
 			{
-					// Filter list.
-					loadedList.rowsData = LoadedList(IsTree);
+				// Filter list.
+				loadedList.rowsData = LoadedList(IsTree);
 
-					// Store state.
-					ModSettings.hideVanilla = isChecked;
+				// Store state.
+				ModSettings.hideVanilla = isChecked;
 			};
 
 
@@ -252,8 +257,8 @@ namespace BOB
 		/// </summary>
 		/// <param name="propListItem">Target item</param>
 		protected virtual void UpdateTargetItem(PropListItem propListItem)
-        {
-        }
+		{
+		}
 
 
 		/// <summary>
@@ -320,6 +325,43 @@ namespace BOB
 
 
 		/// <summary>
+		/// Adds an icon-style button to the specified component at the specified coordinates.
+		/// </summary>
+		/// <param name="parent">Parent UIComponent</param>
+		/// <param name="xPos">Relative X position</param>
+		/// <param name="yPos">Relative Y position</param>
+		/// <param name="size">Button size (square)</param>
+		/// <param name="tooltipKey">Tooltip translation key</param>
+		/// <param name="atlas">Icon atlas</param>
+		/// <returns>New UIButton</returns>
+		protected UIButton AddIconButton(UIComponent parent, float xPos, float yPos, float size, string tooltipKey, UITextureAtlas atlas)
+		{
+			UIButton newButton = parent.AddUIComponent<UIButton>();
+
+			// Size and position.
+			newButton.relativePosition = new Vector2(xPos, yPos);
+			newButton.height = size;
+			newButton.width = size;
+
+			// Appearance.
+			newButton.atlas = atlas;
+
+			Logging.Message("icon button with atlas name ", atlas?.name ?? "null");
+
+			newButton.normalFgSprite = "normal";
+			newButton.focusedFgSprite = "normal";
+			newButton.hoveredFgSprite = "hovered";
+			newButton.disabledFgSprite = "disabled";
+			newButton.pressedFgSprite = "pressed";
+
+			// Tooltip.
+			newButton.tooltip = Translations.Translate(tooltipKey);
+
+			return newButton;
+		}
+
+
+		/// <summary>
 		/// Performs initial fastlist setup.
 		/// </summary>
 		/// <param name="fastList">Fastlist to set up</param>
@@ -342,13 +384,28 @@ namespace BOB
 		}
 
 
-
-
 		/// <summary>
 		/// Returns a cleaned-up display name for the given prefab.
 		/// </summary>
 		/// <param name="prefabName">Raw prefab name</param>
 		/// <returns>Cleaned display name</returns>
 		private string GetDisplayName(string prefabName) => prefabName.Substring(prefabName.IndexOf('.') + 1).Replace("_Data", "");
+
+
+		/// <summary>
+		/// Performs actions to be taken once an update (application or reversion) has been applied, including saving data, updating button states, and refreshing renders.
+		/// </summary>
+		protected virtual void FinishUpdate()
+		{
+			// Save configuration file and refresh target list (to reflect our changes).
+			ConfigurationUtils.SaveConfig();
+			UpdateTargetList();
+
+			// Update button states.
+			UpdateButtonStates();
+
+			// Refresh current target item to update highlighting.
+			CurrentTargetItem = CurrentTargetItem;
+		}
 	}
 }

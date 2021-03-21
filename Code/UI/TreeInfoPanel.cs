@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using ColossalFramework;
+using ColossalFramework.UI;
 
 
 namespace BOB
@@ -11,11 +12,15 @@ namespace BOB
 	public class BOBTreeInfoPanel : BOBInfoPanelBase
 	{
 		// Button labels.
-		protected override string ReplaceLabel => Translations.Translate("BOB_PNL_RTT");
+		protected override string ReplaceTooltipKey => "BOB_PNL_RTT";
 
 
 		// Always, always, trees.
 		protected override bool IsTree => true;
+
+
+		// Replace button atlas.
+		protected override UITextureAtlas ReplaceAtlas => TextureUtils.LoadSpriteAtlas("bob_trees");
 
 
 		/// <summary>

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using ColossalFramework.UI;
 
 
 namespace BOB
@@ -13,10 +14,14 @@ namespace BOB
 		NetInfo currentNet;
 
 
-		// Button labels.
-		protected override string ReplaceLabel => Translations.Translate("BOB_PNL_RTN");
+		// Button tooltips.
+		protected override string ReplaceTooltipKey => "BOB_PNL_RTN";
+		protected override string ReplaceAllTooltipKey => "BOB_PNL_RAN";
 
-		protected override string ReplaceAllLabel => Translations.Translate("BOB_PNL_RAN");
+
+		// Replace button atlases.
+		protected override UITextureAtlas ReplaceAtlas => TextureUtils.LoadSpriteAtlas("bob_road");
+		protected override UITextureAtlas ReplaceAllAtlas => TextureUtils.LoadSpriteAtlas("bob_all_roads");
 
 
 		/// <summary>
@@ -77,7 +82,7 @@ namespace BOB
 			base.Setup(parentTransform, targetPrefabInfo);
 
 			// Add pack button.
-			ColossalFramework.UI.UIButton packButton = UIControls.AddButton(this, 250f, 50f, Translations.Translate("BOB_PNL_PKB"));
+			ColossalFramework.UI.UIButton packButton = UIControls.AddSmallerButton(this, 250f, TitleHeight + Margin, Translations.Translate("BOB_PNL_PKB"));
 			packButton.eventClicked += (component, clickEvent) => PackPanelManager.Create();
 
 			// Event handler for prop checkbox.
@@ -433,14 +438,9 @@ namespace BOB
 		/// <summary>
 		/// Performs actions to be taken once an update (application or reversion) has been applied, including saving data, updating button states, and refreshing renders.
 		/// </summary>
-		private void FinishUpdate()
+		protected override void FinishUpdate()
         {
-			// Save configuration file and refresh target list (to reflect our changes).
-			ConfigurationUtils.SaveConfig();
-			UpdateTargetList();
-
-			// Update button states.
-			UpdateButtonStates();
+			base.FinishUpdate();
 
 			// Update any dirty net renders.
 			NetData.Update();

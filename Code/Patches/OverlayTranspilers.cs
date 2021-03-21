@@ -21,16 +21,16 @@ namespace BOB
         public static IEnumerable<CodeInstruction> BuildingTranspiler(MethodBase original, IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
             // ILCode local variable indexes.
-            const int iVarIndex = 11;
-            const int propVarIndex = 14;
-            const int treeVarIndex = 15;
-            const int propPositionVarIndex = 18;
-            const int treePositionVarIndex = 29;
-            const int dataVector2VarIndex = 30;
+            const int IVarIndex = 11;
+            const int PropVarIndex = 14;
+            const int TreeVarIndex = 15;
+            const int PropPositionVarIndex = 18;
+            const int TreePositionVarIndex = 29;
+            const int DataVector2VarIndex = 30;
 
             // ILCode argument indexes.
-            const int buildingArg = 3;
-            const int isActiveArg = 8;
+            const int BuildingArg = 3;
+            const int IsActiveArg = 8;
 
             // Instruction parsing.
             IEnumerator<CodeInstruction> instructionsEnumerator = instructions.GetEnumerator();
@@ -51,7 +51,7 @@ namespace BOB
                 if (instruction.opcode == OpCodes.Ldarg_S)
                 {
                     // ldarg.s isActive.
-                    if (instruction.operand is byte arg && arg == isActiveArg)
+                    if (instruction.operand is byte arg && arg == IsActiveArg)
                     {
                         foundPropCandidate = true;
                     }
@@ -67,7 +67,7 @@ namespace BOB
                     // ldfld - a lot of false positives here.
                     foundPropCandidate = true;
                 }
-                else if (instruction.opcode == OpCodes.Ldloc_S && instruction.operand is LocalBuilder localBuilder && localBuilder.LocalIndex == dataVector2VarIndex)
+                else if (instruction.opcode == OpCodes.Ldloc_S && instruction.operand is LocalBuilder localBuilder && localBuilder.LocalIndex == DataVector2VarIndex)
                 {
                     // Tree candidate - ldloc.s 2
                     foundTreeCandidate = true;
@@ -91,24 +91,24 @@ namespace BOB
                             {
                                 // Prop.
                                 candidateName = "Prop";
-                                prefabIndex = propVarIndex;
-                                positionIndex = propPositionVarIndex;
+                                prefabIndex = PropVarIndex;
+                                positionIndex = PropPositionVarIndex;
                                 methodName = nameof(RenderOverlays.HighlightBuildingProp);
                             }
                             else
                             {
                                 // Tree.
                                 candidateName = "Tree";
-                                prefabIndex = treeVarIndex;
-                                positionIndex = treePositionVarIndex;
+                                prefabIndex = TreeVarIndex;
+                                positionIndex = TreePositionVarIndex;
                                 methodName = nameof(RenderOverlays.HighlightBuildingTree);
                             }
 
                             // Insert call to PropOverlays.Highlight method after original call.
                             Logging.KeyMessage("adding building Highlight", candidateName, " call after RenderInstance");
-                            yield return new CodeInstruction(OpCodes.Ldloc_S, iVarIndex);
+                            yield return new CodeInstruction(OpCodes.Ldloc_S, IVarIndex);
                             yield return new CodeInstruction(OpCodes.Ldloc_S, prefabIndex);
-                            yield return new CodeInstruction(OpCodes.Ldarg_S, buildingArg);
+                            yield return new CodeInstruction(OpCodes.Ldarg_S, BuildingArg);
                             yield return new CodeInstruction(OpCodes.Ldloc_S, positionIndex);
                             yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(RenderOverlays), methodName));
                         }
@@ -132,12 +132,12 @@ namespace BOB
         public static IEnumerable<CodeInstruction> NetTranspiler(MethodBase original, IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
             // ILCode local variable indexes.
-            const int surfaceMapping2Index = 9;
-            const int iVarIndex = 11;
-            const int propVarIndex = 16;
-            const int propPositionVarIndex = 23;
-            const int treeVarIndex = 31;
-            const int treePositionVarIndex = 38;
+            const int SurfaceMapping2Index = 9;
+            const int IVarIndex = 11;
+            const int PropVarIndex = 16;
+            const int PropPositionVarIndex = 23;
+            const int TreeVarIndex = 31;
+            const int TreePositionVarIndex = 38;
 
 
             // Instruction parsing.
@@ -156,7 +156,7 @@ namespace BOB
                 yield return instruction;
 
                 // Looking for possible precursor calls to "Void RenderInstance".
-                if (instruction.opcode == OpCodes.Ldloc_S && instruction.operand is LocalBuilder localBuilder && localBuilder.LocalIndex == surfaceMapping2Index)
+                if (instruction.opcode == OpCodes.Ldloc_S && instruction.operand is LocalBuilder localBuilder && localBuilder.LocalIndex == SurfaceMapping2Index)
                 {
                     // ldloc.s 9
                     foundPropCandidate = true;
@@ -190,16 +190,16 @@ namespace BOB
                             {
                                 // Prop.
                                 candidateName = "Prop";
-                                prefabIndex = propVarIndex;
-                                positionIndex = propPositionVarIndex;
+                                prefabIndex = PropVarIndex;
+                                positionIndex = PropPositionVarIndex;
                                 methodName = nameof(RenderOverlays.HighlightProp);
                             }
                             else
                             {
                                 // Tree.
                                 candidateName = "Tree";
-                                prefabIndex = treeVarIndex;
-                                positionIndex = treePositionVarIndex;
+                                prefabIndex = TreeVarIndex;
+                                positionIndex = TreePositionVarIndex;
                                 methodName = nameof(RenderOverlays.HighlightTree);
                             }
 
@@ -229,9 +229,9 @@ namespace BOB
         public static IEnumerable<CodeInstruction> TreeTranspiler(MethodBase original, IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
             // ILCode local variable indexes.
-            const int treeVarIndex = 0;
-            const int treePositionVarIndex = 1;
-            const int defaultColorLocationVarIndex = 5;
+            const int TreeVarIndex = 0;
+            const int TreePositionVarIndex = 1;
+            const int DefaultColorLocationVarIndex = 5;
 
 
             // Instruction parsing.
@@ -246,7 +246,7 @@ namespace BOB
                 yield return instruction;
 
                 // Looking for possible precursor calls to "Void DrawMesh".
-                if (instruction.opcode == OpCodes.Ldloc_S && instruction.operand is LocalBuilder localBuilder && localBuilder.LocalIndex == defaultColorLocationVarIndex)
+                if (instruction.opcode == OpCodes.Ldloc_S && instruction.operand is LocalBuilder localBuilder && localBuilder.LocalIndex == DefaultColorLocationVarIndex)
                 {
                     // Found ldloc.1 - are there following instructions?
                     if (instructionsEnumerator.MoveNext())
@@ -261,8 +261,8 @@ namespace BOB
                         {
                             // Yes - insert call to PropOverlays.Highlight method after original call.
                             Logging.KeyMessage("adding tree Highlight call after RenderInstance");
-                            yield return new CodeInstruction(OpCodes.Ldloc_S, treeVarIndex);
-                            yield return new CodeInstruction(OpCodes.Ldloc_S, treePositionVarIndex);
+                            yield return new CodeInstruction(OpCodes.Ldloc_S, TreeVarIndex);
+                            yield return new CodeInstruction(OpCodes.Ldloc_S, TreePositionVarIndex);
                             yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(RenderOverlays), nameof(RenderOverlays.HighlightTree)));
                         }
                     }

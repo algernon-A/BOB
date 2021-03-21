@@ -37,6 +37,13 @@ namespace BOB
 		/// <returns>New texture atlas</returns>
 		internal static UITextureAtlas LoadSpriteAtlas(string atlasName)
 		{
+			// Check if we've already cached this atlas.
+			if (textureCache.ContainsKey(atlasName))
+			{
+				// Cached - return cached result.
+				return textureCache[atlasName];
+			}
+
 			// Create new texture atlas for button.
 			UITextureAtlas newAtlas = ScriptableObject.CreateInstance<UITextureAtlas>();
 			newAtlas.name = atlasName;
@@ -64,6 +71,8 @@ namespace BOB
 				newAtlas.AddSprite(sprite);
 			}
 
+			// Add to cache and return.
+			textureCache.Add(atlasName, newAtlas);
 			return newAtlas;
 		}
 
