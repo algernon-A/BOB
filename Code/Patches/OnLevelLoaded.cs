@@ -48,7 +48,8 @@ namespace BOB
             // Set up Network Skins 2 reflection.
             ModUtils.NS2Reflection();
 
-            // Force update of any dirty net prefabs from replacement process.
+            // Force update of any dirty net or building prefabs from replacement process.
+            BuildingData.Update();
             NetData.Update();
         }
     }

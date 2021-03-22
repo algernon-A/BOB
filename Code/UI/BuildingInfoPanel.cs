@@ -55,11 +55,11 @@ namespace BOB
 						Logging.Message("target changed: individual replacement for ", currentBuilding.name, " at index ", CurrentTargetItem.index.ToString());
 						BOBBuildingReplacement thisReplacement = IndividualReplacement.instance.replacements[currentBuilding][CurrentTargetItem.index];
 
-						angleField.text = thisReplacement.angle.ToString();
-						xField.text = thisReplacement.offsetX.ToString();
-						yField.text = thisReplacement.offsetY.ToString();	
-						zField.text = thisReplacement.offsetZ.ToString();
-						probabilityField.text = thisReplacement.probability.ToString();
+						angleSlider.TrueValue = thisReplacement.angle;
+						xSlider.TrueValue = thisReplacement.offsetX;
+						ySlider.TrueValue = thisReplacement.offsetY;	
+						zSlider.TrueValue = thisReplacement.offsetZ;
+						probabilitySlider.TrueValue = thisReplacement.probability;
 					}
 					// Ditto for any building replacement.
 					else if (CurrentTargetItem.replacementPrefab != null)
@@ -67,11 +67,11 @@ namespace BOB
 						Logging.Message("target changed: getting building replacement for ", currentBuilding.name, " with original prefab ", CurrentTargetItem.originalPrefab.name);
 						BOBBuildingReplacement thisReplacement = BuildingReplacement.instance.replacements[currentBuilding][CurrentTargetItem.originalPrefab];
 
-						angleField.text = thisReplacement.angle.ToString();
-						xField.text = thisReplacement.offsetX.ToString();
-						yField.text = thisReplacement.offsetY.ToString();
-						zField.text = thisReplacement.offsetZ.ToString();
-						probabilityField.text = thisReplacement.probability.ToString();
+						angleSlider.TrueValue = thisReplacement.angle;
+						xSlider.TrueValue = thisReplacement.offsetX;
+						ySlider.TrueValue = thisReplacement.offsetY;
+						zSlider.TrueValue = thisReplacement.offsetZ;
+						probabilitySlider.TrueValue = thisReplacement.probability;
 					}
 					// Ditto for any all-building replacement.
 					else if (CurrentTargetItem.allPrefab != null)
@@ -79,20 +79,20 @@ namespace BOB
 						Logging.Message("target changed: getting all-building replacement for ", currentBuilding.name, " with original prefab ", CurrentTargetItem.originalPrefab.name);
 						BOBBuildingReplacement thisReplacement = AllBuildingReplacement.replacements[CurrentTargetItem.originalPrefab];
 
-						angleField.text = thisReplacement.angle.ToString();
-						xField.text = thisReplacement.offsetX.ToString();
-						yField.text = thisReplacement.offsetY.ToString();
-						zField.text = thisReplacement.offsetZ.ToString();
-						probabilityField.text = thisReplacement.probability.ToString();
+						angleSlider.TrueValue = thisReplacement.angle;
+						xSlider.TrueValue = thisReplacement.offsetX;
+						ySlider.TrueValue = thisReplacement.offsetY;
+						zSlider.TrueValue = thisReplacement.offsetZ;
+						probabilitySlider.TrueValue = thisReplacement.probability;
 					}
 					else
 					{
 						// No current replacement; set all relative fields to zero, and absolute fields to final prop.
-						angleField.text = "0";
-						xField.text = "0";
-						yField.text = "0";
-						zField.text = "0";
-						probabilityField.text = value.originalProb.ToString();
+						angleSlider.TrueValue = 0f;
+						xSlider.TrueValue = 0f;
+						ySlider.TrueValue = 0f;
+						zSlider.TrueValue = 0f;
+						probabilitySlider.TrueValue = value.originalProb;
 					}
 				}
 				catch (Exception e)
@@ -252,25 +252,11 @@ namespace BOB
 				// Make sure we have valid a target and replacement.
 				if (CurrentTargetItem != null && replacementPrefab != null)
 				{
-					// Try to parse textfields.
-					float.TryParse(angleField.text, out float angle);
-					float.TryParse(xField.text, out float xOffset);
-					float.TryParse(yField.text, out float yOffset);
-					float.TryParse(zField.text, out float zOffset);
-					int.TryParse(probabilityField.text, out int probability);
-
-					// Update text fields to match parsed values.
-					angleField.text = angle.ToString();
-					xField.text = xOffset.ToString();
-					yField.text = yOffset.ToString();
-					zField.text = zOffset.ToString();
-					probabilityField.text = probability.ToString();
-
 					// Grouped or individual?
 					if (CurrentTargetItem.index < 0)
 					{
 						// Grouped replacement.
-						BuildingReplacement.instance.Apply(currentBuilding, CurrentTargetItem.originalPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
+						BuildingReplacement.instance.Apply(currentBuilding, CurrentTargetItem.originalPrefab, replacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
 
 						// Update current target.
 						CurrentTargetItem.replacementPrefab = replacementPrefab;
@@ -279,7 +265,7 @@ namespace BOB
 					else
 					{
 						// Individual replacement.
-						IndividualReplacement.instance.Apply(currentBuilding, CurrentTargetItem.originalPrefab, CurrentTargetItem.index, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
+						IndividualReplacement.instance.Apply(currentBuilding, CurrentTargetItem.originalPrefab, CurrentTargetItem.index, replacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
 
 						// Update current target.
 						CurrentTargetItem.individualPrefab = replacementPrefab;
@@ -300,22 +286,8 @@ namespace BOB
 					return;
                 }
 
-				// Try to parse text fields.
-				float.TryParse(angleField.text, out float angle);
-				float.TryParse(xField.text, out float xOffset);
-				float.TryParse(yField.text, out float yOffset);
-				float.TryParse(zField.text, out float zOffset);
-				int.TryParse(probabilityField.text, out int probability);
-
-				// Update text fields to match parsed values.
-				angleField.text = angle.ToString();
-				xField.text = xOffset.ToString();
-				yField.text = yOffset.ToString();
-				zField.text = zOffset.ToString();
-				probabilityField.text = probability.ToString();
-
 				// Apply replacement.
-				AllBuildingReplacement.instance.Apply(CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
+				AllBuildingReplacement.instance.Apply(CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, replacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
 
 				// Update current target.
 				CurrentTargetItem.allPrefab = replacementPrefab;

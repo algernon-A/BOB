@@ -12,21 +12,27 @@ namespace BOB
 	/// </summary>
 	public abstract class BOBInfoPanelBase : UIPanel
 	{
-		// Layout constants.
+		// Layout constants - general.
 		protected const float Margin = 5f;
+
+		// Layout constants - X.
 		protected const float LeftWidth = 400f;
-		protected const float ButtonWidth = 128f;
+		protected const float MidControlWidth = 128f;
 		protected const float MiddleX = LeftWidth + Margin;
-		protected const float MiddleWidth = ButtonWidth + (Margin * 2f);
+		protected const float MiddleWidth = MidControlWidth + (Margin * 2f);
+		protected const float MidControlX = MiddleX + Margin;
 		protected const float RightX = MiddleX + MiddleWidth;
 		protected const float RightWidth = 320f;
+		protected const float PanelWidth = RightX + RightWidth + Margin;
+
+		// Layout constants - Y.
 		protected const float TitleHeight = 40f;
 		protected const float ToolbarHeight = 42f;
 		protected const float ListY = TitleHeight + ToolbarHeight;
 		protected const float ListHeight = UIPropRow.RowHeight * 16f;
-		protected const float PanelWidth = RightX + RightWidth + Margin;
 		protected const float PanelHeight = ListY + ListHeight + (Margin * 2f);
 		protected const float BigIconSize = 64f;
+
 
 		// Component locations.
 		protected const float ReplaceLabelY = ListY;
@@ -221,13 +227,13 @@ namespace BOB
 			// Replace text label.
 			UILabel replaceLabel = AddUIComponent<UILabel>();
 			replaceLabel.text = Translations.Translate("BOB_PNL_REP");
-			replaceLabel.relativePosition = new Vector2(LeftWidth + (Margin * 2), ReplaceLabelY);
+			replaceLabel.relativePosition = new Vector2(MidControlX, ReplaceLabelY);
 
 			// Replace button.
-			replaceButton = AddIconButton(this, LeftWidth + (Margin * 2), ReplaceY, BigIconSize, ReplaceTooltipKey, ReplaceAtlas);
+			replaceButton = AddIconButton(this, MidControlX, ReplaceY, BigIconSize, ReplaceTooltipKey, ReplaceAtlas);
 
 			// Revert button.
-			revertButton = UIControls.AddSmallerButton(this, LeftWidth + (Margin * 2), RevertY, Translations.Translate("BOB_PNL_REV"), ButtonWidth);
+			revertButton = UIControls.AddSmallerButton(this, MidControlX, RevertY, Translations.Translate("BOB_PNL_REV"), MidControlWidth);
 
 			// Name filter.
 			nameFilter = UIControls.SmallLabelledTextField(this, width - 200f - Margin, TitleHeight + Margin, Translations.Translate("BOB_FIL_NAME"));
@@ -362,6 +368,23 @@ namespace BOB
 
 
 		/// <summary>
+		/// Performs actions to be taken once an update (application or reversion) has been applied, including saving data, updating button states, and refreshing renders.
+		/// </summary>
+		protected virtual void FinishUpdate()
+		{
+			// Save configuration file and refresh target list (to reflect our changes).
+			ConfigurationUtils.SaveConfig();
+			UpdateTargetList();
+
+			// Update button states.
+			UpdateButtonStates();
+
+			// Refresh current target item to update highlighting.
+			CurrentTargetItem = CurrentTargetItem;
+		}
+
+
+		/// <summary>
 		/// Performs initial fastlist setup.
 		/// </summary>
 		/// <param name="fastList">Fastlist to set up</param>
@@ -390,22 +413,5 @@ namespace BOB
 		/// <param name="prefabName">Raw prefab name</param>
 		/// <returns>Cleaned display name</returns>
 		private string GetDisplayName(string prefabName) => prefabName.Substring(prefabName.IndexOf('.') + 1).Replace("_Data", "");
-
-
-		/// <summary>
-		/// Performs actions to be taken once an update (application or reversion) has been applied, including saving data, updating button states, and refreshing renders.
-		/// </summary>
-		protected virtual void FinishUpdate()
-		{
-			// Save configuration file and refresh target list (to reflect our changes).
-			ConfigurationUtils.SaveConfig();
-			UpdateTargetList();
-
-			// Update button states.
-			UpdateButtonStates();
-
-			// Refresh current target item to update highlighting.
-			CurrentTargetItem = CurrentTargetItem;
-		}
 	}
 }

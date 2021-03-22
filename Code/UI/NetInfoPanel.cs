@@ -39,29 +39,29 @@ namespace BOB
 					// If we've got a replacement, update the offset fields with the replacement vlues
 					if (CurrentTargetItem.replacementPrefab != null)
 					{
-						angleField.text = NetworkReplacement.instance.replacements[currentNet][CurrentTargetItem.originalPrefab].angle.ToString();
-						xField.text = NetworkReplacement.instance.replacements[currentNet][CurrentTargetItem.originalPrefab].offsetX.ToString();
-						yField.text = NetworkReplacement.instance.replacements[currentNet][CurrentTargetItem.originalPrefab].offsetY.ToString();
-						zField.text = NetworkReplacement.instance.replacements[currentNet][CurrentTargetItem.originalPrefab].offsetZ.ToString();
-						probabilityField.text = NetworkReplacement.instance.replacements[currentNet][CurrentTargetItem.originalPrefab].probability.ToString();
+						angleSlider.TrueValue = NetworkReplacement.instance.replacements[currentNet][CurrentTargetItem.originalPrefab].angle;
+						xSlider.TrueValue = NetworkReplacement.instance.replacements[currentNet][CurrentTargetItem.originalPrefab].offsetX;
+						ySlider.TrueValue = NetworkReplacement.instance.replacements[currentNet][CurrentTargetItem.originalPrefab].offsetY;
+						zSlider.TrueValue = NetworkReplacement.instance.replacements[currentNet][CurrentTargetItem.originalPrefab].offsetZ;
+						probabilitySlider.TrueValue = NetworkReplacement.instance.replacements[currentNet][CurrentTargetItem.originalPrefab].probability;
 					}
 					// Ditto for any all-network replacement.
 					else if (CurrentTargetItem.allPrefab != null)
 					{
-						angleField.text = AllNetworkReplacement.instance.replacements[CurrentTargetItem.originalPrefab].angle.ToString();
-						xField.text = AllNetworkReplacement.instance.replacements[CurrentTargetItem.originalPrefab].offsetX.ToString();
-						yField.text = AllNetworkReplacement.instance.replacements[CurrentTargetItem.originalPrefab].offsetY.ToString();
-						zField.text = AllNetworkReplacement.instance.replacements[CurrentTargetItem.originalPrefab].offsetZ.ToString();
-						probabilityField.text = AllNetworkReplacement.instance.replacements[CurrentTargetItem.originalPrefab].probability.ToString();
+						angleSlider.TrueValue = AllNetworkReplacement.instance.replacements[CurrentTargetItem.originalPrefab].angle;
+						xSlider.TrueValue = AllNetworkReplacement.instance.replacements[CurrentTargetItem.originalPrefab].offsetX;
+						ySlider.TrueValue = AllNetworkReplacement.instance.replacements[CurrentTargetItem.originalPrefab].offsetY;
+						zSlider.TrueValue = AllNetworkReplacement.instance.replacements[CurrentTargetItem.originalPrefab].offsetZ;
+						probabilitySlider.TrueValue = AllNetworkReplacement.instance.replacements[CurrentTargetItem.originalPrefab].probability;
 					}
 					else
 					{
 						// No current replacement; set all offset fields to original prop.
-						angleField.text = value.originalAngle.ToString();
-						xField.text = "0";
-						yField.text = "0";
-						zField.text = "0";
-						probabilityField.text = value.originalProb.ToString();
+						angleSlider.TrueValue = value.originalAngle;
+						xSlider.TrueValue = 0;
+						ySlider.TrueValue = 0;
+						zSlider.TrueValue = 0;
+						probabilitySlider.TrueValue = value.originalProb;
 					}
 				}
             }
@@ -155,22 +155,8 @@ namespace BOB
 				// Make sure we have valid a target and replacement.
 				if (CurrentTargetItem != null && replacementPrefab != null)
 				{
-					// Try to parse textfields.
-					float.TryParse(angleField.text, out float angle);
-					float.TryParse(xField.text, out float xOffset);
-					float.TryParse(yField.text, out float yOffset);
-					float.TryParse(zField.text, out float zOffset);
-					int.TryParse(probabilityField.text, out int probability);
-
-					// Update text fields to match parsed values.
-					angleField.text = angle.ToString();
-					xField.text = xOffset.ToString();
-					yField.text = yOffset.ToString();
-					zField.text = zOffset.ToString();
-					probabilityField.text = probability.ToString();
-
 					// Network replacements are always grouped.
-					NetworkReplacement.instance.Apply(currentNet, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
+					NetworkReplacement.instance.Apply(currentNet, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, replacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
 
 					// Perform post-replacment updates.
 					FinishUpdate();
@@ -180,22 +166,9 @@ namespace BOB
 			// All network button event handler.
 			replaceAllButton.eventClicked += (control, clickEvent) =>
 			{
-				// Try to parse text fields.
-				float.TryParse(angleField.text, out float angle);
-				float.TryParse(xField.text, out float xOffset);
-				float.TryParse(yField.text, out float yOffset);
-				float.TryParse(zField.text, out float zOffset);
-				int.TryParse(probabilityField.text, out int probability);
-
-				// Update text fields to match parsed values.
-				angleField.text = angle.ToString();
-				xField.text = xOffset.ToString();
-				yField.text = yOffset.ToString();
-				zField.text = zOffset.ToString();
-				probabilityField.text = probability.ToString();
 
 				// Apply replacement.
-				AllNetworkReplacement.instance.Apply(CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
+				AllNetworkReplacement.instance.Apply(CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, replacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
 
 				// Perform post-replacment updates.
 				FinishUpdate();

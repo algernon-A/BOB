@@ -12,7 +12,6 @@ namespace BOB
 	{
 		// Component locations.
 		private const float LabelHeight = 17f;
-		private const float TextFieldWidth = 100f;
 		private const float TextFieldHeight = 15f;
 		private const float Padding = 10f;
 		private const float FieldOffset = LabelHeight + TextFieldHeight + Padding;
@@ -28,8 +27,7 @@ namespace BOB
 		// Panel components.
 		protected UIButton replaceAllButton, configButton;
 		protected UICheckBox treeCheck, propCheck;
-		internal UITextField probabilityField;
-		internal UITextField angleField, xField, yField, zField;
+		protected BOBSlider probabilitySlider, angleSlider, xSlider, ySlider, zSlider;
 
 		// Button tooltips.
 		protected abstract string ReplaceAllTooltipKey { get; }
@@ -59,27 +57,43 @@ namespace BOB
 				treeCheck = IconToggleCheck(this, Margin + propCheck.width, TitleHeight + Margin, "bob_trees_small", "BOB_PNL_TRE");
 
 				// Replace all button.
-				replaceAllButton = AddIconButton(this, LeftWidth + (Margin * 2) + 64f, ReplaceY, BigIconSize, ReplaceAllTooltipKey, ReplaceAllAtlas);
+				replaceAllButton = AddIconButton(this, MidControlX + replaceButton.width, ReplaceY, BigIconSize, ReplaceAllTooltipKey, ReplaceAllAtlas);
 
-				// Probability label and textfield.
-				UILabel probabilityLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), ProbabilityY, Translations.Translate("BOB_PNL_PRB"), textScale: 0.7f);
-				probabilityField = UIControls.SmallTextField(this, LeftWidth + (Margin * 2), ProbabilityY + probabilityLabel.height, width: TextFieldWidth);
+				// Probability.
+				probabilitySlider = AddBOBSlider(this, MidControlX, ProbabilityY, "BOB_PNL_PRB");
+				probabilitySlider.maxValue = 100f;
+				probabilitySlider.minValue = 0f;
+				probabilitySlider.stepSize = 1f;
+				probabilitySlider.TrueValue = 0f;
+				probabilitySlider.IsInt = true;
 
-				// Angle label and textfield.
-				UILabel angleLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), AngleY, Translations.Translate("BOB_PNL_ANG"), textScale: 0.7f);
-				angleField = UIControls.SmallTextField(this, LeftWidth + (Margin * 2), AngleY + angleLabel.height, width: TextFieldWidth);
+				// Angle.
+				angleSlider = AddBOBSlider(this, MidControlX, AngleY, "BOB_PNL_ANG");
+				angleSlider.maxValue = 180f;
+				angleSlider.minValue = -180f;
+				angleSlider.stepSize = 1f;
+				angleSlider.TrueValue = 0f;
 
 				// Offset X position.
-				UILabel xLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), XOffsetY, Translations.Translate("BOB_PNL_XOF"), textScale: 0.7f);
-				xField = UIControls.SmallTextField(this, LeftWidth + (Margin * 2), XOffsetY + xLabel.height, width: TextFieldWidth);
+				xSlider = AddBOBSlider(this, MidControlX, XOffsetY, "BOB_PNL_XOF");
+				xSlider.maxValue = 8f;
+				xSlider.minValue = -8f;
+				xSlider.stepSize = 0.1f;
+				xSlider.TrueValue = 0f;
 
 				// Offset Y position.
-				UILabel yLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), YOffsetY, Translations.Translate("BOB_PNL_YOF"), textScale: 0.7f);
-				yField = UIControls.SmallTextField(this, LeftWidth + (Margin * 2), YOffsetY + yLabel.height, width: TextFieldWidth);
+				ySlider = AddBOBSlider(this, MidControlX, YOffsetY, "BOB_PNL_YOF");
+				ySlider.maxValue = 8f;
+				ySlider.minValue = -8f;
+				ySlider.stepSize = 0.1f;
+				ySlider.TrueValue = 0f;
 
 				// Offset Z position.
-				UILabel zLabel = UIControls.AddLabel(this, LeftWidth + (Margin * 2), ZOffsetY, Translations.Translate("BOB_PNL_ZOF"), textScale: 0.7f);
-				zField = UIControls.SmallTextField(this, LeftWidth + (Margin * 2), ZOffsetY + zLabel.height, width: TextFieldWidth);
+				zSlider = AddBOBSlider(this, MidControlX, ZOffsetY, "BOB_PNL_ZOF");
+				zSlider.maxValue = 8f;
+				zSlider.minValue = -8f;
+				zSlider.stepSize = 0.1f;
+				zSlider.TrueValue = 0f;
 
 
 				// Set initial button and checkbox states.
@@ -169,5 +183,145 @@ namespace BOB
 
 			return checkBox;
 		}
+
+
+		/// <summary>
+		/// Adds a BOB slider to the specified component.
+		/// </summary>
+		/// <param name="parent">Parent component</param>
+		/// <param name="xPos">Relative X position</param>
+		/// <param name="yPos">Relative Y position</param>
+		/// <param name="labelKey">Text label translation key</param>
+		/// <returns>New BOBSlider</returns>
+		private BOBSlider AddBOBSlider(UIComponent parent, float xPos, float yPos, string labelKey)
+		{
+			const float SliderPanelMargin = 2f;
+			const float LabelY = SliderPanelMargin;
+			const float LabelHeight = 14f;
+			const float SliderY = LabelY + LabelHeight + SliderPanelMargin;
+			const float SliderHeight = 18f;
+			const float SliderPanelHeight = SliderY + SliderHeight + SliderPanelMargin;
+			const float TextFieldWidth = 40f;
+
+
+			// Slider panel.
+			UIPanel sliderPanel = parent.AddUIComponent<UIPanel>();
+			sliderPanel.atlas = TextureUtils.InGameAtlas;
+			sliderPanel.backgroundSprite = "GenericPanel";
+			sliderPanel.color = new Color32(206, 206, 206, 255);
+			sliderPanel.size = new Vector2(MidControlWidth, SliderPanelHeight);
+			sliderPanel.relativePosition = new Vector2(xPos, yPos);
+
+			// Title label.
+			UIControls.AddLabel(sliderPanel, Margin, 6f, Translations.Translate(labelKey), textScale: 0.7f);
+
+			// Value field.
+			UITextField valueField = UIControls.TinyTextField(sliderPanel, sliderPanel.width - TextFieldWidth - Margin, 3f, TextFieldWidth);
+			valueField.relativePosition = new Vector2(sliderPanel.width - valueField.width - Margin, LabelY);
+
+			// Slider control.
+			BOBSlider newSlider = sliderPanel.AddUIComponent<BOBSlider>();
+			newSlider.size = new Vector2(sliderPanel.width - (Margin * 2f), SliderHeight);
+			newSlider.relativePosition = new Vector2(Margin, SliderY);
+
+			// Slider track.
+			UISlicedSprite sliderSprite = newSlider.AddUIComponent<UISlicedSprite>();
+			sliderSprite.atlas = TextureUtils.InGameAtlas;
+			sliderSprite.spriteName = "BudgetSlider";
+			sliderSprite.size = new Vector2(newSlider.width, 9f);
+			sliderSprite.relativePosition = new Vector2(0f, 4f);
+
+			// Slider thumb.
+			UISlicedSprite sliderThumb = newSlider.AddUIComponent<UISlicedSprite>();
+			sliderThumb.atlas = TextureUtils.InGameAtlas;
+			sliderThumb.spriteName = "SliderBudget";
+			newSlider.thumbObject = sliderThumb;
+
+			// Set references.
+			newSlider.ValueField = valueField;
+
+			// Event handlers.
+			newSlider.eventValueChanged += newSlider.OnSliderUpdate;
+			newSlider.ValueField.eventTextSubmitted += newSlider.OnTextSubmitted;
+
+			return newSlider;
+		}
 	}
+
+#pragma warning disable IDE0060 // Remove unused parameter
+
+	/// <summary>
+	/// Slider with integrated components.
+	/// </summary>
+	public class BOBSlider : UISlider
+	{
+		// State flag (to avoid infinite recursive update loops).
+		private bool suppressEvents = false;
+
+		// Float or integer slider?
+		public bool IsInt { get; set; } = false;
+
+		// Sub-components.
+		public UITextField ValueField { get; set; }
+
+
+		/// <summary>
+		/// 'True' (not just displayed) slider value; use this instead of value to ensure proper operation.
+		/// </summary>
+		public float TrueValue { get=> this.value; set => this.value = value; }
+
+
+		/// <summary>
+		/// Handles slider value change; should be added as eventValueChanged event handler.
+		/// </summary>
+		/// <param name="control">Calling component(unused)</param>
+		/// <param name="value">New slider value</param>
+		public void OnSliderUpdate(UIComponent control, float value)
+        {
+			// Don't do anything is events are suppressed.
+			if (!suppressEvents)
+			{
+				// Suppress events while we change things, to avoid infinite recursive update loops.
+				suppressEvents = true;
+
+				// Update displayed textfield value to current slider value.
+				ValueField.text = IsInt ? Mathf.RoundToInt(TrueValue).ToString() : TrueValue.ToString();
+
+				// Restore event handling.
+				suppressEvents = false;
+			}
+        }
+
+
+		/// <summary>
+		/// Handles textfield value change; should be added as eventTextSubmitted event handler.
+		/// </summary>
+		/// <param name="control">Calling component(unused)</param>
+		/// <param name="text">New text</param>
+		public void OnTextSubmitted(UIComponent control, string text)
+		{
+			// Don't do anything is events are suppressed.
+			if (!suppressEvents)
+			{
+				// Suppress events while we change things, to avoid infinite recursive update loops.
+				suppressEvents = true;
+
+				// Attempt to parse textfield value.
+				if (float.TryParse(text, out float result))
+                {
+					// Successful parse - set slider value.
+					this.value = IsInt ? Mathf.RoundToInt(result) : result;
+                }
+
+				// Set textfield to active value.
+				ValueField.text = IsInt ? Mathf.RoundToInt(TrueValue).ToString() : TrueValue.ToString();
+
+				// Restore event handling.
+				suppressEvents = false;
+            }
+        }
+	}
+
+#pragma warning restore IDE0060 // Remove unused parameter
+
 }
