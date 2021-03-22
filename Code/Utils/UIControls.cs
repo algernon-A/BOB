@@ -153,7 +153,7 @@ namespace BOB
         /// <param name="posY">Relative Y position</param>
         /// <param name="width">Textfield width (default 200)</param>
         /// <returns>New large textfield with attached label</returns>
-        public static UITextField TinyTextField(UIComponent parent, float posX, float posY, float width = 200f) => AddTextField(parent, posX, posY, width, 16f, 0.7f, 3);
+        public static UITextField TinyTextField(UIComponent parent, float posX, float posY, float width = 200f) => AddTextField(parent, posX, posY, width, 16f, 0.8f, 3);
 
 
         /// <summary>

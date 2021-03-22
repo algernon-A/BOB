@@ -64,7 +64,7 @@ namespace BOB
 				probabilitySlider.maxValue = 100f;
 				probabilitySlider.minValue = 0f;
 				probabilitySlider.stepSize = 1f;
-				probabilitySlider.TrueValue = 0f;
+				probabilitySlider.TrueValue = 100f;
 				probabilitySlider.IsInt = true;
 
 				// Angle.
@@ -196,9 +196,9 @@ namespace BOB
 		private BOBSlider AddBOBSlider(UIComponent parent, float xPos, float yPos, string labelKey)
 		{
 			const float SliderPanelMargin = 2f;
-			const float LabelY = SliderPanelMargin;
-			const float LabelHeight = 14f;
-			const float SliderY = LabelY + LabelHeight + SliderPanelMargin;
+			const float ValueY = 3f;
+			const float LabelY = 3f;
+			const float SliderY = 16f + SliderPanelMargin;
 			const float SliderHeight = 18f;
 			const float SliderPanelHeight = SliderY + SliderHeight + SliderPanelMargin;
 			const float TextFieldWidth = 40f;
@@ -213,11 +213,10 @@ namespace BOB
 			sliderPanel.relativePosition = new Vector2(xPos, yPos);
 
 			// Title label.
-			UIControls.AddLabel(sliderPanel, Margin, 6f, Translations.Translate(labelKey), textScale: 0.7f);
+			UIControls.AddLabel(sliderPanel, Margin, LabelY, Translations.Translate(labelKey), textScale: 0.7f);
 
 			// Value field.
-			UITextField valueField = UIControls.TinyTextField(sliderPanel, sliderPanel.width - TextFieldWidth - Margin, 3f, TextFieldWidth);
-			valueField.relativePosition = new Vector2(sliderPanel.width - valueField.width - Margin, LabelY);
+			UITextField valueField = UIControls.TinyTextField(sliderPanel, sliderPanel.width - TextFieldWidth - Margin, ValueY, TextFieldWidth);
 
 			// Slider control.
 			BOBSlider newSlider = sliderPanel.AddUIComponent<BOBSlider>();
