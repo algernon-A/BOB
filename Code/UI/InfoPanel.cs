@@ -73,26 +73,27 @@ namespace BOB
 				angleSlider.minValue = -180f;
 				angleSlider.stepSize = 1f;
 				angleSlider.TrueValue = 0f;
+				angleSlider.IsInt = true;
 
 				// Offset X position.
 				xSlider = AddBOBSlider(this, MidControlX, XOffsetY, "BOB_PNL_XOF");
 				xSlider.maxValue = 8f;
 				xSlider.minValue = -8f;
-				xSlider.stepSize = 0.1f;
+				xSlider.stepSize = 0.01f;
 				xSlider.TrueValue = 0f;
 
 				// Offset Y position.
 				ySlider = AddBOBSlider(this, MidControlX, YOffsetY, "BOB_PNL_YOF");
 				ySlider.maxValue = 8f;
 				ySlider.minValue = -8f;
-				ySlider.stepSize = 0.1f;
+				ySlider.stepSize = 0.01f;
 				ySlider.TrueValue = 0f;
 
 				// Offset Z position.
 				zSlider = AddBOBSlider(this, MidControlX, ZOffsetY, "BOB_PNL_ZOF");
 				zSlider.maxValue = 8f;
 				zSlider.minValue = -8f;
-				zSlider.stepSize = 0.1f;
+				zSlider.stepSize = 0.01f;
 				zSlider.TrueValue = 0f;
 
 
@@ -257,8 +258,12 @@ namespace BOB
 		// State flag (to avoid infinite recursive update loops).
 		private bool suppressEvents = false;
 
+		// True (not displayed) value.
+		private float trueValue;
+
 		// Float or integer slider?
 		public bool IsInt { get; set; } = false;
+
 
 		// Sub-components.
 		public UITextField ValueField { get; set; }
@@ -267,7 +272,18 @@ namespace BOB
 		/// <summary>
 		/// 'True' (not just displayed) slider value; use this instead of value to ensure proper operation.
 		/// </summary>
-		public float TrueValue { get=> this.value; set => this.value = value; }
+		public float TrueValue
+		{
+			get => trueValue;
+
+			set
+			{
+				trueValue = value;
+
+				// Set slider display value - clamped to slider extents.
+				this.value = Mathf.Clamp(value, minValue, maxValue);
+			}
+		}
 
 
 		/// <summary>
@@ -283,7 +299,22 @@ namespace BOB
 				// Suppress events while we change things, to avoid infinite recursive update loops.
 				suppressEvents = true;
 
+				// Quantize value according to key modifiers - for float 1/0.1/0.01 for Alt/none/Ctrl, for Int 5/1 for Alt/not Alt.
+				if (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt) || Input.GetKey(KeyCode.AltGr))
+				{
+					value = value.Quantize(IsInt ? 5 : 1f);
+				}
+				else if (!IsInt && Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+				{
+					value = value.Quantize(0.01f);
+				}
+				else
+                {
+					value = value.Quantize(IsInt ? 1 : 0.1f);
+                }					
+
 				// Update displayed textfield value to current slider value.
+				TrueValue = value;
 				ValueField.text = IsInt ? Mathf.RoundToInt(TrueValue).ToString() : TrueValue.ToString();
 
 				// Restore event handling.
@@ -309,7 +340,7 @@ namespace BOB
 				if (float.TryParse(text, out float result))
                 {
 					// Successful parse - set slider value.
-					this.value = IsInt ? Mathf.RoundToInt(result) : result;
+					TrueValue = IsInt ? Mathf.RoundToInt(result) : result;
                 }
 
 				// Set textfield to active value.
@@ -319,7 +350,7 @@ namespace BOB
 				suppressEvents = false;
             }
         }
-	}
+    }
 
 #pragma warning restore IDE0060 // Remove unused parameter
 
