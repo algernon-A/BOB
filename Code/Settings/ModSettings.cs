@@ -1,4 +1,7 @@
-﻿namespace BOB
+﻿using UnityEngine;
+
+
+namespace BOB
 {
 	/// <summary>
 	/// Static class to hold global mod settings.

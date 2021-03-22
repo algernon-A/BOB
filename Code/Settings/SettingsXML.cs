@@ -27,18 +27,18 @@ namespace BOB
 			{
 				return new KeyBinding
 				{
-					keyCode = (int)UIThreading.hotKey,
-					control = UIThreading.hotCtrl,
-					shift = UIThreading.hotShift,
-					alt = UIThreading.hotAlt
+					keyCode = (int)UIThreading.HotKey,
+					control = UIThreading.HotCtrl,
+					shift = UIThreading.HotShift,
+					alt = UIThreading.HotAlt
 				};
 			}
 			set
 			{
-				UIThreading.hotKey = (KeyCode)value.keyCode;
-				UIThreading.hotCtrl = value.control;
-				UIThreading.hotShift = value.shift;
-				UIThreading.hotAlt = value.alt;
+				UIThreading.HotKey = (KeyCode)value.keyCode;
+				UIThreading.HotCtrl = value.control;
+				UIThreading.HotShift = value.shift;
+				UIThreading.HotAlt = value.alt;
 			}
 		}
 
