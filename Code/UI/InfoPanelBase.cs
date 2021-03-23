@@ -91,7 +91,7 @@ namespace BOB
 				// Check if actual item has been set.
 				if (currentTargetItem != null)
 				{
-					PrefabInfo effectivePrefab = currentTargetItem.replacementPrefab ?? currentTargetItem.allPrefab ?? currentTargetItem.originalPrefab;
+					PrefabInfo effectivePrefab = currentTargetItem.individualPrefab ?? currentTargetItem.replacementPrefab ?? currentTargetItem.allPrefab ?? currentTargetItem.originalPrefab;
 
 					// Select current replacement prefab.
 					loadedList.FindItem(effectivePrefab);
