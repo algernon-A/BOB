@@ -61,6 +61,8 @@
     <Compile Include="Code\Configuration\ConfigurationXML.cs" />
     <Compile Include="Code\Patches\OverlayTranspilers.cs" />
     <Compile Include="Code\Patches\RenderOverlay.cs" />
+    <Compile Include="Code\Replacement\MapPropReplacement.cs" />
+    <Compile Include="Code\UI\PropInfoPanel.cs" />
     <Compile Include="Code\Utils\Logging.cs" />
     <Compile Include="Code\Patches\OnLevelLoaded.cs" />
     <Compile Include="Code\PackUtils\PackUtils.cs" />

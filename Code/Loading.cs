@@ -41,6 +41,7 @@ namespace BOB
             new NetworkReplacement();
             new IndividualReplacement();
             new MapTreeReplacement();
+            new MapPropReplacement();
 
             base.OnCreated(loading);
         }

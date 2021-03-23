@@ -39,7 +39,7 @@ namespace BOB
         public static void RenderOverlay(RenderManager.CameraInfo cameraInfo)
         {
             // 'Contracting circle' effect constants.
-            const float Lifetime = 0.5f;
+            const float Lifetime = 1f;
             const float EffectDistance = 4f;
             Color circleColor = new Color(1f, 0f, 1f, 1f);
 

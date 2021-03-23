@@ -9,18 +9,18 @@ namespace BOB
 	/// <summary>
 	/// BOB map tree replacement panel.
 	/// </summary>
-	public class BOBTreeInfoPanel : BOBInfoPanelBase
+	public class BOBPropInfoPanel : BOBInfoPanelBase
 	{
 		// Button labels.
 		protected override string ReplaceTooltipKey => "BOB_PNL_RTT";
 
 
-		// Always, always, trees.
-		protected override bool IsTree => true;
+		// Never, never, trees.
+		protected override bool IsTree => false;
 
 
 		// Replace button atlas.
-		protected override UITextureAtlas ReplaceAtlas => TextureUtils.LoadSpriteAtlas("bob_trees");
+		protected override UITextureAtlas ReplaceAtlas => TextureUtils.LoadSpriteAtlas("bob_props3");
 
 
 		/// <summary>
@@ -37,7 +37,7 @@ namespace BOB
 			replaceButton.eventClicked += (control, clickEvent) =>
 			{
 				// Apply replacement.
-				MapTreeReplacement.instance.Apply((CurrentTargetItem.replacementPrefab ?? CurrentTargetItem.originalPrefab) as TreeInfo, replacementPrefab as TreeInfo);
+				MapPropReplacement.instance.Apply((CurrentTargetItem.replacementPrefab ?? CurrentTargetItem.originalPrefab) as PropInfo, replacementPrefab as PropInfo);
 
 				// Update current target.
 				CurrentTargetItem.replacementPrefab = replacementPrefab;
@@ -56,7 +56,7 @@ namespace BOB
 				if (CurrentTargetItem != null && CurrentTargetItem is PropListItem currentItem)
 				{
 					// Individual reversion.
-					MapTreeReplacement.instance.Revert(CurrentTargetItem.replacementPrefab as TreeInfo);
+					MapPropReplacement.instance.Revert(CurrentTargetItem.replacementPrefab as PropInfo);
 
 					// Clear current target replacement prefab.
 					CurrentTargetItem.replacementPrefab = null;
@@ -69,9 +69,9 @@ namespace BOB
 				UpdateButtonStates();
 			};
 
-			// Set loaded lists to 'trees'.
-			loadedList.rowsData = LoadedList(isTree: true);
-			targetList.rowsData = TargetList(isTree: true);
+			// Set loaded lists to 'props'.
+			loadedList.rowsData = LoadedList(isTree: false);
+			targetList.rowsData = TargetList(isTree: false);
 
 			// Select target item.
 			targetList.FindTargetItem(targetPrefabInfo);
@@ -80,7 +80,7 @@ namespace BOB
 			UpdateButtonStates();
 
 			// Apply Harmony rendering patches.
-			Patcher.PatchTreeOverlays(true);
+			//Patcher.PatchTreeOverlays(true);
 		}
 
 
@@ -119,20 +119,20 @@ namespace BOB
 		protected override FastList<object> TargetList(bool isTree)
 		{
 			// List of prefabs that have passed filtering.
-			List<PropListItem> treeList = new List<PropListItem>();
+			List<PropListItem> propList = new List<PropListItem>();
 
 			// Local references.
-			TreeManager treeManager = Singleton<TreeManager>.instance;
-			TreeInstance[] trees = treeManager.m_trees.m_buffer;
+			PropManager propManager = Singleton<PropManager>.instance;
+			PropInstance[] props = propManager.m_props.m_buffer;
 
-			// Iterate through each tree instance map.
-			for (int treeIndex = 0; treeIndex < trees.Length; ++treeIndex)
+			// Iterate through each map prop instance.
+			for (uint propIndex = 0; propIndex < props.Length; ++propIndex)
 			{
 				// Local reference.
-				TreeInstance tree = trees[treeIndex];
+				PropInstance prop = props[propIndex];
 
-				// Skip non-existent trees (those with no flags).
-				if (tree.m_flags == (ushort)TreeInstance.Flags.None)
+				// Skip non-existent props (those with no flags).
+				if (prop.m_flags == (ushort)PropInstance.Flags.None)
 				{
 					continue;
 				}
@@ -140,19 +140,19 @@ namespace BOB
 				// Create new list item, hiding probabilities.
 				PropListItem propListItem = new PropListItem { showProbs = false };
 
-				// Try to get any tree replacement.
-				propListItem.originalPrefab = MapTreeReplacement.instance.GetOriginal(tree.Info);
+				// Try to get any prop replacement.
+				propListItem.originalPrefab = MapPropReplacement.instance.GetOriginal(prop.Info);
 
 				// DId we find a current replacment?
 				if (propListItem.originalPrefab == null)
 				{
-					// No - set current item as the original tree.
-					propListItem.originalPrefab = tree.Info;
+					// No - set current item as the original prop.
+					propListItem.originalPrefab = prop.Info;
 				}
 				else
 				{
 					// Yes - record current item as replacement.
-					propListItem.replacementPrefab = tree.Info;
+					propListItem.replacementPrefab = prop.Info;
 				}
 
 				// Check to see if we were succesful - if not (e.g. we only want trees and this is a prop), continue on to next building prop.
@@ -171,7 +171,7 @@ namespace BOB
 					bool matched = false;
 
 					// Iterate through each item in our existing list of props.
-					foreach (PropListItem item in treeList)
+					foreach (PropListItem item in propList)
 					{
 						// Check to see if we already have this in the list - matching original prefab.
 						if (item.originalPrefab == propListItem.originalPrefab)
@@ -193,14 +193,14 @@ namespace BOB
 				}
 
 				// Add this item to our list.
-				treeList.Add(propListItem);
+				propList.Add(propListItem);
 			}
 
 			// Create return fastlist from our filtered list, ordering by name.
 			FastList<object> fastList = new FastList<object>
 			{
-				m_buffer = treeList.ToArray(),
-				m_size = treeList.Count
+				m_buffer = propList.ToArray(),
+				m_size = propList.Count
 			};
 
 			// If the list is empty, show the 'no props' label; otherwise, hide it.

@@ -56,6 +56,15 @@ namespace BOB
 
 						panel = uiGameObject.AddComponent<BOBTreeInfoPanel>();
 					}
+					else if (selectedPrefab is PropInfo)
+					{
+						// A prop prefab is selected; create a TreeInfo panel.
+						// Give it a unique name for easy finding with ModTools.
+						uiGameObject = new GameObject("BOBPropPanel");
+						uiGameObject.transform.parent = UIView.GetAView().transform;
+
+						panel = uiGameObject.AddComponent<BOBPropInfoPanel>();
+					}
 					else
                     {
 						Logging.Message("unsupported prefab type ", selectedPrefab.ToString());

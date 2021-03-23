@@ -60,7 +60,6 @@ namespace BOB
 		/// Reverts a map tree replacement.
 		/// </summary>
 		/// <param name="tree">Applied replacment tree prefab</param>
-		/// <returns>True if the entire building record was removed from the dictionary (due to no remaining replacements for that prefab), false if the prefab remains in the dictionary (has other active replacements)</returns>
 		internal void Revert(TreeInfo tree)
 		{
 			// Safety check.
@@ -106,13 +105,17 @@ namespace BOB
 			// Check for valid parameters.
 			if (target != null && replacement != null)
 			{
+				// Local references.
+				TreeManager treeManager = Singleton<TreeManager>.instance;
+				TreeInstance[] trees = treeManager.m_trees.m_buffer;
+
 				Logging.Message("replacing tree ", target.name, " with ", replacement.name);
 
 				// Iterate through each tree in map.
-				for (uint treeIndex = 0; treeIndex < Singleton<TreeManager>.instance.m_trees.m_buffer.Length; ++treeIndex)
+				for (uint treeIndex = 0; treeIndex < trees.Length; ++treeIndex)
 				{
 					// Local reference.
-					TreeInstance tree = Singleton<TreeManager>.instance.m_trees.m_buffer[treeIndex];
+					TreeInstance tree = trees[treeIndex];
 
 					// Skip non-existent trees (those with no flags).
 					if (tree.m_flags == (ushort)TreeInstance.Flags.None)
@@ -123,10 +126,10 @@ namespace BOB
 					// If tree matches, replace!
 					if (tree.Info == target)
 					{
-						Singleton<TreeManager>.instance.m_trees.m_buffer[treeIndex].Info = replacement;
+						trees[treeIndex].Info = replacement;
 
 						// Refresh tree render (to update LOD).
-						TreeManager.instance.UpdateTreeRenderer(treeIndex, true);
+						treeManager.UpdateTreeRenderer(treeIndex, true);
 					}
 				}
 			}
