@@ -138,11 +138,6 @@ namespace BOB
 					replaceButton.Enable();
 					replaceAllButton.Enable();
 				}
-                else
-                {
-					replaceButton.tooltip = "No valid replacement selected";
-					replaceAllButton.tooltip = "No valid replacement selected";
-                }
 			}
 		}
 

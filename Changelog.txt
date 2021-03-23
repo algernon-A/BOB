@@ -1,5 +1,6 @@
 ﻿- Highlight selected props or trees in buildings or networks
 - Overhaul replacer panel UI, including reducing overall size and replace text-based controls with visual equivalents.
+- Decoration buildings (e.g. rocks) are now selectable
 - Fix parent building LODs not being refreshed on load when replacements are applied to sub-buildings
 - Fix target list selection not resetting on update
 

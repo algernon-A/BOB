@@ -14,6 +14,7 @@ namespace BOB
         public float radius;
     }
 
+
     /// <summary>
     /// Harmony patches and associated methods for rendering selection overlays.
     /// </summary>
@@ -62,22 +63,6 @@ namespace BOB
 
 
         /// <summary>
-        /// Add building prop to the list to be highlighted.
-        /// </summary>
-        /// <param name="index">Prop index</param>
-        /// <param name="prop">Prop info</param>
-        /// <param name="building">Building data</param>
-        /// <param name="position">Prop position</param>
-        public static void HighlightBuildingProp(int index, PropInfo prop, ref Building building, Vector3 position)
-        {
-            if (CurrentIndex < 0 || (CurrentIndex == index && CurrentBuilding != null && CurrentBuilding == building.Info))
-            {
-                HighlightProp(prop, position);
-            }
-        }
-
-
-        /// <summary>
         /// Add building tree to the list to be highlighted.
         /// </summary>
         /// <param name="index">Tree index</param>
@@ -121,6 +106,31 @@ namespace BOB
                 // Calculate radius of effect - largest of x and z size of props (minimum of 1 in any case).
                 Vector3 size = tree.m_mesh.bounds.size;
                 overlays.Add(new OverlayData { position = position, radius = Mathf.Max(1f, size.x, size.z) });
+            }
+        }
+
+
+        /// <summary>
+        /// Add building prop to the list to be highlighted.
+        /// </summary>
+        /// <param name="index">Prop index</param>
+        /// <param name="prop">Prop info</param>
+        /// <param name="building">Building data</param>
+        /// <param name="position">Prop position</param>
+        public static void HighlightBuildingProp(int index, BuildingInfo.Prop prop, ref Building building, Vector3 position)
+        {
+            // Check for match - prop, index (if applicable) and building (if applicable).
+            if (prop.m_finalProp == CurrentProp && (CurrentIndex < 0 || (CurrentIndex == index && CurrentBuilding != null && CurrentBuilding == building.Info)))
+            {
+                // Get transform matrix for building and use to convert prop location to worldspace.
+                Matrix4x4 m = Matrix4x4.TRS(position, Quaternion.Euler(0, -Mathf.Rad2Deg * building.m_angle, 0), Vector3.one);
+                Vector3 propLocation = m.MultiplyPoint(prop.m_position);
+
+                // Prop size (for effect radius).
+                Vector3 size = prop.m_finalProp.m_mesh.bounds.size;
+
+                // Add to list of overlays to be rendered.
+                overlays.Add(new OverlayData { position = propLocation, radius = Mathf.Max(1f, size.x, size.z) });
             }
         }
     }

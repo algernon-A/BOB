@@ -52,7 +52,7 @@
     <Translation ID="BOB_OPT_KEY" String="Hotkey" />
     <Translation ID="BOB_OPT_PRS" String="Press any key" />
     <Translation ID="BOB_NUKE" String="Reset configuration" />
-    <Translation ID="BOB_PER_IND" String="Show individual props by default" />
+    <Translation ID="BOB_PER_IND" String="Show individual items by default" />
     <Translation ID="BOB_PER_SIN" String="Always off" />
     <Translation ID="BOB_PER_GRP" String="Always on" />
     <Translation ID="BOB_PER_LST" String="Remember previous setting" />
