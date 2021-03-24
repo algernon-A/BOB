@@ -3,6 +3,8 @@ using ColossalFramework.UI;
 using UnityEngine;
 
 
+using System;
+
 namespace BOB
 {
 	/// <summary>
@@ -64,6 +66,192 @@ namespace BOB
 		{
 			nameOnly = false;
 			return NetSegment.Flags.None;
+		}
+
+
+		/// <summary>
+		/// Called by the game every simulation step.
+		/// Performs raycasting to select hovered instance.
+		/// </summary>
+		public override void SimulationStep()
+		{
+			// Get base mouse ray.
+			Ray mouseRay = m_mouseRay;
+
+			// Get raycast input.
+			RaycastInput input = new RaycastInput(mouseRay, m_mouseRayLength)
+			{
+				m_rayRight = m_rayRight,
+				m_netService = GetService(),
+				m_buildingService = GetService(),
+				m_propService = GetService(),
+				m_treeService = GetService(),
+				m_districtNameOnly = Singleton<InfoManager>.instance.CurrentMode != InfoManager.InfoMode.Districts,
+				m_ignoreTerrain = GetTerrainIgnore(),
+				m_ignoreNodeFlags = GetNodeIgnoreFlags(),
+				m_ignoreSegmentFlags = GetSegmentIgnoreFlags(out input.m_segmentNameOnly),
+				m_ignoreBuildingFlags = GetBuildingIgnoreFlags(),
+				m_ignoreTreeFlags = GetTreeIgnoreFlags(),
+				m_ignorePropFlags = GetPropIgnoreFlags(),
+				m_ignoreVehicleFlags = GetVehicleIgnoreFlags(),
+				m_ignoreParkedVehicleFlags = GetParkedVehicleIgnoreFlags(),
+				m_ignoreCitizenFlags = GetCitizenIgnoreFlags(),
+				m_ignoreTransportFlags = GetTransportIgnoreFlags(),
+				m_ignoreDistrictFlags = GetDistrictIgnoreFlags(),
+				m_ignoreParkFlags = GetParkIgnoreFlags(),
+				m_ignoreDisasterFlags = GetDisasterIgnoreFlags(),
+				m_transportTypes = GetTransportTypes()
+			};
+
+
+			ToolErrors errors = ToolErrors.None;
+			RaycastOutput output;
+
+			// Is the base mouse ray valid?
+			if (m_mouseRayValid)
+			{
+				// Yes - raycast.
+				if (RayCast(input, out output))
+				{
+					// Set base tool accurate position.
+					m_accuratePosition = output.m_hitPos;
+
+					// Select parent building of any 'untouchable' (sub-)building.
+					if (output.m_building != 0 && (Singleton<BuildingManager>.instance.m_buildings.m_buffer[output.m_building].m_flags & Building.Flags.Untouchable) != 0)
+					{
+						output.m_building = Building.FindParentBuilding(output.m_building);
+					}
+
+					// Check for valid hits by type - network, building, prop, tree, in that order (so e.g. embedded networks can be selected).
+					if (output.m_netSegment != 0)
+					{
+						// Networks.
+						if (CheckSegment(output.m_netSegment, ref errors))
+						{
+							// CheckSegment passed - record hit position.
+							output.m_hitPos = Singleton<NetManager>.instance.m_segments.m_buffer[output.m_netSegment].GetClosestPosition(output.m_hitPos);
+						}
+						else
+						{
+							// CheckSegment failed - deselect segment.
+							output.m_netSegment = 0;
+						}
+					}
+					else if (output.m_building != 0)
+					{
+						// Buildings.
+						if (CheckBuilding(output.m_building, ref errors))
+						{
+							// CheckSigment passed - record hit position.
+							output.m_hitPos = Singleton<BuildingManager>.instance.m_buildings.m_buffer[output.m_building].m_position;
+						}
+						else
+						{
+							// CheckSegment failed - deselect building.
+							output.m_building = 0;
+						}
+					}
+					else if (output.m_propInstance != 0)
+					{
+						// Map props.
+						if (CheckProp(output.m_propInstance, ref errors))
+						{
+							// CheckSigment passed - record hit position.
+							output.m_hitPos = Singleton<PropManager>.instance.m_props.m_buffer[output.m_propInstance].Position;
+						}
+						else
+						{
+							// CheckSegment failed - deselect prop.
+							output.m_propInstance = 0;
+						}
+					}
+					else if (output.m_treeInstance != 0)
+					{
+						// Map trees.
+						if (CheckTree(output.m_treeInstance, ref errors))
+						{
+							// CheckSigment passed - record hit position.
+							output.m_hitPos = Singleton<TreeManager>.instance.m_trees.m_buffer[output.m_treeInstance].Position;
+						}
+						else
+						{
+							// CheckSegment failed - deselect tree.
+							output.m_treeInstance = 0u;
+						}
+					}
+
+
+					// Create new hover instance and set hovered type (if applicable).
+					InstanceID hoverInstance = InstanceID.Empty;
+					if (output.m_netSegment != 0)
+					{
+						hoverInstance.NetSegment = output.m_netSegment;
+					}
+					else if (output.m_building != 0)
+					{
+						hoverInstance.Building = output.m_building;
+					}
+					else if (output.m_propInstance != 0)
+					{
+						hoverInstance.Prop = output.m_propInstance;
+					}
+					else if (output.m_treeInstance != 0)
+					{
+						hoverInstance.Tree = output.m_treeInstance;
+					}
+
+					// Has the hovered instance changed since last time?
+					if (hoverInstance != m_hoverInstance)
+					{
+						// Hover instance has changed.
+						// Unhide any previously-hidden props, trees or buildings.
+						if (m_hoverInstance.Prop != 0)
+						{
+							// Unhide previously hovered prop.
+							if (Singleton<PropManager>.instance.m_props.m_buffer[m_hoverInstance.Prop].Hidden)
+							{
+								Singleton<PropManager>.instance.m_props.m_buffer[m_hoverInstance.Prop].Hidden = false;
+							}
+						}
+						else if (m_hoverInstance.Tree != 0)
+						{
+							// Unhide previously hovered tree.
+							if (Singleton<TreeManager>.instance.m_trees.m_buffer[m_hoverInstance.Tree].Hidden)
+							{
+								Singleton<TreeManager>.instance.m_trees.m_buffer[m_hoverInstance.Tree].Hidden = false;
+								Singleton<TreeManager>.instance.UpdateTreeRenderer(m_hoverInstance.Tree, updateGroup: true);
+							}
+						}
+						else if (m_hoverInstance.Building != 0)
+						{
+							// Unhide previously hovered building.
+							if ((Singleton<BuildingManager>.instance.m_buildings.m_buffer[m_hoverInstance.Building].m_flags & Building.Flags.Hidden) != 0)
+							{
+								Singleton<BuildingManager>.instance.m_buildings.m_buffer[m_hoverInstance.Building].m_flags &= ~Building.Flags.Hidden;
+								Singleton<BuildingManager>.instance.UpdateBuildingRenderer(m_hoverInstance.Building, updateGroup: true);
+							}
+						}
+
+						// Update tool hover instance.
+						m_hoverInstance = hoverInstance;
+					}
+				}
+				else
+				{
+					// Raycast failed.
+					errors = ToolErrors.RaycastFailed;
+				}
+			}
+			else
+			{
+				// No valid mouse ray.
+				output = default;
+				errors = ToolErrors.RaycastFailed;
+			}
+
+			// Set mouse position and record errors.
+			m_mousePosition = output.m_hitPos;
+			m_selectErrors = errors;
 		}
 
 
