@@ -20,6 +20,8 @@ namespace BOB
     /// </summary>
     public static class RenderOverlays
     {
+        private const float MaxBuildingPropDistance = 500f;
+
         // List of positions to highlight.
         private readonly static List<OverlayData> overlays = new List<OverlayData>();
 
@@ -113,11 +115,12 @@ namespace BOB
         /// <summary>
         /// Add building prop to the list to be highlighted.
         /// </summary>
+        /// <param name="camera">Current camera</param>
         /// <param name="index">Prop index</param>
         /// <param name="prop">Prop info</param>
         /// <param name="building">Building data</param>
         /// <param name="position">Prop position</param>
-        public static void HighlightBuildingProp(int index, BuildingInfo.Prop prop, ref Building building, Vector3 position)
+        public static void HighlightBuildingProp(RenderManager.CameraInfo camera, int index, BuildingInfo.Prop prop, ref Building building, Vector3 position)
         {
             // Check for match - prop, index (if applicable) and building (if applicable).
             if (prop.m_finalProp == CurrentProp && (CurrentIndex < 0 || (CurrentIndex == index && CurrentBuilding != null && CurrentBuilding == building.Info)))
@@ -126,11 +129,15 @@ namespace BOB
                 Matrix4x4 m = Matrix4x4.TRS(position, Quaternion.Euler(0, -Mathf.Rad2Deg * building.m_angle, 0), Vector3.one);
                 Vector3 propLocation = m.MultiplyPoint(prop.m_position);
 
-                // Prop size (for effect radius).
-                Vector3 size = prop.m_finalProp.m_mesh.bounds.size;
+                // Don't render overlay is prop is beyond rendering distance.
+                if (camera.CheckRenderDistance(propLocation, MaxBuildingPropDistance))
+                {
+                    // Within rendering distancd size (for effect radius).
+                    Vector3 size = prop.m_finalProp.m_mesh.bounds.size;
 
-                // Add to list of overlays to be rendered.
-                overlays.Add(new OverlayData { position = propLocation, radius = Mathf.Max(1f, size.x, size.z) });
+                    // Add to list of overlays to be rendered.
+                    overlays.Add(new OverlayData { position = propLocation, radius = Mathf.Max(1f, size.x, size.z) });
+                }
             }
         }
     }

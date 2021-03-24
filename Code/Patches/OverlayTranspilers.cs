@@ -48,6 +48,7 @@ namespace BOB
                 {
                     // Yes - insert call to RenderOverlays.HighlightBuildingProp(i, prop, ref building, position)
                     Logging.KeyMessage("adding building HighlightBuildingProp call after stloc.s 17");
+                    yield return new CodeInstruction(OpCodes.Ldarg_1);
                     yield return new CodeInstruction(OpCodes.Ldloc_S, IVarIndex);
                     yield return new CodeInstruction(OpCodes.Ldloc_S, BuildingInfoPropIndex);
                     yield return new CodeInstruction(OpCodes.Ldarg_S, BuildingArg);
