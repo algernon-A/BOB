@@ -12,7 +12,7 @@ namespace BOB
 	public class BOBPropInfoPanel : BOBInfoPanelBase
 	{
 		// Button labels.
-		protected override string ReplaceTooltipKey => "BOB_PNL_RTT";
+		protected override string ReplaceTooltipKey => "BOB_PNL_RTP";
 
 
 		// Never, never, trees.
@@ -20,7 +20,7 @@ namespace BOB
 
 
 		// Replace button atlas.
-		protected override UITextureAtlas ReplaceAtlas => TextureUtils.LoadSpriteAtlas("bob_props3");
+		protected override UITextureAtlas ReplaceAtlas => TextureUtils.LoadSpriteAtlas("bob_props3_large");
 
 
 		/// <summary>
@@ -80,7 +80,7 @@ namespace BOB
 			UpdateButtonStates();
 
 			// Apply Harmony rendering patches.
-			//Patcher.PatchTreeOverlays(true);
+			Patcher.PatchPropOverlays(true);
 		}
 
 

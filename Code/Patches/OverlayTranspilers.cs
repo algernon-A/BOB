@@ -229,5 +229,43 @@ namespace BOB
                 }
             }
         }
+
+
+        /// <summary>
+        /// Harmony transpiler for PropInstance.RenderInstance, to insert calls to highlight selected map prop.
+        /// </summary>
+        /// <param name="original">Original method</param>
+        /// <param name="instructions">Original ILCode</param>
+        /// <param name="generator">IL generator</param>
+        /// <returns>Patched ILCode</returns>
+        public static IEnumerable<CodeInstruction> PropTranspiler(MethodBase original, IEnumerable<CodeInstruction> instructions, ILGenerator generator)
+        {
+            // ILCode local variable indexes.
+            const int PropVarIndex = 0;
+            const int PropPositionVarIndex = 1;
+
+
+            // Instruction parsing.
+            IEnumerator<CodeInstruction> instructionsEnumerator = instructions.GetEnumerator();
+            CodeInstruction instruction;
+
+            // Iterate through all instructions in original method.
+            while (instructionsEnumerator.MoveNext())
+            {
+                // Get next instruction and add it to output.
+                instruction = instructionsEnumerator.Current;
+                yield return instruction;
+
+                // Is this instruction a call to Void RenderInstance?
+                if (instruction.opcode == OpCodes.Call && instruction.operand.ToString().StartsWith("Void RenderInstance"))
+                {
+                    // Yes - insert call to PropOverlays.Highlight method after original call.
+                    Logging.KeyMessage("adding prop Highlight call after RenderInstance");
+                    yield return new CodeInstruction(OpCodes.Ldloc_S, PropVarIndex);
+                    yield return new CodeInstruction(OpCodes.Ldloc_S, PropPositionVarIndex);
+                    yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(RenderOverlays), nameof(RenderOverlays.HighlightProp)));
+                }
+            }
+        }
     }
 }

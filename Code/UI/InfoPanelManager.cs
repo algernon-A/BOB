@@ -95,6 +95,7 @@ namespace BOB
 			Patcher.PatchBuildingOverlays(false);
 			Patcher.PatchNetworkOverlays(false);
 			Patcher.PatchTreeOverlays(false);
+			Patcher.PatchPropOverlays(false);
 
 			// Store previous position.
 			lastX = Panel.relativePosition.x;
