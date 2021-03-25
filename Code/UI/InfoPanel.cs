@@ -10,16 +10,21 @@ namespace BOB
 	/// </summary>
 	public abstract class BOBInfoPanel : BOBInfoPanelBase
 	{
-		// Component locations.
-		private const float LabelHeight = 17f;
-		private const float TextFieldHeight = 15f;
-		private const float Padding = 10f;
-		private const float FieldOffset = LabelHeight + TextFieldHeight + Padding;
-		protected const float ProbabilityY = RevertY + 45f;
-		private const float AngleY = ProbabilityY + FieldOffset;
-		private const float XOffsetY = AngleY + FieldOffset;
-		private const float YOffsetY = XOffsetY + FieldOffset;
-		private const float ZOffsetY = YOffsetY + FieldOffset;
+
+		// Controls - align bottom with bottom of lists, and work up.
+		private const float SliderHeight = 38f;
+		private const float FieldOffset = SliderHeight + Margin;
+		private const float OffsetPanelBase = ListY + ListHeight;
+		private const float OffsetLabelY = Margin;
+		private const float XOffsetY = OffsetLabelY + 20f;
+		private const float YOffsetY = XOffsetY + SliderHeight;
+		private const float ZOffsetY = YOffsetY + SliderHeight;
+		private const float OffsetPanelHeight = ZOffsetY + SliderHeight;
+		private const float OffsetPanelY = OffsetPanelBase - OffsetPanelHeight;
+
+		private const float AngleY = OffsetPanelY - FieldOffset;
+		private const float ProbabilityY = AngleY - FieldOffset;
+
 
 		// Current selections.
 		protected int probability;
@@ -60,42 +65,23 @@ namespace BOB
 				replaceAllButton = AddIconButton(this, MidControlX + replaceButton.width, ReplaceY, BigIconSize, ReplaceAllTooltipKey, ReplaceAllAtlas);
 
 				// Probability.
-				probabilitySlider = AddBOBSlider(this, MidControlX, ProbabilityY, "BOB_PNL_PRB");
-				probabilitySlider.maxValue = 100f;
-				probabilitySlider.minValue = 0f;
-				probabilitySlider.stepSize = 1f;
+				UIPanel probabilityPanel = Sliderpanel(this, MidControlX, ProbabilityY, SliderHeight);
+				probabilitySlider = AddBOBSlider(probabilityPanel, 0f, "BOB_PNL_PRB", 0, 100, 1);
 				probabilitySlider.TrueValue = 100f;
-				probabilitySlider.IsInt = true;
 
 				// Angle.
-				angleSlider = AddBOBSlider(this, MidControlX, AngleY, "BOB_PNL_ANG");
-				angleSlider.maxValue = 180f;
-				angleSlider.minValue = -180f;
-				angleSlider.stepSize = 1f;
-				angleSlider.TrueValue = 0f;
-				angleSlider.IsInt = true;
+				UIPanel anglePanel = Sliderpanel(this, MidControlX, AngleY, SliderHeight);
+				angleSlider = AddBOBSlider(anglePanel, 0f, "BOB_PNL_ANG", -180, 180, 1);
 
-				// Offset X position.
-				xSlider = AddBOBSlider(this, MidControlX, XOffsetY, "BOB_PNL_XOF");
-				xSlider.maxValue = 8f;
-				xSlider.minValue = -8f;
-				xSlider.stepSize = 0.01f;
-				xSlider.TrueValue = 0f;
+				// Offset panel.
+				UIPanel offsetPanel = Sliderpanel(this, MidControlX, OffsetPanelY, OffsetPanelHeight);
+				UILabel offsetLabel = UIControls.AddLabel(offsetPanel, 0f, OffsetLabelY, Translations.Translate("BOB_PNL_OFF"), MidControlWidth);
+				offsetLabel.textAlignment = UIHorizontalAlignment.Center;
 
-				// Offset Y position.
-				ySlider = AddBOBSlider(this, MidControlX, YOffsetY, "BOB_PNL_YOF");
-				ySlider.maxValue = 8f;
-				ySlider.minValue = -8f;
-				ySlider.stepSize = 0.01f;
-				ySlider.TrueValue = 0f;
-
-				// Offset Z position.
-				zSlider = AddBOBSlider(this, MidControlX, ZOffsetY, "BOB_PNL_ZOF");
-				zSlider.maxValue = 8f;
-				zSlider.minValue = -8f;
-				zSlider.stepSize = 0.01f;
-				zSlider.TrueValue = 0f;
-
+				// Offset sliders.
+				xSlider = AddBOBSlider(offsetPanel, XOffsetY, "BOB_PNL_XOF", -8f, 8f, 0.01f);
+				ySlider = AddBOBSlider(offsetPanel, YOffsetY, "BOB_PNL_YOF", -8f, 8f, 0.01f);
+				zSlider = AddBOBSlider(offsetPanel, ZOffsetY, "BOB_PNL_ZOF", -8f, 8f, 0.01f);
 
 				// Set initial button and checkbox states.
 				hideVanilla.isChecked = ModSettings.hideVanilla;
@@ -185,39 +171,33 @@ namespace BOB
 		/// Adds a BOB slider to the specified component.
 		/// </summary>
 		/// <param name="parent">Parent component</param>
-		/// <param name="xPos">Relative X position</param>
 		/// <param name="yPos">Relative Y position</param>
 		/// <param name="labelKey">Text label translation key</param>
+		/// <param name="minValue">Minimum displayed value</param
+		/// <param name="maxValue">Maximum displayed value</param>
+		/// <param name="stepSize">Minimum slider step size</param>
 		/// <returns>New BOBSlider</returns>
-		private BOBSlider AddBOBSlider(UIComponent parent, float xPos, float yPos, string labelKey)
+		private BOBSlider AddBOBSlider(UIComponent parent, float yPos, string labelKey, float minValue, float maxValue, float stepSize)
 		{
-			const float SliderPanelMargin = 2f;
+			const float SliderY = 18f;
 			const float ValueY = 3f;
-			const float LabelY = 3f;
-			const float SliderY = 16f + SliderPanelMargin;
+			const float LabelY = -13f;
 			const float SliderHeight = 18f;
-			const float SliderPanelHeight = SliderY + SliderHeight + SliderPanelMargin;
-			const float TextFieldWidth = 40f;
+			const float FloatTextFieldWidth = 45f;
+			const float IntTextFieldWidth = 38f;
 
-
-			// Slider panel.
-			UIPanel sliderPanel = parent.AddUIComponent<UIPanel>();
-			sliderPanel.atlas = TextureUtils.InGameAtlas;
-			sliderPanel.backgroundSprite = "GenericPanel";
-			sliderPanel.color = new Color32(206, 206, 206, 255);
-			sliderPanel.size = new Vector2(MidControlWidth, SliderPanelHeight);
-			sliderPanel.relativePosition = new Vector2(xPos, yPos);
-
-			// Title label.
-			UIControls.AddLabel(sliderPanel, Margin, LabelY, Translations.Translate(labelKey), textScale: 0.7f);
-
-			// Value field.
-			UITextField valueField = UIControls.TinyTextField(sliderPanel, sliderPanel.width - TextFieldWidth - Margin, ValueY, TextFieldWidth);
 
 			// Slider control.
-			BOBSlider newSlider = sliderPanel.AddUIComponent<BOBSlider>();
-			newSlider.size = new Vector2(sliderPanel.width - (Margin * 2f), SliderHeight);
-			newSlider.relativePosition = new Vector2(Margin, SliderY);
+			BOBSlider newSlider = parent.AddUIComponent<BOBSlider>();
+			newSlider.size = new Vector2(MidControlWidth - (Margin * 2f), SliderHeight);
+			newSlider.relativePosition = new Vector2(Margin, yPos + SliderY);
+
+			// Title label.
+			UIControls.AddLabel(newSlider, 0f, LabelY, Translations.Translate(labelKey), textScale: 0.7f);
+
+			// Value field - added to parent, not to slider, otherwise slider catches all input attempts.  Integer textfields (stepsize == 1) have shorter widths.
+			float textFieldWidth = stepSize == 1 ? IntTextFieldWidth : FloatTextFieldWidth;
+			UITextField valueField = UIControls.TinyTextField(parent, Margin + newSlider.width - textFieldWidth, yPos + ValueY, textFieldWidth);
 
 			// Slider track.
 			UISlicedSprite sliderSprite = newSlider.AddUIComponent<UISlicedSprite>();
@@ -235,15 +215,42 @@ namespace BOB
 			// Set references.
 			newSlider.ValueField = valueField;
 
-			// Event handlers.
-			newSlider.eventValueChanged += newSlider.OnSliderUpdate;
+			// Event handler for textfield.
 			newSlider.ValueField.eventTextSubmitted += newSlider.OnTextSubmitted;
+
+			// Set initial values.
+			newSlider.StepSize = stepSize;
+			newSlider.maxValue = maxValue;
+			newSlider.minValue = minValue;
+			newSlider.TrueValue = 0f;
 
 			return newSlider;
 		}
+
+
+		/// <summary>
+		/// Adds a slider panel to the specified component.
+		/// </summary>
+		/// <param name="parent">Parent component</param>
+		/// <param name="parent">Parent component</param>
+		/// <param name="xPos">Relative X position</param>
+		/// <param name="yPos">Relative Y position</param>
+		/// <param name="height">Panel height</param>
+		/// <returns>New UIPanel</returns>
+		private UIPanel Sliderpanel(UIComponent parent, float xPos, float yPos, float height)
+		{
+			// Slider panel.
+			UIPanel sliderPanel = parent.AddUIComponent<UIPanel>();
+			sliderPanel.atlas = TextureUtils.InGameAtlas;
+			sliderPanel.backgroundSprite = "GenericPanel";
+			sliderPanel.color = new Color32(206, 206, 206, 255);
+			sliderPanel.size = new Vector2(MidControlWidth, height);
+			sliderPanel.relativePosition = new Vector2(xPos, yPos);
+
+			return sliderPanel;
+		}
 	}
 
-#pragma warning disable IDE0060 // Remove unused parameter
 
 	/// <summary>
 	/// Slider with integrated components.
@@ -282,49 +289,35 @@ namespace BOB
 
 
 		/// <summary>
-		/// Handles slider value change; should be added as eventValueChanged event handler.
+		/// Minimum slider step size.  Setting to 1 will make this an integer slider.
 		/// </summary>
-		/// <param name="control">Calling component(unused)</param>
-		/// <param name="value">New slider value</param>
-		public void OnSliderUpdate(UIComponent control, float value)
-        {
-			// Don't do anything is events are suppressed.
-			if (!suppressEvents)
+		public float StepSize
+		{
+			set
 			{
-				// Suppress events while we change things, to avoid infinite recursive update loops.
-				suppressEvents = true;
-
-				// Quantize value according to key modifiers - for float 1/0.1/0.01 for Alt/none/Ctrl, for Int 5/1 for Alt/not Alt.
-				if (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt) || Input.GetKey(KeyCode.AltGr))
+				if (value == 1)
 				{
-					value = value.Quantize(IsInt ? 5 : 1f);
-				}
-				else if (!IsInt && Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
-				{
-					value = value.Quantize(0.01f);
+					// Set as integer.
+					IsInt = true;
+					stepSize = value;
 				}
 				else
-                {
-					value = value.Quantize(IsInt ? 1 : 0.1f);
-                }					
-
-				// Update displayed textfield value to current slider value.
-				TrueValue = value;
-				ValueField.text = IsInt ? Mathf.RoundToInt(TrueValue).ToString() : TrueValue.ToString();
-
-				// Restore event handling.
-				suppressEvents = false;
+				{
+					// For non-integers, underlying step size is 1/10th of value, to ensure small changes aren't quantized out.
+					stepSize = value / 10f;
+				}
 			}
-        }
+		}
 
 
+#pragma warning disable IDE0060 // Remove unused parameter
 		/// <summary>
 		/// Handles textfield value change; should be added as eventTextSubmitted event handler.
 		/// </summary>
 		/// <param name="control">Calling component(unused)</param>
 		/// <param name="text">New text</param>
 		public void OnTextSubmitted(UIComponent control, string text)
-		{
+        {
 			// Don't do anything is events are suppressed.
 			if (!suppressEvents)
 			{
@@ -333,20 +326,93 @@ namespace BOB
 
 				// Attempt to parse textfield value.
 				if (float.TryParse(text, out float result))
-                {
+				{
 					// Successful parse - set slider value.
 					TrueValue = IsInt ? Mathf.RoundToInt(result) : result;
-                }
+				}
 
 				// Set textfield to active value.
 				ValueField.text = IsInt ? Mathf.RoundToInt(TrueValue).ToString() : TrueValue.ToString();
 
 				// Restore event handling.
 				suppressEvents = false;
-            }
-        }
-    }
-
+			}
+		}
 #pragma warning restore IDE0060 // Remove unused parameter
 
+
+		/// <summary>
+		/// Called by game when slider value is changed.
+		/// </summary>
+		protected override void OnValueChanged()
+		{
+			// Don't do anything special if events are suppressed.
+			if (!suppressEvents)
+			{
+				// Suppress events while we change things, to avoid infinite recursive update loops.
+				suppressEvents = true;
+
+				// Apply current multiplier.
+				float multiplier = Multiplier;
+				value = value.RoundToNearest(multiplier);
+
+				// Update displayed textfield value to current slider value (need to round again for display to avoid ocassional off-by-0.001).
+				TrueValue = value;
+				ValueField.text = TrueValue.RoundToNearest(multiplier).ToString();
+
+				// Restore event handling.
+				suppressEvents = false;
+			}
+
+			// Complete normal slider value change processing (update thumb position, invoke events, etc.).
+			base.OnValueChanged();
+		}
+
+
+		/// <summary>
+		/// Called by game when mousewheel is scrolled.
+		/// </summary>
+		/// <param name="mouseEvent">Mouse event parameter</param>
+		protected override void OnMouseWheel(UIMouseEventParameter mouseEvent)
+		{
+			// Get current multiplier.
+			float multiplier = Multiplier;
+
+			// Set current value according to multiplier state, suppressing events first to avoid value clamping, and manuall updating textfield.
+			suppressEvents = true;
+			TrueValue = trueValue.RoundToNearest(multiplier) + (mouseEvent.wheelDelta * multiplier);
+			ValueField.text = TrueValue.RoundToNearest(multiplier).ToString();
+
+			// Use event and invoke any handlers.
+			mouseEvent.Use();
+			Invoke("OnMouseWheel", mouseEvent);
+		}
+
+
+		/// <summary>
+		/// Returns the current step multiplier based on modifier key states.
+		/// For float 1/0.1/0.01 for Alt/none/Ctrl, for Int 5/1 for Alt/not Alt.
+		/// </summary>
+		private float Multiplier
+        {
+			get
+            {
+				if (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt) || Input.GetKey(KeyCode.AltGr))
+				{
+					// Alt modifier.
+					return IsInt ? 10 : 1f;
+				}
+				else if (!IsInt && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+				{
+					// Control modifier.
+					return 0.01f;
+				}
+				else
+				{
+					// Default multiplier.
+					return IsInt ? 1 : 0.1f;
+				}
+			}
+        }
+	}
 }

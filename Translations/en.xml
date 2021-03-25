@@ -26,9 +26,10 @@
     <Translation ID="BOB_PNL_PKB" String="Replacement packs" />
     <Translation ID="BOB_PNL_PRB" String="Probability" />
     <Translation ID="BOB_PNL_ANG" String="Angle" />
-    <Translation ID="BOB_PNL_XOF" String="X offset" />
-    <Translation ID="BOB_PNL_YOF" String="Y offset" />
-    <Translation ID="BOB_PNL_ZOF" String="Z offset" />
+    <Translation ID="BOB_PNL_OFF" String="Offset" />
+    <Translation ID="BOB_PNL_XOF" String="X" />
+    <Translation ID="BOB_PNL_YOF" String="Y" />
+    <Translation ID="BOB_PNL_ZOF" String="Z" />
     <Translation ID="BOB_PNL_SUB" String="Sub-building" />
     <Translation ID="BOB_SPR_SBL" String="A replacement is currently applied for these buildings" />
     <Translation ID="BOB_SPR_ABL" String="A replacement is currently applied for all buildings" />
