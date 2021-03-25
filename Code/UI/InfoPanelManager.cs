@@ -47,23 +47,14 @@ namespace BOB
 
 						panel = uiGameObject.AddComponent<BOBNetInfoPanel>();
 					}
-					else if (selectedPrefab is TreeInfo)
+					else if (selectedPrefab is TreeInfo || selectedPrefab is PropInfo)
 					{
 						// A tree prefab is selected; create a TreeInfo panel.
 						// Give it a unique name for easy finding with ModTools.
-						uiGameObject = new GameObject("BOBTreePanel");
+						uiGameObject = new GameObject("BOBMapPanel");
 						uiGameObject.transform.parent = UIView.GetAView().transform;
 
-						panel = uiGameObject.AddComponent<BOBTreeInfoPanel>();
-					}
-					else if (selectedPrefab is PropInfo)
-					{
-						// A prop prefab is selected; create a TreeInfo panel.
-						// Give it a unique name for easy finding with ModTools.
-						uiGameObject = new GameObject("BOBPropPanel");
-						uiGameObject.transform.parent = UIView.GetAView().transform;
-
-						panel = uiGameObject.AddComponent<BOBPropInfoPanel>();
+						panel = uiGameObject.AddComponent<BOBMapInfoPanel>();
 					}
 					else
                     {
@@ -94,8 +85,7 @@ namespace BOB
 			// Revert overlay patches.
 			Patcher.PatchBuildingOverlays(false);
 			Patcher.PatchNetworkOverlays(false);
-			Patcher.PatchTreeOverlays(false);
-			Patcher.PatchPropOverlays(false);
+			Patcher.PatchMapOverlays(false);
 
 			// Store previous position.
 			lastX = Panel.relativePosition.x;

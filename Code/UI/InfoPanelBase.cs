@@ -46,10 +46,9 @@ namespace BOB
 		protected PrefabInfo replacementPrefab;
 
 		// Panel components.
-		protected UIFastList targetList;
-		protected UIFastList loadedList;
+		protected UIFastList targetList, loadedList;
 		protected UILabel noPropsLabel;
-		protected UICheckBox hideVanilla;
+		protected UICheckBox hideVanilla, treeCheck, propCheck;
 		protected UITextField nameFilter;
 		protected UIButton replaceButton, revertButton;
 
@@ -57,8 +56,9 @@ namespace BOB
 		// Button tooltips.
 		protected abstract string ReplaceTooltipKey { get; }
 
+
 		// Trees or props?
-		protected abstract bool IsTree { get; }
+		protected virtual bool IsTree => treeCheck?.isChecked ?? false;
 
 		// Replace button atlas.
 		protected abstract UITextureAtlas ReplaceAtlas { get; }
@@ -219,6 +219,12 @@ namespace BOB
 			loadedList = UIFastList.Create<UILoadedPropRow>(rightPanel);
 			ListSetup(loadedList);
 
+			// Tree/Prop checkboxes.
+			propCheck = IconToggleCheck(this, Margin, TitleHeight + Margin, "bob_props3", "BOB_PNL_PRP");
+			treeCheck = IconToggleCheck(this, Margin + propCheck.width, TitleHeight + Margin, "bob_trees_small", "BOB_PNL_TRE");
+			propCheck.eventCheckChanged += PropCheckChanged;
+			treeCheck.eventCheckChanged += TreeCheckChanged;
+
 			// 'No props' label (starts hidden).
 			noPropsLabel = leftPanel.AddUIComponent<UILabel>();
 			noPropsLabel.relativePosition = new Vector2(Margin, Margin);
@@ -259,11 +265,116 @@ namespace BOB
 
 
 		/// <summary>
+		/// Prop check event handler.
+		/// </summary>
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="isChecked">New checked state</param>
+		protected virtual void PropCheckChanged(UIComponent control, bool isChecked)
+		{
+			if (isChecked)
+			{
+				// Props are now selected - unset tree check.
+				treeCheck.isChecked = false;
+
+				// Reset current items.
+				CurrentTargetItem = null;
+				replacementPrefab = null;
+
+				// Set loaded lists to 'props'.
+				loadedList.rowsData = LoadedList(isTree: false);
+				targetList.rowsData = TargetList(isTree: false);
+
+				// Set 'no props' label text.
+				noPropsLabel.text = Translations.Translate("BOB_PNL_NOP");
+			}
+			else
+			{
+				// Props are now unselected - set tree check if it isn't already (letting tree check event handler do the work required).
+				if (!treeCheck.isChecked)
+				{
+					treeCheck.isChecked = true;
+				}
+			}
+
+			// Save state.
+			ModSettings.treeSelected = !isChecked;
+		}
+
+
+		/// <summary>
+		/// Tree check event handler.
+		/// </summary>
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="isChecked">New checked state</param>
+		protected void TreeCheckChanged(UIComponent control, bool isChecked)
+		{
+			if (isChecked)
+			{
+				// Trees are now selected - unset prop check.
+				propCheck.isChecked = false;
+
+				// Reset current items.
+				CurrentTargetItem = null;
+				replacementPrefab = null;
+
+				// Set loaded lists to 'trees'.
+				loadedList.rowsData = LoadedList(isTree: true);
+				targetList.rowsData = TargetList(isTree: true);
+
+				// Set 'no trees' label text.
+				noPropsLabel.text = Translations.Translate("BOB_PNL_NOT");
+			}
+			else
+			{
+				// Trees are now unselected - set prop check if it isn't already (letting prop check event handler do the work required).
+				if (!propCheck.isChecked)
+				{
+					propCheck.isChecked = true;
+				}
+			}
+
+			// Save state.
+			ModSettings.treeSelected = isChecked;
+		}
+
+
+		/// <summary>
 		/// Updates the target item record for changes in replacement status (e.g. after applying or reverting changes).
 		/// </summary>
 		/// <param name="propListItem">Target item</param>
 		protected virtual void UpdateTargetItem(PropListItem propListItem)
 		{
+
+			propCheck.eventCheckChanged += (control, isChecked) =>
+			{
+				if (isChecked)
+				{
+					// Props are now selected - unset tree check.
+					treeCheck.isChecked = false;
+
+					// Reset current items.
+					CurrentTargetItem = null;
+					replacementPrefab = null;
+
+					// Set loaded lists to 'props'.
+					loadedList.rowsData = LoadedList(isTree: false);
+					targetList.rowsData = TargetList(isTree: false);
+
+					// Set 'no props' label text.
+					noPropsLabel.text = Translations.Translate("BOB_PNL_NOP");
+				}
+				else
+				{
+					// Props are now unselected - set tree check if it isn't already (letting tree check event handler do the work required).
+					if (!treeCheck.isChecked)
+					{
+						treeCheck.isChecked = true;
+					}
+				}
+
+				// Save state.
+				ModSettings.treeSelected = !isChecked;
+			};
 		}
 
 
@@ -364,6 +475,45 @@ namespace BOB
 			newButton.tooltip = Translations.Translate(tooltipKey);
 
 			return newButton;
+		}
+
+
+		/// <summary>
+		/// Adds an icon toggle checkbox.
+		/// </summary>
+		/// <param name="parent">Parent component</param>
+		/// <param name="xPos">Relative X position</param>
+		/// <param name="yPos">Relative Y position</param>
+		/// <param name="atlasName">Atlas name (for loading from file)</param>
+		/// <param name="tooltipKey">Tooltip translation key</param>
+		/// <returns>New checkbox</returns>
+		private UICheckBox IconToggleCheck(UIComponent parent, float xPos, float yPos, string atlasName, string tooltipKey)
+		{
+			const float ToggleSpriteSize = 32f;
+
+			// Size and position.
+			UICheckBox checkBox = parent.AddUIComponent<UICheckBox>();
+			checkBox.width = ToggleSpriteSize;
+			checkBox.height = ToggleSpriteSize;
+			checkBox.clipChildren = true;
+			checkBox.relativePosition = new Vector2(xPos, yPos);
+
+			// Checkbox sprites.
+			UISprite sprite = checkBox.AddUIComponent<UISprite>();
+			sprite.atlas = TextureUtils.LoadSpriteAtlas(atlasName);
+			sprite.spriteName = "disabled";
+			sprite.size = new Vector2(ToggleSpriteSize, ToggleSpriteSize);
+			sprite.relativePosition = Vector3.zero;
+
+			checkBox.checkedBoxObject = sprite.AddUIComponent<UISprite>();
+			((UISprite)checkBox.checkedBoxObject).atlas = TextureUtils.LoadSpriteAtlas(atlasName);
+			((UISprite)checkBox.checkedBoxObject).spriteName = "pressed";
+			checkBox.checkedBoxObject.size = new Vector2(ToggleSpriteSize, ToggleSpriteSize);
+			checkBox.checkedBoxObject.relativePosition = Vector3.zero;
+
+			checkBox.tooltip = Translations.Translate(tooltipKey);
+
+			return checkBox;
 		}
 
 

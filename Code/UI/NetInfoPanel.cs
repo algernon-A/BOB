@@ -82,72 +82,8 @@ namespace BOB
 			base.Setup(parentTransform, targetPrefabInfo);
 
 			// Add pack button.
-			ColossalFramework.UI.UIButton packButton = UIControls.AddSmallerButton(this, 250f, TitleHeight + Margin, Translations.Translate("BOB_PNL_PKB"));
+			UIButton packButton = UIControls.AddSmallerButton(this, 250f, TitleHeight + Margin, Translations.Translate("BOB_PNL_PKB"));
 			packButton.eventClicked += (component, clickEvent) => PackPanelManager.Create();
-
-			// Event handler for prop checkbox.
-			propCheck.eventCheckChanged += (control, isChecked) =>
-			{
-				if (isChecked)
-				{
-					// Props are now selected - unset tree check.
-					treeCheck.isChecked = false;
-
-					// Reset current items.
-					CurrentTargetItem = null;
-					replacementPrefab = null;
-
-					// Set loaded lists to 'props'.
-					loadedList.rowsData = LoadedList(isTree: false);
-					targetList.rowsData = TargetList(isTree: false);
-
-					// Set 'no props' label text.
-					noPropsLabel.text = Translations.Translate("BOB_PNL_NOP");
-				}
-				else
-				{
-					// Props are now unselected - set tree check if it isn't already (letting tree check event handler do the work required).
-					if (!treeCheck.isChecked)
-					{
-						treeCheck.isChecked = true;
-					}
-				}
-
-				// Save state.
-				ModSettings.treeSelected = !isChecked;
-			};
-
-			// Event handler for tree checkbox.
-			treeCheck.eventCheckChanged += (control, isChecked) =>
-			{
-				if (isChecked)
-				{
-					// Trees are now selected - unset prop check.
-					propCheck.isChecked = false;
-
-					// Reset current items.
-					CurrentTargetItem = null;
-					replacementPrefab = null;
-
-					// Set loaded lists to 'trees'.
-					loadedList.rowsData = LoadedList(isTree: true);
-					targetList.rowsData = TargetList(isTree: true);
-
-					// Set 'no props' label text.
-					noPropsLabel.text = Translations.Translate("BOB_PNL_NOT");
-				}
-				else
-				{
-					// Trees are now unselected - set prop check if it isn't already (letting prop check event handler do the work required).
-					if (!propCheck.isChecked)
-					{
-						propCheck.isChecked = true;
-					}
-				}
-
-				// Save state.
-				ModSettings.treeSelected = isChecked;
-			};
 
 			// Replace button event handler.
 			replaceButton.eventClicked += (control, clickEvent) =>

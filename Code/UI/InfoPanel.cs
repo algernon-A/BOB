@@ -31,7 +31,6 @@ namespace BOB
 
 		// Panel components.
 		protected UIButton replaceAllButton, configButton;
-		protected UICheckBox treeCheck, propCheck;
 		protected BOBSlider probabilitySlider, angleSlider, xSlider, ySlider, zSlider;
 
 		// Button tooltips.
@@ -39,10 +38,6 @@ namespace BOB
 
 		// Replace all button atlas.
 		protected abstract UITextureAtlas ReplaceAllAtlas { get; }
-
-
-		// Trees or props?
-		protected override bool IsTree => treeCheck?.isChecked ?? false;
 
 
 		/// <summary>
@@ -56,10 +51,6 @@ namespace BOB
 			{
 				// Perform basic panel setup.
 				base.Setup(parentTransform, targetPrefabInfo);
-
-				// Add checkboxes.
-				propCheck = IconToggleCheck(this, Margin, TitleHeight + Margin, "bob_props3", "BOB_PNL_PRP");
-				treeCheck = IconToggleCheck(this, Margin + propCheck.width, TitleHeight + Margin, "bob_trees_small", "BOB_PNL_TRE");
 
 				// Replace all button.
 				replaceAllButton = AddIconButton(this, MidControlX + replaceButton.width, ReplaceY, BigIconSize, ReplaceAllTooltipKey, ReplaceAllAtlas);
@@ -125,45 +116,6 @@ namespace BOB
 					replaceAllButton.Enable();
 				}
 			}
-		}
-
-
-		/// <summary>
-		/// Adds an icon toggle checkbox.
-		/// </summary>
-		/// <param name="parent">Parent component</param>
-		/// <param name="xPos">Relative X position</param>
-		/// <param name="yPos">Relative Y position</param>
-		/// <param name="atlasName">Atlas name (for loading from file)</param>
-		/// <param name="tooltipKey">Tooltip translation key</param>
-		/// <returns>New checkbox</returns>
-		private UICheckBox IconToggleCheck(UIComponent parent, float xPos, float yPos, string atlasName, string tooltipKey)
-        {
-			const float ToggleSpriteSize = 32f;
-
-			// Size and position.
-			UICheckBox checkBox = parent.AddUIComponent<UICheckBox>();
-			checkBox.width = ToggleSpriteSize;
-			checkBox.height = ToggleSpriteSize;
-			checkBox.clipChildren = true;
-			checkBox.relativePosition = new Vector2(xPos, yPos);
-
-			// Checkbox sprites.
-			UISprite sprite = checkBox.AddUIComponent<UISprite>();
-			sprite.atlas = TextureUtils.LoadSpriteAtlas(atlasName);
-			sprite.spriteName = "disabled";
-			sprite.size = new Vector2(ToggleSpriteSize, ToggleSpriteSize);
-			sprite.relativePosition = Vector3.zero;
-
-			checkBox.checkedBoxObject = sprite.AddUIComponent<UISprite>();
-			((UISprite)checkBox.checkedBoxObject).atlas = TextureUtils.LoadSpriteAtlas(atlasName);
-			((UISprite)checkBox.checkedBoxObject).spriteName = "pressed";
-			checkBox.checkedBoxObject.size = new Vector2(ToggleSpriteSize, ToggleSpriteSize);
-			checkBox.checkedBoxObject.relativePosition = Vector3.zero;
-
-			checkBox.tooltip = Translations.Translate(tooltipKey);
-
-			return checkBox;
 		}
 
 
@@ -310,13 +262,12 @@ namespace BOB
 		}
 
 
-#pragma warning disable IDE0060 // Remove unused parameter
 		/// <summary>
 		/// Handles textfield value change; should be added as eventTextSubmitted event handler.
 		/// </summary>
 		/// <param name="control">Calling component(unused)</param>
 		/// <param name="text">New text</param>
-		public void OnTextSubmitted(UIComponent control, string text)
+		public void OnTextSubmitted(UIComponent _, string text)
         {
 			// Don't do anything is events are suppressed.
 			if (!suppressEvents)
@@ -338,7 +289,6 @@ namespace BOB
 				suppressEvents = false;
 			}
 		}
-#pragma warning restore IDE0060 // Remove unused parameter
 
 
 		/// <summary>

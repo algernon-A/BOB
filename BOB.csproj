@@ -62,7 +62,7 @@
     <Compile Include="Code\Patches\OverlayTranspilers.cs" />
     <Compile Include="Code\Patches\RenderOverlay.cs" />
     <Compile Include="Code\Replacement\MapPropReplacement.cs" />
-    <Compile Include="Code\UI\PropInfoPanel.cs" />
+    <Compile Include="Code\UI\MapPanel.cs" />
     <Compile Include="Code\Utils\Logging.cs" />
     <Compile Include="Code\Patches\OnLevelLoaded.cs" />
     <Compile Include="Code\PackUtils\PackUtils.cs" />
@@ -107,7 +107,6 @@
     <Compile Include="Code\UI\NetInfoPanel.cs" />
     <Compile Include="Code\UI\BOBTool.cs" />
     <Compile Include="Code\UI\InfoPanel.cs" />
-    <Compile Include="Code\UI\TreeInfoPanel.cs" />
     <Compile Include="Code\Utils\ModUtils.cs" />
     <Compile Include="Code\Utils\UIControls.cs" />
     <Compile Include="Code\UI\UIFastList\UIFastList.cs" />
