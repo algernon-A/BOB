@@ -14,13 +14,13 @@ namespace BOB.MessageBox
     public abstract class MessageBoxBase : UIPanel
     {
         // Layout constants.
-        protected const float Width = 573f;
+        protected const float Width = 600f;
         protected const float Height = 200f;
-        protected const float TitleBarHeight = 42f;
-        protected const float ButtonHeight = 47f;
+        protected const float TitleBarHeight = 40f;
+        protected const float ButtonHeight = 45f;
         protected const float Padding = 16f;
         protected const float ButtonSpacing = 25f;
-        protected const float MaxContentHeight = 500f;
+        protected const float MaxContentHeight = 400f;
 
         // Reference constants.
         private const int DefaultButton = 1;
@@ -36,6 +36,7 @@ namespace BOB.MessageBox
         // Accessors.
         public string Title { get => title.text; set => title.text = value; }
         public UIScrollablePanel ScrollableContent => mainPanel;
+        protected float ContentWidth => ScrollableContent.width - ScrollableContent.autoLayoutPadding.left - ScrollableContent.autoLayoutPadding.right;
         public void Close() => CloseModal(this);
 
 
@@ -110,6 +111,7 @@ namespace BOB.MessageBox
         public MessageBoxBase()
         {
             // Basic setup.
+            autoSize = false;
             isVisible = true;
             canFocus = true;
             isInteractive = true;
@@ -207,10 +209,11 @@ namespace BOB.MessageBox
         private void Resize()
         {
             // Set height.
-            height = titleBar.height + mainPanel.height + buttonPanel.height + Padding;
+            height = titleBar.height + mainPanel.height + buttonPanel.height + (Padding * 2f);
 
-            // Position main panel under title bar.
+            // Position main panel under title bar and set width.
             mainPanel.relativePosition = new Vector2(0, titleBar.height);
+            mainPanel.width = width - (mainPanel?.verticalScrollbar?.width ?? 0) - 3f;
 
             // Position button panel under main panel.
             buttonPanel.relativePosition = new Vector2(0, titleBar.height + mainPanel.height + Padding);
@@ -245,7 +248,7 @@ namespace BOB.MessageBox
             closeButton.hoveredBgSprite = "buttonclosehover";
             closeButton.pressedBgSprite = "buttonclosepressed";
             closeButton.size = new Vector2(32f, 32f);
-            closeButton.relativePosition = new Vector2(527f, 4f);
+            closeButton.relativePosition = new Vector2(Width - 36f, 4f);
 
             // Event handler - resize.
             titleBar.eventSizeChanged += (component, newSize) =>
@@ -294,7 +297,7 @@ namespace BOB.MessageBox
         private void AddButtonPanel()
         {
             buttonPanel = AddUIComponent<UIPanel>();
-            buttonPanel.size = new Vector2(Width, ButtonHeight + 10f);
+            buttonPanel.size = new Vector2(Width, ButtonHeight);
         }
 
 
@@ -339,37 +342,18 @@ namespace BOB.MessageBox
         /// <summary>
         /// Event handler delegate for child visibility changes.
         /// </summary>
-        private void OnChildVisibilityChanged(UIComponent component, bool isVisible) => ChildResized();
+        private void OnChildVisibilityChanged(UIComponent component, bool isVisible) => Resize();
 
 
         /// <summary>
         /// Event handler delegate for child size changes.
         /// </summary>
-        private void OnChildSizeChanged(UIComponent component, Vector2 newSize) => ChildResized();
+        private void OnChildSizeChanged(UIComponent component, Vector2 newSize) => Resize();
 
 
         /// <summary>
         /// Event handler delegate for child position changes.
         /// </summary>
-        private void OnChildPositionChanged(UIComponent component, Vector2 position) => ChildResized();
-
-
-        /// <summary>
-        /// Resizes panel when child size changes - called through event handlers.
-        /// </summary>
-        private void ChildResized()
-        {
-            try
-            {
-                mainPanel.FitChildrenVertically();
-            }
-            catch
-            {
-                Logging.Error("ChildResized exception");
-            }
-
-            // Resize main panel, allowing for scrollbar width if scrollbar is visible.
-            mainPanel.width = mainPanel.verticalScrollbar?.isVisible == true ? Width - mainPanel.verticalScrollbar.width - 3f : Width;
-        }
+        private void OnChildPositionChanged(UIComponent component, Vector2 position) => Resize();
     }
 }

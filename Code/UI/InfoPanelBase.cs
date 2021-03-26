@@ -463,8 +463,6 @@ namespace BOB
 			// Appearance.
 			newButton.atlas = atlas;
 
-			Logging.Message("icon button with atlas name ", atlas?.name ?? "null");
-
 			newButton.normalFgSprite = "normal";
 			newButton.focusedFgSprite = "normal";
 			newButton.hoveredFgSprite = "hovered";

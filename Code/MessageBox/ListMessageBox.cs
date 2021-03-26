@@ -10,8 +10,11 @@ namespace BOB.MessageBox
     public class ListMessageBox : MessageBoxBase
     {
         // Components.
-        protected UIButton closeButton;
+        private UIButton closeButton;
 
+
+        // Number of buttons for this panel (for layout).
+        protected virtual int NumButtons => 1;
 
         /// <summary>
         /// Constructor - performs required basic setup.
@@ -32,7 +35,7 @@ namespace BOB.MessageBox
         public virtual void AddButtons()
         {
             // Add close button.
-            closeButton = AddButton(1, 1, Close);
+            closeButton = AddButton(1, NumButtons, Close);
             closeButton.text = Translations.Translate("MES_CLS");
         }
 
@@ -51,7 +54,7 @@ namespace BOB.MessageBox
                 paraMessage.wordWrap = true;
                 paraMessage.autoSize = false;
                 paraMessage.autoHeight = true;
-                paraMessage.width = width - ScrollableContent.autoLayoutPadding.left - ScrollableContent.autoLayoutPadding.right;
+                paraMessage.width = ContentWidth;
 
                 // Set text while we're autosizing.
                 paraMessage.text = messages[i];
@@ -87,6 +90,7 @@ namespace BOB.MessageBox
             for (int i = 0; i < listItems.Length; ++i)
             {
                 ListItem listItem = ScrollableContent.AddUIComponent<ListItem>();
+                listItem.width = ContentWidth;
                 listItem.Text = listItems[i];
             }
 
