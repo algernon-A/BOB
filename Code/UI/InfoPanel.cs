@@ -59,6 +59,7 @@ namespace BOB
 				UIPanel probabilityPanel = Sliderpanel(this, MidControlX, ProbabilityY, SliderHeight);
 				probabilitySlider = AddBOBSlider(probabilityPanel, 0f, "BOB_PNL_PRB", 0, 100, 1);
 				probabilitySlider.TrueValue = 100f;
+				probabilitySlider.LimitToVisible = true;
 
 				// Angle.
 				UIPanel anglePanel = Sliderpanel(this, MidControlX, AngleY, SliderHeight);
@@ -218,9 +219,13 @@ namespace BOB
 		// Float or integer slider?
 		public bool IsInt { get; set; } = false;
 
+		// Limit to visible range?
+		public bool LimitToVisible { get; set; } = false;
+
 
 		// Sub-components.
 		public UITextField ValueField { get; set; }
+
 
 
 		/// <summary>
@@ -232,10 +237,23 @@ namespace BOB
 
 			set
 			{
-				trueValue = value;
+				// Clamp value to visible slider range.
+				float visibleValue = Mathf.Clamp(value, minValue, maxValue);
+
+				// Are we limiting to visible range?
+				if (LimitToVisible)
+				{
+					// Yes; use clamped value.
+					trueValue = visibleValue;
+				}
+				else
+				{
+					// No - use raw (unclamped) value.
+					trueValue = value;
+				}
 
 				// Set slider display value - clamped to slider extents.
-				this.value = Mathf.Clamp(value, minValue, maxValue);
+				this.value = visibleValue;
 			}
 		}
 
