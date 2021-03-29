@@ -10,7 +10,6 @@ namespace BOB
 	/// </summary>
 	public abstract class BOBInfoPanel : BOBInfoPanelBase
 	{
-
 		// Controls - align bottom with bottom of lists, and work up.
 		private const float SliderHeight = 38f;
 		private const float FieldOffset = SliderHeight + Margin;

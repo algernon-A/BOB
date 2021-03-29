@@ -4,6 +4,8 @@ using UnityEngine;
 using ColossalFramework;
 using ColossalFramework.UI;
 
+using System.Diagnostics;
+
 
 namespace BOB
 {
@@ -154,6 +156,9 @@ namespace BOB
 		/// <param name="targetPrefabInfo">Currently selected target prefab</param>
 		internal virtual void Setup(Transform parentTransform, PrefabInfo targetPrefabInfo)
 		{
+			Stopwatch stopWatch = new Stopwatch();
+			stopWatch.Start();
+
 			// Set target reference.
 			selectedPrefab = targetPrefabInfo;
 
@@ -261,6 +266,9 @@ namespace BOB
 
 			// Set initial checkbox state.
 			hideVanilla.isChecked = ModSettings.hideVanilla;
+
+			stopWatch.Stop();
+			Logging.Message("base panel setup time ", stopWatch.ElapsedMilliseconds.ToString());
 		}
 
 
@@ -385,6 +393,10 @@ namespace BOB
 		/// <returns>Populated fastlist of loaded prefabs</returns>
 		protected FastList<object> LoadedList(bool isTree)
 		{
+			Stopwatch stopWatch = new Stopwatch();
+			stopWatch.Start();
+
+
 			// List of prefabs that have passed filtering.
 			List<PrefabInfo> list = new List<PrefabInfo>();
 
@@ -437,6 +449,10 @@ namespace BOB
 			FastList<object> fastList = new FastList<object>();
 			object[] array = fastList.m_buffer = list.OrderBy(item => UIUtils.GetDisplayName(item.name)).ToArray();
 			fastList.m_size = list.Count;
+
+			stopWatch.Stop();
+			Logging.Message("replacement list setup time ", stopWatch.ElapsedMilliseconds.ToString());
+
 			return fastList;
 		}
 

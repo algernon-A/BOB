@@ -13,7 +13,6 @@ namespace BOB
 		private readonly static Dictionary<string, UITextureAtlas> textureCache = new Dictionary<string, UITextureAtlas>();
 
 
-
 		/// <summary>
 		/// Loads a cursor texture.
 		/// </summary>
