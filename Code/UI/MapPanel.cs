@@ -14,9 +14,11 @@ namespace BOB
 		// Button labels.
 		protected override string ReplaceTooltipKey => "BOB_PNL_RTT";
 
-
 		// Trees or props?
 		protected override bool IsTree => treeCheck?.isChecked ?? false;
+
+		// Initial tree/prop checked state.
+		protected override bool InitialTreeCheckedState => selectedPrefab is TreeInfo;
 
 
 		// Replace button atlas.
@@ -33,63 +35,8 @@ namespace BOB
 			// Base setup.
 			base.Setup(parentTransform, targetPrefabInfo);
 
-			// Replace button event handler.
-			replaceButton.eventClicked += (control, clickEvent) =>
-			{
-				// Apply replacement.
-				if (replacementPrefab is TreeInfo replacementTree)
-				{
-					MapTreeReplacement.instance.Apply((CurrentTargetItem.replacementPrefab ?? CurrentTargetItem.originalPrefab) as TreeInfo, replacementTree);
-				}
-				else if (replacementPrefab is PropInfo replacementProp)
-                {
-					MapPropReplacement.instance.Apply((CurrentTargetItem.replacementPrefab ?? CurrentTargetItem.originalPrefab) as PropInfo, replacementProp);
-				}
-
-				// Update current target.
-				CurrentTargetItem.replacementPrefab = replacementPrefab;
-
-				// Perform post-replacment updates.
-				FinishUpdate();
-			};
-
-			// Revert button event handler.
-			revertButton.eventClicked += (control, clickEvent) =>
-			{
-				// Individual building prop reversion - ensuire that we've got a current selection before doing anything.
-				if (CurrentTargetItem != null && CurrentTargetItem is PropListItem currentItem)
-				{
-					// Individual reversion.
-					if (CurrentTargetItem.replacementPrefab is TreeInfo tree)
-					{
-						MapTreeReplacement.instance.Revert(tree);
-					}
-					else if (CurrentTargetItem.replacementPrefab is PropInfo prop)
-                    {
-						MapPropReplacement.instance.Revert(prop);
-					}
-
-					// Clear current target replacement prefab.
-					CurrentTargetItem.replacementPrefab = null;
-				}
-
-				// Perform post-replacment updates.
-				FinishUpdate();
-			};
-
-			// Set initial tree/prop state based on selection.
-			if (selectedPrefab is TreeInfo)
-			{
-				treeCheck.isChecked = true;
-			}
-			else
-            {
-				propCheck.isChecked = true;
-			}
-			loadedList.rowsData = LoadedList(IsTree);
+			// Populate target list and select target item.
 			targetList.rowsData = TargetList(IsTree);
-
-			// Select target item.
 			targetList.FindTargetItem(targetPrefabInfo);
 
 			// Update button states.
@@ -98,6 +45,61 @@ namespace BOB
 			// Apply Harmony rendering patches.
 			Patcher.PatchMapOverlays(true);
 		}
+
+
+		/// <summary>
+		/// Replace button event handler.
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="mouseEvent">Mouse event (unused)</param>
+		/// </summary>
+		protected override void Replace(UIComponent control, UIMouseEventParameter mouseEvent)
+		{
+			// Apply replacement.
+			if (replacementPrefab is TreeInfo replacementTree)
+			{
+				MapTreeReplacement.instance.Apply((CurrentTargetItem.replacementPrefab ?? CurrentTargetItem.originalPrefab) as TreeInfo, replacementTree);
+			}
+			else if (replacementPrefab is PropInfo replacementProp)
+			{
+				MapPropReplacement.instance.Apply((CurrentTargetItem.replacementPrefab ?? CurrentTargetItem.originalPrefab) as PropInfo, replacementProp);
+			}
+
+			// Update current target.
+			CurrentTargetItem.replacementPrefab = replacementPrefab;
+
+			// Perform post-replacment updates.
+			FinishUpdate();
+		}
+
+
+		/// <summary>
+		/// Revert button event handler.
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="mouseEvent">Mouse event (unused)</param>
+		/// </summary>
+		protected override void Revert(UIComponent control, UIMouseEventParameter mouseEvent)
+		{
+			// Individual building prop reversion - ensuire that we've got a current selection before doing anything.
+			if (CurrentTargetItem != null && CurrentTargetItem is PropListItem)
+			{
+				// Individual reversion.
+				if (CurrentTargetItem.replacementPrefab is TreeInfo tree)
+				{
+					MapTreeReplacement.instance.Revert(tree);
+				}
+				else if (CurrentTargetItem.replacementPrefab is PropInfo prop)
+				{
+					MapPropReplacement.instance.Revert(prop);
+				}
+
+				// Clear current target replacement prefab.
+				CurrentTargetItem.replacementPrefab = null;
+			}
+
+			// Perform post-replacment updates.
+			FinishUpdate();
+		}
+
 
 		/// <summary>
 		/// Prop check event handler.

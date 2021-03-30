@@ -132,12 +132,12 @@ namespace BOB
 				int numChoices = numSubs + 1;
 				string[] subBuildingNames = new string[numChoices];
 				subBuildings = new BuildingInfo[numChoices];
-				subBuildingNames[0] = UIUtils.GetDisplayName(currentBuilding.name);
+				subBuildingNames[0] = PrefabLists.GetDisplayName(currentBuilding.name);
 				subBuildings[0] = currentBuilding;
 
 				for (int i = 0; i < numSubs; ++i)
                 {
-					subBuildingNames[i + 1] = UIUtils.GetDisplayName(currentBuilding.m_subBuildings[i].m_buildingInfo.name);
+					subBuildingNames[i + 1] = PrefabLists.GetDisplayName(currentBuilding.m_subBuildings[i].m_buildingInfo.name);
 					subBuildings[i + 1] = currentBuilding.m_subBuildings[i].m_buildingInfo;
 				}
 
@@ -187,108 +187,6 @@ namespace BOB
                 }
 			};
 
-			// Replace button event handler.
-			replaceButton.eventClicked += (control, clickEvent) =>
-			{
-				// Make sure we have valid a target and replacement.
-				if (CurrentTargetItem != null && replacementPrefab != null)
-				{
-					// Grouped or individual?
-					if (CurrentTargetItem.index < 0)
-					{
-						// Grouped replacement.
-						BuildingReplacement.instance.Apply(currentBuilding, CurrentTargetItem.originalPrefab, replacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
-
-						// Update current target.
-						CurrentTargetItem.replacementPrefab = replacementPrefab;
-						CurrentTargetItem.replacementProb = probability;
-					}
-					else
-					{
-						// Individual replacement.
-						IndividualReplacement.instance.Apply(currentBuilding, CurrentTargetItem.originalPrefab, CurrentTargetItem.index, replacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
-
-						// Update current target.
-						CurrentTargetItem.individualPrefab = replacementPrefab;
-						CurrentTargetItem.individualProb = probability;
-					}
-
-					// Perform post-replacment updates.
-					FinishUpdate();
-				}
-			};
-
-			// All building button event handler.
-			replaceAllButton.eventClicked += (control, clickEvent) =>
-			{
-				// Saftey net - don't do anything if individual check is selected.
-				if (indCheck.isChecked)
-                {
-					return;
-                }
-
-				// Apply replacement.
-				AllBuildingReplacement.instance.Apply(CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, replacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
-
-				// Update current target.
-				CurrentTargetItem.allPrefab = replacementPrefab;
-				CurrentTargetItem.allProb = probability;
-
-				// Perform post-replacment updates.
-				FinishUpdate();
-			};
-
-			// Revert button event handler.
-			revertButton.eventClicked += (control, clickEvent) =>
-			{
-				// Individual building prop reversion?
-				if (CurrentTargetItem.individualPrefab != null)
-				{
-					// Individual building prop reversion - ensuire that we've got a current selection before doing anything.
-					if (CurrentTargetItem != null && CurrentTargetItem is PropListItem currentItem)
-					{
-						// Individual reversion.
-						IndividualReplacement.instance.Revert(currentBuilding, CurrentTargetItem.index, true);
-
-						// Clear current target replacement prefab.
-						CurrentTargetItem.individualPrefab = null;
-					}
-
-					// Perform post-replacment updates.
-					FinishUpdate();
-				}
-				else if (CurrentTargetItem.replacementPrefab != null)
-				{
-					// Building reversion - ensuire that we've got a current selection before doing anything.
-					if (CurrentTargetItem != null && CurrentTargetItem is PropListItem currentItem)
-					{
-						// Grouped reversion.
-						BuildingReplacement.instance.Revert(currentBuilding, CurrentTargetItem.originalPrefab, true);
-
-						// Clear current target replacement prefab.
-						CurrentTargetItem.replacementPrefab = null;
-					}
-
-					// Perform post-replacment updates.
-					FinishUpdate();
-				}
-				else if (CurrentTargetItem.allPrefab != null)
-				{
-					// All-building reversion - make sure we've got a currently active replacement before doing anything.
-					if (CurrentTargetItem.originalPrefab)
-					{
-						// Apply all-building reversion.
-						AllBuildingReplacement.instance.Revert(CurrentTargetItem.originalPrefab, true);
-
-						// Clear current target 'all' prefab.
-						CurrentTargetItem.allPrefab = null;
-
-						// Perform post-replacment updates.
-						FinishUpdate();
-					}
-				}
-			};
-
 			// Set grouped checkbox initial state according to preferences.
 			switch (ModSettings.indDefault)
 			{
@@ -306,10 +204,8 @@ namespace BOB
 					break;
 			}
 
-			// Set remaining check states from previous (OR default) settings and update button states.
-			propCheck.isChecked = !ModSettings.treeSelected;
-			treeCheck.isChecked = ModSettings.treeSelected;
-			UpdateButtonStates();
+			// Populate target list and select target item.
+			targetList.rowsData = TargetList(IsTree);
 
 			Logging.Message("building setup time ", stopwatch.ElapsedMilliseconds.ToString());
 
@@ -319,6 +215,123 @@ namespace BOB
 
 			stopwatch.Stop();
 			Logging.Message("Harmony patching time ", stopwatch.ElapsedMilliseconds.ToString());
+		}
+
+
+		/// <summary>
+		/// Replace button event handler.
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="mouseEvent">Mouse event (unused)</param>
+		/// </summary>
+		protected override void Replace(UIComponent control, UIMouseEventParameter mouseEvent)
+        {
+			// Make sure we have valid a target and replacement.
+			if (CurrentTargetItem != null && replacementPrefab != null)
+			{
+				// Grouped or individual?
+				if (CurrentTargetItem.index < 0)
+				{
+					// Grouped replacement.
+					BuildingReplacement.instance.Apply(currentBuilding, CurrentTargetItem.originalPrefab, replacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+
+					// Update current target.
+					CurrentTargetItem.replacementPrefab = replacementPrefab;
+					CurrentTargetItem.replacementProb = probability;
+				}
+				else
+				{
+					// Individual replacement.
+					IndividualReplacement.instance.Apply(currentBuilding, CurrentTargetItem.originalPrefab, CurrentTargetItem.index, replacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+
+					// Update current target.
+					CurrentTargetItem.individualPrefab = replacementPrefab;
+					CurrentTargetItem.individualProb = probability;
+				}
+
+				// Perform post-replacment updates.
+				FinishUpdate();
+			}
+		}
+
+
+		/// <summary>
+		/// Revert button event handler.
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="mouseEvent">Mouse event (unused)</param>
+		/// </summary>
+		protected override void Revert(UIComponent control, UIMouseEventParameter mouseEvent)
+		{
+			// Individual building prop reversion?
+			if (CurrentTargetItem.individualPrefab != null)
+			{
+				// Individual building prop reversion - ensuire that we've got a current selection before doing anything.
+				if (CurrentTargetItem != null && CurrentTargetItem is PropListItem)
+				{
+					// Individual reversion.
+					IndividualReplacement.instance.Revert(currentBuilding, CurrentTargetItem.index, true);
+
+					// Clear current target replacement prefab.
+					CurrentTargetItem.individualPrefab = null;
+				}
+
+				// Perform post-replacment updates.
+				FinishUpdate();
+			}
+			else if (CurrentTargetItem.replacementPrefab != null)
+			{
+				// Building reversion - ensuire that we've got a current selection before doing anything.
+				if (CurrentTargetItem != null && CurrentTargetItem is PropListItem)
+				{
+					// Grouped reversion.
+					BuildingReplacement.instance.Revert(currentBuilding, CurrentTargetItem.originalPrefab, true);
+
+					// Clear current target replacement prefab.
+					CurrentTargetItem.replacementPrefab = null;
+				}
+
+				// Perform post-replacment updates.
+				FinishUpdate();
+			}
+			else if (CurrentTargetItem.allPrefab != null)
+			{
+				// All-building reversion - make sure we've got a currently active replacement before doing anything.
+				if (CurrentTargetItem.originalPrefab)
+				{
+					// Apply all-building reversion.
+					AllBuildingReplacement.instance.Revert(CurrentTargetItem.originalPrefab, true);
+
+					// Clear current target 'all' prefab.
+					CurrentTargetItem.allPrefab = null;
+
+					// Perform post-replacment updates.
+					FinishUpdate();
+				}
+			}
+		}
+
+
+		/// <summary>
+		/// Replace all button event handler.
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="mouseEvent">Mouse event (unused)</param>
+		/// </summary>
+		protected override void ReplaceAll(UIComponent control, UIMouseEventParameter mouseEvent)
+		{
+			// Saftey net - don't do anything if individual check is selected.
+			if (indCheck.isChecked)
+			{
+				return;
+			}
+
+			// Apply replacement.
+			AllBuildingReplacement.instance.Apply(CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, replacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+
+			// Update current target.
+			CurrentTargetItem.allPrefab = replacementPrefab;
+			CurrentTargetItem.allProb = probability;
+
+			// Perform post-replacment updates.
+			FinishUpdate();
 		}
 
 

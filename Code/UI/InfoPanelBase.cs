@@ -58,12 +58,15 @@ namespace BOB
 		// Button tooltips.
 		protected abstract string ReplaceTooltipKey { get; }
 
-
 		// Trees or props?
 		protected virtual bool IsTree => treeCheck?.isChecked ?? false;
 
+		// Initial tree/prop checked state.
+		protected abstract bool InitialTreeCheckedState { get; }
+
 		// Replace button atlas.
 		protected abstract UITextureAtlas ReplaceAtlas { get; }
+
 
 
 		/// <summary>
@@ -72,6 +75,7 @@ namespace BOB
 		/// <param name="isTree">True for a list of trees, false for props</param>
 		/// <returns>Populated fastlist of loaded prefabs</returns>
 		protected abstract FastList<object> TargetList(bool isTree);
+
 
 		/// <summary>
 		/// Updates button states (enabled/disabled) according to current control states.
@@ -89,6 +93,13 @@ namespace BOB
 			set
 			{
 				currentTargetItem = value;
+
+				// Refresh loaded list if needed.
+				if (value != null && (loadedList.m_rowsData?.m_buffer == null || loadedList.m_rowsData.m_size == 0))
+                {
+					loadedList.m_rowsData = LoadedList(IsTree);
+					loadedList.Refresh();
+                }
 
 				// Check if actual item has been set.
 				if (currentTargetItem != null)
@@ -227,6 +238,8 @@ namespace BOB
 			// Tree/Prop checkboxes.
 			propCheck = IconToggleCheck(this, Margin, TitleHeight + Margin, "bob_props3", "BOB_PNL_PRP");
 			treeCheck = IconToggleCheck(this, Margin + propCheck.width, TitleHeight + Margin, "bob_trees_small", "BOB_PNL_TRE");
+			propCheck.isChecked = !InitialTreeCheckedState;
+			treeCheck.isChecked = InitialTreeCheckedState;
 			propCheck.eventCheckChanged += PropCheckChanged;
 			treeCheck.eventCheckChanged += TreeCheckChanged;
 
@@ -242,9 +255,11 @@ namespace BOB
 
 			// Replace button.
 			replaceButton = AddIconButton(this, MidControlX, ReplaceY, BigIconSize, ReplaceTooltipKey, ReplaceAtlas);
+			replaceButton.eventClicked += Replace;
 
 			// Revert button.
 			revertButton = UIControls.AddSmallerButton(this, MidControlX, RevertY, Translations.Translate("BOB_PNL_REV"), MidControlWidth);
+			revertButton.eventClicked += Revert;
 
 			// Name filter.
 			nameFilter = UIControls.SmallLabelledTextField(this, width - 200f - Margin, TitleHeight + Margin, Translations.Translate("BOB_FIL_NAME"));
@@ -254,22 +269,28 @@ namespace BOB
 
 			// Vanilla filter.
 			hideVanilla = UIControls.LabelledCheckBox((UIComponent)(object)this, nameFilter.relativePosition.x, nameFilter.relativePosition.y + nameFilter.height + (Margin / 2f), Translations.Translate("BOB_PNL_HDV"), 12f, 0.7f);
-			hideVanilla.eventCheckChanged += (control, isChecked) =>
-			{
-				// Filter list.
-				loadedList.rowsData = LoadedList(IsTree);
-
-				// Store state.
-				ModSettings.hideVanilla = isChecked;
-			};
-
-
-			// Set initial checkbox state.
 			hideVanilla.isChecked = ModSettings.hideVanilla;
+			hideVanilla.eventCheckChanged += VanillaCheckChanged;
 
 			stopWatch.Stop();
 			Logging.Message("base panel setup time ", stopWatch.ElapsedMilliseconds.ToString());
 		}
+
+
+		/// <summary>
+		/// Replace button event handler.
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="mouseEvent">Mouse event (unused)</param>
+		/// </summary>
+		protected abstract void Replace(UIComponent control, UIMouseEventParameter mouseEvent);
+
+
+		/// <summary>
+		/// Revertt button event handler.
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="mouseEvent">Mouse event (unused)</param>
+		/// </summary>
+		protected abstract void Revert(UIComponent control, UIMouseEventParameter mouseEvent);
 
 
 		/// <summary>
@@ -403,23 +424,28 @@ namespace BOB
 			// Clear current selection.
 			loadedList.selectedIndex = -1;
 
+			bool nameFilterActive = !nameFilter.text.IsNullOrWhiteSpace();
+
 			// Tree or prop?
 			if (isTree)
 			{
 				// Tree - iterate through each tree in our list of loaded prefabs.
-				foreach (TreeInfo loadedTree in PrefabLists.loadedTrees)
+				for (int i = 0; i < PrefabLists.loadedTrees.Length; ++i)
 				{
-					// Set display name.
-					string displayName = UIUtils.GetDisplayName(loadedTree.name);
-
-					// Apply vanilla filtering if selected.
-					if (!hideVanilla.isChecked || !displayName.StartsWith("[v]"))
+					TreeInfo loadedTree = PrefabLists.loadedTrees[i];
 					{
-						// Apply name filter.
-						if (StringExtensions.IsNullOrWhiteSpace(nameFilter.text.Trim()) || displayName.ToLower().Contains(nameFilter.text.Trim().ToLower()))
+						// Set display name.
+						string displayName = PrefabLists.GetDisplayName(loadedTree.name);
+
+						// Apply vanilla filtering if selected.
+						if (!hideVanilla.isChecked || !displayName.StartsWith("[v]"))
 						{
-							// Filtering passed - add this prefab to our list.
-							list.Add(loadedTree);
+							// Apply name filter.
+							if (!nameFilterActive || displayName.ToLower().Contains(nameFilter.text.Trim().ToLower()))
+							{
+								// Filtering passed - add this prefab to our list.
+								list.Add(loadedTree);
+							}
 						}
 					}
 				}
@@ -427,16 +453,18 @@ namespace BOB
 			else
 			{
 				// Prop - iterate through each prop in our list of loaded prefabs.
-				foreach (PropInfo loadedProp in PrefabLists.loadedProps)
+				for (int i = 0; i < PrefabLists.loadedProps.Length; ++i)
 				{
+					PropInfo loadedProp = PrefabLists.loadedProps[i];
+
 					// Set display name.
-					string displayName = UIUtils.GetDisplayName(loadedProp.name);
+					string displayName = PrefabLists.GetDisplayName(loadedProp.name);
 
 					// Apply vanilla filtering if selected.
 					if (!hideVanilla.isChecked || !displayName.StartsWith("[v]"))
 					{
 						// Apply name filter.
-						if (StringExtensions.IsNullOrWhiteSpace(nameFilter.text.Trim()) || displayName.ToLower().Contains(nameFilter.text.Trim().ToLower()))
+						if (!nameFilterActive || displayName.ToLower().Contains(nameFilter.text.Trim().ToLower()))
 						{
 							// Filtering passed - add this prefab to our list.
 							list.Add(loadedProp);
@@ -445,10 +473,12 @@ namespace BOB
 				}
 			}
 
-			// Create return fastlist from our filtered list, ordering by name.
-			FastList<object> fastList = new FastList<object>();
-			object[] array = fastList.m_buffer = list.OrderBy(item => UIUtils.GetDisplayName(item.name)).ToArray();
-			fastList.m_size = list.Count;
+			// Create return fastlist from our filtered list; master lists should already be sorted by display name so no need to sort again here.
+			FastList<object> fastList = new FastList<object>
+			{
+				m_buffer = list.ToArray(),
+				m_size = list.Count
+			};
 
 			stopWatch.Stop();
 			Logging.Message("replacement list setup time ", stopWatch.ElapsedMilliseconds.ToString());
@@ -545,6 +575,21 @@ namespace BOB
 
 			// Refresh current target item to update highlighting.
 			CurrentTargetItem = CurrentTargetItem;
+		}
+
+
+		/// <summary>
+		/// Hide vanilla check event handler.
+		/// </summary>
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="isChecked">New checked state</param>
+		private void VanillaCheckChanged(UIComponent control, bool isChecked)
+		{
+			// Filter list.
+			loadedList.rowsData = LoadedList(IsTree);
+
+			// Store state.
+			ModSettings.hideVanilla = isChecked;
 		}
 
 

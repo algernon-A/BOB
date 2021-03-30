@@ -35,6 +35,9 @@ namespace BOB
 		// Button tooltips.
 		protected abstract string ReplaceAllTooltipKey { get; }
 
+		// Initial tree/prop checked state.
+		protected override bool InitialTreeCheckedState => ModSettings.treeSelected;
+
 		// Replace all button atlas.
 		protected abstract UITextureAtlas ReplaceAllAtlas { get; }
 
@@ -53,6 +56,7 @@ namespace BOB
 
 				// Replace all button.
 				replaceAllButton = AddIconButton(this, MidControlX + replaceButton.width, ReplaceY, BigIconSize, ReplaceAllTooltipKey, ReplaceAllAtlas);
+				replaceAllButton.eventClicked += ReplaceAll;
 
 				// Probability.
 				UIPanel probabilityPanel = Sliderpanel(this, MidControlX, ProbabilityY, SliderHeight);
@@ -74,16 +78,22 @@ namespace BOB
 				ySlider = AddBOBSlider(offsetPanel, YOffsetY, "BOB_PNL_YOF", -8f, 8f, 0.01f);
 				zSlider = AddBOBSlider(offsetPanel, ZOffsetY, "BOB_PNL_ZOF", -8f, 8f, 0.01f);
 
-				// Set initial button and checkbox states.
-				hideVanilla.isChecked = ModSettings.hideVanilla;
+				// Set initial button states.
 				UpdateButtonStates();
-
 			}
 			catch (Exception e)
 			{
 				Logging.LogException(e, "exception setting up InfoPanel");
 			}
 		}
+
+
+		/// <summary>
+		/// Replace all button event handler.
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="mouseEvent">Mouse event (unused)</param>
+		/// </summary>
+		protected abstract void ReplaceAll(UIComponent control, UIMouseEventParameter mouseEvent);
 
 
 		/// <summary>

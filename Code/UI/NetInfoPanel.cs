@@ -85,71 +85,83 @@ namespace BOB
 			UIButton packButton = UIControls.AddSmallerButton(this, 250f, TitleHeight + Margin, Translations.Translate("BOB_PNL_PKB"));
 			packButton.eventClicked += (component, clickEvent) => PackPanelManager.Create();
 
-			// Replace button event handler.
-			replaceButton.eventClicked += (control, clickEvent) =>
-			{
-				// Make sure we have valid a target and replacement.
-				if (CurrentTargetItem != null && replacementPrefab != null)
-				{
-					// Network replacements are always grouped.
-					NetworkReplacement.instance.Apply(currentNet, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, replacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
-
-					// Perform post-replacment updates.
-					FinishUpdate();
-				}
-			};
-
-			// All network button event handler.
-			replaceAllButton.eventClicked += (control, clickEvent) =>
-			{
-
-				// Apply replacement.
-				AllNetworkReplacement.instance.Apply(CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, replacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
-
-				// Perform post-replacment updates.
-				FinishUpdate();
-			};
-
-			// Revert button event handler.
-			revertButton.eventClicked += (control, clickEvent) =>
-			{
-				// Network or all-network reversion?
-				if (CurrentTargetItem.replacementPrefab != null)
-				{
-					// Individual network reversion - ensuire that we've got a current selection before doing anything.
-					if (CurrentTargetItem != null && CurrentTargetItem is NetPropListItem currentNetItem)
-					{
-						// Network replacements are always grouped.
-						NetworkReplacement.instance.Revert(currentNet, CurrentTargetItem.originalPrefab, true);
-
-						// Perform post-reversion updates.
-						FinishUpdate();
-					}
-				}
-				else if (CurrentTargetItem.allPrefab != null)
-				{
-					// All-network reversion - make sure we've got a currently active replacement before doing anything.
-					if (CurrentTargetItem.originalPrefab)
-					{
-						// Apply all-network reversion.
-						AllNetworkReplacement.instance.Revert(CurrentTargetItem.originalPrefab, true);
-
-						// Save configuration file and refresh target list (to reflect our changes).
-						ConfigurationUtils.SaveConfig();
-
-						// Perform post-reversion updates.
-						FinishUpdate();
-					}
-				}
-			};
-
-			// Set remaining check states from previous (OR default) settings and update button states.
-			propCheck.isChecked = !ModSettings.treeSelected;
-			treeCheck.isChecked = ModSettings.treeSelected;
-			UpdateButtonStates();
+			// Populate target list and select target item.
+			targetList.rowsData = TargetList(IsTree);
 
 			// Apply Harmony rendering patches.
 			Patcher.PatchNetworkOverlays(true);
+		}
+
+
+		/// <summary>
+		/// Replace button event handler.
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="mouseEvent">Mouse event (unused)</param>
+		/// </summary>
+		protected override void Replace(UIComponent control, UIMouseEventParameter mouseEvent)
+		{
+			// Make sure we have valid a target and replacement.
+			if (CurrentTargetItem != null && replacementPrefab != null)
+			{
+				// Network replacements are always grouped.
+				NetworkReplacement.instance.Apply(currentNet, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, replacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+
+				// Perform post-replacment updates.
+				FinishUpdate();
+			}
+		}
+
+
+		/// <summary>
+		/// Revert button event handler.
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="mouseEvent">Mouse event (unused)</param>
+		/// </summary>
+		protected override void Revert(UIComponent control, UIMouseEventParameter mouseEvent)
+		{
+			// Network or all-network reversion?
+			if (CurrentTargetItem.replacementPrefab != null)
+			{
+				// Individual network reversion - ensuire that we've got a current selection before doing anything.
+				if (CurrentTargetItem != null && CurrentTargetItem is NetPropListItem)
+				{
+					// Network replacements are always grouped.
+					NetworkReplacement.instance.Revert(currentNet, CurrentTargetItem.originalPrefab, true);
+
+					// Perform post-reversion updates.
+					FinishUpdate();
+				}
+			}
+			else if (CurrentTargetItem.allPrefab != null)
+			{
+				// All-network reversion - make sure we've got a currently active replacement before doing anything.
+				if (CurrentTargetItem.originalPrefab)
+				{
+					// Apply all-network reversion.
+					AllNetworkReplacement.instance.Revert(CurrentTargetItem.originalPrefab, true);
+
+					// Save configuration file and refresh target list (to reflect our changes).
+					ConfigurationUtils.SaveConfig();
+
+					// Perform post-reversion updates.
+					FinishUpdate();
+				}
+			}
+		}
+
+
+		/// <summary>
+		/// Replace all button event handler.
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="mouseEvent">Mouse event (unused)</param>
+		/// </summary>
+		protected override void ReplaceAll(UIComponent control, UIMouseEventParameter mouseEvent)
+		{
+			// Apply replacement.
+			AllNetworkReplacement.instance.Apply(CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, replacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+
+			// Perform post-replacment updates.
+			FinishUpdate();
 		}
 
 

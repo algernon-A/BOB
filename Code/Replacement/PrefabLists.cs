@@ -10,8 +10,8 @@ namespace BOB
 	internal static class PrefabLists
 	{
 		// Lists lf loaded trees and props.
-		internal static List<PropInfo> loadedProps;
-		internal static List<TreeInfo> loadedTrees;
+		internal static PropInfo[] loadedProps;
+		internal static TreeInfo[] loadedTrees;
 
 
 		/// <summary>
@@ -20,8 +20,8 @@ namespace BOB
 		internal static void BuildLists()
 		{
 			// Initialise lists.
-			loadedProps = new List<PropInfo>();
-			loadedTrees = new List<TreeInfo>();
+			List<PropInfo> props = new List<PropInfo>();
+			List<TreeInfo> trees = new List<TreeInfo>();
 
 			// Iterate through all loaded props.
 			for (uint i = 0u; i < PrefabCollection<PropInfo>.LoadedCount(); ++i)
@@ -30,7 +30,7 @@ namespace BOB
 				PropInfo prop = PrefabCollection<PropInfo>.GetLoaded(i);
 				if (prop?.name != null)
 				{
-					loadedProps.Add(prop);
+					props.Add(prop);
 				}
 			}
 
@@ -41,13 +41,35 @@ namespace BOB
 				TreeInfo tree = PrefabCollection<TreeInfo>.GetLoaded(i);
 				if (tree?.name != null)
 				{
-					loadedTrees.Add(tree);
+					trees.Add(tree);
 				}
 			}
 
 			// Order lists by name.
-			loadedProps = loadedProps.OrderBy(prop => UIUtils.GetDisplayName(prop.name)).ToList();
-			loadedTrees = loadedTrees.OrderBy(tree => UIUtils.GetDisplayName(tree.name)).ToList();
+			loadedProps = props.OrderBy(prop => GetDisplayName(prop.name)).ToList().ToArray();
+			loadedTrees = trees.OrderBy(tree => GetDisplayName(tree.name)).ToList().ToArray();
+		}
+
+
+		/// <summary>
+		/// Sanitises a raw prefab name for display.
+		/// Called by the settings panel fastlist.
+		/// </summary>
+		/// <param name="fullName">Original (raw) prefab name</param>
+		/// <returns>Cleaned display name</returns>
+		internal static string GetDisplayName(string fullName)
+		{
+			// Find any leading period (Steam package number).
+			int num = fullName.IndexOf('.');
+
+			// If no period, assume vanilla asset; return full name preceeded by vanilla flag.
+			if (num < 0)
+			{
+				return "[v] " + fullName;
+			}
+
+			// Otherwise, omit the package number, and trim off any trailing _Data.
+			return fullName.Substring(num + 1).Replace("_Data", "");
 		}
 	}
 }
