@@ -2,42 +2,87 @@
 <Language UniqueName="es" ReadableName="Español">
   <Translations>
     <Translation ID="BOB_NAM" String="BOB: the tree and prop replacer" />
-    <Translation ID="BOB_DESC" String="UNDER DEVELOPMENT: Reemplaza árboles y props." />
+    <Translation ID="BOB_DESC" String="UNDER DEVELOPMENT: Reemplaza árboles y decoraciones." />
     <Translation ID="TRN_CHOICE" String="Elegir idioma" />
-    <Translation ID="TRN_SYS" String="Usar el idimoa del juego" />
+    <Translation ID="TRN_SYS" String="Usa el idioma del juego" />
     <Translation ID="MES_CLS" String="Cerrar" />
     <Translation ID="MES_DSA" String="No mostrar de nuevo" />
     <Translation ID="BOB_MBX_OK" String="OK" />
-    <Translation ID="BOB_ROW_NOW" String="ahora" />
-    <Translation ID="BOB_PNL_NOP" String="No se encontraron props" />
+    <Translation ID="BOB_ROW_WAS" String="era" />
+    <Translation ID="BOB_PNL_NOP" String="No se encontraron decoraciones" />
     <Translation ID="BOB_PNL_NOT" String="No se encontraron árboles" />
-    <Translation ID="BOB_PNL_TRE" String="Arboles" />
-    <Translation ID="BOB_PNL_PRP" String="Props" />
-    <Translation ID="BOB_PNL_IND" String="Mostrtar props individuales" />
-    <Translation ID="BOB_PNL_HDV" String="Esconder vanilla" />
+    <Translation ID="BOB_PNL_TRE" String="Árboles" />
+    <Translation ID="BOB_PNL_PRP" String="Decoraciones" />
+    <Translation ID="BOB_PNL_IND" String="Mostrar decoraciones individuales" />
+    <Translation ID="BOB_PNL_HDV" String="Ocultar Vanilla" />
     <Translation ID="BOB_PNL_REP" String="Reemplazar" />
     <Translation ID="BOB_PNL_RTB" String="Estos edificios" />
-    <Translation ID="BOB_PNL_RAB" String="Todos los edificios" />
+    <Translation ID="BOB_PNL_RAB" String="Todos edificios" />
     <Translation ID="BOB_PNL_RTN" String="Estas redes" />
-    <Translation ID="BOB_PNL_RAN" String="Todas las redes" />
-    <Translation ID="BOB_PNL_RTT" String="Arboles del mapa" />
-    <Translation ID="BOB_PNL_REV" String="Restablecer" />
+    <Translation ID="BOB_PNL_RAN" String="Todas redes" />
+    <Translation ID="BOB_PNL_RTT" String="Árboles del mapa" />
+    <Translation ID="BOB_PNL_RTP" String="Decoraciones del mapa" />
+    <Translation ID="BOB_PNL_REV" String="Revertir" />
+    <Translation ID="BOB_PNL_PKB" String="Paquetes de reemplazo" />
     <Translation ID="BOB_PNL_PRB" String="Probabilidad" />
-    <Translation ID="BOB_PNL_ANG" String="Angulo" />
-    <Translation ID="BOB_PNL_XOF" String="Desplazamiento en eje X" />
-    <Translation ID="BOB_PNL_YOF" String="Desplazamiento en eje Y" />
-    <Translation ID="BOB_PNL_ZOF" String="Desplazamiento en eje Z" />
-    <Translation ID="BOB_PNL_SUB" String="Edificio Secundario" />
-    <Translation ID="BOB_OPT_KEY" String="Acceso directo" />
+    <Translation ID="BOB_PNL_ANG" String="Ángulo" />
+    <Translation ID="BOB_PNL_OFF" String="Desplazamiento" />
+    <Translation ID="BOB_PNL_XOF" String="X" />
+    <Translation ID="BOB_PNL_YOF" String="Y" />
+    <Translation ID="BOB_PNL_ZOF" String="Z" />
+    <Translation ID="BOB_PNL_SUB" String="Subedificio" />
+    <Translation ID="BOB_SPR_SBL" String="Actualmente se aplica un reemplazo para estos edificios" />
+    <Translation ID="BOB_SPR_ABL" String="Actualmente se aplica un reemplazo para todos edificios" />
+    <Translation ID="BOB_SPR_SNT" String="Actualmente se aplica un reemplazo para estas redes" />
+    <Translation ID="BOB_SPR_ANT" String="Actualmente se aplica un reemplazo para todas redes" />
+    <Translation ID="BOB_SPR_PCK" String="Actualmente se aplica un paquete de reemplazo" />
+    <Translation ID="BOB_PCK_APP" String="Aplicar paquete" />
+    <Translation ID="BOB_PCK_APP_A" String="Se aplica el paquete de reemplazo seleccionado" />
+    <Translation ID="BOB_PCK_APP_C" String="El paquete no se puede aplicar porque entra en conflicto con un paquete ya aplicado" />
+    <Translation ID="BOB_PCK_APP_I" String="El paquete está aplicado actualmente" />
+    <Translation ID="BOB_PCK_RVT" String="Revertir paquete" />
+    <Translation ID="BOB_PCK_RVT_A" String="Se elimina la aplicación del paquete de reemplazo seleccionado" />
+    <Translation ID="BOB_PCK_RVT_I" String="El paquete no se aplica actualmente" />
+    <Translation ID="BOB_PCK_NAL" String="No todos los reemplazos están disponibles" />
+    <Translation ID="BOB_CFG_UCS" String="Utilice la configuración seleccionada (en lugar de la configuración global) para este guardado" />
+    <Translation ID="BOB_CFG_SAC" String="Guardar la configuración actual" />
+    <Translation ID="BOB_CFG_SSC" String="Copiar la configuración seleccionada" />
+    <Translation ID="BOB_CFG_SEC" String="Nueva configuración vacía" />
+    <Translation ID="BOB_CFG_DEL" String="Eliminar la configuración seleccionada" />
+    <Translation ID="BOB_OPT_GEN" String="Opciones generales" />
+    <Translation ID="BOB_OPT_CFG" String="Configuraciones" />
+    <Translation ID="BOB_OPT_KEY" String="Tecla de acceso rápido" />
     <Translation ID="BOB_OPT_PRS" String="Presiona cualquier tecla" />
     <Translation ID="BOB_NUKE" String="Restablecer configuración" />
-    <Translation ID="BOB_PER_IND" String="Mostrar props individuales de forma predeterminanda" />
+    <Translation ID="BOB_PER_IND" String="Mostrar elementos individuales de forma predeterminada" />
     <Translation ID="BOB_PER_SIN" String="Siempre apagado" />
     <Translation ID="BOB_PER_GRP" String="Siempre encendido" />
-    <Translation ID="BOB_PER_LST" String="Recordar configuración anterior" />
-    <Translation ID="BOB_OPT_POS" String="Recordar posición anterior del panel" />
-    <Translation ID="BOB_FIL_NAME" String="Buscar:" />
-    <Translation ID="BOB_UPD_040_0" String="Presentando reemplazo de árboles en el mapa!  Activa BOB como siempre y has clic en cualquier arbol." />
-    <Translation ID="BOB_UPD_041_0" String="Arreglada excepción en el panel de reemplazo del edificio al cambiar un detalle/artículo destino." />
+    <Translation ID="BOB_PER_LST" String="Recuerda la configuración anterior" />
+    <Translation ID="BOB_OPT_POS" String="Recuerda la posición anterior del panel" />
+    <Translation ID="BOB_FIL_NAME" String="Búsqueda:" />
+    <Translation ID="MES_PAGE" String="Consulta la página de Steam Workshop del mod para obtener más información." />
+    <Translation ID="BOB_ERR_FAT" String="Esto significa que el mod no puede funcionar y se ha apagado." />
+    <Translation ID="BOB_ERR_HAR" String="BOB, the tree and prop replacer, no pudo completar los parches de Harmony requeridos." />
+    <Translation ID="ERR_HAR0" String="Error de parcheo de Harmony" />
+    <Translation ID="ERR_HAR1" String="Las posibles causas de este problema incluyen:" />
+    <Translation ID="ERR_HAR2" String="No se instaló la dependencia del mod Harmony 2 requerida" />
+    <Translation ID="ERR_HAR3" String="Un mod antiguo y/o roto impide que Harmony 2 funcione correctamente" />
+    <Translation ID="BOB_UPD_040_0" String="¡Presentamos el reemplazo del árbol de mapas! Active la herramienta BOB como siempre y haga clic en un árbol independiente." />
+    <Translation ID="BOB_UPD_041_0" String="Se corrigió la excepción intermitente del panel de reemplazo del edificio al cambiar el elemento de destino." />
+    <Translation ID="BOB_UPD_042_0" String="Se habilitó la selección de sub-edificios" />
+    <Translation ID="BOB_UPD_042_1" String="Se corrigió un error potencial al cargar el juego." />
+    <Translation ID="BOB_UPD_043_0" String="Se corrigió la actualización de probabilidad al revertir a un reemplazo de todos los edificios o todas las redes" />
+    <Translation ID="BOB_UPD_043_1" String="Se corrigieron los LOD que no se actualizan después de revertir los reemplazos de todas las redes o todos los edificios" />
+    <Translation ID="BOB_UPD_043_2" String="Ajuste las etiquetas de las casillas del panel de información para que se ajusten a cadenas de traducción más largas" />
+    <Translation ID="BOB_UPD_050_0" String="Implementación inicial de paquetes de reemplazo de red" />
+    <Translation ID="BOB_UPD_050_1" String="Ahora correctamente compatible con Network Skins 2" />
+    <Translation ID="BOB_UPD_050_2" String="Procesamiento de reemplazo más rápido" />
+    <Translation ID="BOB_UPD_051_0" String="Nuevo diseño de lista de árboles/decoraciones, con iconos para indicar qué tipo de reemplazo está activo" />
+    <Translation ID="BOB_UPD_052_0" String="Agregue administración de configuraciones para manejar múltiples archivos de configuración diferentes, accesibles a través del panel de opciones" />
+    <Translation ID="BOB_UPD_060_0" String="Reemplazo de decoración independiente" />
+    <Translation ID="BOB_UPD_060_1" String="Resalte decoraciones o árboles seleccionados" />
+    <Translation ID="BOB_UPD_060_2" String="Ahora puede seleccionar redes en edificios." />
+    <Translation ID="BOB_UPD_060_3" String="Ahora puede seleccionar edificios de decoración." />
+    <Translation ID="BOB_UPD_060_4" String="Rediseño panel de reemplazo más pequeño" />
   </Translations>
 </Language>

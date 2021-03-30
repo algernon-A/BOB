@@ -140,6 +140,7 @@
     <Content Include="Resources\bob_single_building_small.png" />
     <Content Include="Resources\bob_trees.png" />
     <Content Include="Resources\bob_trees_small.png" />
+    <Content Include="Translations\de.xml" />
     <Content Include="Translations\en.xml" />
     <Content Include="Translations\es.xml" />
     <Content Include="Translations\zh.xml" />
