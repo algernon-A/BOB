@@ -70,8 +70,14 @@ namespace BOB
 
 				// Offset panel.
 				UIPanel offsetPanel = Sliderpanel(this, MidControlX, OffsetPanelY, OffsetPanelHeight);
-				UILabel offsetLabel = UIControls.AddLabel(offsetPanel, 0f, OffsetLabelY, Translations.Translate("BOB_PNL_OFF"), MidControlWidth);
+				UILabel offsetLabel = UIControls.AddLabel(offsetPanel, 0f, OffsetLabelY, Translations.Translate("BOB_PNL_OFF"));
 				offsetLabel.textAlignment = UIHorizontalAlignment.Center;
+				while (offsetLabel.width > MidControlWidth)
+                {
+					offsetLabel.textScale -= 0.05f;
+					offsetLabel.PerformLayout();
+				}
+				offsetLabel.relativePosition = new Vector2((offsetPanel.width - offsetLabel.width) / 2f, OffsetLabelY);
 
 				// Offset sliders.
 				xSlider = AddBOBSlider(offsetPanel, XOffsetY, "BOB_PNL_XOF", -8f, 8f, 0.01f);
@@ -154,12 +160,17 @@ namespace BOB
 			newSlider.size = new Vector2(MidControlWidth - (Margin * 2f), SliderHeight);
 			newSlider.relativePosition = new Vector2(Margin, yPos + SliderY);
 
-			// Title label.
-			UIControls.AddLabel(newSlider, 0f, LabelY, Translations.Translate(labelKey), textScale: 0.7f);
-
 			// Value field - added to parent, not to slider, otherwise slider catches all input attempts.  Integer textfields (stepsize == 1) have shorter widths.
 			float textFieldWidth = stepSize == 1 ? IntTextFieldWidth : FloatTextFieldWidth;
 			UITextField valueField = UIControls.TinyTextField(parent, Margin + newSlider.width - textFieldWidth, yPos + ValueY, textFieldWidth);
+
+			// Title label.
+			UILabel titleLabel = UIControls.AddLabel(newSlider, 0f, LabelY, Translations.Translate(labelKey), textScale: 0.7f);
+			while (titleLabel.width > newSlider.width - textFieldWidth)
+			{
+				titleLabel.textScale -= 0.05f;
+				titleLabel.PerformLayout();
+			}
 
 			// Slider track.
 			UISlicedSprite sliderSprite = newSlider.AddUIComponent<UISlicedSprite>();
