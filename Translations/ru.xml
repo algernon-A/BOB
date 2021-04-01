@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Language UniqueName="ru" ReadableName="Русский">
+  <Translations>
+    <Translation ID="BOB_NAM" String="BOB: the tree and prop replacer" />
+    <Translation ID="BOB_DESC" String="UNDER DEVELOPMENT: Заменяет деревья и реквизит." />
+    <Translation ID="TRN_CHOICE" String="Выбрать язык" />
+    <Translation ID="TRN_SYS" String="Использовать язык игры" />
+    <Translation ID="MES_CLS" String="Закрыть" />
+    <Translation ID="MES_DSA" String="Больше не показывать" />
+    <Translation ID="BOB_MBX_OK" String="OK" />
+    <Translation ID="BOB_ROW_WAS" String="было" />
+    <Translation ID="BOB_PNL_NOP" String="Не обнаружено реквизита" />
+    <Translation ID="BOB_PNL_NOT" String="Не обнаружено деревьев" />
+    <Translation ID="BOB_PNL_TRE" String="Деревья" />
+    <Translation ID="BOB_PNL_PRP" String="Реквизит" />
+    <Translation ID="BOB_PNL_IND" String="Показать индивидуальный реквизит" />
+    <Translation ID="BOB_PNL_HDV" String="Скрыть vanilla" />
+    <Translation ID="BOB_PNL_REP" String="Заменить" />
+    <Translation ID="BOB_PNL_RTB" String="Эти здания" />
+    <Translation ID="BOB_PNL_RAB" String="Все здания" />
+    <Translation ID="BOB_PNL_RTN" String="Эти пути" />
+    <Translation ID="BOB_PNL_RAN" String="Все пути" />
+    <Translation ID="BOB_PNL_RTT" String="Деревья карты" />
+    <Translation ID="BOB_PNL_RTP" String="Реквизит карты" />
+    <Translation ID="BOB_PNL_REV" String="Изменить обратно" />
+    <Translation ID="BOB_PNL_PKB" String="Пакеты замен" />
+    <Translation ID="BOB_PNL_PRB" String="Вероятность" />
+    <Translation ID="BOB_PNL_ANG" String="Угол" />
+    <Translation ID="BOB_PNL_OFF" String="Смещение" />
+    <Translation ID="BOB_PNL_XOF" String="X" />
+    <Translation ID="BOB_PNL_YOF" String="Y" />
+    <Translation ID="BOB_PNL_ZOF" String="Z" />
+    <Translation ID="BOB_PNL_SUB" String="Дополнительное здание" />
+    <Translation ID="BOB_SPR_SBL" String="В настоящее время применяется замена для этих зданий" />
+    <Translation ID="BOB_SPR_ABL" String="В настоящее время применяется замена для всех зданий" />
+    <Translation ID="BOB_SPR_SNT" String="В настоящее время применяется замена для этих путей" />
+    <Translation ID="BOB_SPR_ANT" String="В настоящее время применяется замена для всех путей" />
+    <Translation ID="BOB_SPR_PCK" String="В настоящее время применяется пакет замен" />
+    <Translation ID="BOB_PCK_APP" String="Применить пакет" />
+    <Translation ID="BOB_PCK_APP_A" String="Применение выбранного пакета замен" />
+    <Translation ID="BOB_PCK_APP_C" String="Пакет не может быть применен, так как он конфликтует с уже примененным пакетом." />
+    <Translation ID="BOB_PCK_APP_I" String="Применен пакет замен" />
+    <Translation ID="BOB_PCK_RVT" String="Изменить пакет обратно" />
+    <Translation ID="BOB_PCK_RVT_A" String="Отменяет применение выбранного пакета замены" />
+    <Translation ID="BOB_PCK_RVT_I" String="В настоящее время пакет не применяется" />
+    <Translation ID="BOB_PCK_NAL" String="Не все замены доступны" />
+    <Translation ID="BOB_CFG_UCS" String="Использовать выбранную конфигурацию (вместо глобальной) для этого сэйва" />
+    <Translation ID="BOB_CFG_SAC" String="Сохранить текущую конфигурацию" />
+    <Translation ID="BOB_CFG_SSC" String="Копировать выбранную конфигурацию" />
+    <Translation ID="BOB_CFG_SEC" String="Новая пустая конфигурация" />
+    <Translation ID="BOB_CFG_DEL" String="Удалить выбранную конфигурацию" />
+    <Translation ID="BOB_OPT_GEN" String="Общие настройки" />
+    <Translation ID="BOB_OPT_CFG" String="Конфигурации" />
+    <Translation ID="BOB_OPT_KEY" String="Горячая клавиша" />
+    <Translation ID="BOB_OPT_PRS" String="Нажмите любую клавишу" />
+    <Translation ID="BOB_NUKE" String="Сбросить конфигурацию" />
+    <Translation ID="BOB_PER_IND" String="Показывать отдельные элементы по умолчанию" />
+    <Translation ID="BOB_PER_SIN" String="Всегда выключен" />
+    <Translation ID="BOB_PER_GRP" String="Всегда включен" />
+    <Translation ID="BOB_PER_LST" String="Помнить предыдущую настройку" />
+    <Translation ID="BOB_OPT_POS" String="Помнить предыдущее положение панели" />
+    <Translation ID="BOB_FIL_NAME" String="Поиск:" />
+    <Translation ID="MES_PAGE" String="Пожалуйста, перейдите на страницу мода в Steam Workshop для получения дополнительной информации." />
+    <Translation ID="BOB_ERR_FAT" String="Это означает, что мод не может работать и отключился." />
+    <Translation ID="BOB_ERR_HAR" String="BOB, the tree and prop replacer, не смог завершить необходимые патчи Harmony." />
+    <Translation ID="ERR_HAR0" String="Ошибка пропатчивания Harmony" />
+    <Translation ID="ERR_HAR1" String="Возможные причины этой проблемы:" />
+    <Translation ID="ERR_HAR2" String="Необходимый обязательный мод Harmony 2 не был установлен" />
+    <Translation ID="ERR_HAR3" String="Старый и/или сломанный мод мешает правильной работе Harmony 2." />
+    <Translation ID="BOB_UPD_040_0" String="Представляем замену деревьев карты! Активируйте инструмент BOB как обычно и щелкните отдельно стоящее дерево." />
+    <Translation ID="BOB_UPD_041_0" String="Исправлен сбой панели замены здания при смене цели замены" />
+    <Translation ID="BOB_UPD_042_0" String="Появилась возможность выбора дополнительных зданий" />
+    <Translation ID="BOB_UPD_042_1" String="Исправлена потенциальная ошибка при загрузке игры" />
+    <Translation ID="BOB_UPD_043_0" String="Исправлен сброс настройки вероятности после отмены замены для всех зданий или всех путей" />
+    <Translation ID="BOB_UPD_043_1" String="Исправлена ошибка, из-за которой LOD не обновлялись после отмены замены всех путей или всех зданий" />
+    <Translation ID="BOB_UPD_043_2" String="Отрегулированы текстовые поля информационной панели для соответствия более длинным строкам перевода" />
+    <Translation ID="BOB_UPD_050_0" String="Начальная реализация пакетов замен для путей" />
+    <Translation ID="BOB_UPD_050_1" String="Теперь должным образом совместим с Network Skins 2." />
+    <Translation ID="BOB_UPD_050_2" String="Более быстрая обработка замены" />
+    <Translation ID="BOB_UPD_051_0" String="Новый формат списка деревьев/реквизита, со значками, указывающими, какой тип замены активен" />
+    <Translation ID="BOB_UPD_052_0" String="Добавлено управление конфигурациями для работы с несколькими различными файлами конфигураций, доступное через панель параметров." />
+    <Translation ID="BOB_UPD_060_0" String="Замена автономного реквизита" />
+    <Translation ID="BOB_UPD_060_1" String="Выделение выбранного реквизита или деревьев" />
+    <Translation ID="BOB_UPD_060_2" String="Теперь можно выбирать пути в зданиях" />
+    <Translation ID="BOB_UPD_060_3" String="Теперь можно выбирать декоративные сооружения." />
+    <Translation ID="BOB_UPD_060_4" String="Новая уменьшенная панель замены" />
+  </Translations>
+</Language>
