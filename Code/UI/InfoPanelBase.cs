@@ -110,7 +110,28 @@ namespace BOB
 				if (value != null && (loadedList.m_rowsData?.m_buffer == null || loadedList.m_rowsData.m_size == 0))
                 {
 					LoadedList();
-                }
+				}
+
+				// Check if actual item has been set.
+				if (currentTargetItem != null)
+				{
+					PrefabInfo effectivePrefab = currentTargetItem.individualPrefab ?? currentTargetItem.replacementPrefab ?? currentTargetItem.allPrefab ?? currentTargetItem.originalPrefab;
+
+					// Select current replacement prefab.
+					loadedList.FindItem(effectivePrefab);
+
+					// Set highlighting.
+					RenderOverlays.CurrentIndex = currentTargetItem.index;
+					RenderOverlays.CurrentProp = effectivePrefab as PropInfo;
+					RenderOverlays.CurrentTree = effectivePrefab as TreeInfo;
+				}
+				else
+				{
+					loadedList.selectedIndex = -1;
+					RenderOverlays.CurrentIndex = -1;
+					RenderOverlays.CurrentProp = null;
+					RenderOverlays.CurrentTree = null;
+				}
 
 				UpdateButtonStates();
 			}
@@ -421,8 +442,6 @@ namespace BOB
 			// List of prefabs that have passed filtering.
 			List<PrefabInfo> list = new List<PrefabInfo>();
 
-			list.Add(BuildingReplacement.instance.randomProp);
-
 			bool nameFilterActive = !nameFilter.text.IsNullOrWhiteSpace();
 
 			// Tree or prop?
@@ -491,21 +510,11 @@ namespace BOB
 			if (replacementPrefab != null)
 			{
 				loadedList.FindItem(replacementPrefab);
-
-				// Set highlighting.
-				RenderOverlays.CurrentIndex = currentTargetItem.index;
-				RenderOverlays.CurrentProp = replacementPrefab as PropInfo;
-				RenderOverlays.CurrentTree = replacementPrefab as TreeInfo;
 			}
 			else
 			{
 				// No current selection.
 				loadedList.selectedIndex = -1;
-
-				// Clear highlighting.
-				RenderOverlays.CurrentIndex = -1;
-				RenderOverlays.CurrentProp = null;
-				RenderOverlays.CurrentTree = null;
 			}
 
 			stopWatch.Stop();
