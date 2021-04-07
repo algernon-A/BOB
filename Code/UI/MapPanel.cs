@@ -36,7 +36,7 @@ namespace BOB
 			base.Setup(parentTransform, targetPrefabInfo);
 
 			// Populate target list and select target item.
-			targetList.rowsData = TargetList(IsTree);
+			TargetList();
 			targetList.FindTargetItem(targetPrefabInfo);
 
 			// Update button states.
@@ -143,11 +143,9 @@ namespace BOB
 
 
 		/// <summary>
-		/// Populates a fastlist with a list of map trees.
+		/// Populates the target list with a list of map trees or props.
 		/// </summary>
-		/// <param name="isTree">True for a list of trees, false for props</param>
-		/// <returns>Populated fastlist of loaded prefabs</returns>
-		protected override FastList<object> TargetList(bool isTree)
+		protected override void TargetList()
 		{
 			// List of prefabs that have passed filtering.
 			List<PropListItem> itemList = new List<PropListItem>();
@@ -159,12 +157,12 @@ namespace BOB
 			PropInstance[] props = propManager.m_props.m_buffer;
 
 			// Iterate through each tree instance map.
-			for (int index = 0; index < (isTree ? trees.Length : props.Length); ++index)
+			for (int index = 0; index < (IsTree ? trees.Length : props.Length); ++index)
 			{
 				// Create new list item, hiding probabilities.
 				PropListItem propListItem = new PropListItem { showProbs = false };
 
-				if (isTree)
+				if (IsTree)
 				{
 					// Local reference.
 					TreeInstance tree = trees[index];
@@ -258,15 +256,23 @@ namespace BOB
 				itemList.Add(propListItem);
 			}
 
+			// Master lists should already be sorted by display name so no need to sort again here.
+			// Reverse order of filtered list if we're searching name descending.
+			if (targetSearchStatus == (int)OrderBy.NameDescending)
+			{
+				itemList.Reverse();
+			}
+
 			// Create return fastlist from our filtered list, ordering by name.
-			FastList<object> fastList = new FastList<object>
+			targetList.m_rowsData = new FastList<object>
 			{
 				m_buffer = itemList.ToArray(),
 				m_size = itemList.Count
 			};
+			targetList.Refresh();
 
 			// If the list is empty, show the 'no props' label; otherwise, hide it.
-			if (fastList.m_size == 0)
+			if (targetList.m_rowsData.m_size == 0)
 			{
 				noPropsLabel.Show();
 			}
@@ -274,8 +280,6 @@ namespace BOB
 			{
 				noPropsLabel.Hide();
 			}
-
-			return fastList;
 		}
 	}
 }

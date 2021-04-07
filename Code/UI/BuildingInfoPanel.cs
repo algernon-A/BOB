@@ -158,8 +158,8 @@ namespace BOB
 					replacementPrefab = null;
 
 					// Reset loaded lists.
-					loadedList.rowsData = LoadedList(IsTree);
-					targetList.rowsData = TargetList(IsTree);
+					LoadedList();
+					TargetList();
 				};
 			}
 
@@ -167,7 +167,7 @@ namespace BOB
 			indCheck.eventCheckChanged += (control, isChecked) =>
 			{
 				// Rebuild target list.
-				targetList.rowsData = TargetList(treeCheck.isChecked);
+				TargetList();
 
 				// Clear selection.
 				targetList.selectedIndex = -1;
@@ -205,7 +205,7 @@ namespace BOB
 			}
 
 			// Populate target list and select target item.
-			targetList.rowsData = TargetList(IsTree);
+			TargetList();
 
 			Logging.Message("building setup time ", stopwatch.ElapsedMilliseconds.ToString());
 
@@ -390,11 +390,9 @@ namespace BOB
 
 
 		/// <summary>
-		/// Populates a fastlist with a list of building-specific trees or props.
+		/// Populates the target fastlist with a list of target-specific trees or props.
 		/// </summary>
-		/// <param name="isTree">True for a list of trees, false for props</param>
-		/// <returns>Populated fastlist of loaded prefabs</returns>
-		protected override FastList<object> TargetList(bool isTree)
+		protected override void TargetList()
 		{
 			System.Diagnostics.Stopwatch targetStopwatch = new System.Diagnostics.Stopwatch();
 			targetStopwatch.Start();
@@ -410,7 +408,8 @@ namespace BOB
 			{
 				// No props - show 'no props' label and return an empty list.
 				noPropsLabel.Show();
-				return new FastList<object>();
+                targetList.m_rowsData = new FastList<object>();
+				return;
 			}
 
 
@@ -421,7 +420,7 @@ namespace BOB
 				PropListItem propListItem = new PropListItem();
 
 				// Try to get relevant prefab (prop/tree), using finalProp.
-				PrefabInfo finalInfo = isTree ? (PrefabInfo)currentBuilding.m_props[propIndex]?.m_finalTree : (PrefabInfo)currentBuilding.m_props[propIndex]?.m_finalProp;
+				PrefabInfo finalInfo = IsTree ? (PrefabInfo)currentBuilding.m_props[propIndex]?.m_finalTree : (PrefabInfo)currentBuilding.m_props[propIndex]?.m_finalProp;
 
 				// Check to see if we were succesful - if not (e.g. we only want trees and this is a prop), continue on to next building prop.
 				if (finalInfo?.name == null)
@@ -504,18 +503,25 @@ namespace BOB
 				propList.Add(propListItem);
 			}
 
-
 			Logging.Message("basic target list setup time ", targetStopwatch.ElapsedMilliseconds.ToString());
 
+			// Master lists should already be sorted by display name so no need to sort again here.
+			// Reverse order of filtered list if we're searching name descending.
+			if (targetSearchStatus == (int)OrderBy.NameDescending)
+			{
+				propList.Reverse();
+			}
+
 			// Create return fastlist from our filtered list, ordering by name.
-			FastList<object> fastList = new FastList<object>
+			targetList.m_rowsData = new FastList<object>
 			{
 				m_buffer = propList.ToArray(),
 				m_size = propList.Count
 			};
+			targetList.Refresh();
 
 			// If the list is empty, show the 'no props' label; otherwise, hide it.
-			if (fastList.m_size == 0)
+			if (targetList.m_rowsData.m_size == 0)
 			{
 				noPropsLabel.Show();
 			}
@@ -524,11 +530,8 @@ namespace BOB
 				noPropsLabel.Hide();
 			}
 
-
 			targetStopwatch.Stop();
 			Logging.Message("target list sort time ", targetStopwatch.ElapsedMilliseconds.ToString());
-
-			return fastList;
 		}
 
 

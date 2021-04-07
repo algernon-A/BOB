@@ -86,7 +86,7 @@ namespace BOB
 			packButton.eventClicked += (component, clickEvent) => PackPanelManager.Create();
 
 			// Populate target list and select target item.
-			targetList.rowsData = TargetList(IsTree);
+			TargetList();
 
 			// Apply Harmony rendering patches.
 			Patcher.PatchNetworkOverlays(true);
@@ -219,11 +219,9 @@ namespace BOB
 
 
 		/// <summary>
-		/// Populates a fastlist with a list of network-specific trees or props.
+		/// Populates the target fastlist with a list of target-specific trees or props.
 		/// </summary>
-		/// <param name="isTree">True for a list of trees, false for props</param>
-		/// <returns>Populated fastlist of loaded prefabs</returns>
-		protected override FastList<object> TargetList(bool isTree)
+		protected override void TargetList()
 		{
 			// List of prefabs that have passed filtering.
 			List<NetPropListItem> propList = new List<NetPropListItem>();
@@ -233,7 +231,8 @@ namespace BOB
 			{
 				// No props - show 'no props' label and return an empty list.
 				noPropsLabel.Show();
-				return new FastList<object>();
+				targetList.m_rowsData = new FastList<object>();
+				return;
 			}
 
 			// Local reference.
@@ -258,7 +257,7 @@ namespace BOB
 					NetPropListItem propListItem = new NetPropListItem();
 
 					// Try to get relevant prefab (prop/tree), using finalProp.
-					PrefabInfo finalInfo = isTree ? (PrefabInfo)laneProps[propIndex]?.m_finalTree : (PrefabInfo)laneProps[propIndex]?.m_finalProp;
+					PrefabInfo finalInfo = IsTree ? (PrefabInfo)laneProps[propIndex]?.m_finalTree : (PrefabInfo)laneProps[propIndex]?.m_finalProp;
 
 					// Check to see if we were succesful - if not (e.g. we only want trees and this is a prop), continue on to next building prop.
 					if (finalInfo?.name == null)
@@ -335,15 +334,23 @@ namespace BOB
 				}
 			}
 
+			// Master lists should already be sorted by display name so no need to sort again here.
+			// Reverse order of filtered list if we're searching name descending.
+			if (targetSearchStatus == (int)OrderBy.NameDescending)
+			{
+				propList.Reverse();
+			}
+
 			// Create return fastlist from our filtered list, ordering by name.
-			FastList<object> fastList = new FastList<object>()
+			targetList.m_rowsData = new FastList<object>()
 			{
 				m_buffer = propList.ToArray(),
 				m_size = propList.Count
 			};
+			targetList.Refresh();
 
 			// If the list is empty, show the 'no props' label; otherwise, hide it.
-			if (fastList.m_size == 0)
+			if (targetList.m_rowsData.m_size == 0)
 			{
 				noPropsLabel.Show();
 			}
@@ -351,8 +358,6 @@ namespace BOB
 			{
 				noPropsLabel.Hide();
 			}
-
-			return fastList;
 		}
 
 

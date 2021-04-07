@@ -14,6 +14,14 @@ namespace BOB
 	/// </summary>
 	public abstract class BOBInfoPanelBase : UIPanel
 	{
+		// Display order state.
+		internal enum OrderBy
+		{
+			NameAscending = 0,
+			NameDescending
+		}
+
+
 		// Layout constants - general.
 		protected const float Margin = 5f;
 
@@ -30,7 +38,9 @@ namespace BOB
 		// Layout constants - Y.
 		protected const float TitleHeight = 40f;
 		protected const float ToolbarHeight = 42f;
-		protected const float ListY = TitleHeight + ToolbarHeight;
+		protected const float FilterY = TitleHeight + ToolbarHeight;
+		protected const float FilterHeight = 20f;
+		protected const float ListY = FilterY + FilterHeight;
 		protected const float ListHeight = UIPropRow.RowHeight * 16f;
 		protected const float PanelHeight = ListY + ListHeight + (Margin * 2f);
 		protected const float BigIconSize = 64f;
@@ -53,6 +63,10 @@ namespace BOB
 		protected UICheckBox hideVanilla, treeCheck, propCheck;
 		protected UITextField nameFilter;
 		protected UIButton replaceButton, revertButton;
+		private UIButton targetNameButton, loadedNameButton;
+
+		// Search settings.
+		protected int targetSearchStatus, loadedSearchStatus;
 
 
 		// Button tooltips.
@@ -70,11 +84,9 @@ namespace BOB
 
 
 		/// <summary>
-		/// Populates a fastlist with a list of target-specific trees or props.
+		/// Populates the target fastlist with a list of target-specific trees or props.
 		/// </summary>
-		/// <param name="isTree">True for a list of trees, false for props</param>
-		/// <returns>Populated fastlist of loaded prefabs</returns>
-		protected abstract FastList<object> TargetList(bool isTree);
+		protected abstract void TargetList();
 
 
 		/// <summary>
@@ -97,30 +109,8 @@ namespace BOB
 				// Refresh loaded list if needed.
 				if (value != null && (loadedList.m_rowsData?.m_buffer == null || loadedList.m_rowsData.m_size == 0))
                 {
-					loadedList.m_rowsData = LoadedList(IsTree);
-					loadedList.Refresh();
+					LoadedList();
                 }
-
-				// Check if actual item has been set.
-				if (currentTargetItem != null)
-				{
-					PrefabInfo effectivePrefab = currentTargetItem.individualPrefab ?? currentTargetItem.replacementPrefab ?? currentTargetItem.allPrefab ?? currentTargetItem.originalPrefab;
-
-					// Select current replacement prefab.
-					loadedList.FindItem(effectivePrefab);
-
-					// Set highlighting.
-					RenderOverlays.CurrentIndex = currentTargetItem.index;
-					RenderOverlays.CurrentProp = effectivePrefab as PropInfo;
-					RenderOverlays.CurrentTree = effectivePrefab as TreeInfo;
-				}
-				else
-				{
-					loadedList.selectedIndex = -1;
-					RenderOverlays.CurrentIndex = -1;
-					RenderOverlays.CurrentProp = null;
-					RenderOverlays.CurrentTree = null;
-				}
 
 				UpdateButtonStates();
 			}
@@ -219,6 +209,18 @@ namespace BOB
 			closeButton.pressedBgSprite = "buttonclosepressed";
 			closeButton.eventClick += (component, clickEvent) => InfoPanelManager.Close();
 
+
+			// Order buttons.
+			targetNameButton = ArrowButton(this, 30f, FilterY);
+			loadedNameButton = ArrowButton(this, RightX + 10f, FilterY);
+
+			targetNameButton.eventClicked += SortTargets;
+			loadedNameButton.eventClicked += SortLoaded;
+
+			// Default is name ascending.
+			SetFgSprites(targetNameButton, "IconUpArrow2");
+			SetFgSprites(loadedNameButton, "IconUpArrow2");
+
 			// Target prop list.
 			UIPanel leftPanel = AddUIComponent<UIPanel>();
 			leftPanel.width = LeftWidth;
@@ -264,8 +266,8 @@ namespace BOB
 			// Name filter.
 			nameFilter = UIControls.SmallLabelledTextField(this, width - 200f - Margin, TitleHeight + Margin, Translations.Translate("BOB_FIL_NAME"));
 			// Event handlers for name filter textbox.
-			nameFilter.eventTextChanged += (control, text) => loadedList.rowsData = LoadedList(IsTree);
-			nameFilter.eventTextSubmitted += (control, text) => loadedList.rowsData = LoadedList(IsTree);
+			nameFilter.eventTextChanged += (control, text) => LoadedList();
+			nameFilter.eventTextSubmitted += (control, text) => LoadedList();
 
 			// Vanilla filter.
 			hideVanilla = UIControls.LabelledCheckBox((UIComponent)(object)this, nameFilter.relativePosition.x, nameFilter.relativePosition.y + nameFilter.height + (Margin / 2f), Translations.Translate("BOB_PNL_HDV"), 12f, 0.7f);
@@ -310,8 +312,8 @@ namespace BOB
 				replacementPrefab = null;
 
 				// Set loaded lists to 'props'.
-				loadedList.rowsData = LoadedList(isTree: false);
-				targetList.rowsData = TargetList(isTree: false);
+				LoadedList();
+				TargetList();
 
 				// Set 'no props' label text.
 				noPropsLabel.text = Translations.Translate("BOB_PNL_NOP");
@@ -347,8 +349,8 @@ namespace BOB
 				replacementPrefab = null;
 
 				// Set loaded lists to 'trees'.
-				loadedList.rowsData = LoadedList(isTree: true);
-				targetList.rowsData = TargetList(isTree: true);
+				LoadedList();
+				TargetList();
 
 				// Set 'no trees' label text.
 				noPropsLabel.text = Translations.Translate("BOB_PNL_NOT");
@@ -386,8 +388,8 @@ namespace BOB
 					replacementPrefab = null;
 
 					// Set loaded lists to 'props'.
-					loadedList.rowsData = LoadedList(isTree: false);
-					targetList.rowsData = TargetList(isTree: false);
+					LoadedList();
+					TargetList();
 
 					// Set 'no props' label text.
 					noPropsLabel.text = Translations.Translate("BOB_PNL_NOP");
@@ -410,9 +412,7 @@ namespace BOB
 		/// <summary>
 		/// Populates a fastlist with a filtered list of loaded trees or props.
 		/// </summary>
-		/// <param name="isTree">True for a list of trees, false for props</param>
-		/// <returns>Populated fastlist of loaded prefabs</returns>
-		protected FastList<object> LoadedList(bool isTree)
+		protected void LoadedList()
 		{
 			Stopwatch stopWatch = new Stopwatch();
 			stopWatch.Start();
@@ -421,13 +421,12 @@ namespace BOB
 			// List of prefabs that have passed filtering.
 			List<PrefabInfo> list = new List<PrefabInfo>();
 
-			// Clear current selection.
-			loadedList.selectedIndex = -1;
+			list.Add(BuildingReplacement.instance.randomProp);
 
 			bool nameFilterActive = !nameFilter.text.IsNullOrWhiteSpace();
 
 			// Tree or prop?
-			if (isTree)
+			if (IsTree)
 			{
 				// Tree - iterate through each tree in our list of loaded prefabs.
 				for (int i = 0; i < PrefabLists.loadedTrees.Length; ++i)
@@ -473,17 +472,44 @@ namespace BOB
 				}
 			}
 
-			// Create return fastlist from our filtered list; master lists should already be sorted by display name so no need to sort again here.
-			FastList<object> fastList = new FastList<object>
+			// Master lists should already be sorted by display name so no need to sort again here.
+			// Reverse order of filtered list if we're searching name descending.
+			if (loadedSearchStatus == (int)OrderBy.NameDescending)
+			{
+				list.Reverse();
+			}
+
+			// Create return fastlist from our filtered list.
+			loadedList.m_rowsData = new FastList<object>
 			{
 				m_buffer = list.ToArray(),
 				m_size = list.Count
 			};
+			loadedList.Refresh();
+
+			// Select current replacement prefab, if any.
+			if (replacementPrefab != null)
+			{
+				loadedList.FindItem(replacementPrefab);
+
+				// Set highlighting.
+				RenderOverlays.CurrentIndex = currentTargetItem.index;
+				RenderOverlays.CurrentProp = replacementPrefab as PropInfo;
+				RenderOverlays.CurrentTree = replacementPrefab as TreeInfo;
+			}
+			else
+			{
+				// No current selection.
+				loadedList.selectedIndex = -1;
+
+				// Clear highlighting.
+				RenderOverlays.CurrentIndex = -1;
+				RenderOverlays.CurrentProp = null;
+				RenderOverlays.CurrentTree = null;
+			}
 
 			stopWatch.Stop();
 			Logging.Message("replacement list setup time ", stopWatch.ElapsedMilliseconds.ToString());
-
-			return fastList;
 		}
 
 
@@ -586,10 +612,96 @@ namespace BOB
 		private void VanillaCheckChanged(UIComponent control, bool isChecked)
 		{
 			// Filter list.
-			loadedList.rowsData = LoadedList(IsTree);
+			LoadedList();
 
 			// Store state.
 			ModSettings.hideVanilla = isChecked;
+		}
+
+
+
+		/// <summary>
+		/// Loaded list sort button event handler.
+		/// <param name="control">Calling component</param>
+		/// <param name="mouseEvent">Mouse event (unused)</param>
+		/// </summary>
+		private void SortLoaded(UIComponent control, UIMouseEventParameter mouseEvent)
+		{
+			// Toggle status (set to descending if we're currently ascending, otherwise set to ascending).
+			if (loadedSearchStatus == (int)OrderBy.NameAscending)
+			{
+				// Order by name descending.
+				loadedSearchStatus = (int)OrderBy.NameDescending;
+			}
+			else
+			{
+				// Order by name ascending.
+				loadedSearchStatus = (int)OrderBy.NameAscending;
+			}
+
+			// Reset name order buttons.
+			SetSortButton(loadedNameButton, loadedSearchStatus);
+
+
+			// Regenerate loaded list.
+			LoadedList();
+		}
+
+
+		/// <summary>
+		/// Target list sort button event handler.
+		/// <param name="control">Calling component</param>
+		/// <param name="mouseEvent">Mouse event (unused)</param>
+		/// </summary>
+		private void SortTargets(UIComponent control, UIMouseEventParameter mouseEvent)
+		{
+				// Toggle status (set to descending if we're currently ascending, otherwise set to ascending).
+				if (targetSearchStatus == (int)OrderBy.NameAscending)
+				{
+					// Order by name descending.
+					targetSearchStatus = (int)OrderBy.NameDescending;
+				}
+				else
+				{
+					// Order by name ascending.
+					targetSearchStatus = (int)OrderBy.NameAscending;
+				}
+
+				// Reset name order buttons.
+				SetSortButton(control as UIButton, targetSearchStatus);
+
+			// Regenerate loaded list.
+			TargetList();
+		}
+
+
+		/// <summary>
+		/// Sets the states of the two given sort buttons to match the given search status.
+		/// </summary>
+		/// <param name="activeButton">Currently active sort button</param>
+		/// <param name="inactiveButton">Inactive button (other sort button for same list)</param>
+		/// <param name="searchStatus">Search status to apply</param>
+		private void SetSortButton(UIButton activeButton, int searchStatus)
+		{
+			// Null check.
+			if (activeButton == null)
+            {
+				return;
+            }
+
+			bool ascending = searchStatus == (int)OrderBy.NameAscending;
+
+			// Toggle status (set to descending if we're currently ascending, otherwise set to ascending).
+			if (ascending)
+			{
+				// Order ascending.
+				SetFgSprites(activeButton, "IconUpArrow2");
+			}
+			else
+			{
+				// Order descending.
+				SetFgSprites(activeButton, "IconDownArrow2");
+			}
 		}
 
 
@@ -613,6 +725,42 @@ namespace BOB
 			// Data.
 			fastList.rowsData = new FastList<object>();
 			fastList.selectedIndex = -1;
+		}
+
+
+		/// <summary>
+		/// Adds an arrow button.
+		/// </summary>
+		/// <param name="parent">Parent component</param>
+		/// <param name="posX">Relative X postion</param>
+		/// <param name="posY">Relative Y position</param>
+		/// <param name="width">Button width (default 32)</param>
+		/// <param name="height">Button height (default 20)</param>
+		/// <returns>New arrow button</returns>
+		private UIButton ArrowButton(UIComponent parent, float posX, float posY, float width = 32f, float height = 20f)
+		{
+			UIButton button = parent.AddUIComponent<UIButton>();
+
+			// Size and position.
+			button.size = new Vector2(width, height);
+			button.relativePosition = new Vector2(posX, posY);
+
+			// Appearance.
+			SetFgSprites(button, "IconUpArrow2");
+			button.canFocus = false;
+
+			return button;
+		}
+
+
+		/// <summary>
+		/// Sets the foreground sprites for the given button to the specified sprite.
+		/// </summary>
+		/// <param name="button">Targeted button</param>
+		/// <param name="spriteName">Sprite name</param>
+		private void SetFgSprites(UIButton button, string spriteName)
+		{
+			button.normalFgSprite = button.hoveredFgSprite = button.pressedFgSprite = button.focusedFgSprite = spriteName;
 		}
 
 
