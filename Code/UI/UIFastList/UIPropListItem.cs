@@ -39,7 +39,7 @@ namespace BOB
 		public bool showProbs = false;
 
 		// Current prefab.
-		public PrefabInfo CurrentPrefab => individualPrefab ?? allPrefab ?? packagePrefab ?? originalPrefab;
+		public PrefabInfo CurrentPrefab => individualPrefab ?? replacementPrefab ?? allPrefab ?? packagePrefab ?? originalPrefab;
 
 		// Display name.
 		public string DisplayName => PrefabLists.GetDisplayName(CurrentPrefab.name);

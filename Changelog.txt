@@ -1,4 +1,7 @@
-﻿Version 0.6 -
+﻿- Add ascending/descending name sort filters.
+
+
+Version 0.6 -
 
 - Add standalone prop replacement
 - Highlight selected props or trees
