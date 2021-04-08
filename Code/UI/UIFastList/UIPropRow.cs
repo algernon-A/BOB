@@ -14,13 +14,17 @@ namespace BOB
         public const float RowHeight = 23f;
         private const float PaddingY = 5f;
         private const float TextScale = 0.8f;
+        private const float LeftMargin = 10f;
+        private const float PackageMargin = 20f;
+        private const float IndexWidth = 20f;
+        private const float IndexLabelX = LeftMargin + PackageMargin;
 
         // Layout variables.
         private float labelX;
 
         // Panel components.
         private UIPanel panelBackground;
-        private UILabel objectName;
+        private UILabel indexLabel, nameLabel;
         private UISprite lineSprite;
 
         // ObjectData.
@@ -56,10 +60,11 @@ namespace BOB
         {
             base.OnSizeChanged();
 
-            if (objectName != null)
+            if (nameLabel != null)
             {
                 Background.width = width;
-                objectName.relativePosition = new Vector2(labelX, PaddingY);
+                nameLabel.relativePosition = new Vector2(labelX, PaddingY);
+                indexLabel.relativePosition = new Vector2(IndexLabelX, PaddingY);
             }
         }
 
@@ -91,7 +96,7 @@ namespace BOB
         public void Display(object data, bool isRowOdd)
         {
             // Perform initial setup for new rows.
-            if (objectName == null)
+            if (nameLabel == null)
             {
                 isVisible = true;
                 canFocus = true;
@@ -100,9 +105,15 @@ namespace BOB
                 height = RowHeight;
 
                 // Add object name label.
-                objectName = AddUIComponent<UILabel>();
-                objectName.width = this.width - 10f;
-                objectName.textScale = TextScale;
+                nameLabel = AddUIComponent<UILabel>();
+                nameLabel.width = this.width - 10f;
+                nameLabel.textScale = TextScale;
+
+                // Add index text label.
+                indexLabel = AddUIComponent<UILabel>();
+                indexLabel.width = IndexWidth;
+                indexLabel.textScale = TextScale;
+                indexLabel.relativePosition = new Vector2(IndexLabelX, PaddingY);
             }
 
             // Add line sprite if we need to (initially hidden).
@@ -114,6 +125,8 @@ namespace BOB
                 lineSprite.Hide();
             }
 
+            // Set initial label position.
+            labelX = LeftMargin;
 
             // See if our attached data is a raw PropInfo (e.g an available prop item as opposed to a PropListItem replacment record).
             thisPrefab = data as PrefabInfo;
@@ -123,6 +136,9 @@ namespace BOB
                 if (lineSprite != null)
                 {
                     lineSprite.Hide();
+
+                    // Adjust name label position to accomodate.
+                    labelX += PackageMargin;
                 }
 
                 // Text to display - StringBuilder due to the amount of manipulation we're doing.
@@ -139,8 +155,14 @@ namespace BOB
                 // Display index number if this is an individual reference.
                 if (thisItem.index >= 0)
                 {
-                    displayText.Append(thisItem.index);
-                    displayText.Append(" ");
+                    indexLabel.text = thisItem.index.ToString();
+
+                    // Adjust name label position to accomodate.
+                    labelX += IndexWidth;
+                }
+                else
+                {
+                    indexLabel.text = "";
                 }
 
                 bool hasReplacement = false;
@@ -224,7 +246,7 @@ namespace BOB
                     lineSprite.Show();
                 }
 
-                // Do we have a replacement.
+                // Do we have a replacement?
                 if (hasReplacement)
                 {
                     // Yes; append "was" to the display name.
@@ -245,20 +267,16 @@ namespace BOB
                 }
 
                 // Set display text.
-                objectName.text = displayText.ToString();
-
-                // Indent label for line sprite.
-                labelX = 30f;
+                nameLabel.text = displayText.ToString();
             }
             else
             {
                 // Attached data is a raw PropInfo; just display its (cleaned-up) name.
-                objectName.text = PrefabLists.GetDisplayName(thisPrefab.name);
-                labelX = 10f;
+                nameLabel.text = PrefabLists.GetDisplayName(thisPrefab.name);
             }
 
             // Set label position
-            objectName.relativePosition = new Vector2(labelX, PaddingY);
+            nameLabel.relativePosition = new Vector2(labelX, PaddingY);
 
             // Set initial background as deselected state.
             Deselect(isRowOdd);

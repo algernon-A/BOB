@@ -54,6 +54,8 @@ namespace BOB
 				// Perform basic panel setup.
 				base.Setup(parentTransform, targetPrefabInfo);
 
+				Logging.Message("commencing InfoPanel setup");
+
 				// Replace all button.
 				replaceAllButton = AddIconButton(this, MidControlX + replaceButton.width, ReplaceY, BigIconSize, ReplaceAllTooltipKey, ReplaceAllAtlas);
 				replaceAllButton.eventClicked += ReplaceAll;
@@ -67,6 +69,8 @@ namespace BOB
 				// Angle.
 				UIPanel anglePanel = Sliderpanel(this, MidControlX, AngleY, SliderHeight);
 				angleSlider = AddBOBSlider(anglePanel, 0f, "BOB_PNL_ANG", -180, 180, 1);
+
+				Logging.Message("Creating offset panel");
 
 				// Offset panel.
 				UIPanel offsetPanel = Sliderpanel(this, MidControlX, OffsetPanelY, OffsetPanelHeight);
@@ -86,6 +90,8 @@ namespace BOB
 
 				// Set initial button states.
 				UpdateButtonStates();
+
+				Logging.Message("InfoPanel setup completed");
 			}
 			catch (Exception e)
 			{

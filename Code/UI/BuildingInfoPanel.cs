@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using ColossalFramework.UI;
@@ -505,17 +506,10 @@ namespace BOB
 
 			Logging.Message("basic target list setup time ", targetStopwatch.ElapsedMilliseconds.ToString());
 
-			// Master lists should already be sorted by display name so no need to sort again here.
-			// Reverse order of filtered list if we're searching name descending.
-			if (targetSearchStatus == (int)OrderBy.NameDescending)
-			{
-				propList.Reverse();
-			}
-
 			// Create return fastlist from our filtered list, ordering by name.
 			targetList.m_rowsData = new FastList<object>
 			{
-				m_buffer = propList.ToArray(),
+				m_buffer = targetSearchStatus == (int)OrderBy.NameDescending ? propList.OrderByDescending(item => item.DisplayName).ToArray() : propList.OrderBy(item => item.DisplayName).ToArray(),
 				m_size = propList.Count
 			};
 			targetList.Refresh();
