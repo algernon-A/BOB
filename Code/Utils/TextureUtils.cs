@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 using ColossalFramework;
@@ -36,43 +37,51 @@ namespace BOB
 		/// <returns>New texture atlas</returns>
 		internal static UITextureAtlas LoadSpriteAtlas(string atlasName)
 		{
-			// Check if we've already cached this atlas.
-			if (textureCache.ContainsKey(atlasName))
+			try
 			{
-				// Cached - return cached result.
-				return textureCache[atlasName];
-			}
-
-			// Create new texture atlas for button.
-			UITextureAtlas newAtlas = ScriptableObject.CreateInstance<UITextureAtlas>();
-			newAtlas.name = atlasName;
-			newAtlas.material = UnityEngine.Object.Instantiate<Material>(UIView.GetAView().defaultAtlas.material);
-
-			// Load texture from file.
-			Texture2D newTexture = LoadTexture(atlasName + ".png");
-			newAtlas.material.mainTexture = newTexture;
-
-			// Setup sprites.
-			string[] spriteNames = new string[] { "disabled", "normal", "pressed", "hovered" };
-			int numSprites = spriteNames.Length;
-			float spriteWidth = 1f / spriteNames.Length;
-
-			// Iterate through each sprite (counter increment is in region setup).
-			for (int i = 0; i < numSprites; ++i)
-			{
-				UITextureAtlas.SpriteInfo sprite = new UITextureAtlas.SpriteInfo
+				// Check if we've already cached this atlas.
+				if (textureCache.ContainsKey(atlasName))
 				{
-					name = spriteNames[i],
-					texture = newTexture,
-					// Sprite regions are horizontally arranged, evenly spaced.
-					region = new Rect(i * spriteWidth, 0f, spriteWidth, 1f)
-				};
-				newAtlas.AddSprite(sprite);
-			}
+					// Cached - return cached result.
+					return textureCache[atlasName];
+				}
 
-			// Add to cache and return.
-			textureCache.Add(atlasName, newAtlas);
-			return newAtlas;
+				// Create new texture atlas for button.
+				UITextureAtlas newAtlas = ScriptableObject.CreateInstance<UITextureAtlas>();
+				newAtlas.name = atlasName;
+				newAtlas.material = UnityEngine.Object.Instantiate<Material>(UIView.GetAView().defaultAtlas.material);
+
+				// Load texture from file.
+				Texture2D newTexture = LoadTexture(atlasName + ".png");
+				newAtlas.material.mainTexture = newTexture;
+
+				// Setup sprites.
+				string[] spriteNames = new string[] { "disabled", "normal", "pressed", "hovered" };
+				int numSprites = spriteNames.Length;
+				float spriteWidth = 1f / spriteNames.Length;
+
+				// Iterate through each sprite (counter increment is in region setup).
+				for (int i = 0; i < numSprites; ++i)
+				{
+					UITextureAtlas.SpriteInfo sprite = new UITextureAtlas.SpriteInfo
+					{
+						name = spriteNames[i],
+						texture = newTexture,
+						// Sprite regions are horizontally arranged, evenly spaced.
+						region = new Rect(i * spriteWidth, 0f, spriteWidth, 1f)
+					};
+					newAtlas.AddSprite(sprite);
+				}
+
+				// Add to cache and return.
+				textureCache.Add(atlasName, newAtlas);
+				return newAtlas;
+			}
+			catch (Exception e)
+            {
+				Logging.LogException(e, "exception loading texture atlas from file ", atlasName);
+				return null;
+            }
 		}
 
 

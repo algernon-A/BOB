@@ -240,7 +240,7 @@ namespace BOB
                     hasReplacement = true;
 
                     // Show package replacement sprite.
-                    lineSprite.atlas = TextureUtils.LoadSpriteAtlas("bob_prop_pack_small.png");
+                    lineSprite.atlas = TextureUtils.LoadSpriteAtlas("bob_prop_pack_small");
                     lineSprite.spriteName = "normal";
                     lineSprite.tooltip = Translations.Translate("BOB_SPR_PCK");
                     lineSprite.Show();
