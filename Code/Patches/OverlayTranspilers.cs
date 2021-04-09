@@ -35,6 +35,10 @@ namespace BOB
             IEnumerator<CodeInstruction> instructionsEnumerator = instructions.GetEnumerator();
             CodeInstruction instruction;
 
+            // Original TreeInfo (pre-variations).
+            bool foundTreeInfo = false;
+            LocalBuilder originalTreeInfo = generator.DeclareLocal(typeof(TreeInfo));
+
 
             // Iterate through all instructions in original method.
             while (instructionsEnumerator.MoveNext())
@@ -43,21 +47,34 @@ namespace BOB
                 instruction = instructionsEnumerator.Current;
                 yield return instruction;
 
-                // Is this stloc.s 17 (should be only one in entire method)?
-                if (instruction.opcode == OpCodes.Stloc_S && instruction.operand is LocalBuilder localBuilder1 && localBuilder1.LocalIndex == 17)
+                // Is this stloc.s?
+                if (instruction.opcode == OpCodes.Stloc_S && instruction.operand is LocalBuilder localBuilder)
                 {
-                    // Yes - insert call to RenderOverlays.HighlightBuildingProp(i, prop, ref building, position)
-                    Logging.KeyMessage("adding building HighlightBuildingProp call after stloc.s 17");
-                    yield return new CodeInstruction(OpCodes.Ldarg_1);
-                    yield return new CodeInstruction(OpCodes.Ldloc_S, IVarIndex);
-                    yield return new CodeInstruction(OpCodes.Ldloc_S, BuildingInfoPropIndex);
-                    yield return new CodeInstruction(OpCodes.Ldarg_S, BuildingArg);
-                    yield return new CodeInstruction(OpCodes.Ldloc_S, PositionIndex);
-                    yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(RenderOverlays), nameof(RenderOverlays.HighlightBuildingProp)));
+                    // Is this stloc.s 17 (should be only one in entire method)?
+                    if (localBuilder.LocalIndex == 17)
+                    {
+                        // Yes - insert call to RenderOverlays.HighlightBuildingProp(i, prop, ref building, position)
+                        Logging.KeyMessage("adding building HighlightBuildingProp call after stloc.s 17");
+                        yield return new CodeInstruction(OpCodes.Ldarg_1);
+                        yield return new CodeInstruction(OpCodes.Ldloc_S, IVarIndex);
+                        yield return new CodeInstruction(OpCodes.Ldloc_S, BuildingInfoPropIndex);
+                        yield return new CodeInstruction(OpCodes.Ldarg_S, BuildingArg);
+                        yield return new CodeInstruction(OpCodes.Ldloc_S, PositionIndex);
+                        yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(RenderOverlays), nameof(RenderOverlays.HighlightBuildingProp)));
+                    }
+                    // Otherwise, is this the first instance of stloc.s 15?
+                    else if (!foundTreeInfo && localBuilder.LocalIndex == TreeVarIndex)
+                    {
+                        // Yes - record the original tree reference and flag that we've already got it (so no need to get again).
+                        Logging.KeyMessage("adding building HighlightBuildingProp call after stloc.s 17");
+                        foundTreeInfo = true;
+                        yield return new CodeInstruction(OpCodes.Ldloc_S, TreeVarIndex);
+                        yield return new CodeInstruction(OpCodes.Stloc_S, originalTreeInfo);
+                    }
                 }
 
                 // Tree candidate - ldloc.s 2
-                if (instruction.opcode == OpCodes.Ldloc_S && instruction.operand is LocalBuilder localBuilder && localBuilder.LocalIndex == DataVector2VarIndex)
+                if (instruction.opcode == OpCodes.Ldloc_S && instruction.operand is LocalBuilder localBuilder2 && localBuilder2.LocalIndex == DataVector2VarIndex)
                 {
                     // Found a possible candidate - are there following instructions?
                     if (instructionsEnumerator.MoveNext())
@@ -72,7 +89,7 @@ namespace BOB
                             // Yes - insert call to PropOverlays.Highlight method after original call.
                             Logging.KeyMessage("adding building HighlightTree call after RenderInstance");
                             yield return new CodeInstruction(OpCodes.Ldloc_S, IVarIndex);
-                            yield return new CodeInstruction(OpCodes.Ldloc_S, TreeVarIndex);
+                            yield return new CodeInstruction(OpCodes.Ldloc_S, originalTreeInfo);
                             yield return new CodeInstruction(OpCodes.Ldarg_S, BuildingArg);
                             yield return new CodeInstruction(OpCodes.Ldloc_S, TreePositionVarIndex);
                             yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(RenderOverlays), nameof(RenderOverlays.HighlightBuildingTree)));
