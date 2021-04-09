@@ -172,10 +172,11 @@ namespace BOB
 
 			// Title label.
 			UILabel titleLabel = UIControls.AddLabel(newSlider, 0f, LabelY, Translations.Translate(labelKey), textScale: 0.7f);
-			while (titleLabel.width > newSlider.width - textFieldWidth)
+
+			// Autoscale tile label text, with minimum size 0.35.
+			while (titleLabel.width > newSlider.width - textFieldWidth && titleLabel.textScale > 0.35f)
 			{
 				titleLabel.textScale -= 0.05f;
-				titleLabel.PerformLayout();
 			}
 
 			// Slider track.
