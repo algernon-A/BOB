@@ -84,5 +84,6 @@
     <Translation ID="BOB_UPD_060_2" String="Kann jetzt Netzwerke in Gebäuden auswählen" />
     <Translation ID="BOB_UPD_060_3" String="Kann jetzt Dekorationsgebäude auswählen" />
     <Translation ID="BOB_UPD_060_4" String="Neu gestaltete, kleinere Oberfläche" />
+    <Translation ID="BOB_UPD_061_0" String="Sortieren nach Name als Filter hinzugefügt" />
   </Translations>
 </Language>

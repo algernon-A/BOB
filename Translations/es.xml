@@ -84,5 +84,6 @@
     <Translation ID="BOB_UPD_060_2" String="Ahora puede seleccionar redes en edificios." />
     <Translation ID="BOB_UPD_060_3" String="Ahora puede seleccionar edificios de decoración." />
     <Translation ID="BOB_UPD_060_4" String="Rediseño panel de reemplazo más pequeño" />
+    <Translation ID="BOB_UPD_061_0" String="Añadir filtros de clasificación por nombres ascendentes/descendentes" />
   </Translations>
 </Language>

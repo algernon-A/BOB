@@ -84,5 +84,6 @@
     <Translation ID="BOB_UPD_060_2" String="Can now select networks in buildings" />
     <Translation ID="BOB_UPD_060_3" String="Can now select decoration buildings" />
     <Translation ID="BOB_UPD_060_4" String="Redesigned smaller replacer panel" />
+    <Translation ID="BOB_UPD_061_0" String="Add ascending/descending name sort filters to lists" />
   </Translations>
 </Language>

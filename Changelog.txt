@@ -1,6 +1,9 @@
-﻿- Add ascending/descending name sort filters.
-- Fix ".png.png" reference to replacement pack icon.
-- Fix infinite loop when trying to resize slider text when Enhanced Mouse Light mod is active (only stops the hand - EML still breaks text scaling and layout)
+﻿Version 0.6.1 -
+
+- Add ascending/descending name sort filters to both target and replacement lists
+- Fix overlay not properly recognising randomized trees in buildings
+- Fix ".png.png" reference to replacement pack icon file
+- Fix infinite loop when trying to resize slider text when Enhanced Mouse Light mod is active (only stops the hang - EML still breaks text scaling and layout)
 
 
 Version 0.6 -
