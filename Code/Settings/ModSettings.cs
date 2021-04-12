@@ -23,6 +23,10 @@ namespace BOB
 		// Remember last panel position.
 		internal static bool rememberPosition = false;
 
+		// Ruining.
+		internal static bool StopTreeRuining { get; set; }
+		internal static bool StopPropRuining { get; set; }
+
 		// What's new notification version.
 		internal static string whatsNewVersion = "0.0";
 		internal static int whatsNewBetaVersion = 0;

@@ -56,7 +56,23 @@ namespace BOB
         {
 			get => ModSettings.rememberPosition;
 			set => ModSettings.rememberPosition = value;
-        }
+		}
+
+		// Tree ruining.
+		[XmlElement("StopTreeRuining")]
+		public bool StopTreeRuining
+		{
+			get => ModSettings.StopTreeRuining;
+			set => ModSettings.StopTreeRuining = value;
+		}
+
+		// Prop ruining.
+		[XmlElement("StopPropRuining")]
+		public bool StopPropRuining
+		{
+			get => ModSettings.StopPropRuining;
+			set => ModSettings.StopPropRuining = value;
+		}
 	}
 
 

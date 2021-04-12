@@ -51,8 +51,11 @@
     <Translation ID="BOB_CFG_DEL" String="Delete selected configuration" />
     <Translation ID="BOB_OPT_GEN" String="General options" />
     <Translation ID="BOB_OPT_CFG" String="Configurations" />
+    <Translation ID="BOB_OPT_RUI" String="Ruining" />
     <Translation ID="BOB_OPT_KEY" String="Hotkey" />
     <Translation ID="BOB_OPT_PRS" String="Press any key" />
+    <Translation ID="BOB_OPT_RPT" String="Prevent ruining by trees" />
+    <Translation ID="BOB_OPT_RPP" String="Prevent ruining by props" />
     <Translation ID="BOB_NUKE" String="Reset configuration" />
     <Translation ID="BOB_PER_IND" String="Show individual items by default" />
     <Translation ID="BOB_PER_SIN" String="Always off" />

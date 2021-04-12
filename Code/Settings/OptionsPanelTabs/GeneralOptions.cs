@@ -22,11 +22,7 @@ namespace BOB
 
             // Language dropdown.
             UIDropDown languageDrop = UIControls.AddPlainDropDown(panel, Translations.Translate("TRN_CHOICE"), Translations.LanguageList, Translations.Index);
-            languageDrop.eventSelectedIndexChanged += (control, index) =>
-            {
-                Translations.Index = index;
-                SettingsUtils.SaveSettings();
-            };
+            languageDrop.eventSelectedIndexChanged += (control, index) => Translations.Index = index;
 
             // Hotkey control.
             panel.gameObject.AddComponent<OptionsKeymapping>();
@@ -39,20 +35,12 @@ namespace BOB
                 Translations.Translate("BOB_PER_GRP")
             };
             UIDropDown groupDropDown = UIControls.AddPlainDropDown(panel, Translations.Translate("BOB_PER_IND"), groupItems, ModSettings.indDefault, 350f);
-            groupDropDown.eventSelectedIndexChanged += (control, index) =>
-            {
-                ModSettings.indDefault = index;
-                SettingsUtils.SaveSettings();
-            };
+            groupDropDown.eventSelectedIndexChanged += (control, index) => ModSettings.indDefault = index;
 
             // Rember last position.
             UICheckBox rememberPosCheck = UIControls.AddPlainCheckBox(panel, Translations.Translate("BOB_OPT_POS"));
             rememberPosCheck.isChecked = ModSettings.rememberPosition;
-            rememberPosCheck.eventCheckChanged += (control, isChecked) =>
-            {
-                ModSettings.rememberPosition = isChecked;
-                SettingsUtils.SaveSettings();
-            };
+            rememberPosCheck.eventCheckChanged += (control, isChecked) => ModSettings.rememberPosition = isChecked;
         }
     }
 }

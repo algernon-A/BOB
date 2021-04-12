@@ -76,7 +76,7 @@ namespace BOB
             try
             {
                 // We're now visible - create our gameobject, and give it a unique name for easy finding with ModTools.
-                optionsGameObject = new GameObject("RealPopOptionsPanel");
+                optionsGameObject = new GameObject("BOBOptionsPanel");
 
                 // Attach to game options panel.
                 optionsGameObject.transform.parent = optionsPanel.transform;
@@ -103,6 +103,7 @@ namespace BOB
                 // Add tabs and panels.
                 new GeneralOptionsPanel(tabStrip, 0);
                 new ConfigurationsPanel(tabStrip, 1);
+                new RuiningOptionsPanel(tabStrip, 2);
 
                 // Disable hotkey while options panel is open.
                 UIThreading.Operating = false;
