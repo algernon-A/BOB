@@ -25,10 +25,20 @@ namespace BOB
             stopTreeRuin.isChecked = ModSettings.StopTreeRuining;
             stopTreeRuin.eventCheckChanged += (control, isChecked) => PrefabLists.DisableTreeRuining(isChecked);
 
+            // Refresh tree ruining on load.
+            UICheckBox refreshTreeRuin = UIControls.AddPlainCheckBox(panel, Translations.Translate("BOB_OPT_RRT"));
+            refreshTreeRuin.isChecked = ModSettings.RefreshTreeRuining;
+            refreshTreeRuin.eventCheckChanged += (control, isChecked) => ModSettings.RefreshTreeRuining = isChecked;
+
             // Prevent ruining by props.
             UICheckBox stopPropRuin = UIControls.AddPlainCheckBox(panel, Translations.Translate("BOB_OPT_RPP"));
             stopPropRuin.isChecked = ModSettings.StopPropRuining;
             stopPropRuin.eventCheckChanged += (control, isChecked) => PrefabLists.DisablePropRuining(isChecked);
+
+            // Prevent prop ruining on load.
+            UICheckBox refreshPropRuin = UIControls.AddPlainCheckBox(panel, Translations.Translate("BOB_OPT_RRP"));
+            refreshPropRuin.isChecked = ModSettings.RefreshPropRuining;
+            refreshPropRuin.eventCheckChanged += (control, isChecked) => ModSettings.RefreshPropRuining = isChecked;
         }
     }
 }

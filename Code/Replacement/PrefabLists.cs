@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System.Diagnostics;
+using System.Collections.Generic;
 using System.Linq;
+using ColossalFramework;
 
 
 namespace BOB
@@ -23,11 +25,58 @@ namespace BOB
 		/// </summary>
 		internal static void BuildLists()
 		{
+			// Diagnostics.
+			Stopwatch sw = new Stopwatch();
+			Logging.Message("commencing BuildLists");
+			sw.Start();
+
+			// Local references.
+			TreeInstance[] treeBuffer = Singleton<TreeManager>.instance.m_trees.m_buffer;
+			PropInstance[] propBuffer = Singleton<PropManager>.instance.m_props.m_buffer;
+
 			// Initialise lists.
 			List<PropInfo> props = new List<PropInfo>();
 			List<TreeInfo> trees = new List<TreeInfo>();
 			ruinedChangedProps = new List<PropInfo>();
 			ruinedChangedTrees = new List<TreeInfo>();
+			List<uint> treesToUpdate = new List<uint>();
+			List<uint> propsToUpdate = new List<uint>();
+
+			// Are we removing existing tree ruining?
+			if (ModSettings.RefreshTreeRuining && ModSettings.StopTreeRuining)
+			{
+				Logging.Message("calculating tree ruining");
+
+				// Yes - iterate through all trees on map.
+				for (uint i = 0; i < treeBuffer.Length; ++i)
+				{
+					if ((treeBuffer[i].m_flags & 1) == 1 && (treeBuffer[i].m_flags & 4) == 0 && treeBuffer[i].Info != null && treeBuffer[i].Position != null && treeBuffer[i].Info.m_createRuining)
+					{
+						// This one passed our filter - add to list.
+						treesToUpdate.Add(i);
+					}
+				}
+
+				Logging.Message("tree ruining calculation completed at ", sw.ElapsedMilliseconds.ToString(), "ms");
+			}
+
+			// Are we removing existing prop ruining?
+			if (ModSettings.RefreshPropRuining && ModSettings.StopPropRuining)
+			{
+				Logging.Message("calculating prop ruining");
+
+				// Yes - iterate through all props on map.
+				for (uint i = 0; i < propBuffer.Length; ++i)
+				{
+					if ((propBuffer[i].m_flags & 1) == 1 && (propBuffer[i].m_flags & 4) == 0 && propBuffer[i].Info != null && propBuffer[i].Position != null && propBuffer[i].Info.m_createRuining)
+					{
+						// This one passed our filter - add to list.
+						propsToUpdate.Add(i);
+					}
+				}
+
+				Logging.Message("tree ruining calculation completed at ", sw.ElapsedMilliseconds.ToString(), "ms");
+			}
 
 			// Iterate through all loaded prop prefabs.
 			for (uint i = 0u; i < PrefabCollection<PropInfo>.LoadedCount(); ++i)
@@ -50,6 +99,8 @@ namespace BOB
 					}
 				}
 			}
+
+			Logging.Message("loaded prop collection completed at ", sw.ElapsedMilliseconds.ToString(), "ms");
 
 			// Iterate through all loaded tree prefabs.
 			for (uint i = 0u; i < PrefabCollection<TreeInfo>.LoadedCount(); ++i)
@@ -74,9 +125,55 @@ namespace BOB
 				}
 			}
 
+			Logging.Message("loaded tree collection completed at ", sw.ElapsedMilliseconds.ToString(), "ms");
+
 			// Order lists by name.
 			loadedProps = props.OrderBy(prop => GetDisplayName(prop.name)).ToList().ToArray();
 			loadedTrees = trees.OrderBy(tree => GetDisplayName(tree.name)).ToList().ToArray();
+
+			Logging.KeyMessage("completed prefab lists at ", sw.ElapsedMilliseconds.ToString(), "ms");
+
+			// Process any trees marked for update.
+			if (treesToUpdate.Count > 0)
+			{
+				Logging.KeyMessage("updating tree ruining with ", treesToUpdate.Count.ToString(), " instances");
+				long elapsedTime = sw.ElapsedMilliseconds;
+
+				foreach (int treeID in treesToUpdate)
+				{
+					treeBuffer[treeID].Info.m_createRuining = false;
+					float minX = treeBuffer[treeID].Position.x - 4f;
+					float minZ = treeBuffer[treeID].Position.z - 4f;
+					float maxX = treeBuffer[treeID].Position.x + 4f;
+					float maxZ = treeBuffer[treeID].Position.z + 4f;
+					TerrainModify.UpdateArea(minX, minZ, maxX, maxZ, heights: false, surface: true, zones: false);
+
+					if (sw.ElapsedMilliseconds - elapsedTime > 5000)
+                    {
+						Logging.KeyMessage("not crashed - still updating tree ruining, just processed tree ", treeID.ToString());
+						elapsedTime = sw.ElapsedMilliseconds;
+                    }
+				}
+				Logging.KeyMessage("completed tree ruining update at ", sw.ElapsedMilliseconds.ToString(), "ms");
+			}
+
+			if (propsToUpdate.Count > 0)
+			{
+				Logging.KeyMessage("updating prop ruining with ", treesToUpdate.Count.ToString(), " instances");
+
+				// Process any props marked for update.
+				foreach (int propID in propsToUpdate)
+				{
+					propBuffer[propID].Info.m_createRuining = false;
+					float minX = propBuffer[propID].Position.x - 4f;
+					float minZ = propBuffer[propID].Position.z - 4f;
+					float maxX = propBuffer[propID].Position.x + 4f;
+					float maxZ = propBuffer[propID].Position.z + 4f;
+					TerrainModify.UpdateArea(minX, minZ, maxX, maxZ, heights: false, surface: true, zones: false);
+				}
+
+				Logging.KeyMessage("completed prop ruining update at ", sw.ElapsedMilliseconds.ToString(), "ms");
+			}
 		}
 
 

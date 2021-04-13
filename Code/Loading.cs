@@ -85,6 +85,29 @@ namespace BOB
                 return;
             }
 
+            // Build lists of loaded prefabs.
+            PrefabLists.BuildLists();
+
+            // Load prop packs.
+            new PackReplacement();
+
+            // Load configuration file.
+            ConfigurationUtils.LoadConfig();
+
+            // Initialise select tool.
+            ToolsModifierControl.toolController.gameObject.AddComponent<BOBTool>();
+            Logging.KeyMessage("loading complete");
+
+            // Display update notification.
+            WhatsNew.ShowWhatsNew();
+
+            // Set up Network Skins 2 reflection.
+            ModUtils.NS2Reflection();
+
+            // Force update of any dirty net or building prefabs from replacement process.
+            BuildingData.Update();
+            NetData.Update();
+
             // Set up options panel event handler.
             OptionsPanel.OptionsEventHook();
         }

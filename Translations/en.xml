@@ -56,6 +56,8 @@
     <Translation ID="BOB_OPT_PRS" String="Press any key" />
     <Translation ID="BOB_OPT_RPT" String="Prevent ruining by trees" />
     <Translation ID="BOB_OPT_RPP" String="Prevent ruining by props" />
+    <Translation ID="BOB_OPT_RRT" String="Refresh tree ruining on game load" />
+    <Translation ID="BOB_OPT_RRP" String="Refresh prop ruining on game load" />
     <Translation ID="BOB_NUKE" String="Reset configuration" />
     <Translation ID="BOB_PER_IND" String="Show individual items by default" />
     <Translation ID="BOB_PER_SIN" String="Always off" />

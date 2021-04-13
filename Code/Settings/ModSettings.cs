@@ -24,8 +24,12 @@ namespace BOB
 		internal static bool rememberPosition = false;
 
 		// Ruining.
-		internal static bool StopTreeRuining { get; set; }
-		internal static bool StopPropRuining { get; set; }
+		internal static bool StopTreeRuining { get; set; } = false;
+		internal static bool StopPropRuining { get; set; } = false;
+
+		//  update ruining on load.
+		internal static bool RefreshTreeRuining { get; set; } = false;
+		internal static bool RefreshPropRuining { get; set; } = false;
 
 		// What's new notification version.
 		internal static string whatsNewVersion = "0.0";
