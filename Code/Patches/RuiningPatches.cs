@@ -10,7 +10,7 @@ namespace BOB
     public static class RuiningPatches
     {
         /// <summary>
-        /// Harmony Prefix patch for TreeInfo.InitializaePrefab, to implement ruining removal.
+        /// Harmony Prefix patch for TreeInfo.InitializePrefab, to implement ruining removal.
         /// </summary>
         /// <param name="__instance"></param>
         [HarmonyPatch(typeof(TreeInfo), nameof(TreeInfo.InitializePrefab))]
@@ -25,7 +25,7 @@ namespace BOB
         }
 
         /// <summary>
-        /// Harmony Prefix patch for TreeInfo.InitializaePrefab, to implement ruining removal.
+        /// Harmony Prefix patch for TreeInfo.InitializePrefab, to implement ruining removal.
         /// </summary>
         [HarmonyPatch(typeof(PropInfo), nameof(PropInfo.InitializePrefab))]
         [HarmonyPrefix]

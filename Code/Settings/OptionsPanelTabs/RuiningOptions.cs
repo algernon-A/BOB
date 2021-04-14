@@ -24,8 +24,8 @@ namespace BOB
             UIHelperBase ruinGroup = helper.AddGroup(Translations.Translate("BOB_OPT_RGL"));
 
             // Checkboxes.
-            ruinGroup.AddCheckbox(Translations.Translate("BOB_OPT_RPT"), ModSettings.StopTreeRuining, (value) => ModSettings.StopTreeRuining = value);
-            ruinGroup.AddCheckbox(Translations.Translate("BOB_OPT_RPP"), ModSettings.StopPropRuining, (value) => ModSettings.StopPropRuining = value);
+            ruinGroup.AddCheckbox(Translations.Translate("BOB_OPT_RRT"), ModSettings.StopTreeRuining, (value) => ModSettings.StopTreeRuining = value);
+            ruinGroup.AddCheckbox(Translations.Translate("BOB_OPT_RRP"), ModSettings.StopPropRuining, (value) => ModSettings.StopPropRuining = value);
         }
     }
 }

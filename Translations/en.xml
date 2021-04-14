@@ -54,9 +54,9 @@
     <Translation ID="BOB_OPT_RUI" String="Ruining" />
     <Translation ID="BOB_OPT_KEY" String="Hotkey" />
     <Translation ID="BOB_OPT_PRS" String="Press any key" />
-    <Translation ID="BOB_OPT_RPT" String="Prevent ruining by trees" />
-    <Translation ID="BOB_OPT_RPP" String="Prevent ruining by props" />
     <Translation ID="BOB_OPT_RGL" String="Changes will take effect on restart" />
+    <Translation ID="BOB_OPT_RRT" String="Prevent ruining by trees" />
+    <Translation ID="BOB_OPT_RRP" String="Prevent ruining by props" />
     <Translation ID="BOB_NUKE" String="Reset configuration" />
     <Translation ID="BOB_PER_IND" String="Show individual items by default" />
     <Translation ID="BOB_PER_SIN" String="Always off" />
