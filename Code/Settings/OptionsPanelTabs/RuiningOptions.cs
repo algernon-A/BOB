@@ -1,4 +1,5 @@
-﻿using ColossalFramework.UI;
+﻿using ICities;
+using ColossalFramework.UI;
 
 
 namespace BOB
@@ -20,25 +21,11 @@ namespace BOB
             UIHelper helper = new UIHelper(panel);
             panel.autoLayout = true;
 
-            // Prevent ruining by trees.
-            UICheckBox stopTreeRuin = UIControls.AddPlainCheckBox(panel, Translations.Translate("BOB_OPT_RPT"));
-            stopTreeRuin.isChecked = ModSettings.StopTreeRuining;
-            stopTreeRuin.eventCheckChanged += (control, isChecked) => PrefabLists.DisableTreeRuining(isChecked);
+            UIHelperBase ruinGroup = helper.AddGroup(Translations.Translate("BOB_OPT_RGL"));
 
-            // Refresh tree ruining on load.
-            UICheckBox refreshTreeRuin = UIControls.AddPlainCheckBox(panel, Translations.Translate("BOB_OPT_RRT"));
-            refreshTreeRuin.isChecked = ModSettings.RefreshTreeRuining;
-            refreshTreeRuin.eventCheckChanged += (control, isChecked) => ModSettings.RefreshTreeRuining = isChecked;
-
-            // Prevent ruining by props.
-            UICheckBox stopPropRuin = UIControls.AddPlainCheckBox(panel, Translations.Translate("BOB_OPT_RPP"));
-            stopPropRuin.isChecked = ModSettings.StopPropRuining;
-            stopPropRuin.eventCheckChanged += (control, isChecked) => PrefabLists.DisablePropRuining(isChecked);
-
-            // Prevent prop ruining on load.
-            UICheckBox refreshPropRuin = UIControls.AddPlainCheckBox(panel, Translations.Translate("BOB_OPT_RRP"));
-            refreshPropRuin.isChecked = ModSettings.RefreshPropRuining;
-            refreshPropRuin.eventCheckChanged += (control, isChecked) => ModSettings.RefreshPropRuining = isChecked;
+            // Checkboxes.
+            ruinGroup.AddCheckbox(Translations.Translate("BOB_OPT_RPT"), ModSettings.StopTreeRuining, (value) => ModSettings.StopTreeRuining = value);
+            ruinGroup.AddCheckbox(Translations.Translate("BOB_OPT_RPP"), ModSettings.StopPropRuining, (value) => ModSettings.StopPropRuining = value);
         }
     }
 }

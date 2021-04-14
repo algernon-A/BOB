@@ -73,22 +73,6 @@ namespace BOB
 			get => ModSettings.StopPropRuining;
 			set => ModSettings.StopPropRuining = value;
 		}
-
-		// Tree ruining.
-		[XmlElement("RefreshTreeRuining")]
-		public bool RefreshTreeRuining
-		{
-			get => ModSettings.RefreshTreeRuining;
-			set => ModSettings.RefreshTreeRuining = value;
-		}
-
-		// Prop ruining.
-		[XmlElement("RefreshPropRuining")]
-		public bool RefreshPropRuining
-		{
-			get => ModSettings.RefreshPropRuining;
-			set => ModSettings.RefreshPropRuining = value;
-		}
 	}
 
 
