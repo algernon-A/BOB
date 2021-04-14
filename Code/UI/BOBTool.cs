@@ -47,7 +47,7 @@ namespace BOB
 		public override CitizenInstance.Flags GetCitizenIgnoreFlags() => CitizenInstance.Flags.All;
 		public override DisasterData.Flags GetDisasterIgnoreFlags() => DisasterData.Flags.All;
 		public override District.Flags GetDistrictIgnoreFlags() => District.Flags.All;
-		public override TransportLine.Flags GetTransportIgnoreFlags() => TransportLine.Flags.All;
+		public override TransportLine.Flags GetTransportIgnoreFlags() => TransportLine.Flags.None;
 		public override VehicleParked.Flags GetParkedVehicleIgnoreFlags() => VehicleParked.Flags.All;
 		public override TreeInstance.Flags GetTreeIgnoreFlags() => TreeInstance.Flags.None;
 		public override PropInstance.Flags GetPropIgnoreFlags() => PropInstance.Flags.None;
@@ -103,6 +103,8 @@ namespace BOB
 				m_transportTypes = GetTransportTypes()
 			};
 
+			// Enable ferry line selection.
+			input.m_netService.m_itemLayers |= ItemClass.Layer.FerryPaths;
 
 			ToolErrors errors = ToolErrors.None;
 			RaycastOutput output;
