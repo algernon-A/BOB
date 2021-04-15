@@ -3,8 +3,6 @@ using ColossalFramework.UI;
 using UnityEngine;
 
 
-using System;
-
 namespace BOB
 {
 	/// <summary>

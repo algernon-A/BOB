@@ -58,7 +58,7 @@ namespace BOB
 					else
 					{
 						// No current replacement; set all offset fields to original prop.
-						angleSlider.TrueValue = value.originalAngle;
+						angleSlider.TrueValue = 0f;
 						xSlider.TrueValue = 0;
 						ySlider.TrueValue = 0;
 						zSlider.TrueValue = 0;
