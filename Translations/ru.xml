@@ -53,6 +53,9 @@
     <Translation ID="BOB_OPT_CFG" String="Конфигурации" />
     <Translation ID="BOB_OPT_KEY" String="Горячая клавиша" />
     <Translation ID="BOB_OPT_PRS" String="Нажмите любую клавишу" />
+    <Translation ID="BOB_OPT_RGL" String="Изменения вступят в силу после перезагрузки" />
+    <Translation ID="BOB_OPT_RRT" String="Отключить разрушенную текстуру под деревьями" />
+    <Translation ID="BOB_OPT_RRP" String="Отключить разрушенную текстуру под декорациями" />
     <Translation ID="BOB_NUKE" String="Сбросить конфигурацию" />
     <Translation ID="BOB_PER_IND" String="Показывать отдельные элементы по умолчанию" />
     <Translation ID="BOB_PER_SIN" String="Всегда выключен" />
@@ -85,5 +88,8 @@
     <Translation ID="BOB_UPD_060_3" String="Теперь можно выбирать декоративные сооружения." />
     <Translation ID="BOB_UPD_060_4" String="Новая уменьшенная панель замены" />
     <Translation ID="BOB_UPD_061_0" String="Добавить фильтры сортировки имен по возрастанию/убыванию" />
+    <Translation ID="BOB_UPD_062_0" String="Добавлена возможность удаления разрушения ландшафта под всеми деревьями и/или декораций (в опциях)" />
+    <Translation ID="BOB_UPD_062_1" String="Теперь можно выбрать паромные пути (чтобы изменить/скрыть их буи)" />
+    <Translation ID="BOB_UPD_062_2" String="Исправлены углы декораций для путей, иногда неправильно отображаемые при выборе" />
   </Translations>
 </Language>

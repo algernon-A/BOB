@@ -53,6 +53,9 @@
     <Translation ID="BOB_OPT_CFG" String="Configuraciones" />
     <Translation ID="BOB_OPT_KEY" String="Tecla de acceso rápido" />
     <Translation ID="BOB_OPT_PRS" String="Presiona cualquier tecla" />
+    <Translation ID="BOB_OPT_RGL" String="Los cambios entrarán en vigor al reiniciar" />
+    <Translation ID="BOB_OPT_RRT" String="Evita que los árboles arruinen el terreno" />
+    <Translation ID="BOB_OPT_RRP" String="Evita que los decoraciones arruinen el terreno" />
     <Translation ID="BOB_NUKE" String="Restablecer configuración" />
     <Translation ID="BOB_PER_IND" String="Mostrar elementos individuales de forma predeterminada" />
     <Translation ID="BOB_PER_SIN" String="Siempre apagado" />
@@ -85,5 +88,8 @@
     <Translation ID="BOB_UPD_060_3" String="Ahora puede seleccionar edificios de decoración." />
     <Translation ID="BOB_UPD_060_4" String="Rediseño panel de reemplazo más pequeño" />
     <Translation ID="BOB_UPD_061_0" String="Añadir filtros de clasificación por nombres ascendentes/descendentes" />
+    <Translation ID="BOB_UPD_062_0" String="Agregue la capacidad de eliminar las ruinas del terreno de todos los árboles y/o decoraciones (en el panel de opciones)" />
+    <Translation ID="BOB_UPD_062_1" String="Ahora se puede seleccionar las rutas de los transbordadores (para cambiar/ocultar esas boyas marcadoras de ruta)" />
+    <Translation ID="BOB_UPD_062_2" String="Se corrigieron los ángulos de decoraciones en redes que a veces se mostraban incorrectamente en la selección" />
   </Translations>
 </Language>

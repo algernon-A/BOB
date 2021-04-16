@@ -53,6 +53,9 @@
     <Translation ID="BOB_OPT_CFG" String="Konfigurationen" />
     <Translation ID="BOB_OPT_KEY" String="Tastenkürzel" />
     <Translation ID="BOB_OPT_PRS" String="Drücke eine Taste" />
+    <Translation ID="BOB_OPT_RGL" String="Änderungen werden nach dem Neustart übernommen" />
+    <Translation ID="BOB_OPT_RRT" String="Verhindert die Zerstörung von Gras durch Bäume" />
+    <Translation ID="BOB_OPT_RRP" String="Verhindert die Zerstörung von Gras durch Dekorationen" />
     <Translation ID="BOB_NUKE" String="Konfiguration zurücksetzen" />
     <Translation ID="BOB_PER_IND" String="Zeige standardmäßig einzelne Dekorationen" />
     <Translation ID="BOB_PER_SIN" String="Immer aus" />
@@ -85,5 +88,8 @@
     <Translation ID="BOB_UPD_060_3" String="Kann jetzt Dekorationsgebäude auswählen" />
     <Translation ID="BOB_UPD_060_4" String="Neu gestaltete, kleinere Oberfläche" />
     <Translation ID="BOB_UPD_061_0" String="Sortieren nach Name als Filter hinzugefügt" />
+    <Translation ID="BOB_UPD_062_0" String="Funktion hinzugefügt um die Zerstörung von Gras durch alle Bäume und/oder Dekorationen zu verhindern (In den Einstellungen)" />
+    <Translation ID="BOB_UPD_062_1" String="Fährstraßen sind nun anwählbar (um die Makierungs-Bojen auszutauschen oder zu verstecken)" />
+    <Translation ID="BOB_UPD_062_2" String="Fehler behoben, der manchmal die Winkel-Angaben von Netzwerk-Dekoration fehlerhaft anzeigte" />
   </Translations>
 </Language>
