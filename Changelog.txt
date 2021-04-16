@@ -1,4 +1,11 @@
-﻿Version 0.6.1 -
+﻿Version 0.6.2 -
+
+- Add options to remove ruining from trees and props
+- Fix network prop rotation sometimes being incorrectly displayed when first selected
+- Ferry paths are now selectable (to change/hide those ferry path marker buoys)
+
+
+Version 0.6.1 -
 
 - Add ascending/descending name sort filters to both target and replacement lists
 - Fix overlay not properly recognising randomized trees in buildings

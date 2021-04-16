@@ -89,5 +89,8 @@
     <Translation ID="BOB_UPD_060_3" String="Can now select decoration buildings" />
     <Translation ID="BOB_UPD_060_4" String="Redesigned smaller replacer panel" />
     <Translation ID="BOB_UPD_061_0" String="Add ascending/descending name sort filters to lists" />
+    <Translation ID="BOB_UPD_062_0" String="Add ability to remove terrain ruining from all trees and/or props (in the options panel)" />
+    <Translation ID="BOB_UPD_062_1" String="Ferry paths are now selectable (to change/hide those ferry path marker buoys)" />
+    <Translation ID="BOB_UPD_062_2" String="Fix network prop angles sometimes being incorrectly displayed on selection" />
   </Translations>
 </Language>

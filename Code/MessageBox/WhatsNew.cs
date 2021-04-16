@@ -15,6 +15,18 @@ namespace BOB
         {
             new WhatsNewMessage
             {
+                version = new Version("0.6.2.0"),
+                versionHeader = "",
+                messageKeys = true,
+                messages = new string[]
+                {
+                    "BOB_UPD_062_0",
+                    "BOB_UPD_062_1",
+                    "BOB_UPD_062_2"
+                }
+            },
+            new WhatsNewMessage
+            {
                 version = new Version("0.6.1.0"),
                 versionHeader = "",
                 messageKeys = true,
@@ -140,6 +152,8 @@ namespace BOB
             // Don't show notification if we're already up to (or ahead of) the first what's new message.
             if (whatsNewVersion < latestMessage.version)
             {
+                Logging.Message("displaying what's new message");
+
                 // Show messagebox.
                 WhatsNewMessageBox messageBox = MessageBoxBase.ShowModal<WhatsNewMessageBox>();
                 messageBox.Title = BOBMod.ModName + " " + BOBMod.Version;

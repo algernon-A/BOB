@@ -53,6 +53,8 @@ namespace BOB
         /// <param name="mode">Loading mode (e.g. game, editor, scenario, etc.)</param>
         public override void OnLevelLoaded(LoadMode mode)
         {
+            Logging.Message("commencing loading checks");
+
             base.OnLevelLoaded(mode);
 
             // Don't do anything further if we're not operating.
@@ -85,6 +87,8 @@ namespace BOB
                 return;
             }
 
+            Logging.Message("loading checks passed");
+
             // Build lists of loaded prefabs.
             PrefabLists.BuildLists();
 
@@ -96,7 +100,6 @@ namespace BOB
 
             // Initialise select tool.
             ToolsModifierControl.toolController.gameObject.AddComponent<BOBTool>();
-            Logging.KeyMessage("loading complete");
 
             // Display update notification.
             WhatsNew.ShowWhatsNew();
@@ -105,11 +108,14 @@ namespace BOB
             ModUtils.NS2Reflection();
 
             // Force update of any dirty net or building prefabs from replacement process.
+            Logging.Message("updating dirty prefabs");
             BuildingData.Update();
             NetData.Update();
 
             // Set up options panel event handler.
             OptionsPanel.OptionsEventHook();
+
+            Logging.Message("loading complete");
         }
     }
 }

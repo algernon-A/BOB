@@ -62,6 +62,8 @@ namespace BOB
         /// </summary>
         internal static void NS2Reflection()
         {
+            Logging.Message("looking for Network Skins");
+
             // Iterate through each loaded plugin assembly.
             foreach (PluginManager.PluginInfo plugin in PluginManager.instance.GetPluginsInfo())
             {

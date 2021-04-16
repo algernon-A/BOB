@@ -13,12 +13,13 @@ namespace BOB
 		internal static PropInfo[] loadedProps;
 		internal static TreeInfo[] loadedTrees;
 
-
 		/// <summary>
 		/// Builds the lists of loaded trees props.  Must be called before use.
 		/// </summary>
 		internal static void BuildLists()
 		{
+			Logging.Message("building prop list with ", PrefabCollection<PropInfo>.LoadedCount().ToString(), " loaded prefabs");
+
 			// Initialise lists.
 			List<PropInfo> props = new List<PropInfo>();
 			List<TreeInfo> trees = new List<TreeInfo>();
@@ -34,6 +35,8 @@ namespace BOB
 				}
 			}
 
+			Logging.Message("building tree list with ", PrefabCollection<TreeInfo>.LoadedCount().ToString(), " loaded prefabs");
+
 			// Iterate through all loaded tree prefabs.
 			for (uint i = 0u; i < PrefabCollection<TreeInfo>.LoadedCount(); ++i)
 			{
@@ -45,9 +48,13 @@ namespace BOB
 				}
 			}
 
+			Logging.Message("list build completed");
+
 			// Order lists by name.
 			loadedProps = props.OrderBy(prop => GetDisplayName(prop.name)).ToList().ToArray();
 			loadedTrees = trees.OrderBy(tree => GetDisplayName(tree.name)).ToList().ToArray();
+
+			Logging.Message("list ordering complete");
 		}
 
 
