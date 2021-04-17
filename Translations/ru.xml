@@ -51,6 +51,7 @@
     <Translation ID="BOB_CFG_DEL" String="Удалить выбранную конфигурацию" />
     <Translation ID="BOB_OPT_GEN" String="Общие настройки" />
     <Translation ID="BOB_OPT_CFG" String="Конфигурации" />
+    <Translation ID="BOB_OPT_RUI" String="разрушенная текстура" />
     <Translation ID="BOB_OPT_KEY" String="Горячая клавиша" />
     <Translation ID="BOB_OPT_PRS" String="Нажмите любую клавишу" />
     <Translation ID="BOB_OPT_RGL" String="Изменения вступят в силу после перезагрузки" />
@@ -90,6 +91,6 @@
     <Translation ID="BOB_UPD_061_0" String="Добавить фильтры сортировки имен по возрастанию/убыванию" />
     <Translation ID="BOB_UPD_062_0" String="Добавлена возможность удаления разрушения ландшафта под всеми деревьями и/или декораций (в опциях)" />
     <Translation ID="BOB_UPD_062_1" String="Теперь можно выбрать паромные пути (чтобы изменить/скрыть их буи)" />
-    <Translation ID="BOB_UPD_062_2" String="Исправлены углы декораций для путей, иногда неправильно отображаемые при выборе" />
+    <Translation ID="BOB_UPD_062_0" String = "Добавлена возможность удаления разрушенной текстуры под всеми деревьями и/или декораций (в опциях)" />
   </Translations>
 </Language>

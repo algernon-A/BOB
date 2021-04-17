@@ -51,6 +51,7 @@
     <Translation ID="BOB_CFG_DEL" String="Lösche die ausgewählte Konfiguration" />
     <Translation ID="BOB_OPT_GEN" String="Algemeine Einstellungen" />
     <Translation ID="BOB_OPT_CFG" String="Konfigurationen" />
+    <Translation ID="BOB_OPT_RUI" String="Zerstörung von Gras" />
     <Translation ID="BOB_OPT_KEY" String="Tastenkürzel" />
     <Translation ID="BOB_OPT_PRS" String="Drücke eine Taste" />
     <Translation ID="BOB_OPT_RGL" String="Änderungen werden nach dem Neustart übernommen" />

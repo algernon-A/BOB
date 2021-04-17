@@ -51,6 +51,7 @@
     <Translation ID="BOB_CFG_DEL" String="Eliminar la configuración seleccionada" />
     <Translation ID="BOB_OPT_GEN" String="Opciones generales" />
     <Translation ID="BOB_OPT_CFG" String="Configuraciones" />
+    <Translation ID="BOB_OPT_RUI" String="Rinas del terreno" />
     <Translation ID="BOB_OPT_KEY" String="Tecla de acceso rápido" />
     <Translation ID="BOB_OPT_PRS" String="Presiona cualquier tecla" />
     <Translation ID="BOB_OPT_RGL" String="Los cambios entrarán en vigor al reiniciar" />
