@@ -107,6 +107,9 @@ namespace BOB
 			ToolErrors errors = ToolErrors.None;
 			RaycastOutput output;
 
+			// Cursor is dark by default.
+			m_cursor = darkCursor;
+
 			// Is the base mouse ray valid?
 			if (m_mouseRayValid)
 			{
@@ -128,8 +131,10 @@ namespace BOB
 						// Networks.
 						if (CheckSegment(output.m_netSegment, ref errors))
 						{
-							// CheckSegment passed - record hit position.
+							// CheckSegment passed - record hit position and set cursor to light.
 							output.m_hitPos = Singleton<NetManager>.instance.m_segments.m_buffer[output.m_netSegment].GetClosestPosition(output.m_hitPos);
+							m_cursor = lightCursor;
+
 						}
 						else
 						{
@@ -142,8 +147,9 @@ namespace BOB
 						// Buildings.
 						if (CheckBuilding(output.m_building, ref errors))
 						{
-							// CheckSigment passed - record hit position.
+							// CheckSigment passed - record hit position and set cursor to light.
 							output.m_hitPos = Singleton<BuildingManager>.instance.m_buildings.m_buffer[output.m_building].m_position;
+							m_cursor = lightCursor;
 						}
 						else
 						{
@@ -156,8 +162,9 @@ namespace BOB
 						// Map props.
 						if (CheckProp(output.m_propInstance, ref errors))
 						{
-							// CheckSigment passed - record hit position.
+							// CheckSigment passed - record hit position and set cursor to light.
 							output.m_hitPos = Singleton<PropManager>.instance.m_props.m_buffer[output.m_propInstance].Position;
+							m_cursor = lightCursor;
 						}
 						else
 						{
@@ -170,8 +177,9 @@ namespace BOB
 						// Map trees.
 						if (CheckTree(output.m_treeInstance, ref errors))
 						{
-							// CheckSigment passed - record hit position.
+							// CheckSigment passed - record hit position and set cursor to light.
 							output.m_hitPos = Singleton<TreeManager>.instance.m_trees.m_buffer[output.m_treeInstance].Position;
+							m_cursor = lightCursor;
 						}
 						else
 						{
@@ -293,9 +301,6 @@ namespace BOB
 			ushort building = m_hoverInstance.Building;
 			if (building != 0)
 			{
-				// We have a hovered building; set the cursor to the light cursor.
-				m_cursor = lightCursor;
-
 				// Check for mousedown events with button zero.
 				if (e.type == EventType.MouseDown && e.button == 0)
 				{
@@ -313,9 +318,6 @@ namespace BOB
 				// Try to get a hovered network instance.
 				if (segment != 0)
 				{
-					// We have a hovered network; set the cursor to the light cursor.
-					m_cursor = lightCursor;
-
 					// Check for mousedown events with button zero.
 					if (e.type == EventType.MouseDown && e.button == 0)
 					{
@@ -334,9 +336,6 @@ namespace BOB
 					// Try to get a hovered tree instance.
 					if (tree != 0)
 					{
-						// We have a hovered tree; set the cursor to the light cursor.
-						m_cursor = lightCursor;
-
 						// Check for mousedown events with button zero.
 						if (e.type == EventType.MouseDown && e.button == 0)
 						{
@@ -354,9 +353,6 @@ namespace BOB
 						// Try to get a hovered prop instance.
 						if (prop != 0)
 						{
-							// We have a hovered tree; set the cursor to the light cursor.
-							m_cursor = lightCursor;
-
 							// Check for mousedown events with button zero.
 							if (e.type == EventType.MouseDown && e.button == 0)
 							{
@@ -367,11 +363,6 @@ namespace BOB
 								ToolsModifierControl.SetTool<DefaultTool>();
 								InfoPanelManager.Create(Singleton<PropManager>.instance.m_props.m_buffer[prop].Info);
 							}
-						}
-						else
-						{
-							// No building or network hovered; set the cursor to the dark cursor.
-							m_cursor = darkCursor;
 						}
 					}
 				}
