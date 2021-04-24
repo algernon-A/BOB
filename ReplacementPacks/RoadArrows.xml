@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <BOBPackFile>
   <propPacks>
- 
+    <replacementpack name="Another American Highways">
+      <propReplacements>
+        <replacement target="Road Arrow R" replacement="2017154380.ZDS PM R HW_Data" />
+        <replacement target="Road Arrow L" replacement="2017154380.ZDS PM L HW_Data" />
+        <replacement target="Road Arrow F" replacement="2017154380.ZDS PM F HW_Data" />
+        <replacement target="Road Arrow LF" replacement="2017154380.ZDS PM FL HW_Data" />
+        <replacement target="Road Arrow FR" replacement="2017154380.ZDS PM FR HW_Data" />
+        <replacement target="Road Arrow LR" replacement="2017154380.ZDS PM LR HW_Data" />
+        <replacement target="Road Arrow LFR" replacement="2017154380.ZDS PM FLR HW_Data" />
+      </propReplacements>
+    </replacementpack>	  
     <replacementpack name="Australian Road Arrows">
       <propReplacements>
         <replacement target="Road Arrow R" replacement="2071057587.AU Arrow Right_Data" />
