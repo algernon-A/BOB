@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using ColossalFramework;
 using ColossalFramework.UI;
 
 
@@ -27,6 +28,8 @@ namespace BOB
 		private const float LoadedWidth = 320f;
 		private const float PanelWidth = LoadedX + LoadedWidth + Margin;
 		private const float RandomButtonWidth = 100f;
+		private const float RandomButtonX = Margin + RandomizerWidth - RandomButtonWidth;
+		private const float NameFieldWidth = RandomizerWidth - RandomButtonWidth - Margin;
 
 		// Layout constants - Y.
 		private const float TitleHeight = 40f;
@@ -34,9 +37,11 @@ namespace BOB
 		private const float ToolHeight = 30f;
 		private const float ListY = ToolY + ToolHeight + Margin;
 		private const float ListHeight = UIPropRow.RowHeight * 16f;
+		private const float LeftListY = ListY + 32f;
+		private const float LeftListHeight = ListHeight - 32f;
 		private const float PanelHeight = ListY + ListHeight + Margin;
 		private const float ArrowHeight = 64f;
-
+		private const float NameFieldY = LeftListY - 22f - Margin;
 
 
 		// Instance references.
@@ -46,7 +51,9 @@ namespace BOB
 
 		// Panel components.
 		private readonly UIFastList randomList, variationsList, loadedList;
+		private readonly UIButton removeRandomButton, renameButton;
 		private readonly UICheckBox treeCheck, propCheck;
+		private readonly UITextField nameField;
 
 		// Current selections.
 		private PrefabInfo selectedRandomPrefab, selectedVariation, selectedLoadedPrefab;
@@ -177,6 +184,12 @@ namespace BOB
 
 				// Regenerate variation UI fastlist.
 				VariationsList();
+
+				// Update name text.
+				nameField.text = selectedRandomPrefab?.name ?? "";
+
+				// Update button states.
+				UpdateButtonStates();
 			}
         }
 
@@ -224,8 +237,8 @@ namespace BOB
 			// Selected random prop list.
 			UIPanel randomizerPanel = AddUIComponent<UIPanel>();
 			randomizerPanel.width = RandomizerWidth;
-			randomizerPanel.height = ListHeight;
-			randomizerPanel.relativePosition = new Vector2(RandomizerX, ListY);
+			randomizerPanel.height = LeftListHeight;
+			randomizerPanel.relativePosition = new Vector2(RandomizerX, LeftListY);
 			randomList = UIFastList.Create<UIRandomRefabRow>(randomizerPanel);
 			ListSetup(randomList);
 
@@ -236,6 +249,7 @@ namespace BOB
 			selectedPanel.relativePosition = new Vector2(SelectedX, ListY);
 			variationsList = UIFastList.Create<UIRandomComponentRow>(selectedPanel);
 			ListSetup(variationsList);
+
 
 			// Initialize curren variations list.
 			currentVariations = new List<PrefabInfo>();
@@ -257,12 +271,19 @@ namespace BOB
 			removeVariationButton.eventClicked += RemoveVariation;
 
 			// Add random prefab button.
-			UIButton addRandomButton = UIControls.AddButton(this, Margin, ToolY, "Add", RandomButtonWidth);
+			UIButton addRandomButton = UIControls.AddButton(this, Margin, ToolY, Translations.Translate("BOB_RND_NEW"), RandomButtonWidth);
 			addRandomButton.eventClicked += NewRandomPrefab;
 
 			// Remove random prefab button.
-			UIButton removeRandomButton = UIControls.AddButton(this, RandomButtonWidth + (Margin * 2f), ToolY, "Remove", RandomButtonWidth);
+			removeRandomButton = UIControls.AddButton(this, RandomButtonWidth + (Margin * 2f), ToolY, Translations.Translate("BOB_RND_DEL"), RandomButtonWidth);
 			removeRandomButton.eventClicked += RemoveRandomPrefab;
+
+			// Name change textfield.
+			nameField = UIControls.AddTextField(this, Margin, NameFieldY, NameFieldWidth);
+
+			// Rename button.
+			renameButton = UIControls.EvenSmallerButton(this, RandomButtonX, NameFieldY + 1f, Translations.Translate("BOB_RND_REN"), RandomButtonWidth);
+			renameButton.eventClicked += RenameRandomPrefab;
 
 			// Tree/prop checks.
 			propCheck = IconToggleCheck(this, (RandomButtonWidth * 2f) + (Margin * 3f), ToolY, "bob_props3", "BOB_PNL_PRP");
@@ -275,8 +296,23 @@ namespace BOB
 			RandomList();
 			LoadedList();
 
+			// Update button states.
+			UpdateButtonStates();
+
 			// Bring to front.
 			BringToFront();
+		}
+
+
+		/// <summary>
+		/// Updates button states (enabled/disabled) according to current control states.
+		/// </summary>
+		private void UpdateButtonStates()
+		{
+			// Toggle enabled state based on whether or not there's a valid current selection.
+			bool buttonState = selectedRandomPrefab != null;
+			removeRandomButton.isEnabled = buttonState;
+			renameButton.isEnabled = buttonState;
 		}
 
 
@@ -435,6 +471,36 @@ namespace BOB
 			selectedRandomPrefab = null;
 			randomList.selectedIndex = -1;
 			RandomList();
+		}
+
+
+		/// <summary>
+		/// Rename random prefab event handler.
+		/// </summary>
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="clickEvent">Mouse event parameter (unused)</param>
+		private void RenameRandomPrefab(UIComponent control, UIMouseEventParameter clickEvent)
+		{
+			// Safety checks.
+			if (randomList.selectedIndex < 0 || selectedRandomPrefab == null || nameField.text.IsNullOrWhiteSpace())
+			{
+				return;
+			}
+
+			string trimmedName = nameField.text.Trim();
+
+			// Need unique name.
+			if ((selectedRandomPrefab is PropInfo && PrefabLists.DuplicatePropName(trimmedName)) || (selectedRandomPrefab is TreeInfo && PrefabLists.DuplicateTreeName(trimmedName)))
+			{
+				Logging.Error("duplicate name");
+				return;
+			}
+
+			// If we got here, all good; rename prefab.
+			selectedRandomPrefab.name = trimmedName;
+
+			// Refresh list.
+			randomList.Refresh();
 		}
 
 

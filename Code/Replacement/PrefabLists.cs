@@ -60,6 +60,22 @@ namespace BOB
 
 
 		/// <summary>
+		/// Checks to see if the given prop name is already in use.
+		/// </summary>
+		/// <param name="propName">Prop name to check</param>
+		/// <returns>True if name is already in use, false otherwise</returns>
+		internal static bool DuplicatePropName(string propName) => randomProps.Find(x => x.name.Equals(propName)) != null || System.Array.Find(loadedProps, x => x.name.Equals(propName)) != null;
+
+
+		/// <summary>
+		/// Checks to see if the given tree name is already in use.
+		/// </summary>
+		/// <param name="treeName">Tree name to check</param>
+		/// <returns>True if name is already in use, false otherwise</returns>
+		internal static bool DuplicateTreeName(string treeName) => randomTrees.Find(x => x.name.Equals(treeName)) != null || System.Array.Find(loadedTrees, x => x.name.Equals(treeName)) != null;
+
+
+		/// <summary>
 		/// Creates a new random prop prefab.
 		/// </summary>
 		/// <param name="propName">Name of prefab</param>
@@ -74,7 +90,7 @@ namespace BOB
 			}
 
 			// Need unique name.
-			if (randomProps.Find(x => x.name.Equals(propName)) != null || System.Array.Find(loadedProps, x => x.name.Equals(propName)) != null)
+			if (DuplicatePropName(propName))
 			{
 				Logging.Error("duplicate prop name for random prop");
 				return null;
@@ -109,7 +125,7 @@ namespace BOB
 			}
 
 			// Need unique name.
-			if (randomTrees.Find(x => x.name.Equals(treeName)) != null || System.Array.Find(loadedTrees, x => x.name.Equals(treeName)) != null)
+			if (DuplicateTreeName(treeName))
             {
 				Logging.Error("duplicate tree name for random tree");
 				return null;

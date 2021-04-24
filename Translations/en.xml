@@ -94,5 +94,8 @@
     <Translation ID="BOB_UPD_062_2" String="Fix network prop angles sometimes being incorrectly displayed on selection" />
     <Translation ID="BOB_PNL_RSW" String="Show random" />
     <Translation ID="BOB_PNL_RST" String="Random setup" />
+    <Translation ID="BOB_RND_NEW" String="New" />
+    <Translation ID="BOB_RND_DEL" String="Delete" />
+    <Translation ID="BOB_RND_REN" String="Rename" />
   </Translations>
 </Language>
