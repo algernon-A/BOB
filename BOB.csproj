@@ -65,6 +65,8 @@
     <Compile Include="Code\Replacement\MapPropReplacement.cs" />
     <Compile Include="Code\Settings\OptionsPanelTabs\RuiningOptions.cs" />
     <Compile Include="Code\UI\MapPanel.cs" />
+    <Compile Include="Code\UI\RandomPanel.cs" />
+    <Compile Include="Code\UI\UIFastList\UIRandomPropRow.cs" />
     <Compile Include="Code\Utils\Logging.cs" />
     <Compile Include="Code\PackUtils\PackUtils.cs" />
     <Compile Include="Code\PackUtils\PackXML.cs" />

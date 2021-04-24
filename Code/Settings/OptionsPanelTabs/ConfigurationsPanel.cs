@@ -76,7 +76,7 @@ namespace BOB
             UIPanel configListPanel = panel.AddUIComponent<UIPanel>();
             configListPanel.width = ListWidth;
             configListPanel.height = ListHeight;
-            configListPanel.relativePosition = new Vector3(Margin, ListY);
+            configListPanel.relativePosition = new Vector2(Margin, ListY);
 
             // Config selection list.
             configList = UIFastList.Create<UIConfigRow>(configListPanel);
@@ -86,7 +86,7 @@ namespace BOB
             configList.canSelect = true;
             configList.rowHeight = RowHeight;
             configList.autoHideScrollbar = true;
-            configList.relativePosition = Vector3.zero;
+            configList.relativePosition = Vector2.zero;
             configList.rowsData = new FastList<object>();
 
             // File name textfield.
@@ -350,7 +350,7 @@ namespace BOB
 
                 rowLabel = AddUIComponent<UILabel>();
                 rowLabel.width = ConfigurationsPanel.ListWidth;
-                rowLabel.relativePosition = new Vector3(TextX, 6f);
+                rowLabel.relativePosition = new Vector2(TextX, 6f);
             }
 
             // Set selected config.

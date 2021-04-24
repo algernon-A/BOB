@@ -60,6 +60,10 @@ namespace BOB
 							return;
 						}
 
+						// Deserialise random prefabs.
+						PrefabLists.DeserializeRandomProps(configFile.randomProps);
+						PrefabLists.DeserializeRandomTrees(configFile.randomTrees);
+
 						// Deserialize all-building replacements.
 						DeserializeAllBuilding(configFile.allBuildingProps);
 
@@ -147,6 +151,10 @@ namespace BOB
 					// Don't populate file if we're doing a clean save.
 					if (!clean)
 					{
+						// Serialise random prefabs.
+						configFile.randomProps = PrefabLists.SerializeRandomProps();
+						configFile.randomTrees = PrefabLists.SerializeRandomTrees();
+
 						// Serialise all-building replacements.
 						configFile.allBuildingProps = AllBuildingReplacement.replacements.Values.ToList();
 
@@ -335,7 +343,7 @@ namespace BOB
 				}
 
 				// Try to find replacement prefab.
-				PrefabInfo replacementPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.replacement) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.replacement);
+				PrefabInfo replacementPrefab = FindReplacementPrefab(replacement.replacement, replacement.tree);
 				if (replacementPrefab == null)
 				{
 					Logging.Message("Couldn't find replacement prefab ", replacement.replacement);
@@ -375,7 +383,7 @@ namespace BOB
 				}
 
 				// Try to find replacement prefab.
-				PrefabInfo replacementPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.replacement) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.replacement);
+				PrefabInfo replacementPrefab = FindReplacementPrefab(replacement.replacement, replacement.tree);
 				if (replacementPrefab == null)
 				{
 					Logging.Message("Couldn't find replacement prefab ", replacement.replacement);
@@ -406,7 +414,7 @@ namespace BOB
 				}
 
 				// Try to find replacement prefab.
-				PrefabInfo replacementPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.replacement) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.replacement);
+				PrefabInfo replacementPrefab = FindReplacementPrefab(replacement.replacement, replacement.tree);
 				if (replacementPrefab == null)
 				{
 					Logging.Message("Couldn't find replacement prefab ", replacement.replacement);
@@ -447,7 +455,7 @@ namespace BOB
 				}
 
 				// Try to find replacement prefab.
-				PrefabInfo replacementPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.replacement) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.replacement);
+				PrefabInfo replacementPrefab = FindReplacementPrefab(replacement.replacement, replacement.tree);
 				if (replacementPrefab == null)
 				{
 					Logging.Message("Couldn't find replacement prefab ", replacement.replacement);
@@ -487,7 +495,7 @@ namespace BOB
 				}
 
 				// Try to find replacement prefab.
-				PrefabInfo replacementPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.replacement) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.replacement);
+				PrefabInfo replacementPrefab = FindReplacementPrefab(replacement.replacement, replacement.tree);
 				if (replacementPrefab == null)
 				{
 					Logging.Message("Couldn't find replacement prefab ", replacement.replacement);
@@ -497,6 +505,28 @@ namespace BOB
 				// If we got here, it's all good; apply the building replacement.
 				IndividualReplacement.instance.Apply(buildingInfo, targetPrefab, replacement.index, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
 			}
+		}
+
+
+		/// <summary>
+		/// Attempts to find the replacement prefab with the specified name.
+		/// </summary>
+		/// <param name="replacementName">Prefab name to find</param>
+		/// <param name="isTree">True if the desired prefab is a tree, false if it's a prop</param>
+		/// <returns>Requested prefab, or null if not found</returns>
+		private static PrefabInfo FindReplacementPrefab(string replacementName, bool isTree)
+        {
+			// Attempt to load from prefab collection.
+			PrefabInfo replacementPrefab = isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacementName) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacementName);
+
+			if (replacementPrefab == null)
+			{
+				// If we couldn't load from prefab collection, attempt to find in our list of replacement prefabs.
+				replacementPrefab = isTree ? (PrefabInfo)PrefabLists.randomTrees.Find(x => x.name.Equals(replacementName)) : (PrefabInfo)PrefabLists.randomProps.Find(x => x.name.Equals(replacementName));
+			}
+
+			// Return what we have.
+			return replacementPrefab;
 		}
 	}
 }

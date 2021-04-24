@@ -30,4 +30,36 @@
 			InfoPanelManager.Panel.CurrentTargetItem = thisItem;
 		}
 	}
+
+
+	/// <summary>
+	/// Prop row fastlist item for loaded props/trees for random setup.
+	/// </summary>
+	public class UILoadedRandomPropRow : UIPropRow
+	{
+		/// <summary>
+		/// Called when this item is selected.
+		/// </summary>
+		public override void UpdateSelection()
+		{
+			// Update currently selected loaded prefab.
+			BOBRandomPanel.Panel.SelectedLoadedPrefab = thisPrefab;
+		}
+	}
+
+
+	/// <summary>
+	/// Prop row fastlist item for random prop/tree variations.
+	/// </summary>
+	public class UIRandomComponentRow : UIPropRow
+	{
+		/// <summary>
+		/// Called when this item is selected.
+		/// </summary>
+		public override void UpdateSelection()
+		{
+			// Update currently selected variation prefab.
+			BOBRandomPanel.Panel.SelectedVariation = thisPrefab;
+		}
+	}
 }

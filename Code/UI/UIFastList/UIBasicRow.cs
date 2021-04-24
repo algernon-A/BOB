@@ -14,12 +14,12 @@ namespace BOB
         protected virtual float TextX => 60f;
 
         // Panel components.
-        private UIPanel panelBackground;
+        protected UIPanel panelBackground;
         protected UILabel rowLabel;
 
 
         // Background for each list item.
-        public UIPanel Background
+        public virtual UIPanel Background
         {
             get
             {
@@ -48,7 +48,7 @@ namespace BOB
             if (rowLabel != null)
             {
                 Background.width = width;
-                rowLabel.relativePosition = new Vector3(TextX, 6f);
+                rowLabel.relativePosition = new Vector2(TextX, 6f);
             }
         }
 

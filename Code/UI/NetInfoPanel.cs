@@ -83,7 +83,7 @@ namespace BOB
 			base.Setup(parentTransform, targetPrefabInfo);
 
 			// Add pack button.
-			UIButton packButton = UIControls.AddSmallerButton(this, 250f, TitleHeight + Margin, Translations.Translate("BOB_PNL_PKB"));
+			UIButton packButton = UIControls.EvenSmallerButton(this, RightX - 200f, TitleHeight + (Margin / 2f), Translations.Translate("BOB_PNL_PKB"));
 			packButton.eventClicked += (component, clickEvent) => PackPanelManager.Create();
 
 			// Populate target list and select target item.

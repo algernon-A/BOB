@@ -85,6 +85,7 @@ namespace BOB
         /// </summary>
         public virtual void UpdateSelection()
         {
+
         }
 
 

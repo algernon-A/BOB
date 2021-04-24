@@ -45,12 +45,12 @@ namespace BOB
 		protected const float PanelHeight = ListY + ListHeight + (Margin * 2f);
 		protected const float BigIconSize = 64f;
 
-
 		// Component locations.
 		protected const float ReplaceLabelY = ListY;
 		protected const float ReplaceY = ReplaceLabelY + 25f;
 		protected const float ReplaceAllY = ReplaceY + 30f;
 		protected const float RevertY = ReplaceAllY + 45f;
+
 
 		// Current selections.
 		protected PrefabInfo selectedPrefab;
@@ -58,6 +58,7 @@ namespace BOB
 		protected PrefabInfo replacementPrefab;
 
 		// Panel components.
+		protected UIPanel rightPanel;
 		protected UIFastList targetList, loadedList;
 		protected UILabel noPropsLabel;
 		protected UICheckBox hideVanilla, treeCheck, propCheck;
@@ -119,6 +120,9 @@ namespace BOB
 
 					// Select current replacement prefab.
 					loadedList.FindItem(effectivePrefab);
+
+					// Set current panel selection.
+					ReplacementPrefab = effectivePrefab;
 
 					// Set highlighting.
 					RenderOverlays.CurrentIndex = currentTargetItem.index;
@@ -251,7 +255,7 @@ namespace BOB
 			ListSetup(targetList);
 
 			// Loaded prop list.
-			UIPanel rightPanel = AddUIComponent<UIPanel>();
+			rightPanel = AddUIComponent<UIPanel>();
 			rightPanel.width = RightWidth;
 			rightPanel.height = ListHeight;
 			rightPanel.relativePosition = new Vector2(RightX, ListY);
@@ -433,7 +437,7 @@ namespace BOB
 		/// <summary>
 		/// Populates a fastlist with a filtered list of loaded trees or props.
 		/// </summary>
-		protected void LoadedList()
+		protected virtual void LoadedList()
 		{
 			Stopwatch stopWatch = new Stopwatch();
 			stopWatch.Start();
@@ -718,7 +722,7 @@ namespace BOB
 		/// Performs initial fastlist setup.
 		/// </summary>
 		/// <param name="fastList">Fastlist to set up</param>
-		private void ListSetup(UIFastList fastList)
+		protected void ListSetup(UIFastList fastList)
 		{
 			// Apperance, size and position.
 			fastList.backgroundSprite = "UnlockingPanel";

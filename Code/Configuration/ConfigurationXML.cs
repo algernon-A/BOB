@@ -13,6 +13,14 @@ namespace BOB
 		[XmlAttribute("version")]
 		public int version = 1;
 
+		[XmlArray("randomprops")]
+		[XmlArrayItem("randomprop")]
+		public List<BOBRandomPrefab> randomProps;
+
+		[XmlArray("randomtrees")]
+		[XmlArrayItem("randomtree")]
+		public List<BOBRandomPrefab> randomTrees;
+
 		[XmlArray("buildprops")]
 		[XmlArrayItem("buildprop")]
 		public List<BOBBuildingReplacement> allBuildingProps;
@@ -126,4 +134,31 @@ namespace BOB
 		[XmlIgnore]
 		public List<NetPropReference> references;
 	}
+
+
+	/// <summary>
+	/// Random prefab XML record.
+	/// </summary>
+	public class BOBRandomPrefab
+    {
+		[XmlAttribute("name")]
+		public string name = string.Empty;
+
+		[XmlArray("variations")]
+		[XmlArrayItem("variation")]
+		public List<BOBVariation> variations;
+    }
+
+
+	/// <summary>
+	/// Random prefab variation XML record.
+	/// </summary>
+	public class BOBVariation
+    {
+		[XmlAttribute("name")]
+		public string name;
+
+		[XmlAttribute("probability")]
+		public int probability;
+    }
 }

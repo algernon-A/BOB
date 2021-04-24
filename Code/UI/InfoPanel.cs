@@ -31,6 +31,7 @@ namespace BOB
 		// Panel components.
 		protected UIButton replaceAllButton, configButton;
 		protected BOBSlider probabilitySlider, angleSlider, xSlider, ySlider, zSlider;
+		private UICheckBox randomCheck;
 
 		// Button tooltips.
 		protected abstract string ReplaceAllTooltipKey { get; }
@@ -91,6 +92,14 @@ namespace BOB
 				// Set initial button states.
 				UpdateButtonStates();
 
+				// Normal/random toggle.
+				randomCheck = UIControls.LabelledCheckBox((UIComponent)(object)this, hideVanilla.relativePosition.x, hideVanilla.relativePosition.y + hideVanilla.height + (Margin / 2f), Translations.Translate("BOB_PNL_RSW"), 12f, 0.7f);
+				randomCheck.eventCheckChanged += RandomCheckChanged;
+
+				// Random settings button.
+				UIButton randomButton = UIControls.EvenSmallerButton(this, RightX - 200f, TitleHeight + Margin + 20f, Translations.Translate("BOB_PNL_RST"));
+				randomButton.eventClicked += (control, clickEvent) => BOBRandomPanel.Create();
+
 				Logging.Message("InfoPanel setup completed");
 			}
 			catch (Exception e)
@@ -138,6 +147,58 @@ namespace BOB
 					replaceAllButton.Enable();
 				}
 			}
+		}
+
+
+		/// <summary>
+		/// Populates a fastlist with a filtered list of loaded trees or props.
+		/// </summary>
+		protected override void LoadedList()
+        {
+			// Are we using random props?
+			if (randomCheck.isChecked)
+            {
+				// Yes - show only random trees/props.
+				if (IsTree)
+				{
+					// Trees.
+					loadedList.rowsData = new FastList<object>
+					{
+						m_buffer = PrefabLists.randomTrees.ToArray(),
+						m_size = PrefabLists.randomTrees.Count
+					};
+				}
+				else
+				{
+					// Props.
+					loadedList.rowsData = new FastList<object>
+					{
+						m_buffer = PrefabLists.randomProps.ToArray(),
+						m_size = PrefabLists.randomProps.Count
+					};
+				}
+
+				// Clear selections.
+				loadedList.selectedIndex = -1;
+				selectedPrefab = null;
+			}
+			else
+            {
+				// No - show normal loaded prefab list.
+				base.LoadedList();
+            }
+        }
+
+
+		/// <summary>
+		/// Random check event handler.
+		/// </summary>
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="isChecked">New checked state</param>
+		private void RandomCheckChanged(UIComponent control, bool isChecked)
+		{
+			// Regenerate loaded list.
+			LoadedList();
 		}
 
 

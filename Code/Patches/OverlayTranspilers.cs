@@ -111,7 +111,6 @@ namespace BOB
         {
             // ILCode local variable indexes.
             const int SurfaceMapping2Index = 9;
-            const int IVarIndex = 11;
             const int PropVarIndex = 16;
             const int PropPositionVarIndex = 23;
             const int TreeVarIndex = 31;
