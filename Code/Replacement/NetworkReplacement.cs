@@ -167,7 +167,7 @@ namespace BOB
 
 			// Record replacement prop.
 			replacements[network][target].replacementInfo = replacement;
-			replacements[network][target].replacement = replacement.name;
+			replacements[network][target].Replacement = replacement.name;
 
 			// Iterate through each lane.
 			for (int laneIndex = 0; laneIndex < network.m_lanes.Length; ++laneIndex)

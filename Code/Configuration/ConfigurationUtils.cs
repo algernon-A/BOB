@@ -343,10 +343,10 @@ namespace BOB
 				}
 
 				// Try to find replacement prefab.
-				PrefabInfo replacementPrefab = FindReplacementPrefab(replacement.replacement, replacement.tree);
+				PrefabInfo replacementPrefab = FindReplacementPrefab(replacement.Replacement, replacement.tree);
 				if (replacementPrefab == null)
 				{
-					Logging.Message("Couldn't find replacement prefab ", replacement.replacement);
+					Logging.Message("Couldn't find replacement prefab ", replacement.Replacement);
 					continue;
 				}
 
@@ -383,10 +383,10 @@ namespace BOB
 				}
 
 				// Try to find replacement prefab.
-				PrefabInfo replacementPrefab = FindReplacementPrefab(replacement.replacement, replacement.tree);
+				PrefabInfo replacementPrefab = FindReplacementPrefab(replacement.Replacement, replacement.tree);
 				if (replacementPrefab == null)
 				{
-					Logging.Message("Couldn't find replacement prefab ", replacement.replacement);
+					Logging.Message("Couldn't find replacement prefab ", replacement.Replacement);
 					continue;
 				}
 
@@ -414,10 +414,10 @@ namespace BOB
 				}
 
 				// Try to find replacement prefab.
-				PrefabInfo replacementPrefab = FindReplacementPrefab(replacement.replacement, replacement.tree);
+				PrefabInfo replacementPrefab = FindReplacementPrefab(replacement.Replacement, replacement.tree);
 				if (replacementPrefab == null)
 				{
-					Logging.Message("Couldn't find replacement prefab ", replacement.replacement);
+					Logging.Message("Couldn't find replacement prefab ", replacement.Replacement);
 					continue;
 				}
 
@@ -455,10 +455,10 @@ namespace BOB
 				}
 
 				// Try to find replacement prefab.
-				PrefabInfo replacementPrefab = FindReplacementPrefab(replacement.replacement, replacement.tree);
+				PrefabInfo replacementPrefab = FindReplacementPrefab(replacement.Replacement, replacement.tree);
 				if (replacementPrefab == null)
 				{
-					Logging.Message("Couldn't find replacement prefab ", replacement.replacement);
+					Logging.Message("Couldn't find replacement prefab ", replacement.Replacement);
 					continue;
 				}
 
@@ -495,10 +495,10 @@ namespace BOB
 				}
 
 				// Try to find replacement prefab.
-				PrefabInfo replacementPrefab = FindReplacementPrefab(replacement.replacement, replacement.tree);
+				PrefabInfo replacementPrefab = FindReplacementPrefab(replacement.Replacement, replacement.tree);
 				if (replacementPrefab == null)
 				{
-					Logging.Message("Couldn't find replacement prefab ", replacement.replacement);
+					Logging.Message("Couldn't find replacement prefab ", replacement.Replacement);
 					continue;
 				}
 

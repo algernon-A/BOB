@@ -108,7 +108,11 @@ namespace BOB
 		public string target = string.Empty;
 
 		[XmlAttribute("replacement")]
-		public string replacement = string.Empty;
+		public string Replacement
+		{
+			get => replacementInfo?.name ?? replacementName ?? string.Empty;
+			set => replacementName = value;
+		}
 
 		[XmlAttribute("angle")]
 		public float angle = 0f;
@@ -124,6 +128,9 @@ namespace BOB
 
 		[XmlAttribute("probability")]
 		public int probability = 100;
+
+		[XmlIgnore]
+		private string replacementName;
 
 		[XmlIgnore]
 		public PrefabInfo replacementInfo;

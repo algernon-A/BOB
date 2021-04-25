@@ -214,7 +214,7 @@ namespace BOB
 
 			// Record replacement prop.
 			replacements[building][target].replacementInfo = replacement;
-			replacements[building][target].replacement = replacement.name;
+			replacements[building][target].Replacement = replacement.name;
 
 			// Iterate through each prop in building.
 			for (int propIndex = 0; propIndex < building.m_props.Length; ++propIndex)
