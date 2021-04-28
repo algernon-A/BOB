@@ -118,7 +118,7 @@ namespace BOB
 				}
 				else
                 {
-					revertButton.tooltip = "Revert is not available as there is no active replacement for this item";
+					revertButton.tooltip = Translations.Translate("BOB_PNL_REV_TIP");
                 }
 
 				// Replacement requires a valid replacement selection.

@@ -23,6 +23,7 @@
     <Translation ID="BOB_PNL_RTT" String="Map trees" />
     <Translation ID="BOB_PNL_RTP" String="Map props" />
     <Translation ID="BOB_PNL_REV" String="Revert" />
+    <Translation ID="BOB_PNL_REV_TIP" String="Revert is not available as there is no active replacement for this item" />
     <Translation ID="BOB_PNL_PKB" String="Replacement packs" />
     <Translation ID="BOB_PNL_PRB" String="Probability" />
     <Translation ID="BOB_PNL_ANG" String="Angle" />
