@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using ColossalFramework;
 using ColossalFramework.UI;
@@ -9,7 +10,7 @@ namespace BOB
 	/// <summary>
 	/// Abstract base class for all BOB tree/prop replacement panels.
 	/// </summary>
-	public abstract class BOBInfoPanelBase : UIPanel
+	internal abstract class BOBInfoPanelBase : UIPanel
 	{
 		// Display order state.
 		internal enum OrderBy
@@ -61,7 +62,7 @@ namespace BOB
 		protected UICheckBox hideVanilla, treeCheck, propCheck;
 		protected UITextField nameFilter;
 		protected UIButton replaceButton, revertButton;
-		private UIButton targetNameButton, loadedNameButton;
+		private readonly UIButton targetNameButton, loadedNameButton;
 
 		// Search settings.
 		protected int targetSearchStatus, loadedSearchStatus;
@@ -78,19 +79,6 @@ namespace BOB
 
 		// Replace button atlas.
 		protected abstract UITextureAtlas ReplaceAtlas { get; }
-
-
-
-		/// <summary>
-		/// Populates the target fastlist with a list of target-specific trees or props.
-		/// </summary>
-		protected abstract void TargetList();
-
-
-		/// <summary>
-		/// Updates button states (enabled/disabled) according to current control states.
-		/// </summary>
-		protected abstract void UpdateButtonStates();
 
 
 		/// <summary>
@@ -173,6 +161,125 @@ namespace BOB
 
 
 		/// <summary>
+		/// Constructor.
+		/// </summary>
+		internal BOBInfoPanelBase()
+        {
+			try
+			{
+				// Basic behaviour.
+				autoLayout = false;
+				canFocus = true;
+				isInteractive = true;
+
+				// Appearance.
+				backgroundSprite = "MenuPanel2";
+				opacity = 0.8f;
+
+				// Size.
+				width = PanelWidth;
+				height = PanelHeight;
+
+				// Position - are we restoring the previous position?.
+				if (ModSettings.rememberPosition && (InfoPanelManager.lastX != 0f || InfoPanelManager.lastY != 0f))
+				{
+					// 'Remember default position' is active and at least one of X and Y positions is non-zero.
+					relativePosition = new Vector2(InfoPanelManager.lastX, InfoPanelManager.lastY);
+				}
+				else
+				{
+					// Default position - centre in screen.
+					relativePosition = new Vector2(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
+				}
+
+				// Drag bar.
+				UIDragHandle dragHandle = AddUIComponent<UIDragHandle>();
+				dragHandle.width = this.width - 50f;
+				dragHandle.height = this.height;
+				dragHandle.relativePosition = Vector3.zero;
+				dragHandle.target = this;
+
+				// Close button.
+				UIButton closeButton = AddUIComponent<UIButton>();
+				closeButton.relativePosition = new Vector2(width - 35, 2);
+				closeButton.normalBgSprite = "buttonclose";
+				closeButton.hoveredBgSprite = "buttonclosehover";
+				closeButton.pressedBgSprite = "buttonclosepressed";
+				closeButton.eventClick += (component, clickEvent) => InfoPanelManager.Close();
+
+
+				// Order buttons.
+				targetNameButton = ArrowButton(this, 30f, FilterY);
+				loadedNameButton = ArrowButton(this, RightX + 10f, FilterY);
+
+				targetNameButton.eventClicked += SortTargets;
+				loadedNameButton.eventClicked += SortLoaded;
+
+				// Default is name ascending.
+				SetFgSprites(targetNameButton, "IconUpArrow2");
+				SetFgSprites(loadedNameButton, "IconUpArrow2");
+
+				// Target prop list.
+				UIPanel leftPanel = AddUIComponent<UIPanel>();
+				leftPanel.width = LeftWidth;
+				leftPanel.height = ListHeight;
+				leftPanel.relativePosition = new Vector2(Margin, ListY);
+				targetList = UIFastList.Create<UIPrefabPropRow>(leftPanel);
+				ListSetup(targetList);
+
+				// Loaded prop list.
+				rightPanel = AddUIComponent<UIPanel>();
+				rightPanel.width = RightWidth;
+				rightPanel.height = ListHeight;
+				rightPanel.relativePosition = new Vector2(RightX, ListY);
+				loadedList = UIFastList.Create<UILoadedPropRow>(rightPanel);
+				ListSetup(loadedList);
+
+				// Tree/Prop checkboxes.
+				propCheck = IconToggleCheck(this, Margin, TitleHeight + Margin, "bob_props3", "BOB_PNL_PRP");
+				treeCheck = IconToggleCheck(this, Margin + propCheck.width, TitleHeight + Margin, "bob_trees_small", "BOB_PNL_TRE");
+				propCheck.isChecked = !InitialTreeCheckedState;
+				treeCheck.isChecked = InitialTreeCheckedState;
+				propCheck.eventCheckChanged += PropCheckChanged;
+				treeCheck.eventCheckChanged += TreeCheckChanged;
+
+				// 'No props' label (starts hidden).
+				noPropsLabel = leftPanel.AddUIComponent<UILabel>();
+				noPropsLabel.relativePosition = new Vector2(Margin, Margin);
+				noPropsLabel.Hide();
+
+				// Replace text label.
+				UILabel replaceLabel = AddUIComponent<UILabel>();
+				replaceLabel.text = Translations.Translate("BOB_PNL_REP");
+				replaceLabel.relativePosition = new Vector2(MidControlX, ReplaceLabelY);
+
+				// Replace button.
+				replaceButton = AddIconButton(this, MidControlX, ReplaceY, BigIconSize, ReplaceTooltipKey, ReplaceAtlas);
+				replaceButton.eventClicked += Replace;
+
+				// Revert button.
+				revertButton = UIControls.AddSmallerButton(this, MidControlX, RevertY, Translations.Translate("BOB_PNL_REV"), MidControlWidth);
+				revertButton.eventClicked += Revert;
+
+				// Name filter.
+				nameFilter = UIControls.SmallLabelledTextField(this, width - 200f - Margin, TitleHeight + Margin, Translations.Translate("BOB_FIL_NAME"));
+				// Event handlers for name filter textbox.
+				nameFilter.eventTextChanged += (control, text) => LoadedList();
+				nameFilter.eventTextSubmitted += (control, text) => LoadedList();
+
+				// Vanilla filter.
+				hideVanilla = UIControls.LabelledCheckBox((UIComponent)(object)this, nameFilter.relativePosition.x, nameFilter.relativePosition.y + nameFilter.height + (Margin / 2f), Translations.Translate("BOB_PNL_HDV"), 12f, 0.7f);
+				hideVanilla.isChecked = ModSettings.hideVanilla;
+				hideVanilla.eventCheckChanged += VanillaCheckChanged;
+			}
+			catch (Exception e)
+			{
+				Logging.LogException(e, "exception setting up InfoPanelBase");
+			}
+		}
+
+
+		/// <summary>
 		/// Performs initial setup 
 		/// </summary>
 		/// <param name="targetPrefabInfo">Currently selected target prefab</param>
@@ -181,116 +288,23 @@ namespace BOB
 			// Set target reference.
 			selectedPrefab = targetPrefabInfo;
 
-			// Basic behaviour.
-			autoLayout = false;
-			canFocus = true;
-			isInteractive = true;
-
-			// Appearance.
-			backgroundSprite = "MenuPanel2";
-			opacity = 0.8f;
-
-			// Size.
-			width = PanelWidth;
-			height = PanelHeight;
-
-			// Position - are we restoring the previous position?.
-			if (ModSettings.rememberPosition && (InfoPanelManager.lastX != 0f || InfoPanelManager.lastY != 0f))
-			{
-				// 'Remember default position' is active and at least one of X and Y positions is non-zero.
-				relativePosition = new Vector2(InfoPanelManager.lastX, InfoPanelManager.lastY);
-			}
-			else
-			{
-				// Default position - centre in screen.
-				relativePosition = new Vector2(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
-			}
-
-			// Drag bar.
-			UIDragHandle dragHandle = AddUIComponent<UIDragHandle>();
-			dragHandle.width = this.width - 50f;
-			dragHandle.height = this.height;
-			dragHandle.relativePosition = Vector3.zero;
-			dragHandle.target = this;
-
 			// Title label.
 			UILabel titleLabel = AddUIComponent<UILabel>();
 			titleLabel.text = Translations.Translate("BOB_NAM") + ": " + GetDisplayName(targetPrefabInfo.name);
 			titleLabel.relativePosition = new Vector2(50f, (TitleHeight - titleLabel.height) / 2f);
-
-			// Close button.
-			UIButton closeButton = AddUIComponent<UIButton>();
-			closeButton.relativePosition = new Vector2(width - 35, 2);
-			closeButton.normalBgSprite = "buttonclose";
-			closeButton.hoveredBgSprite = "buttonclosehover";
-			closeButton.pressedBgSprite = "buttonclosepressed";
-			closeButton.eventClick += (component, clickEvent) => InfoPanelManager.Close();
-
-
-			// Order buttons.
-			targetNameButton = ArrowButton(this, 30f, FilterY);
-			loadedNameButton = ArrowButton(this, RightX + 10f, FilterY);
-
-			targetNameButton.eventClicked += SortTargets;
-			loadedNameButton.eventClicked += SortLoaded;
-
-			// Default is name ascending.
-			SetFgSprites(targetNameButton, "IconUpArrow2");
-			SetFgSprites(loadedNameButton, "IconUpArrow2");
-
-			// Target prop list.
-			UIPanel leftPanel = AddUIComponent<UIPanel>();
-			leftPanel.width = LeftWidth;
-			leftPanel.height = ListHeight;
-			leftPanel.relativePosition = new Vector2(Margin, ListY);
-			targetList = UIFastList.Create<UIPrefabPropRow>(leftPanel);
-			ListSetup(targetList);
-
-			// Loaded prop list.
-			rightPanel = AddUIComponent<UIPanel>();
-			rightPanel.width = RightWidth;
-			rightPanel.height = ListHeight;
-			rightPanel.relativePosition = new Vector2(RightX, ListY);
-			loadedList = UIFastList.Create<UILoadedPropRow>(rightPanel);
-			ListSetup(loadedList);
-
-			// Tree/Prop checkboxes.
-			propCheck = IconToggleCheck(this, Margin, TitleHeight + Margin, "bob_props3", "BOB_PNL_PRP");
-			treeCheck = IconToggleCheck(this, Margin + propCheck.width, TitleHeight + Margin, "bob_trees_small", "BOB_PNL_TRE");
-			propCheck.isChecked = !InitialTreeCheckedState;
-			treeCheck.isChecked = InitialTreeCheckedState;
-			propCheck.eventCheckChanged += PropCheckChanged;
-			treeCheck.eventCheckChanged += TreeCheckChanged;
-
-			// 'No props' label (starts hidden).
-			noPropsLabel = leftPanel.AddUIComponent<UILabel>();
-			noPropsLabel.relativePosition = new Vector2(Margin, Margin);
-			noPropsLabel.Hide();
-
-			// Replace text label.
-			UILabel replaceLabel = AddUIComponent<UILabel>();
-			replaceLabel.text = Translations.Translate("BOB_PNL_REP");
-			replaceLabel.relativePosition = new Vector2(MidControlX, ReplaceLabelY);
-
-			// Replace button.
-			replaceButton = AddIconButton(this, MidControlX, ReplaceY, BigIconSize, ReplaceTooltipKey, ReplaceAtlas);
-			replaceButton.eventClicked += Replace;
-
-			// Revert button.
-			revertButton = UIControls.AddSmallerButton(this, MidControlX, RevertY, Translations.Translate("BOB_PNL_REV"), MidControlWidth);
-			revertButton.eventClicked += Revert;
-
-			// Name filter.
-			nameFilter = UIControls.SmallLabelledTextField(this, width - 200f - Margin, TitleHeight + Margin, Translations.Translate("BOB_FIL_NAME"));
-			// Event handlers for name filter textbox.
-			nameFilter.eventTextChanged += (control, text) => LoadedList();
-			nameFilter.eventTextSubmitted += (control, text) => LoadedList();
-
-			// Vanilla filter.
-			hideVanilla = UIControls.LabelledCheckBox((UIComponent)(object)this, nameFilter.relativePosition.x, nameFilter.relativePosition.y + nameFilter.height + (Margin / 2f), Translations.Translate("BOB_PNL_HDV"), 12f, 0.7f);
-			hideVanilla.isChecked = ModSettings.hideVanilla;
-			hideVanilla.eventCheckChanged += VanillaCheckChanged;
 		}
+
+
+		/// <summary>
+		/// Populates the target fastlist with a list of target-specific trees or props.
+		/// </summary>
+		protected abstract void TargetList();
+
+
+		/// <summary>
+		/// Updates button states (enabled/disabled) according to current control states.
+		/// </summary>
+		protected abstract void UpdateButtonStates();
 
 
 		/// <summary>

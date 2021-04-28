@@ -10,7 +10,7 @@ namespace BOB
 	/// <summary>
 	/// BOB map tree/prop replacement panel.
 	/// </summary>
-	public class BOBMapInfoPanel : BOBInfoPanelBase
+	internal class BOBMapInfoPanel : BOBInfoPanelBase
 	{
 		// Button labels.
 		protected override string ReplaceTooltipKey => "BOB_PNL_RTT";

@@ -10,7 +10,7 @@ namespace BOB
 	/// <summary>
 	/// BOB building tree/prop replacement panel.
 	/// </summary>
-	public class BOBBuildingInfoPanel : BOBInfoPanel
+	internal class BOBBuildingInfoPanel : BOBInfoPanel
 	{
 		// Current selection reference.
 		BuildingInfo currentBuilding;

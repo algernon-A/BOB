@@ -1,5 +1,4 @@
-﻿using System;
-using ColossalFramework.UI;
+﻿using ColossalFramework.UI;
 using UnityEngine;
 
 
@@ -8,7 +7,7 @@ namespace BOB
 	/// <summary>
 	/// Abstract class for building and network BOB tree/prop replacement panels.
 	/// </summary>
-	public abstract class BOBInfoPanel : BOBInfoPanelBase
+	internal abstract class BOBInfoPanel : BOBInfoPanelBase
 	{
 		// Controls - align bottom with bottom of lists, and work up.
 		private const float SliderHeight = 38f;
@@ -31,7 +30,7 @@ namespace BOB
 		// Panel components.
 		protected UIButton replaceAllButton, configButton;
 		protected BOBSlider probabilitySlider, angleSlider, xSlider, ySlider, zSlider;
-		private UICheckBox randomCheck;
+		private readonly UICheckBox randomCheck;
 
 		// Button tooltips.
 		protected abstract string ReplaceAllTooltipKey { get; }
@@ -44,67 +43,50 @@ namespace BOB
 
 
 		/// <summary>
-		/// Performs initial setup 
+		/// Constructor.
 		/// </summary>
-		/// <param name="targetPrefabInfo">Currently selected target prefab</param>
-		internal override void Setup(PrefabInfo targetPrefabInfo)
-		{
-			try
+		internal BOBInfoPanel()
+        {
+			// Replace all button.
+			replaceAllButton = AddIconButton(this, MidControlX + replaceButton.width, ReplaceY, BigIconSize, ReplaceAllTooltipKey, ReplaceAllAtlas);
+			replaceAllButton.eventClicked += ReplaceAll;
+
+			// Probability.
+			UIPanel probabilityPanel = Sliderpanel(this, MidControlX, ProbabilityY, SliderHeight);
+			probabilitySlider = AddBOBSlider(probabilityPanel, 0f, "BOB_PNL_PRB", 0, 100, 1);
+			probabilitySlider.TrueValue = 100f;
+			probabilitySlider.LimitToVisible = true;
+
+			// Angle.
+			UIPanel anglePanel = Sliderpanel(this, MidControlX, AngleY, SliderHeight);
+			angleSlider = AddBOBSlider(anglePanel, 0f, "BOB_PNL_ANG", -180, 180, 1);
+
+			// Offset panel.
+			UIPanel offsetPanel = Sliderpanel(this, MidControlX, OffsetPanelY, OffsetPanelHeight);
+			UILabel offsetLabel = UIControls.AddLabel(offsetPanel, 0f, OffsetLabelY, Translations.Translate("BOB_PNL_OFF"));
+			offsetLabel.textAlignment = UIHorizontalAlignment.Center;
+			while (offsetLabel.width > MidControlWidth)
 			{
-				// Perform basic panel setup.
-				base.Setup(targetPrefabInfo);
-
-				Logging.Message("commencing InfoPanel setup");
-
-				// Replace all button.
-				replaceAllButton = AddIconButton(this, MidControlX + replaceButton.width, ReplaceY, BigIconSize, ReplaceAllTooltipKey, ReplaceAllAtlas);
-				replaceAllButton.eventClicked += ReplaceAll;
-
-				// Probability.
-				UIPanel probabilityPanel = Sliderpanel(this, MidControlX, ProbabilityY, SliderHeight);
-				probabilitySlider = AddBOBSlider(probabilityPanel, 0f, "BOB_PNL_PRB", 0, 100, 1);
-				probabilitySlider.TrueValue = 100f;
-				probabilitySlider.LimitToVisible = true;
-
-				// Angle.
-				UIPanel anglePanel = Sliderpanel(this, MidControlX, AngleY, SliderHeight);
-				angleSlider = AddBOBSlider(anglePanel, 0f, "BOB_PNL_ANG", -180, 180, 1);
-
-				Logging.Message("Creating offset panel");
-
-				// Offset panel.
-				UIPanel offsetPanel = Sliderpanel(this, MidControlX, OffsetPanelY, OffsetPanelHeight);
-				UILabel offsetLabel = UIControls.AddLabel(offsetPanel, 0f, OffsetLabelY, Translations.Translate("BOB_PNL_OFF"));
-				offsetLabel.textAlignment = UIHorizontalAlignment.Center;
-				while (offsetLabel.width > MidControlWidth)
-                {
-					offsetLabel.textScale -= 0.05f;
-					offsetLabel.PerformLayout();
-				}
-				offsetLabel.relativePosition = new Vector2((offsetPanel.width - offsetLabel.width) / 2f, OffsetLabelY);
-
-				// Offset sliders.
-				xSlider = AddBOBSlider(offsetPanel, XOffsetY, "BOB_PNL_XOF", -8f, 8f, 0.01f);
-				ySlider = AddBOBSlider(offsetPanel, YOffsetY, "BOB_PNL_YOF", -8f, 8f, 0.01f);
-				zSlider = AddBOBSlider(offsetPanel, ZOffsetY, "BOB_PNL_ZOF", -8f, 8f, 0.01f);
-
-				// Set initial button states.
-				UpdateButtonStates();
-
-				// Normal/random toggle.
-				randomCheck = UIControls.LabelledCheckBox((UIComponent)(object)this, hideVanilla.relativePosition.x, hideVanilla.relativePosition.y + hideVanilla.height + (Margin / 2f), Translations.Translate("BOB_PNL_RSW"), 12f, 0.7f);
-				randomCheck.eventCheckChanged += RandomCheckChanged;
-
-				// Random settings button.
-				UIButton randomButton = UIControls.EvenSmallerButton(this, RightX - 200f, TitleHeight + Margin + 20f, Translations.Translate("BOB_PNL_RST"));
-				randomButton.eventClicked += (control, clickEvent) => BOBRandomPanel.Create();
-
-				Logging.Message("InfoPanel setup completed");
+				offsetLabel.textScale -= 0.05f;
+				offsetLabel.PerformLayout();
 			}
-			catch (Exception e)
-			{
-				Logging.LogException(e, "exception setting up InfoPanel");
-			}
+			offsetLabel.relativePosition = new Vector2((offsetPanel.width - offsetLabel.width) / 2f, OffsetLabelY);
+
+			// Offset sliders.
+			xSlider = AddBOBSlider(offsetPanel, XOffsetY, "BOB_PNL_XOF", -8f, 8f, 0.01f);
+			ySlider = AddBOBSlider(offsetPanel, YOffsetY, "BOB_PNL_YOF", -8f, 8f, 0.01f);
+			zSlider = AddBOBSlider(offsetPanel, ZOffsetY, "BOB_PNL_ZOF", -8f, 8f, 0.01f);
+
+			// Set initial button states.
+			UpdateButtonStates();
+
+			// Normal/random toggle.
+			randomCheck = UIControls.LabelledCheckBox((UIComponent)(object)this, hideVanilla.relativePosition.x, hideVanilla.relativePosition.y + hideVanilla.height + (Margin / 2f), Translations.Translate("BOB_PNL_RSW"), 12f, 0.7f);
+			randomCheck.eventCheckChanged += RandomCheckChanged;
+
+			// Random settings button.
+			UIButton randomButton = UIControls.EvenSmallerButton(this, RightX - 200f, TitleHeight + Margin + 20f, Translations.Translate("BOB_PNL_RST"));
+			randomButton.eventClicked += (control, clickEvent) => BOBRandomPanel.Create();
 		}
 
 

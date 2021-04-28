@@ -9,7 +9,7 @@ namespace BOB
 	/// <summary>
 	/// BOB network tree/prop replacement panel.
 	/// </summary>
-	public class BOBNetInfoPanel : BOBInfoPanel
+	internal class BOBNetInfoPanel : BOBInfoPanel
 	{
 		// Current selection reference.
 		NetInfo currentNet;
