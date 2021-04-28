@@ -64,6 +64,7 @@
     <Compile Include="Code\Patches\RuiningPatches.cs" />
     <Compile Include="Code\Replacement\MapPropReplacement.cs" />
     <Compile Include="Code\Settings\OptionsPanelTabs\RuiningOptions.cs" />
+    <Compile Include="Code\UI\BOBSlider.cs" />
     <Compile Include="Code\UI\MapPanel.cs" />
     <Compile Include="Code\UI\RandomPanel.cs" />
     <Compile Include="Code\UI\UIFastList\UIRandomPropRow.cs" />
