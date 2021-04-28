@@ -175,15 +175,13 @@ namespace BOB
 		/// <summary>
 		/// Performs initial setup 
 		/// </summary>
-		/// <param name="parentTransform">Parent transform</param>
 		/// <param name="targetPrefabInfo">Currently selected target prefab</param>
-		internal virtual void Setup(Transform parentTransform, PrefabInfo targetPrefabInfo)
+		internal virtual void Setup(PrefabInfo targetPrefabInfo)
 		{
 			// Set target reference.
 			selectedPrefab = targetPrefabInfo;
 
 			// Basic behaviour.
-			transform.parent = parentTransform;
 			autoLayout = false;
 			canFocus = true;
 			isInteractive = true;

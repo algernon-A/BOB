@@ -63,7 +63,8 @@ namespace BOB
 					}
 
 					// Set up panel with selected prefab.
-					Panel.Setup(uiGameObject.transform.parent, selectedPrefab);
+					Panel.transform.parent = uiGameObject.transform.parent;
+					Panel.Setup(selectedPrefab);
 				}
 			}
 			catch (Exception e)

@@ -46,14 +46,13 @@ namespace BOB
 		/// <summary>
 		/// Performs initial setup 
 		/// </summary>
-		/// <param name="parentTransform">Parent transform</param>
 		/// <param name="targetPrefabInfo">Currently selected target prefab</param>
-		internal override void Setup(Transform parentTransform, PrefabInfo targetPrefabInfo)
+		internal override void Setup(PrefabInfo targetPrefabInfo)
 		{
 			try
 			{
 				// Perform basic panel setup.
-				base.Setup(parentTransform, targetPrefabInfo);
+				base.Setup(targetPrefabInfo);
 
 				Logging.Message("commencing InfoPanel setup");
 

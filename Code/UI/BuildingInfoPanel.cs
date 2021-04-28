@@ -109,18 +109,13 @@ namespace BOB
 		/// </summary>
 		/// <param name="parentTransform">Parent transform</param>
 		/// <param name="targetPrefabInfo">Currently selected target prefab</param>
-		internal override void Setup(Transform parentTransform, PrefabInfo targetPrefabInfo)
+		internal override void Setup(PrefabInfo targetPrefabInfo)
 		{
-			System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
-			stopwatch.Start();
-
 			// Set target reference.
 			currentBuilding = targetPrefabInfo as BuildingInfo;
 
 			// Base setup.
-			base.Setup(parentTransform, targetPrefabInfo);
-
-			Logging.Message("base setup time ", stopwatch.ElapsedMilliseconds.ToString());
+			base.Setup(targetPrefabInfo);
 
 			// Add group checkbox.
 			indCheck = UIControls.LabelledCheckBox(this, 155f, TitleHeight + Margin, Translations.Translate("BOB_PNL_IND"), 12f, 0.7f);
@@ -208,14 +203,9 @@ namespace BOB
 			// Populate target list and select target item.
 			TargetList();
 
-			Logging.Message("building setup time ", stopwatch.ElapsedMilliseconds.ToString());
-
 			// Apply Harmony rendering patches.
 			RenderOverlays.CurrentBuilding = selectedPrefab as BuildingInfo;
 			Patcher.PatchBuildingOverlays(true);
-
-			stopwatch.Stop();
-			Logging.Message("Harmony patching time ", stopwatch.ElapsedMilliseconds.ToString());
 		}
 
 

@@ -72,15 +72,14 @@ namespace BOB
 		/// <summary>
 		/// Performs initial setup 
 		/// </summary>
-		/// <param name="parentTransform">Parent transform</param>
 		/// <param name="targetPrefabInfo">Currently selected target prefab</param>
-		internal override void Setup(Transform parentTransform, PrefabInfo targetPrefabInfo)
+		internal override void Setup(PrefabInfo targetPrefabInfo)
 		{
 			// Set target reference.
 			currentNet = targetPrefabInfo as NetInfo;
 
 			// Base setup.
-			base.Setup(parentTransform, targetPrefabInfo);
+			base.Setup(targetPrefabInfo);
 
 			// Add pack button.
 			UIButton packButton = UIControls.EvenSmallerButton(this, RightX - 200f, TitleHeight + (Margin / 2f), Translations.Translate("BOB_PNL_PKB"));
