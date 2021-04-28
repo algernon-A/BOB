@@ -1,10 +1,7 @@
-﻿using System.Linq;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using ColossalFramework;
 using ColossalFramework.UI;
-
-using System.Diagnostics;
 
 
 namespace BOB
@@ -182,9 +179,6 @@ namespace BOB
 		/// <param name="targetPrefabInfo">Currently selected target prefab</param>
 		internal virtual void Setup(Transform parentTransform, PrefabInfo targetPrefabInfo)
 		{
-			Stopwatch stopWatch = new Stopwatch();
-			stopWatch.Start();
-
 			// Set target reference.
 			selectedPrefab = targetPrefabInfo;
 
@@ -298,9 +292,6 @@ namespace BOB
 			hideVanilla = UIControls.LabelledCheckBox((UIComponent)(object)this, nameFilter.relativePosition.x, nameFilter.relativePosition.y + nameFilter.height + (Margin / 2f), Translations.Translate("BOB_PNL_HDV"), 12f, 0.7f);
 			hideVanilla.isChecked = ModSettings.hideVanilla;
 			hideVanilla.eventCheckChanged += VanillaCheckChanged;
-
-			stopWatch.Stop();
-			Logging.Message("base panel setup time ", stopWatch.ElapsedMilliseconds.ToString());
 		}
 
 
@@ -439,10 +430,6 @@ namespace BOB
 		/// </summary>
 		protected virtual void LoadedList()
 		{
-			Stopwatch stopWatch = new Stopwatch();
-			stopWatch.Start();
-
-
 			// List of prefabs that have passed filtering.
 			List<PrefabInfo> list = new List<PrefabInfo>();
 
@@ -520,9 +507,6 @@ namespace BOB
 				// No current selection.
 				loadedList.selectedIndex = -1;
 			}
-
-			stopWatch.Stop();
-			Logging.Message("replacement list setup time ", stopWatch.ElapsedMilliseconds.ToString());
 		}
 
 
