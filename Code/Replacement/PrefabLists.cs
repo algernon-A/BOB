@@ -176,28 +176,31 @@ namespace BOB
 			// Return list.
 			List<BOBRandomPrefab> serializedProps = new List<BOBRandomPrefab>();
 
-			// Iterate through random props and add to list.
-			foreach (PropInfo randomProp in randomProps)
+			if (randomProps != null)
 			{
-				// Serialize prefab record.
-				BOBRandomPrefab serializedPrefab = new BOBRandomPrefab
+				// Iterate through random props and add to list.
+				foreach (PropInfo randomProp in randomProps)
 				{
-					name = randomProp.name,
-					variations = new List<BOBVariation>()
-				};
-
-				// Add variations.
-				foreach (PropInfo.Variation variation in randomProp.m_variations)
-                {
-					serializedPrefab.variations.Add(new BOBVariation
+					// Serialize prefab record.
+					BOBRandomPrefab serializedPrefab = new BOBRandomPrefab
 					{
-						name = variation.m_finalProp.name,
-						probability = variation.m_probability
-					});
-                }
+						name = randomProp.name,
+						variations = new List<BOBVariation>()
+					};
 
-				// Add serialized prefab to list.
-				serializedProps.Add(serializedPrefab);
+					// Add variations.
+					foreach (PropInfo.Variation variation in randomProp.m_variations)
+					{
+						serializedPrefab.variations.Add(new BOBVariation
+						{
+							name = variation.m_finalProp.name,
+							probability = variation.m_probability
+						});
+					}
+
+					// Add serialized prefab to list.
+					serializedProps.Add(serializedPrefab);
+				}
 			}
 
 			return serializedProps;
@@ -213,28 +216,31 @@ namespace BOB
 			// Return list.
 			List<BOBRandomPrefab> serializedTrees = new List<BOBRandomPrefab>();
 
-			// Iterate through random props and add to list.
-			foreach (TreeInfo randomTree in randomTrees)
+			if (randomTrees != null)
 			{
-				// Serialize prefab record.
-				BOBRandomPrefab serializedPrefab = new BOBRandomPrefab
+				// Iterate through random props and add to list.
+				foreach (TreeInfo randomTree in randomTrees)
 				{
-					name = randomTree.name,
-					variations = new List<BOBVariation>()
-				};
-
-				// Add variations.
-				foreach (TreeInfo.Variation variation in randomTree.m_variations)
-				{
-					serializedPrefab.variations.Add(new BOBVariation
+					// Serialize prefab record.
+					BOBRandomPrefab serializedPrefab = new BOBRandomPrefab
 					{
-						name = variation.m_finalTree.name,
-						probability = variation.m_probability
-					});
-				}
+						name = randomTree.name,
+						variations = new List<BOBVariation>()
+					};
 
-				// Add serialized prefab to list.
-				serializedTrees.Add(serializedPrefab);
+					// Add variations.
+					foreach (TreeInfo.Variation variation in randomTree.m_variations)
+					{
+						serializedPrefab.variations.Add(new BOBVariation
+						{
+							name = variation.m_finalTree.name,
+							probability = variation.m_probability
+						});
+					}
+
+					// Add serialized prefab to list.
+					serializedTrees.Add(serializedPrefab);
+				}
 			}
 
 			return serializedTrees;
