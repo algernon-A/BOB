@@ -55,6 +55,9 @@ namespace BOB
 
 				// Set slider display value - clamped to slider extents.
 				this.value = visibleValue;
+
+				// Force update.
+				OnValueChanged();
 			}
 		}
 
