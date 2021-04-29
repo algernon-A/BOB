@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Language UniqueName="pl" ReadableName="Polski">
+  <Translations>
+    <Translation ID="BOB_NAM" String="BOB: Zamiana drzew i rekwizytów" />
+    <Translation ID="BOB_DESC" String="W BUDOWIE: zamienia drzewa i rekwizyty." />
+    <Translation ID="TRN_CHOICE" String="Wybierz język" />
+    <Translation ID="TRN_SYS" String="Użyj języka gry" />
+    <Translation ID="MES_CLS" String="Zamknij" />
+    <Translation ID="MES_DSA" String="Nie pokazuj więcej" />
+    <Translation ID="BOB_MBX_OK" String="OK" />
+    <Translation ID="BOB_ROW_WAS" String="było" />
+    <Translation ID="BOB_PNL_NOP" String="Nie znaleziono rekwizytów" />
+    <Translation ID="BOB_PNL_NOT" String="Nie znaleziono drzew" />
+    <Translation ID="BOB_PNL_TRE" String="Drzewa" />
+    <Translation ID="BOB_PNL_PRP" String="Rekwizyty" />
+    <Translation ID="BOB_PNL_IND" String="Pokaż indywidualne rekwizyty" />
+    <Translation ID="BOB_PNL_HDV" String="Ukryj standardowe" />
+    <Translation ID="BOB_PNL_REP" String="Zamień" />
+    <Translation ID="BOB_PNL_RTB" String="Te budynki" />
+    <Translation ID="BOB_PNL_RAB" String="Wszystkie budynki" />
+    <Translation ID="BOB_PNL_RTN" String="Te sieci" />
+    <Translation ID="BOB_PNL_RAN" String="Wszystkie sieci" />
+    <Translation ID="BOB_PNL_RTT" String="Drzewa na mapie" />
+    <Translation ID="BOB_PNL_RTP" String="Rekwizyty na mapie" />
+    <Translation ID="BOB_PNL_REV" String="Cofnij" />
+    <Translation ID="BOB_PNL_PKB" String="Paczki zastępcze" />
+    <Translation ID="BOB_PNL_PRB" String="Prawdopodobieństwo" />
+    <Translation ID="BOB_PNL_ANG" String="Kąt" />
+    <Translation ID="BOB_PNL_OFF" String="Przesunięcie" />
+    <Translation ID="BOB_PNL_XOF" String="X" />
+    <Translation ID="BOB_PNL_YOF" String="Y" />
+    <Translation ID="BOB_PNL_ZOF" String="Z" />
+    <Translation ID="BOB_PNL_SUB" String="Budynek podrzędny" />
+    <Translation ID="BOB_SPR_SBL" String="Zmiana jest obecnie stosowana w tych budynkach" />
+    <Translation ID="BOB_SPR_ABL" String="Zmiana jest obecnie stosowana we wszystkich budynkach" />
+    <Translation ID="BOB_SPR_SNT" String="Zmiana jest obecnie stosowana w tych sieciach" />
+    <Translation ID="BOB_SPR_ANT" String="Zmiana jest obecnie stosowana we wszystkich sieciach" />
+    <Translation ID="BOB_SPR_PCK" String="Paczka zastępcza jest obecnie zastosowana" />
+    <Translation ID="BOB_PCK_APP" String="Zastosuj paczkę" />
+    <Translation ID="BOB_PCK_APP_A" String="Stosuje wybraną paczkę zastępczą" />
+    <Translation ID="BOB_PCK_APP_C" String="Paczka nie może być zastosowana, ponieważ istnieje konflikt z inną zastosowaną paczką" />
+    <Translation ID="BOB_PCK_APP_I" String="Paczka jest obecnie zastosowana" />
+    <Translation ID="BOB_PCK_RVT" String="Cofnij paczkę" />
+    <Translation ID="BOB_PCK_RVT_A" String="Cofa zastosowanie wybranej paczki zastępczej" />
+    <Translation ID="BOB_PCK_RVT_I" String="Paczka nie jest zastosowana" />
+    <Translation ID="BOB_PCK_NAL" String="Nie wszystkie zamienniki są dostępne" />
+    <Translation ID="BOB_CFG_UCS" String="Użyj wybraną konfigurację (zamiast konfiguracji ogólnej) dla tego zapisu" />
+    <Translation ID="BOB_CFG_SAC" String="Zapisz obecną konfigurację" />
+    <Translation ID="BOB_CFG_SSC" String="Kopiuj wybraną konfigurację" />
+    <Translation ID="BOB_CFG_SEC" String="Nowa pusta konfiguracja" />
+    <Translation ID="BOB_CFG_DEL" String="Usuń wybraną konfigurację" />
+    <Translation ID="BOB_OPT_GEN" String="Opcje ogólne" />
+    <Translation ID="BOB_OPT_CFG" String="Konfiguracje" />
+    <Translation ID="BOB_OPT_RUI" String="Rujnowanie" />
+    <Translation ID="BOB_OPT_KEY" String="Klawisz skrótu" />
+    <Translation ID="BOB_OPT_PRS" String="Nacisnij dowolny klawisz" />
+    <Translation ID="BOB_OPT_RGL" String="Zmiany zostaną wprowadzone po ponownym uruchomieniu" />
+    <Translation ID="BOB_OPT_RRT" String="Zapobiegaj rujnowaniu terenu przez drzewa" />
+    <Translation ID="BOB_OPT_RRP" String="Zapobiegaj rujnowaniu terenu przez rekwizyty" />
+    <Translation ID="BOB_NUKE" String="Resetuj konfigurację" />
+    <Translation ID="BOB_PER_IND" String="Domyślnie pokazuj indywidualne przedmioty" />
+    <Translation ID="BOB_PER_SIN" String="Zawsze wyłączone" />
+    <Translation ID="BOB_PER_GRP" String="Zawsze włączone" />
+    <Translation ID="BOB_PER_LST" String="Pamiętaj poprzednie ustawienia" />
+    <Translation ID="BOB_OPT_POS" String="Pamiętaj poprzednią pozycję panelu" />
+    <Translation ID="BOB_FIL_NAME" String="Szukaj:" />
+    <Translation ID="MES_PAGE" String="Więcej informacji znajdziesz na stronie moda w Warsztacie Steam." />
+    <Translation ID="BOB_ERR_FAT" String="Oznacza to, że mod nie może działać i został wyłączony." />
+    <Translation ID="BOB_ERR_HAR" String="BOB, Zamiana drzew i rekwizytów, nie był w stanie ukończyć wymaganych poprawek Harmony." />
+    <Translation ID="ERR_HAR0" String="Błąd aktualizacji Harmony." />
+    <Translation ID="ERR_HAR1" String="Możliwe przyczyny problemu zawierają:" />
+    <Translation ID="ERR_HAR2" String="Wymagany mod Harmony 2 nie został zainstalowany" />
+    <Translation ID="ERR_HAR3" String="Stary lub zepsuty mod uniemożliwia poprawne działanie moda Harmony 2" />
+    <Translation ID="BOB_UPD_040_0" String="Przedstawiamy zamianę drzew na mapie! Aktywuj narzędzie BOB tak jak zazwyczaj i kliknij na wolno stojące drzewo na mapie." />
+    <Translation ID="BOB_UPD_041_0" String="Naprawiono sporadyczny wyjątek panelu wymiany budynku podczas zmiany przedmiotu docelowego." />
+    <Translation ID="BOB_UPD_042_0" String="Umożliwiono wybór budynków podrzędnych" />
+    <Translation ID="BOB_UPD_042_1" String="Naprawiono potencjalne race conditions podczas ładowania gry" />
+    <Translation ID="BOB_UPD_043_0" String="Naprawiono odświeżanie prawdopodobieństwa podczas cofania zmian dla wszystkich budynków i wszystkich sieci" />
+    <Translation ID="BOB_UPD_043_1" String="Naprawiono błąd odświeżania LOD-a podczas cofania zmian dla wszystkich budynków i wszystkich sieci" />
+    <Translation ID="BOB_UPD_043_2" String="Poprawiono etykiety pól tekstowych panelu informacyjnego, aby pasowały do dłuższych ciągów znaków tłumaczeń" />
+    <Translation ID="BOB_UPD_050_0" String="Wstępne wdrożenie pakietów zastępczych dla sieci" />
+    <Translation ID="BOB_UPD_050_1" String="Teraz poprawnie kompatybilny z Network Skins 2" />
+    <Translation ID="BOB_UPD_050_2" String="Szybsze przetwarzanie zmian" />
+    <Translation ID="BOB_UPD_051_0" String="Nowy wygląd listy drzew/rekwizytów z ikonami do identyfikacji jaki rodzaj zmiany jest aktywny" />
+    <Translation ID="BOB_UPD_052_0" String="Dodano zarządzanie konfiguracjami do obsługi wielu różnych plików konfiguracyjnych, dostępnych za pośrednictwem panelu opcji" />
+    <Translation ID="BOB_UPD_060_0" String="Zamiana wolnostojących rekwizytów" />
+    <Translation ID="BOB_UPD_060_1" String="Podświetlenie wybranych rekwizytów lub drzew" />
+    <Translation ID="BOB_UPD_060_2" String="Można teraz wybierać sieci w budynkach" />
+    <Translation ID="BOB_UPD_060_3" String="Można teraz wybierać budynki dekoracyjne" />
+    <Translation ID="BOB_UPD_060_4" String="Przeprojektowany mniejszy panel zastępczy" />
+    <Translation ID="BOB_UPD_061_0" String="Dodano możliwość sortowania listy rosnąco/malejąco według nazw" />
+    <Translation ID="BOB_UPD_062_0" String="Dodano możliwość usuwania rujnowania terenu ze wszystkich drzew i / lub rekwizytów (w panelu opcji)" />
+    <Translation ID="BOB_UPD_062_1" String="Można teraz wybrać ścieżki promowe (aby zmienić / ukryć boje znaczników tras promowych)" />
+    <Translation ID="BOB_UPD_062_2" String="Naprawiono błędne wyświetlanie kątów rekwizytów sieci podczas wyboru" />
+    <Translation ID="BOB_PNL_RSW" String="Pokaż losowo" />
+    <Translation ID="BOB_PNL_RST" String="Losowe ustawienie" />
+    <Translation ID="BOB_RND_NEW" String="Nowy" />
+    <Translation ID="BOB_RND_DEL" String="Usuń" />
+    <Translation ID="BOB_RND_REN" String="Zmień nazwę" />
+  </Translations>
+</Language>
