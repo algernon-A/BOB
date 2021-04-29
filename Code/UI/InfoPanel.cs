@@ -53,13 +53,13 @@ namespace BOB
 
 			// Probability.
 			UIPanel probabilityPanel = Sliderpanel(this, MidControlX, ProbabilityY, SliderHeight);
-			probabilitySlider = AddBOBSlider(probabilityPanel, 0f, "BOB_PNL_PRB", 0, 100, 1);
+			probabilitySlider = AddBOBSlider(probabilityPanel, 0f, "BOB_PNL_PRB", 0, 100, 1, "Probability");
 			probabilitySlider.TrueValue = 100f;
 			probabilitySlider.LimitToVisible = true;
 
 			// Angle.
 			UIPanel anglePanel = Sliderpanel(this, MidControlX, AngleY, SliderHeight);
-			angleSlider = AddBOBSlider(anglePanel, 0f, "BOB_PNL_ANG", -180, 180, 1);
+			angleSlider = AddBOBSlider(anglePanel, 0f, "BOB_PNL_ANG", -180, 180, 1, "Angle");
 
 			// Offset panel.
 			UIPanel offsetPanel = Sliderpanel(this, MidControlX, OffsetPanelY, OffsetPanelHeight);
@@ -73,9 +73,9 @@ namespace BOB
 			offsetLabel.relativePosition = new Vector2((offsetPanel.width - offsetLabel.width) / 2f, OffsetLabelY);
 
 			// Offset sliders.
-			xSlider = AddBOBSlider(offsetPanel, XOffsetY, "BOB_PNL_XOF", -8f, 8f, 0.01f);
-			ySlider = AddBOBSlider(offsetPanel, YOffsetY, "BOB_PNL_YOF", -8f, 8f, 0.01f);
-			zSlider = AddBOBSlider(offsetPanel, ZOffsetY, "BOB_PNL_ZOF", -8f, 8f, 0.01f);
+			xSlider = AddBOBSlider(offsetPanel, XOffsetY, "BOB_PNL_XOF", -8f, 8f, 0.01f, "X offset");
+			ySlider = AddBOBSlider(offsetPanel, YOffsetY, "BOB_PNL_YOF", -8f, 8f, 0.01f, "Y offset");
+			zSlider = AddBOBSlider(offsetPanel, ZOffsetY, "BOB_PNL_ZOF", -8f, 8f, 0.01f, "Z offset");
 
 			// Set initial button states.
 			UpdateButtonStates();
@@ -192,8 +192,9 @@ namespace BOB
 		/// <param name="minValue">Minimum displayed value</param
 		/// <param name="maxValue">Maximum displayed value</param>
 		/// <param name="stepSize">Minimum slider step size</param>
+		/// <param name="name">Slider name</param>
 		/// <returns>New BOBSlider</returns>
-		private BOBSlider AddBOBSlider(UIComponent parent, float yPos, string labelKey, float minValue, float maxValue, float stepSize)
+		private BOBSlider AddBOBSlider(UIComponent parent, float yPos, string labelKey, float minValue, float maxValue, float stepSize, string name)
 		{
 			const float SliderY = 18f;
 			const float ValueY = 3f;
@@ -207,6 +208,7 @@ namespace BOB
 			BOBSlider newSlider = parent.AddUIComponent<BOBSlider>();
 			newSlider.size = new Vector2(MidControlWidth - (Margin * 2f), SliderHeight);
 			newSlider.relativePosition = new Vector2(Margin, yPos + SliderY);
+			newSlider.name = name;
 
 			// Value field - added to parent, not to slider, otherwise slider catches all input attempts.  Integer textfields (stepsize == 1) have shorter widths.
 			float textFieldWidth = stepSize == 1 ? IntTextFieldWidth : FloatTextFieldWidth;

@@ -56,8 +56,8 @@ namespace BOB
 				// Set slider display value - clamped to slider extents.
 				this.value = visibleValue;
 
-				// Force update.
-				OnValueChanged();
+				// Forcibly set text.
+				ValueField.text = IsInt ? Mathf.RoundToInt(TrueValue).ToString() : TrueValue.ToString();
 			}
 		}
 
