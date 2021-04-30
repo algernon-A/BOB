@@ -18,6 +18,10 @@ namespace BOB
 		internal static List<PropInfo> randomProps;
 		internal static List<TreeInfo> randomTrees;
 
+		// Random tree and prop templates.
+		private static PropInfo randomPropTemplate;
+		private static TreeInfo randomTreeTemplate;
+
 
 		/// <summary>
 		/// Builds the lists of loaded trees props.  Must be called before use.
@@ -36,6 +40,15 @@ namespace BOB
 				if (prop?.name != null)
 				{
 					props.Add(prop);
+
+					// Try to find random prop template if it isn't already there.
+					if (randomPropTemplate == null)
+                    {
+						if (prop.name.EndsWith("BOBRandomPropTemplate_Data"))
+                        {
+							randomPropTemplate = prop;
+                        }
+                    }
 				}
 			}
 
@@ -47,15 +60,25 @@ namespace BOB
 				if (tree?.name != null)
 				{
 					trees.Add(tree);
+
+					// Try to find random tree template if it isn't already there.
+					if (randomTreeTemplate == null)
+					{
+						if (tree.name.EndsWith("BOBRandomTreeTemplate_Data"))
+						{
+							randomTreeTemplate = tree;
+						}
+					}
 				}
 			}
 
+			// Initialise random lists.
 			randomProps = new List<PropInfo>();
 			randomTrees = new List<TreeInfo>();
 
 			// Order lists by name.
-			loadedProps = props.OrderBy(prop => GetDisplayName(prop.name)).ToList().ToArray();
-			loadedTrees = trees.OrderBy(tree => GetDisplayName(tree.name)).ToList().ToArray();
+			loadedProps = props.OrderBy(prop => GetDisplayName(prop)).ToList().ToArray();
+			loadedTrees = trees.OrderBy(tree => GetDisplayName(tree)).ToList().ToArray();
 		}
 
 
@@ -96,17 +119,25 @@ namespace BOB
 				return null;
 			}
 
-			// Instantiate existing prop and use as base for new prop.
-			GameObject objectInstance = Object.Instantiate(PrefabCollection<PropInfo>.FindLoaded("Amp Stack").gameObject);
-			objectInstance.name = propName;
-			PropInfo randomProp = objectInstance.GetComponent<PropInfo>();
-			objectInstance.SetActive(false);
-			randomProp.m_prefabInitialized = false;
-			randomProp.InitializePrefab();
+			// Instantiate prop template and use as base for new prop.
+			if (randomPropTemplate != null)
+			{
+				GameObject objectInstance = Object.Instantiate(randomPropTemplate.gameObject);
+				objectInstance.name = propName;
+				PropInfo randomProp = objectInstance.GetComponent<PropInfo>();
+				objectInstance.SetActive(false);
+				randomProp.m_isCustomContent = true;
+				randomProp.m_prefabInitialized = false;
+				randomProp.InitializePrefab();
 
-			// Add new prop to list and return direct reference.
-			randomProps.Add(randomProp);
-			return randomProp;
+				// Add new prop to list and return direct reference.
+				randomProps.Add(randomProp);
+				return randomProp;
+			}
+
+			// If we got here, then we weren't able to find the random prop template.
+			Logging.Error("random prop template not found");
+			return null;
 		}
 
 
@@ -131,17 +162,25 @@ namespace BOB
 				return null;
             }
 
-			// Instantiate existing tree and use as base for new tree.
-			GameObject treeInstance = Object.Instantiate(PrefabCollection<TreeInfo>.FindLoaded("Tree2variant").gameObject);
-			treeInstance.name = treeName;
-			TreeInfo randomTree = treeInstance.GetComponent<TreeInfo>();
-			treeInstance.SetActive(false);
-			randomTree.m_prefabInitialized = false;
-			randomTree.InitializePrefab();
+			// Instantiate tree template and use as base for new tree.
+			if (randomTreeTemplate != null)
+			{
+				GameObject treeInstance = Object.Instantiate(randomTreeTemplate.gameObject);
+				treeInstance.name = treeName;
+				TreeInfo randomTree = treeInstance.GetComponent<TreeInfo>();
+				treeInstance.SetActive(false);
+				randomTree.m_isCustomContent = true;
+				randomTree.m_prefabInitialized = false;
+				randomTree.InitializePrefab();
 
-			// Add new tree to list and return direct reference.
-			randomTrees.Add(randomTree);
-			return randomTree;
+				// Add new tree to list and return direct reference.
+				randomTrees.Add(randomTree);
+				return randomTree;
+			}
+
+			// If we got here, then we weren't able to find the random tree template.
+			Logging.Error("random tree template not found");
+			return null;
 		}
 
 
@@ -149,21 +188,19 @@ namespace BOB
 		/// Sanitises a raw prefab name for display.
 		/// Called by the settings panel fastlist.
 		/// </summary>
-		/// <param name="fullName">Original (raw) prefab name</param>
+		/// <param name="prefab">Original (raw) prefab</param>
 		/// <returns>Cleaned display name</returns>
-		internal static string GetDisplayName(string fullName)
+		internal static string GetDisplayName(PrefabInfo prefab)
 		{
-			// Find any leading period (Steam package number).
-			int num = fullName.IndexOf('.');
-
-			// If no period, assume vanilla asset; return full name preceeded by vanilla flag.
-			if (num < 0)
+			// If h9t custom content, return full name preceeded by vanilla flag.
+			if (!prefab.m_isCustomContent)
 			{
-				return "[v] " + fullName;
+				return "[v] " + prefab.name;
 			}
 
 			// Otherwise, omit the package number, and trim off any trailing _Data.
-			return fullName.Substring(num + 1).Replace("_Data", "");
+			int index = prefab.name.IndexOf('.');
+			return prefab.name.Substring(index + 1).Replace("_Data", "");
 		}
 
 

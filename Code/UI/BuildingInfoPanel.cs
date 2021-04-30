@@ -128,12 +128,12 @@ namespace BOB
 				int numChoices = numSubs + 1;
 				string[] subBuildingNames = new string[numChoices];
 				subBuildings = new BuildingInfo[numChoices];
-				subBuildingNames[0] = PrefabLists.GetDisplayName(currentBuilding.name);
+				subBuildingNames[0] = PrefabLists.GetDisplayName(currentBuilding);
 				subBuildings[0] = currentBuilding;
 
 				for (int i = 0; i < numSubs; ++i)
                 {
-					subBuildingNames[i + 1] = PrefabLists.GetDisplayName(currentBuilding.m_subBuildings[i].m_buildingInfo.name);
+					subBuildingNames[i + 1] = PrefabLists.GetDisplayName(currentBuilding.m_subBuildings[i].m_buildingInfo);
 					subBuildings[i + 1] = currentBuilding.m_subBuildings[i].m_buildingInfo;
 				}
 

@@ -42,7 +42,7 @@ namespace BOB
 		public PrefabInfo CurrentPrefab => individualPrefab ?? replacementPrefab ?? allPrefab ?? packagePrefab ?? originalPrefab;
 
 		// Display name.
-		public string DisplayName => PrefabLists.GetDisplayName(CurrentPrefab.name);
+		public string DisplayName => PrefabLists.GetDisplayName(CurrentPrefab);
 	}
 
 

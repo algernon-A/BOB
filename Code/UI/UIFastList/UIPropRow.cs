@@ -172,7 +172,7 @@ namespace BOB
                 if (thisItem.individualPrefab != null)
                 {
                     // A replacement is currently active - include it in the text.
-                    displayText.Append(PrefabLists.GetDisplayName(thisItem.individualPrefab.name));
+                    displayText.Append(PrefabLists.GetDisplayName(thisItem.individualPrefab));
 
                     // Append probability to the label, if we're showing it.
                     if (thisItem.showProbs)
@@ -189,7 +189,7 @@ namespace BOB
                 else if (thisItem.replacementPrefab != null)
                 {
                     // A replacement is currently active - include it in the text.
-                    displayText.Append(PrefabLists.GetDisplayName(thisItem.replacementPrefab.name));
+                    displayText.Append(PrefabLists.GetDisplayName(thisItem.replacementPrefab));
 
                     // Append probability to the label, if we're showing it.
                     if (thisItem.showProbs)
@@ -212,7 +212,7 @@ namespace BOB
                 else if (thisItem.allPrefab != null)
                 {
                     // An all- replacement is currently active; append name to the label.
-                    displayText.Append(PrefabLists.GetDisplayName(thisItem.allPrefab.name));
+                    displayText.Append(PrefabLists.GetDisplayName(thisItem.allPrefab));
 
                     // Append probability if this is not a network item and we're showing probs.
                     if (thisNetItem == null && thisItem.showProbs)
@@ -235,7 +235,7 @@ namespace BOB
                 else if (thisItem.packagePrefab != null)
                 {
                     // Yes; append name to the label.
-                    displayText.Append(PrefabLists.GetDisplayName(thisItem.packagePrefab.name));
+                    displayText.Append(PrefabLists.GetDisplayName(thisItem.packagePrefab));
 
                     // Set flag.
                     hasReplacement = true;
@@ -257,7 +257,7 @@ namespace BOB
                 }
 
                 // Original prefab display name.
-                displayText.Append(PrefabLists.GetDisplayName(thisItem.originalPrefab.name));
+                displayText.Append(PrefabLists.GetDisplayName(thisItem.originalPrefab));
 
                 // Show original probability in brackets immediately afterwards.
                 if (thisItem.showProbs)
@@ -273,7 +273,7 @@ namespace BOB
             else
             {
                 // Attached data is a raw PropInfo; just display its (cleaned-up) name.
-                nameLabel.text = PrefabLists.GetDisplayName(thisPrefab.name);
+                nameLabel.text = PrefabLists.GetDisplayName(thisPrefab);
             }
 
             // Set label position

@@ -456,7 +456,7 @@ namespace BOB
 					TreeInfo loadedTree = PrefabLists.loadedTrees[i];
 					{
 						// Set display name.
-						string displayName = PrefabLists.GetDisplayName(loadedTree.name);
+						string displayName = PrefabLists.GetDisplayName(loadedTree);
 
 						// Apply vanilla filtering if selected.
 						if (!hideVanilla.isChecked || !displayName.StartsWith("[v]"))
@@ -479,7 +479,7 @@ namespace BOB
 					PropInfo loadedProp = PrefabLists.loadedProps[i];
 
 					// Set display name.
-					string displayName = PrefabLists.GetDisplayName(loadedProp.name);
+					string displayName = PrefabLists.GetDisplayName(loadedProp);
 
 					// Apply vanilla filtering if selected.
 					if (!hideVanilla.isChecked || !displayName.StartsWith("[v]"))
