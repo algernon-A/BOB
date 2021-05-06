@@ -10,7 +10,7 @@ namespace BOB
 	/// <summary>
 	/// Abstract base class for all BOB tree/prop replacement panels.
 	/// </summary>
-	internal abstract class BOBInfoPanelBase : UIPanel
+	internal abstract class BOBInfoPanelBase : BOBPanelBase
 	{
 		// Display order state.
 		internal enum OrderBy
@@ -20,9 +20,6 @@ namespace BOB
 		}
 
 
-		// Layout constants - general.
-		protected const float Margin = 5f;
-
 		// Layout constants - X.
 		protected const float LeftWidth = 400f;
 		protected const float MidControlWidth = 128f;
@@ -31,16 +28,10 @@ namespace BOB
 		protected const float MidControlX = MiddleX + Margin;
 		protected const float RightX = MiddleX + MiddleWidth;
 		protected const float RightWidth = 320f;
-		protected const float PanelWidth = RightX + RightWidth + Margin;
 
 		// Layout constants - Y.
-		protected const float TitleHeight = 40f;
-		protected const float ToolbarHeight = 42f;
-		protected const float FilterY = TitleHeight + ToolbarHeight;
-		protected const float FilterHeight = 20f;
 		protected const float ListY = FilterY + FilterHeight;
 		protected const float ListHeight = UIPropRow.RowHeight * 16f;
-		protected const float PanelHeight = ListY + ListHeight + (Margin * 2f);
 		protected const float BigIconSize = 64f;
 
 		// Component locations.
@@ -59,8 +50,6 @@ namespace BOB
 		protected UIPanel rightPanel;
 		protected UIFastList targetList, loadedList;
 		protected UILabel noPropsLabel;
-		protected UICheckBox hideVanilla, treeCheck, propCheck;
-		protected UITextField nameFilter;
 		protected UIButton replaceButton, revertButton;
 		private readonly UIButton targetNameButton, loadedNameButton;
 
@@ -74,11 +63,17 @@ namespace BOB
 		// Trees or props?
 		protected virtual bool IsTree => treeCheck?.isChecked ?? false;
 
-		// Initial tree/prop checked state.
-		protected abstract bool InitialTreeCheckedState { get; }
-
 		// Replace button atlas.
 		protected abstract UITextureAtlas ReplaceAtlas { get; }
+
+		// Panel width.
+		protected override float PanelWidth => RightX + RightWidth + Margin;
+
+		// Panel height.
+		protected override float PanelHeight => ListY + ListHeight + (Margin * 2f);
+
+		// Panel opacity.
+		protected override float PanelOpacity => 0.8f;
 
 
 		/// <summary>
@@ -167,19 +162,6 @@ namespace BOB
         {
 			try
 			{
-				// Basic behaviour.
-				autoLayout = false;
-				canFocus = true;
-				isInteractive = true;
-
-				// Appearance.
-				backgroundSprite = "MenuPanel2";
-				opacity = 0.8f;
-
-				// Size.
-				width = PanelWidth;
-				height = PanelHeight;
-
 				// Position - are we restoring the previous position?.
 				if (ModSettings.rememberPosition && (InfoPanelManager.lastX != 0f || InfoPanelManager.lastY != 0f))
 				{
@@ -191,22 +173,6 @@ namespace BOB
 					// Default position - centre in screen.
 					relativePosition = new Vector2(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
 				}
-
-				// Drag bar.
-				UIDragHandle dragHandle = AddUIComponent<UIDragHandle>();
-				dragHandle.width = this.width - 50f;
-				dragHandle.height = this.height;
-				dragHandle.relativePosition = Vector3.zero;
-				dragHandle.target = this;
-
-				// Close button.
-				UIButton closeButton = AddUIComponent<UIButton>();
-				closeButton.relativePosition = new Vector2(width - 35, 2);
-				closeButton.normalBgSprite = "buttonclose";
-				closeButton.hoveredBgSprite = "buttonclosehover";
-				closeButton.pressedBgSprite = "buttonclosepressed";
-				closeButton.eventClick += (component, clickEvent) => InfoPanelManager.Close();
-
 
 				// Order buttons.
 				targetNameButton = ArrowButton(this, 30f, FilterY);
@@ -235,14 +201,6 @@ namespace BOB
 				loadedList = UIFastList.Create<UILoadedPropRow>(rightPanel);
 				ListSetup(loadedList);
 
-				// Tree/Prop checkboxes.
-				propCheck = IconToggleCheck(this, Margin, TitleHeight + Margin, "bob_props3", "BOB_PNL_PRP");
-				treeCheck = IconToggleCheck(this, Margin + propCheck.width, TitleHeight + Margin, "bob_trees_small", "BOB_PNL_TRE");
-				propCheck.isChecked = !InitialTreeCheckedState;
-				treeCheck.isChecked = InitialTreeCheckedState;
-				propCheck.eventCheckChanged += PropCheckChanged;
-				treeCheck.eventCheckChanged += TreeCheckChanged;
-
 				// 'No props' label (starts hidden).
 				noPropsLabel = leftPanel.AddUIComponent<UILabel>();
 				noPropsLabel.relativePosition = new Vector2(Margin, Margin);
@@ -260,17 +218,6 @@ namespace BOB
 				// Revert button.
 				revertButton = UIControls.AddSmallerButton(this, MidControlX, RevertY, Translations.Translate("BOB_PNL_REV"), MidControlWidth);
 				revertButton.eventClicked += Revert;
-
-				// Name filter.
-				nameFilter = UIControls.SmallLabelledTextField(this, width - 200f - Margin, TitleHeight + Margin, Translations.Translate("BOB_FIL_NAME"));
-				// Event handlers for name filter textbox.
-				nameFilter.eventTextChanged += (control, text) => LoadedList();
-				nameFilter.eventTextSubmitted += (control, text) => LoadedList();
-
-				// Vanilla filter.
-				hideVanilla = UIControls.LabelledCheckBox((UIComponent)(object)this, nameFilter.relativePosition.x, nameFilter.relativePosition.y + nameFilter.height + (Margin / 2f), Translations.Translate("BOB_PNL_HDV"), 12f, 0.7f);
-				hideVanilla.isChecked = ModSettings.hideVanilla;
-				hideVanilla.eventCheckChanged += VanillaCheckChanged;
 			}
 			catch (Exception e)
 			{
@@ -316,7 +263,7 @@ namespace BOB
 
 
 		/// <summary>
-		/// Revertt button event handler.
+		/// Revert button event handler.
 		/// <param name="control">Calling component (unused)</param>
 		/// <param name="mouseEvent">Mouse event (unused)</param>
 		/// </summary>
@@ -324,11 +271,18 @@ namespace BOB
 
 
 		/// <summary>
+		/// Close button event handler.
+		/// </summary>
+		protected override void CloseEvent() => InfoPanelManager.Close();
+
+
+
+		/// <summary>
 		/// Prop check event handler.
 		/// </summary>
 		/// <param name="control">Calling component (unused)</param>
 		/// <param name="isChecked">New checked state</param>
-		protected virtual void PropCheckChanged(UIComponent control, bool isChecked)
+		protected override void PropCheckChanged(UIComponent control, bool isChecked)
 		{
 			if (isChecked)
 			{
@@ -365,7 +319,7 @@ namespace BOB
 		/// </summary>
 		/// <param name="control">Calling component (unused)</param>
 		/// <param name="isChecked">New checked state</param>
-		protected void TreeCheckChanged(UIComponent control, bool isChecked)
+		protected override void TreeCheckChanged(UIComponent control, bool isChecked)
 		{
 			if (isChecked)
 			{
@@ -440,7 +394,7 @@ namespace BOB
 		/// <summary>
 		/// Populates a fastlist with a filtered list of loaded trees or props.
 		/// </summary>
-		protected virtual void LoadedList()
+		protected override void LoadedList()
 		{
 			// List of prefabs that have passed filtering.
 			List<PrefabInfo> list = new List<PrefabInfo>();
@@ -454,19 +408,17 @@ namespace BOB
 				for (int i = 0; i < PrefabLists.loadedTrees.Length; ++i)
 				{
 					TreeInfo loadedTree = PrefabLists.loadedTrees[i];
-					{
-						// Set display name.
-						string displayName = PrefabLists.GetDisplayName(loadedTree);
+					// Set display name.
+					string displayName = PrefabLists.GetDisplayName(loadedTree);
 
-						// Apply vanilla filtering if selected.
-						if (!hideVanilla.isChecked || !displayName.StartsWith("[v]"))
+					// Apply vanilla filtering if selected.
+					if (!hideVanilla.isChecked || !displayName.StartsWith("[v]"))
+					{
+						// Apply name filter.
+						if (!nameFilterActive || displayName.ToLower().Contains(nameFilter.text.Trim().ToLower()))
 						{
-							// Apply name filter.
-							if (!nameFilterActive || displayName.ToLower().Contains(nameFilter.text.Trim().ToLower()))
-							{
-								// Filtering passed - add this prefab to our list.
-								list.Add(loadedTree);
-							}
+							// Filtering passed - add this prefab to our list.
+							list.Add(loadedTree);
 						}
 					}
 				}
@@ -523,80 +475,6 @@ namespace BOB
 
 
 		/// <summary>
-		/// Adds an icon-style button to the specified component at the specified coordinates.
-		/// </summary>
-		/// <param name="parent">Parent UIComponent</param>
-		/// <param name="xPos">Relative X position</param>
-		/// <param name="yPos">Relative Y position</param>
-		/// <param name="size">Button size (square)</param>
-		/// <param name="tooltipKey">Tooltip translation key</param>
-		/// <param name="atlas">Icon atlas</param>
-		/// <returns>New UIButton</returns>
-		protected UIButton AddIconButton(UIComponent parent, float xPos, float yPos, float size, string tooltipKey, UITextureAtlas atlas)
-		{
-			UIButton newButton = parent.AddUIComponent<UIButton>();
-
-			// Size and position.
-			newButton.relativePosition = new Vector2(xPos, yPos);
-			newButton.height = size;
-			newButton.width = size;
-
-			// Appearance.
-			newButton.atlas = atlas;
-
-			newButton.normalFgSprite = "normal";
-			newButton.focusedFgSprite = "normal";
-			newButton.hoveredFgSprite = "hovered";
-			newButton.disabledFgSprite = "disabled";
-			newButton.pressedFgSprite = "pressed";
-
-			// Tooltip.
-			newButton.tooltip = Translations.Translate(tooltipKey);
-
-			return newButton;
-		}
-
-
-		/// <summary>
-		/// Adds an icon toggle checkbox.
-		/// </summary>
-		/// <param name="parent">Parent component</param>
-		/// <param name="xPos">Relative X position</param>
-		/// <param name="yPos">Relative Y position</param>
-		/// <param name="atlasName">Atlas name (for loading from file)</param>
-		/// <param name="tooltipKey">Tooltip translation key</param>
-		/// <returns>New checkbox</returns>
-		private UICheckBox IconToggleCheck(UIComponent parent, float xPos, float yPos, string atlasName, string tooltipKey)
-		{
-			const float ToggleSpriteSize = 32f;
-
-			// Size and position.
-			UICheckBox checkBox = parent.AddUIComponent<UICheckBox>();
-			checkBox.width = ToggleSpriteSize;
-			checkBox.height = ToggleSpriteSize;
-			checkBox.clipChildren = true;
-			checkBox.relativePosition = new Vector2(xPos, yPos);
-
-			// Checkbox sprites.
-			UISprite sprite = checkBox.AddUIComponent<UISprite>();
-			sprite.atlas = TextureUtils.LoadSpriteAtlas(atlasName);
-			sprite.spriteName = "disabled";
-			sprite.size = new Vector2(ToggleSpriteSize, ToggleSpriteSize);
-			sprite.relativePosition = Vector3.zero;
-
-			checkBox.checkedBoxObject = sprite.AddUIComponent<UISprite>();
-			((UISprite)checkBox.checkedBoxObject).atlas = TextureUtils.LoadSpriteAtlas(atlasName);
-			((UISprite)checkBox.checkedBoxObject).spriteName = "pressed";
-			checkBox.checkedBoxObject.size = new Vector2(ToggleSpriteSize, ToggleSpriteSize);
-			checkBox.checkedBoxObject.relativePosition = Vector3.zero;
-
-			checkBox.tooltip = Translations.Translate(tooltipKey);
-
-			return checkBox;
-		}
-
-
-		/// <summary>
 		/// Performs actions to be taken once an update (application or reversion) has been applied, including saving data, updating button states, and refreshing renders.
 		/// </summary>
 		protected virtual void FinishUpdate()
@@ -618,10 +496,10 @@ namespace BOB
 		/// </summary>
 		/// <param name="control">Calling component (unused)</param>
 		/// <param name="isChecked">New checked state</param>
-		private void VanillaCheckChanged(UIComponent control, bool isChecked)
+		protected override void VanillaCheckChanged(UIComponent control, bool isChecked)
 		{
 			// Filter list.
-			LoadedList();
+			base.VanillaCheckChanged(control, isChecked);
 
 			// Store state.
 			ModSettings.hideVanilla = isChecked;

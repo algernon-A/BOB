@@ -10,11 +10,8 @@ namespace BOB
 	/// <summary>
 	/// Panel to setup random props/trees.
 	/// </summary>
-	public class BOBRandomPanel : UIPanel
+	internal class BOBRandomPanel : BOBPanelBase
 	{
-		// Layout constants - general.
-		private const float Margin = 5f;
-
 		// Layout constants - X.
 		private const float RandomizerX = Margin;
 		private const float RandomizerWidth = 300f;
@@ -26,20 +23,16 @@ namespace BOB
 		private const float MiddleWidth = ArrowWidth + (Margin * 2f);
 		private const float LoadedX = MiddleX + MiddleWidth;
 		private const float LoadedWidth = 320f;
-		private const float PanelWidth = LoadedX + LoadedWidth + Margin;
 		private const float RandomButtonWidth = 100f;
 		private const float RandomButtonX = Margin + RandomizerWidth - RandomButtonWidth;
 		private const float NameFieldWidth = RandomizerWidth - RandomButtonWidth - Margin;
 
 		// Layout constants - Y.
-		private const float TitleHeight = 40f;
 		private const float ToolY = TitleHeight + Margin;
-		private const float ToolHeight = 30f;
-		private const float ListY = ToolY + ToolHeight + Margin;
+		private const float ListY = ToolY + ToolbarHeight + Margin;
 		private const float ListHeight = UIPropRow.RowHeight * 16f;
 		private const float LeftListY = ListY + 32f;
 		private const float LeftListHeight = ListHeight - 32f;
-		private const float PanelHeight = ListY + ListHeight + Margin;
 		private const float ArrowHeight = 64f;
 		private const float NameFieldY = LeftListY - 22f - Margin;
 
@@ -52,12 +45,27 @@ namespace BOB
 		// Panel components.
 		private readonly UIFastList randomList, variationsList, loadedList;
 		private readonly UIButton removeRandomButton, renameButton;
-		private readonly UICheckBox treeCheck, propCheck;
 		private readonly UITextField nameField;
 
 		// Current selections.
 		private PrefabInfo selectedRandomPrefab, selectedVariation, selectedLoadedPrefab;
 		private readonly List<PrefabInfo> currentVariations;
+
+
+		// Panel width.
+		protected override float PanelWidth => LoadedX + LoadedWidth + Margin;
+
+		// Panel height.
+		protected override float PanelHeight => ListY + ListHeight + Margin;
+
+		// Panel opacity.
+		protected override float PanelOpacity => 1f;
+
+
+		/// <summary>
+		/// Initial tree/prop checked state.
+		/// </summary>
+		protected override bool InitialTreeCheckedState => false;
 
 
 		/// <summary>
@@ -199,40 +207,8 @@ namespace BOB
 		/// </summary>
 		internal BOBRandomPanel()
 		{
-			// Basic behaviour.
-			autoLayout = false;
-			canFocus = true;
-			isInteractive = true;
-
-			// Appearance.
-			backgroundSprite = "MenuPanel2";
-			opacity = 1f;
-
-			// Size.
-			size = new Vector2(PanelWidth, PanelHeight);
-
 			// Default position - centre in screen.
 			relativePosition = new Vector2(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
-
-			// Drag bar.
-			UIDragHandle dragHandle = AddUIComponent<UIDragHandle>();
-			dragHandle.width = this.width - 50f;
-			dragHandle.height = this.height;
-			dragHandle.relativePosition = Vector3.zero;
-			dragHandle.target = this;
-
-			// Title label.
-			UILabel titleLabel = AddUIComponent<UILabel>();
-			titleLabel.text = Translations.Translate("BOB_NAM");
-			titleLabel.relativePosition = new Vector2(50f, (TitleHeight - titleLabel.height) / 2f);
-
-			// Close button.
-			UIButton closeButton = AddUIComponent<UIButton>();
-			closeButton.relativePosition = new Vector2(width - 35, 2);
-			closeButton.normalBgSprite = "buttonclose";
-			closeButton.hoveredBgSprite = "buttonclosehover";
-			closeButton.pressedBgSprite = "buttonclosepressed";
-			closeButton.eventClick += (component, clickEvent) => Close();
 
 			// Selected random prop list.
 			UIPanel randomizerPanel = AddUIComponent<UIPanel>();
@@ -271,11 +247,11 @@ namespace BOB
 			removeVariationButton.eventClicked += RemoveVariation;
 
 			// Add random prefab button.
-			UIButton addRandomButton = UIControls.AddButton(this, Margin, ToolY, Translations.Translate("BOB_RND_NEW"), RandomButtonWidth);
+			UIButton addRandomButton = AddIconButton(this, treeCheck.relativePosition.x + 32f, treeCheck.relativePosition.y, 32f, "BOB_RND_NEW", TextureUtils.LoadSpriteAtlas("bob_buttons_plus_round"));
 			addRandomButton.eventClicked += NewRandomPrefab;
 
 			// Remove random prefab button.
-			removeRandomButton = UIControls.AddButton(this, RandomButtonWidth + (Margin * 2f), ToolY, Translations.Translate("BOB_RND_DEL"), RandomButtonWidth);
+			UIButton removeRandomButton = AddIconButton(this, addRandomButton.relativePosition.x + 32f, addRandomButton.relativePosition.y, 32f, "BOB_RND_NEW", TextureUtils.LoadSpriteAtlas("bob_buttons_minus_round"));
 			removeRandomButton.eventClicked += RemoveRandomPrefab;
 
 			// Name change textfield.
@@ -284,13 +260,6 @@ namespace BOB
 			// Rename button.
 			renameButton = UIControls.EvenSmallerButton(this, RandomButtonX, NameFieldY + 1f, Translations.Translate("BOB_RND_REN"), RandomButtonWidth);
 			renameButton.eventClicked += RenameRandomPrefab;
-
-			// Tree/prop checks.
-			propCheck = IconToggleCheck(this, (RandomButtonWidth * 2f) + (Margin * 3f), ToolY, "bob_props3", "BOB_PNL_PRP");
-			treeCheck = IconToggleCheck(this, propCheck.relativePosition.x + propCheck.width, ToolY, "bob_trees_small", "BOB_PNL_TRE");
-			propCheck.isChecked = true;
-			propCheck.eventCheckChanged += PropCheckChanged;
-			treeCheck.eventCheckChanged += TreeCheckChanged;
 
 			// Populate loaded lists.
 			RandomList();
@@ -301,6 +270,82 @@ namespace BOB
 
 			// Bring to front.
 			BringToFront();
+		}
+
+
+		/// <summary>
+		/// Close button event handler.
+		/// </summary>
+		protected override void CloseEvent() => Close();
+
+
+		/// <summary>
+		/// Populates a fastlist with a filtered list of loaded trees or props.
+		/// </summary>
+		protected override void LoadedList()
+		{
+			// List of prefabs that have passed filtering.
+			List<PrefabInfo> list = new List<PrefabInfo>();
+
+			bool nameFilterActive = !nameFilter.text.IsNullOrWhiteSpace();
+
+			if (IsTree)
+			{
+				// Tree - iterate through each prop in our list of loaded prefabs.
+				for (int i = 0; i < PrefabLists.loadedTrees.Length; ++i)
+				{
+					TreeInfo loadedTree = PrefabLists.loadedTrees[i];
+
+					// Set display name.
+					string displayName = PrefabLists.GetDisplayName(loadedTree);
+
+					// Apply vanilla filtering if selected.
+					if (!hideVanilla.isChecked || !displayName.StartsWith("[v]"))
+					{
+						// Apply name filter.
+						if (!nameFilterActive || displayName.ToLower().Contains(nameFilter.text.Trim().ToLower()))
+						{
+							// Filtering passed - add this prefab to our list.
+							list.Add(loadedTree);
+						}
+					}
+				}
+			}
+			else
+			{
+				// Prop - iterate through each prop in our list of loaded prefabs.
+				for (int i = 0; i < PrefabLists.loadedProps.Length; ++i)
+				{
+					PropInfo loadedProp = PrefabLists.loadedProps[i];
+
+					// Skip any props that require height or water maps.
+					if (loadedProp.m_requireHeightMap || loadedProp.m_requireWaterMap)
+					{
+						continue;
+					}
+
+					// Set display name.
+					string displayName = PrefabLists.GetDisplayName(loadedProp);
+
+					// Apply vanilla filtering if selected.
+					if (!hideVanilla.isChecked || !displayName.StartsWith("[v]"))
+					{
+						// Apply name filter.
+						if (!nameFilterActive || displayName.ToLower().Contains(nameFilter.text.Trim().ToLower()))
+						{
+							// Filtering passed - add this prefab to our list.
+							list.Add(loadedProp);
+						}
+					}
+				}
+			}
+
+			// Create return fastlist from our filtered list.
+			loadedList.rowsData = new FastList<object>
+			{
+				m_buffer = list.ToArray(),
+				m_size = list.Count
+			};
 		}
 
 
@@ -321,7 +366,7 @@ namespace BOB
 		/// </summary>
 		/// <param name="control">Calling component (unused)</param>
 		/// <param name="isChecked">New checked state</param>
-		private void PropCheckChanged(UIComponent control, bool isChecked)
+		protected override void PropCheckChanged(UIComponent control, bool isChecked)
 		{
 			if (isChecked)
 			{
@@ -351,7 +396,7 @@ namespace BOB
 		/// </summary>
 		/// <param name="control">Calling component (unused)</param>
 		/// <param name="isChecked">New checked state</param>
-		private void TreeCheckChanged(UIComponent control, bool isChecked)
+		protected override void TreeCheckChanged(UIComponent control, bool isChecked)
 		{
 			if (isChecked)
 			{
@@ -640,51 +685,6 @@ namespace BOB
 
 
 		/// <summary>
-		/// Populates a fastlist with a filtered list of loaded trees or props.
-		/// </summary>
-		private void LoadedList()
-		{
-			// List of prefabs that have passed filtering.
-			List<PrefabInfo> list = new List<PrefabInfo>();
-
-			if (IsTree)
-			{
-				// Tree - iterate through each prop in our list of loaded prefabs.
-				for (int i = 0; i < PrefabLists.loadedTrees.Length; ++i)
-				{
-					TreeInfo loadedTree = PrefabLists.loadedTrees[i];
-					// Add this prefab to our list.
-					list.Add(loadedTree);
-				}
-			}
-			else
-			{
-				// Prop - iterate through each prop in our list of loaded prefabs.
-				for (int i = 0; i < PrefabLists.loadedProps.Length; ++i)
-				{
-					PropInfo loadedProp = PrefabLists.loadedProps[i];
-
-					// Skip any props that require height or water maps.
-					if (loadedProp.m_requireHeightMap || loadedProp.m_requireWaterMap)
-					{
-						continue;
-					}
-
-					// Add this prefab to our list.
-					list.Add(loadedProp);
-				}
-			}
-
-			// Create return fastlist from our filtered list.
-			loadedList.rowsData = new FastList<object>
-			{
-				m_buffer = list.ToArray(),
-				m_size = list.Count
-			};
-		}
-
-
-		/// <summary>
 		/// Performs initial fastlist setup.
 		/// </summary>
 		/// <param name="fastList">Fastlist to set up</param>
@@ -704,45 +704,6 @@ namespace BOB
 			// Data.
 			fastList.rowsData = new FastList<object>();
 			fastList.selectedIndex = -1;
-		}
-
-
-		/// <summary>
-		/// Adds an icon toggle checkbox.
-		/// </summary>
-		/// <param name="parent">Parent component</param>
-		/// <param name="xPos">Relative X position</param>
-		/// <param name="yPos">Relative Y position</param>
-		/// <param name="atlasName">Atlas name (for loading from file)</param>
-		/// <param name="tooltipKey">Tooltip translation key</param>
-		/// <returns>New checkbox</returns>
-		private UICheckBox IconToggleCheck(UIComponent parent, float xPos, float yPos, string atlasName, string tooltipKey)
-		{
-			const float ToggleSpriteSize = 32f;
-
-			// Size and position.
-			UICheckBox checkBox = parent.AddUIComponent<UICheckBox>();
-			checkBox.width = ToggleSpriteSize;
-			checkBox.height = ToggleSpriteSize;
-			checkBox.clipChildren = true;
-			checkBox.relativePosition = new Vector2(xPos, yPos);
-
-			// Checkbox sprites.
-			UISprite sprite = checkBox.AddUIComponent<UISprite>();
-			sprite.atlas = TextureUtils.LoadSpriteAtlas(atlasName);
-			sprite.spriteName = "disabled";
-			sprite.size = new Vector2(ToggleSpriteSize, ToggleSpriteSize);
-			sprite.relativePosition = Vector3.zero;
-
-			checkBox.checkedBoxObject = sprite.AddUIComponent<UISprite>();
-			((UISprite)checkBox.checkedBoxObject).atlas = TextureUtils.LoadSpriteAtlas(atlasName);
-			((UISprite)checkBox.checkedBoxObject).spriteName = "pressed";
-			checkBox.checkedBoxObject.size = new Vector2(ToggleSpriteSize, ToggleSpriteSize);
-			checkBox.checkedBoxObject.relativePosition = Vector3.zero;
-
-			checkBox.tooltip = Translations.Translate(tooltipKey);
-
-			return checkBox;
 		}
 
 

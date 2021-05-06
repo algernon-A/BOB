@@ -66,6 +66,7 @@
     <Compile Include="Code\Settings\OptionsPanelTabs\RuiningOptions.cs" />
     <Compile Include="Code\UI\BOBSlider.cs" />
     <Compile Include="Code\UI\MapPanel.cs" />
+    <Compile Include="Code\UI\PanelBase.cs" />
     <Compile Include="Code\UI\RandomPanel.cs" />
     <Compile Include="Code\UI\UIFastList\UIRandomPropRow.cs" />
     <Compile Include="Code\Utils\Logging.cs" />
@@ -133,6 +134,8 @@
     <Content Include="Resources\bob_all_roads_small.png" />
     <Content Include="Resources\bob_buildings.png" />
     <Content Include="Resources\bob_buildings_small.png" />
+    <Content Include="Resources\bob_buttons_minus_round.png" />
+    <Content Include="Resources\bob_buttons_plus_round.png" />
     <Content Include="Resources\bob_cursor_dark.png" />
     <Content Include="Resources\bob_cursor_light.png" />
     <Content Include="Resources\bob_props3.png" />
@@ -144,6 +147,7 @@
     <Content Include="Resources\bob_single_building_small.png" />
     <Content Include="Resources\bob_trees.png" />
     <Content Include="Resources\bob_trees_small.png" />
+    <Content Include="Resources\uui_bob_random.png" />
     <Content Include="Translations\de.xml" />
     <Content Include="Translations\en.xml" />
     <Content Include="Translations\es.xml" />

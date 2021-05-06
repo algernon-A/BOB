@@ -77,7 +77,7 @@ namespace BOB
 			ySlider = AddBOBSlider(offsetPanel, YOffsetY, "BOB_PNL_YOF", -8f, 8f, 0.01f, "Y offset");
 			zSlider = AddBOBSlider(offsetPanel, ZOffsetY, "BOB_PNL_ZOF", -8f, 8f, 0.01f, "Z offset");
 
-			// Set initial button states.
+			// Set initial button states);
 			UpdateButtonStates();
 
 			// Normal/random toggle.
@@ -85,7 +85,7 @@ namespace BOB
 			randomCheck.eventCheckChanged += RandomCheckChanged;
 
 			// Random settings button.
-			UIButton randomButton = UIControls.EvenSmallerButton(this, RightX - 200f, TitleHeight + Margin + 20f, Translations.Translate("BOB_PNL_RST"));
+			UIButton randomButton = AddIconButton(this, RightX - 200f, TitleHeight + Margin + 20f, 40f, "BOB_PNL_RST", TextureUtils.LoadSpriteAtlas("uui_bob_random"));
 			randomButton.eventClicked += (control, clickEvent) => BOBRandomPanel.Create();
 		}
 
