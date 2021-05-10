@@ -18,7 +18,7 @@ namespace BOB
 		private const float SelectedX = RandomizerX + RandomizerWidth + Margin;
 		private const float SelectedWidth = 300f;
 		private const float MiddleX = SelectedX + SelectedWidth + Margin;
-		private const float ArrowWidth = 32f;
+		private const float ArrowWidth = ToggleSize;
 		private const float MidControlX = MiddleX + Margin;
 		private const float MiddleWidth = ArrowWidth + (Margin * 2f);
 		private const float LoadedX = MiddleX + MiddleWidth;
@@ -32,7 +32,6 @@ namespace BOB
 		private const float ListHeight = UIPropRow.RowHeight * 16f;
 		private const float LeftListY = ListY + 64f;
 		private const float LeftListHeight = ListHeight - 64f;
-		private const float ArrowHeight = 64f;
 		private const float RandomButtonY = LeftListY - ToggleSize - Margin;
 		private const float NameFieldY = RandomButtonY - 22f - Margin;
 
@@ -211,7 +210,7 @@ namespace BOB
 			relativePosition = new Vector2(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
 
 			// Title label.
-			AddTitle(Translations.Translate("BOB_NAM"));
+			AddTitle(Translations.Translate("BOB_NAM") + " : " + Translations.Translate("BOB_RND_TIT"));
 
 			// Selected random prop list.
 			UIPanel randomizerPanel = AddUIComponent<UIPanel>();
@@ -244,11 +243,11 @@ namespace BOB
 			nameField = UIControls.AddTextField(this, Margin, NameFieldY, RandomizerWidth);
 
 			// Add random prefab button.
-			UIButton addRandomButton = AddIconButton(this, Margin, RandomButtonY, 32f, "BOB_RND_NEW", TextureUtils.LoadSpriteAtlas("bob_buttons_plus_round_small"));
+			UIButton addRandomButton = AddIconButton(this, Margin, RandomButtonY, ToggleSize, "BOB_RND_NEW", TextureUtils.LoadSpriteAtlas("bob_buttons_plus_round_small"));
 			addRandomButton.eventClicked += NewRandomPrefab;
 
 			// Remove random prefab button.
-			removeRandomButton = AddIconButton(this, addRandomButton.relativePosition.x + 32f, RandomButtonY, 32f, "BOB_RND_NEW", TextureUtils.LoadSpriteAtlas("bob_buttons_minus_round_small"));
+			removeRandomButton = AddIconButton(this, addRandomButton.relativePosition.x + ToggleSize, RandomButtonY, ToggleSize, "BOB_RND_NEW", TextureUtils.LoadSpriteAtlas("bob_buttons_minus_round_small"));
 			removeRandomButton.eventClicked += RemoveRandomPrefab;
 
 			// Rename button.
@@ -256,11 +255,11 @@ namespace BOB
 			renameButton.eventClicked += RenameRandomPrefab;
 
 			// Add variation button.
-			UIButton addVariationButton = ArrowButton(this, MidControlX, ListY, "ArrowLeft");
+			UIButton addVariationButton = AddIconButton(this, MidControlX, ListY, ToggleSize, Translations.Translate("BOB_RND_ADD"), TextureUtils.LoadSpriteAtlas("bob_plus"));
 			addVariationButton.eventClicked += AddVariation;
 
 			// Remove variation button.
-			UIButton removeVariationButton = ArrowButton(this, MidControlX, ListY + ArrowHeight + Margin, "ArrowRight");
+			UIButton removeVariationButton = AddIconButton(this, MidControlX, ListY + ToggleSize, ToggleSize, Translations.Translate("BOB_RND_SUB"), TextureUtils.LoadSpriteAtlas("bob_minus"));
 			removeVariationButton.eventClicked += RemoveVariation;
 
 			// Populate loaded lists.
@@ -706,34 +705,6 @@ namespace BOB
 			// Data.
 			fastList.rowsData = new FastList<object>();
 			fastList.selectedIndex = -1;
-		}
-
-
-		/// <summary>
-		/// Adds an arrow button.
-		/// </summary>
-		/// <param name="parent">Parent component</param>
-		/// <param name="posX">Relative X postion</param>
-		/// <param name="posY">Relative Y position</param>
-		/// <param name="spriteName">Sprite name</param>
-		/// <returns>New arrow button</returns>
-		private UIButton ArrowButton(UIComponent parent, float posX, float posY, string spriteName)
-		{
-			UIButton arrowButton = parent.AddUIComponent<UIButton>();
-
-			// Size and position.
-			arrowButton.size = new Vector2(ArrowWidth, ArrowHeight);
-			arrowButton.relativePosition = new Vector2(posX, posY);
-
-			// Appearance.
-			arrowButton.atlas = TextureUtils.InGameAtlas;
-			arrowButton.normalFgSprite = spriteName;
-			arrowButton.focusedFgSprite = spriteName + "Focused";
-			arrowButton.disabledFgSprite = spriteName + "Disabled";
-			arrowButton.hoveredFgSprite = spriteName + "Hovered";
-			arrowButton.pressedFgSprite = spriteName + "Pressed";
-
-			return arrowButton;
 		}
 	}
 }
