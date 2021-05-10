@@ -18,23 +18,23 @@ namespace BOB
 		private const float SelectedX = RandomizerX + RandomizerWidth + Margin;
 		private const float SelectedWidth = 300f;
 		private const float MiddleX = SelectedX + SelectedWidth + Margin;
-		private const float ArrowWidth = 32;
+		private const float ArrowWidth = 32f;
 		private const float MidControlX = MiddleX + Margin;
 		private const float MiddleWidth = ArrowWidth + (Margin * 2f);
 		private const float LoadedX = MiddleX + MiddleWidth;
 		private const float LoadedWidth = 320f;
 		private const float RandomButtonWidth = 100f;
 		private const float RandomButtonX = Margin + RandomizerWidth - RandomButtonWidth;
-		private const float NameFieldWidth = RandomizerWidth - RandomButtonWidth - Margin;
 
 		// Layout constants - Y.
 		private const float ToolY = TitleHeight + Margin;
 		private const float ListY = ToolY + ToolbarHeight + Margin;
 		private const float ListHeight = UIPropRow.RowHeight * 16f;
-		private const float LeftListY = ListY + 32f;
-		private const float LeftListHeight = ListHeight - 32f;
+		private const float LeftListY = ListY + 64f;
+		private const float LeftListHeight = ListHeight - 64f;
 		private const float ArrowHeight = 64f;
-		private const float NameFieldY = LeftListY - 22f - Margin;
+		private const float RandomButtonY = LeftListY - ToggleSize - Margin;
+		private const float NameFieldY = RandomButtonY - 22f - Margin;
 
 
 		// Instance references.
@@ -210,6 +210,9 @@ namespace BOB
 			// Default position - centre in screen.
 			relativePosition = new Vector2(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
 
+			// Title label.
+			AddTitle(Translations.Translate("BOB_NAM"));
+
 			// Selected random prop list.
 			UIPanel randomizerPanel = AddUIComponent<UIPanel>();
 			randomizerPanel.width = RandomizerWidth;
@@ -226,7 +229,6 @@ namespace BOB
 			variationsList = UIFastList.Create<UIRandomComponentRow>(selectedPanel);
 			ListSetup(variationsList);
 
-
 			// Initialize curren variations list.
 			currentVariations = new List<PrefabInfo>();
 
@@ -238,6 +240,21 @@ namespace BOB
 			loadedList = UIFastList.Create<UILoadedRandomPropRow>(loadedPanel);
 			ListSetup(loadedList);
 
+			// Name change textfield.
+			nameField = UIControls.AddTextField(this, Margin, NameFieldY, RandomizerWidth);
+
+			// Add random prefab button.
+			UIButton addRandomButton = AddIconButton(this, Margin, RandomButtonY, 32f, "BOB_RND_NEW", TextureUtils.LoadSpriteAtlas("bob_buttons_plus_round_small"));
+			addRandomButton.eventClicked += NewRandomPrefab;
+
+			// Remove random prefab button.
+			removeRandomButton = AddIconButton(this, addRandomButton.relativePosition.x + 32f, RandomButtonY, 32f, "BOB_RND_NEW", TextureUtils.LoadSpriteAtlas("bob_buttons_minus_round_small"));
+			removeRandomButton.eventClicked += RemoveRandomPrefab;
+
+			// Rename button.
+			renameButton = UIControls.EvenSmallerButton(this, RandomButtonX, RandomButtonY, Translations.Translate("BOB_RND_REN"), RandomButtonWidth);
+			renameButton.eventClicked += RenameRandomPrefab;
+
 			// Add variation button.
 			UIButton addVariationButton = ArrowButton(this, MidControlX, ListY, "ArrowLeft");
 			addVariationButton.eventClicked += AddVariation;
@@ -245,21 +262,6 @@ namespace BOB
 			// Remove variation button.
 			UIButton removeVariationButton = ArrowButton(this, MidControlX, ListY + ArrowHeight + Margin, "ArrowRight");
 			removeVariationButton.eventClicked += RemoveVariation;
-
-			// Add random prefab button.
-			UIButton addRandomButton = AddIconButton(this, treeCheck.relativePosition.x + 32f, treeCheck.relativePosition.y, 32f, "BOB_RND_NEW", TextureUtils.LoadSpriteAtlas("bob_buttons_plus_round"));
-			addRandomButton.eventClicked += NewRandomPrefab;
-
-			// Remove random prefab button.
-			UIButton removeRandomButton = AddIconButton(this, addRandomButton.relativePosition.x + 32f, addRandomButton.relativePosition.y, 32f, "BOB_RND_NEW", TextureUtils.LoadSpriteAtlas("bob_buttons_minus_round"));
-			removeRandomButton.eventClicked += RemoveRandomPrefab;
-
-			// Name change textfield.
-			nameField = UIControls.AddTextField(this, Margin, NameFieldY, NameFieldWidth);
-
-			// Rename button.
-			renameButton = UIControls.EvenSmallerButton(this, RandomButtonX, NameFieldY + 1f, Translations.Translate("BOB_RND_REN"), RandomButtonWidth);
-			renameButton.eventClicked += RenameRandomPrefab;
 
 			// Populate loaded lists.
 			RandomList();
@@ -513,7 +515,7 @@ namespace BOB
 			}
 
 			// Reset selection and regenerate UI fastlist.
-			selectedRandomPrefab = null;
+			SelectedRandomPrefab = null;
 			randomList.selectedIndex = -1;
 			RandomList();
 		}

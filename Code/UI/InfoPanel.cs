@@ -28,7 +28,7 @@ namespace BOB
 		protected int probability;
 
 		// Panel components.
-		protected UIButton replaceAllButton, configButton;
+		protected UIButton replaceAllButton;
 		protected BOBSlider probabilitySlider, angleSlider, xSlider, ySlider, zSlider;
 		private readonly UICheckBox randomCheck;
 

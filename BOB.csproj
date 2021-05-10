@@ -134,8 +134,8 @@
     <Content Include="Resources\bob_all_roads_small.png" />
     <Content Include="Resources\bob_buildings.png" />
     <Content Include="Resources\bob_buildings_small.png" />
-    <Content Include="Resources\bob_buttons_minus_round.png" />
-    <Content Include="Resources\bob_buttons_plus_round.png" />
+    <Content Include="Resources\bob_buttons_minus_round_small.png" />
+    <Content Include="Resources\bob_buttons_plus_round_small.png" />
     <Content Include="Resources\bob_cursor_dark.png" />
     <Content Include="Resources\bob_cursor_light.png" />
     <Content Include="Resources\bob_props3.png" />

@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using System.Linq;
+﻿using System.Linq;
 using System.Collections.Generic;
 using ColossalFramework;
 using ColossalFramework.UI;

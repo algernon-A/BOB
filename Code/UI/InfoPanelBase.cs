@@ -236,9 +236,7 @@ namespace BOB
 			selectedPrefab = targetPrefabInfo;
 
 			// Title label.
-			UILabel titleLabel = AddUIComponent<UILabel>();
-			titleLabel.text = Translations.Translate("BOB_NAM") + ": " + GetDisplayName(targetPrefabInfo.name);
-			titleLabel.relativePosition = new Vector2(50f, (TitleHeight - titleLabel.height) / 2f);
+			AddTitle(Translations.Translate("BOB_NAM") + ": " + GetDisplayName(targetPrefabInfo.name));
 		}
 
 

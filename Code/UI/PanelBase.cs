@@ -11,6 +11,7 @@ namespace BOB
 	{
 		// Layout constants - general.
 		protected const float Margin = 5f;
+		protected const float ToggleSize = 32f;
 
 		// Layout constants - Y.
 		protected const float TitleHeight = 40f;
@@ -87,7 +88,7 @@ namespace BOB
 
 			// Tree/Prop checkboxes.
 			propCheck = IconToggleCheck(this, Margin, TitleHeight + Margin, "bob_props3", "BOB_PNL_PRP");
-			treeCheck = IconToggleCheck(this, Margin + propCheck.width, TitleHeight + Margin, "bob_trees_small", "BOB_PNL_TRE");
+			treeCheck = IconToggleCheck(this, Margin + ToggleSize, TitleHeight + Margin, "bob_trees_small", "BOB_PNL_TRE");
 			propCheck.isChecked = !InitialTreeCheckedState;
 			treeCheck.isChecked = InitialTreeCheckedState;
 			propCheck.eventCheckChanged += PropCheckChanged;
@@ -174,6 +175,19 @@ namespace BOB
 
 
 		/// <summary>
+		/// Adds the title text label.
+		/// </summary>
+		/// <param name="title">Title text</param>
+		protected void AddTitle(string title)
+        {
+			// Title label.
+			UILabel titleLabel = AddUIComponent<UILabel>();
+			titleLabel.text = title;
+			titleLabel.relativePosition = new Vector2(50f, (TitleHeight - titleLabel.height) / 2f);
+		}
+
+
+		/// <summary>
 		/// Adds an icon toggle checkbox.
 		/// </summary>
 		/// <param name="parent">Parent component</param>
@@ -184,12 +198,10 @@ namespace BOB
 		/// <returns>New checkbox</returns>
 		private UICheckBox IconToggleCheck(UIComponent parent, float xPos, float yPos, string atlasName, string tooltipKey)
 		{
-			const float ToggleSpriteSize = 32f;
-
 			// Size and position.
 			UICheckBox checkBox = parent.AddUIComponent<UICheckBox>();
-			checkBox.width = ToggleSpriteSize;
-			checkBox.height = ToggleSpriteSize;
+			checkBox.width = ToggleSize;
+			checkBox.height = ToggleSize;
 			checkBox.clipChildren = true;
 			checkBox.relativePosition = new Vector2(xPos, yPos);
 
@@ -197,13 +209,13 @@ namespace BOB
 			UISprite sprite = checkBox.AddUIComponent<UISprite>();
 			sprite.atlas = TextureUtils.LoadSpriteAtlas(atlasName);
 			sprite.spriteName = "disabled";
-			sprite.size = new Vector2(ToggleSpriteSize, ToggleSpriteSize);
+			sprite.size = new Vector2(ToggleSize, ToggleSize);
 			sprite.relativePosition = Vector3.zero;
 
 			checkBox.checkedBoxObject = sprite.AddUIComponent<UISprite>();
 			((UISprite)checkBox.checkedBoxObject).atlas = TextureUtils.LoadSpriteAtlas(atlasName);
 			((UISprite)checkBox.checkedBoxObject).spriteName = "pressed";
-			checkBox.checkedBoxObject.size = new Vector2(ToggleSpriteSize, ToggleSpriteSize);
+			checkBox.checkedBoxObject.size = new Vector2(ToggleSize, ToggleSize);
 			checkBox.checkedBoxObject.relativePosition = Vector3.zero;
 
 			checkBox.tooltip = Translations.Translate(tooltipKey);
