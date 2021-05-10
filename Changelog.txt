@@ -1,4 +1,9 @@
-﻿Version 0.6.2 -
+﻿- Add random prop and tree support
+- Add support for map editor
+- Fix slider text values not updating for some users
+
+
+Version 0.6.2 -
 
 - Add options to remove ruining from trees and props
 - Fix network prop rotation sometimes being incorrectly displayed when first selected

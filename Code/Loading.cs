@@ -21,7 +21,7 @@ namespace BOB
             Logging.KeyMessage("version ", BOBMod.Version, " loading");
 
             // Don't do anything if not in game (e.g. if we're going into an editor).
-            if (loading.currentMode != AppMode.Game)
+            if (loading.currentMode != AppMode.Game && loading.currentMode != AppMode.MapEditor)
             {
                 isModEnabled = false;
                 Logging.KeyMessage("not loading into game, skipping activation");
