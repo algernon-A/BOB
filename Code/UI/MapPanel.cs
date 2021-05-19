@@ -12,7 +12,7 @@ namespace BOB
 	internal class BOBMapInfoPanel : BOBInfoPanelBase
 	{
 		// Button labels.
-		protected override string ReplaceTooltipKey => "BOB_PNL_RTT";
+		protected override string ReplaceTooltipKey => IsTree ? "BOB_PNL_RTT" : "BOB_PNL_RTP";
 
 		// Trees or props?
 		protected override bool IsTree => treeCheck?.isChecked ?? false;
@@ -33,6 +33,13 @@ namespace BOB
 		{
 			// Base setup.
 			base.Setup(targetPrefabInfo);
+
+			// Title label.
+			AddTitle(Translations.Translate("BOB_NAM"));
+
+			// Set trees/props.
+			propCheck.isChecked = !InitialTreeCheckedState;
+			treeCheck.isChecked = InitialTreeCheckedState;
 
 			// Populate target list and select target item.
 			TargetList();
@@ -111,6 +118,7 @@ namespace BOB
 
 			// Toggle replace button atlas.
 			replaceButton.atlas = isChecked ? TextureUtils.LoadSpriteAtlas("bob_props3_large") : TextureUtils.LoadSpriteAtlas("bob_trees");
+			replaceButton.tooltip = Translations.Translate(ReplaceTooltipKey);
 		}
 
 

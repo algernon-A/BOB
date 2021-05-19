@@ -95,6 +95,13 @@ namespace BOB
 			treeCheck.eventCheckChanged += TreeCheckChanged;
 		}
 
+
+		/// <summary>
+		/// Initial tree/prop checked state.
+		/// </summary>
+		protected abstract bool InitialTreeCheckedState { get; }
+
+
 		/// <summary>
 		/// Close button event handler.
 		/// <param name="control">Calling component (unused)</param>
@@ -115,12 +122,6 @@ namespace BOB
 		/// <param name="control">Calling component (unused)</param>
 		/// <param name="isChecked">New checked state</param>
 		protected virtual void VanillaCheckChanged(UIComponent control, bool isChecked) => LoadedList();
-
-
-		/// <summary>
-		/// Initial tree/prop checked state.
-		/// </summary>
-		protected abstract bool InitialTreeCheckedState { get; }
 
 
 		/// <summary>

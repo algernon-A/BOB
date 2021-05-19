@@ -91,6 +91,19 @@ namespace BOB
 
 
 		/// <summary>
+		/// Performs initial setup 
+		/// </summary>
+		/// <param name="targetPrefabInfo">Currently selected target prefab</param>
+		internal override void Setup(PrefabInfo targetPrefabInfo)
+		{
+			base.Setup(targetPrefabInfo);
+
+			// Title label.
+			AddTitle(Translations.Translate("BOB_NAM") + ": " + GetDisplayName(targetPrefabInfo.name));
+		}
+
+
+		/// <summary>
 		/// Replace all button event handler.
 		/// <param name="control">Calling component (unused)</param>
 		/// <param name="mouseEvent">Mouse event (unused)</param>
@@ -273,5 +286,13 @@ namespace BOB
 
 			return sliderPanel;
 		}
+
+
+		/// <summary>
+		/// Returns a cleaned-up display name for the given prefab.
+		/// </summary>
+		/// <param name="prefabName">Raw prefab name</param>
+		/// <returns>Cleaned display name</returns>
+		private string GetDisplayName(string prefabName) => prefabName.Substring(prefabName.IndexOf('.') + 1).Replace("_Data", "");
 	}
 }
