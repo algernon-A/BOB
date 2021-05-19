@@ -142,6 +142,7 @@
     <Content Include="Resources\bob_plus.png" />
     <Content Include="Resources\bob_props3.png" />
     <Content Include="Resources\bob_props3_large.png" />
+    <Content Include="Resources\bob_prop_pack.png" />
     <Content Include="Resources\bob_prop_pack_small.png" />
     <Content Include="Resources\bob_random_small.png" />
     <Content Include="Resources\bob_road.png" />
