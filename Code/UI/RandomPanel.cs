@@ -262,6 +262,13 @@ namespace BOB
 			UIButton removeVariationButton = AddIconButton(this, MidControlX, ListY + ToggleSize, ToggleSize, "BOB_RND_SUB", TextureUtils.LoadSpriteAtlas("bob_minus"));
 			removeVariationButton.eventClicked += RemoveVariation;
 
+			// Order buttons.
+			loadedNameButton = ArrowButton(this, LoadedX + 10f, ListY - 20f);
+			loadedNameButton.eventClicked += SortLoaded;
+
+			// Default is name ascending.
+			SetFgSprites(loadedNameButton, "IconUpArrow2");
+
 			// Populate loaded lists.
 			RandomList();
 			LoadedList();
@@ -339,6 +346,13 @@ namespace BOB
 						}
 					}
 				}
+			}
+
+			// Master lists should already be sorted by display name so no need to sort again here.
+			// Reverse order of filtered list if we're searching name descending.
+			if (loadedSearchStatus == (int)OrderBy.NameDescending)
+			{
+				list.Reverse();
 			}
 
 			// Create return fastlist from our filtered list.

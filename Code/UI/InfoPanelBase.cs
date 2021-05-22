@@ -12,14 +12,6 @@ namespace BOB
 	/// </summary>
 	internal abstract class BOBInfoPanelBase : BOBPanelBase
 	{
-		// Display order state.
-		internal enum OrderBy
-		{
-			NameAscending = 0,
-			NameDescending
-		}
-
-
 		// Layout constants - X.
 		protected const float LeftWidth = 400f;
 		protected const float MidControlWidth = 128f;
@@ -51,10 +43,10 @@ namespace BOB
 		protected UIFastList targetList, loadedList;
 		protected UILabel noPropsLabel;
 		protected UIButton replaceButton, revertButton;
-		private readonly UIButton targetNameButton, loadedNameButton;
+		private readonly UIButton targetNameButton;
 
 		// Search settings.
-		protected int targetSearchStatus, loadedSearchStatus;
+		protected int targetSearchStatus;
 
 
 		// Button tooltips.
@@ -501,35 +493,6 @@ namespace BOB
 		}
 
 
-
-		/// <summary>
-		/// Loaded list sort button event handler.
-		/// <param name="control">Calling component</param>
-		/// <param name="mouseEvent">Mouse event (unused)</param>
-		/// </summary>
-		private void SortLoaded(UIComponent control, UIMouseEventParameter mouseEvent)
-		{
-			// Toggle status (set to descending if we're currently ascending, otherwise set to ascending).
-			if (loadedSearchStatus == (int)OrderBy.NameAscending)
-			{
-				// Order by name descending.
-				loadedSearchStatus = (int)OrderBy.NameDescending;
-			}
-			else
-			{
-				// Order by name ascending.
-				loadedSearchStatus = (int)OrderBy.NameAscending;
-			}
-
-			// Reset name order buttons.
-			SetSortButton(loadedNameButton, loadedSearchStatus);
-
-
-			// Regenerate loaded list.
-			LoadedList();
-		}
-
-
 		/// <summary>
 		/// Target list sort button event handler.
 		/// <param name="control">Calling component</param>
@@ -558,36 +521,6 @@ namespace BOB
 
 
 		/// <summary>
-		/// Sets the states of the two given sort buttons to match the given search status.
-		/// </summary>
-		/// <param name="activeButton">Currently active sort button</param>
-		/// <param name="inactiveButton">Inactive button (other sort button for same list)</param>
-		/// <param name="searchStatus">Search status to apply</param>
-		private void SetSortButton(UIButton activeButton, int searchStatus)
-		{
-			// Null check.
-			if (activeButton == null)
-            {
-				return;
-            }
-
-			bool ascending = searchStatus == (int)OrderBy.NameAscending;
-
-			// Toggle status (set to descending if we're currently ascending, otherwise set to ascending).
-			if (ascending)
-			{
-				// Order ascending.
-				SetFgSprites(activeButton, "IconUpArrow2");
-			}
-			else
-			{
-				// Order descending.
-				SetFgSprites(activeButton, "IconDownArrow2");
-			}
-		}
-
-
-		/// <summary>
 		/// Performs initial fastlist setup.
 		/// </summary>
 		/// <param name="fastList">Fastlist to set up</param>
@@ -607,42 +540,6 @@ namespace BOB
 			// Data.
 			fastList.rowsData = new FastList<object>();
 			fastList.selectedIndex = -1;
-		}
-
-
-		/// <summary>
-		/// Adds an arrow button.
-		/// </summary>
-		/// <param name="parent">Parent component</param>
-		/// <param name="posX">Relative X postion</param>
-		/// <param name="posY">Relative Y position</param>
-		/// <param name="width">Button width (default 32)</param>
-		/// <param name="height">Button height (default 20)</param>
-		/// <returns>New arrow button</returns>
-		private UIButton ArrowButton(UIComponent parent, float posX, float posY, float width = 32f, float height = 20f)
-		{
-			UIButton button = parent.AddUIComponent<UIButton>();
-
-			// Size and position.
-			button.size = new Vector2(width, height);
-			button.relativePosition = new Vector2(posX, posY);
-
-			// Appearance.
-			SetFgSprites(button, "IconUpArrow2");
-			button.canFocus = false;
-
-			return button;
-		}
-
-
-		/// <summary>
-		/// Sets the foreground sprites for the given button to the specified sprite.
-		/// </summary>
-		/// <param name="button">Targeted button</param>
-		/// <param name="spriteName">Sprite name</param>
-		private void SetFgSprites(UIButton button, string spriteName)
-		{
-			button.normalFgSprite = button.hoveredFgSprite = button.pressedFgSprite = button.focusedFgSprite = spriteName;
 		}
 	}
 }
