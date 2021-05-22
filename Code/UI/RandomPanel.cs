@@ -255,11 +255,11 @@ namespace BOB
 			renameButton.eventClicked += RenameRandomPrefab;
 
 			// Add variation button.
-			UIButton addVariationButton = AddIconButton(this, MidControlX, ListY, ToggleSize, Translations.Translate("BOB_RND_ADD"), TextureUtils.LoadSpriteAtlas("bob_plus"));
+			UIButton addVariationButton = AddIconButton(this, MidControlX, ListY, ToggleSize, "BOB_RND_ADD", TextureUtils.LoadSpriteAtlas("bob_plus"));
 			addVariationButton.eventClicked += AddVariation;
 
 			// Remove variation button.
-			UIButton removeVariationButton = AddIconButton(this, MidControlX, ListY + ToggleSize, ToggleSize, Translations.Translate("BOB_RND_SUB"), TextureUtils.LoadSpriteAtlas("bob_minus"));
+			UIButton removeVariationButton = AddIconButton(this, MidControlX, ListY + ToggleSize, ToggleSize, "BOB_RND_SUB", TextureUtils.LoadSpriteAtlas("bob_minus"));
 			removeVariationButton.eventClicked += RemoveVariation;
 
 			// Populate loaded lists.
