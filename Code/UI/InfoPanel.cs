@@ -1,4 +1,5 @@
-﻿using ColossalFramework.UI;
+﻿using System;
+using ColossalFramework.UI;
 using UnityEngine;
 
 
@@ -170,6 +171,15 @@ namespace BOB
 						m_buffer = PrefabLists.randomProps.ToArray(),
 						m_size = PrefabLists.randomProps.Count
 					};
+				}
+
+				// Master lists should already be sorted by display name so no need to sort again here.
+				// Reverse order of filtered list if we're searching name descending.
+				if (loadedSearchStatus == (int)OrderBy.NameDescending)
+				{
+					Logging.Message("reversing random prop order");
+					Array.Reverse(loadedList.rowsData.m_buffer);
+					loadedList.Refresh();
 				}
 
 				// Clear selections.
