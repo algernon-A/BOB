@@ -12,19 +12,19 @@ namespace BOB
     {
         // Layout constants.
         public const float RowHeight = 23f;
-        private const float PaddingY = 5f;
-        private const float TextScale = 0.8f;
+        protected const float PaddingY = 5f;
+        protected const float TextScale = 0.8f;
         private const float LeftMargin = 10f;
         private const float PackageMargin = 20f;
-        private const float IndexWidth = 20f;
-        private const float IndexLabelX = LeftMargin + PackageMargin;
+        protected const float IndexWidth = 20f;
+        protected const float IndexLabelX = LeftMargin + PackageMargin;
 
         // Layout variables.
-        private float labelX;
+        protected float labelX;
 
         // Panel components.
         private UIPanel panelBackground;
-        private UILabel indexLabel, nameLabel;
+        protected UILabel indexLabel, nameLabel;
         private UISprite lineSprite;
 
         // ObjectData.
@@ -94,7 +94,7 @@ namespace BOB
         /// </summary>
         /// <param name="data">Object to list</param>
         /// <param name="isRowOdd">If the row is an odd-numbered row (for background banding)</param>
-        public void Display(object data, bool isRowOdd)
+        public virtual void Display(object data, bool isRowOdd)
         {
             // Perform initial setup for new rows.
             if (nameLabel == null)

@@ -7,6 +7,13 @@ using ColossalFramework.UI;
 
 namespace BOB
 {
+	public class BOBVariant
+    {
+		public PrefabInfo prefab;
+		public int probability;
+		public bool probLocked = false;
+    }
+
 	/// <summary>
 	/// Panel to setup random props/trees.
 	/// </summary>
@@ -45,10 +52,14 @@ namespace BOB
 		private readonly UIFastList randomList, variationsList, loadedList;
 		private readonly UIButton removeRandomButton, renameButton;
 		private readonly UITextField nameField;
+		private readonly BOBSlider probSlider;
 
 		// Current selections.
-		private PrefabInfo selectedRandomPrefab, selectedVariation, selectedLoadedPrefab;
-		private readonly List<PrefabInfo> currentVariations;
+		private PrefabInfo selectedRandomPrefab, selectedLoadedPrefab;
+		private BOBVariant selectedVariation;
+		private readonly List<BOBVariant> currentVariations;
+		private BOBVariant lastChangedVariant;
+		private bool ignoreValueChange = false;
 
 
 		// Panel width.
@@ -147,7 +158,18 @@ namespace BOB
 		/// <summary>
 		/// Sets the currently selected random component.
 		/// </summary>
-		internal PrefabInfo SelectedVariation { set => selectedVariation = value; }
+		internal BOBVariant SelectedVariation
+		{
+			set
+			{
+				selectedVariation = value;
+
+				// Disable events while updating value.
+				ignoreValueChange = true;
+				probSlider.value = value.probability;
+				ignoreValueChange = false;
+			}
+		}
 
 
 		/// <summary>
@@ -177,7 +199,7 @@ namespace BOB
 					// Prop- iterate through variations and add to list.
 					for (int i = 0; i < randomProp.m_variations.Length; ++i)
                     {
-						currentVariations.Add(randomProp.m_variations[i].m_finalProp);
+						currentVariations.Add(new BOBVariant { prefab = randomProp.m_variations[i].m_finalProp, probability = randomProp.m_variations[i].m_probability });
                     }
 				}
 				else if (selectedRandomPrefab is TreeInfo randomTree && randomTree.m_variations != null)
@@ -185,7 +207,7 @@ namespace BOB
 					// Tree - iterate through variations and add to list.
 					for (int i = 0; i < randomTree.m_variations.Length; ++i)
 					{
-						currentVariations.Add(randomTree.m_variations[i].m_finalTree);
+						currentVariations.Add(new BOBVariant { prefab = randomTree.m_variations[i].m_finalTree, probability = randomTree.m_variations[i].m_probability });
 					}
 				}
 
@@ -229,7 +251,7 @@ namespace BOB
 			ListSetup(variationsList);
 
 			// Initialize curren variations list.
-			currentVariations = new List<PrefabInfo>();
+			currentVariations = new List<BOBVariant>();
 
 			// Loaded prop list.
 			UIPanel loadedPanel = AddUIComponent<UIPanel>();
@@ -265,6 +287,25 @@ namespace BOB
 			// Order buttons.
 			loadedNameButton = ArrowButton(this, LoadedX + 10f, ListY - 20f);
 			loadedNameButton.eventClicked += SortLoaded;
+
+			// Probability slider.
+			probSlider = AddBOBSlider(this, SelectedX + Margin, ToolY, SelectedWidth - (Margin * 2f), "BOB_PNL_PRB", 0, 100, 1, "Probability");
+			probSlider.eventValueChanged += (control, value) =>
+			{
+				if (selectedVariation != null)
+                {
+					selectedVariation.probability = (int)value;
+					lastChangedVariant = selectedVariation;
+
+					if (!ignoreValueChange)
+					{
+						UpdateCurrentRandomPrefab();
+					}
+
+					variationsList.Refresh();
+					ConfigurationUtils.SaveConfig();
+                }
+			};
 
 			// Default is name ascending.
 			SetFgSprites(loadedNameButton, "IconUpArrow2");
@@ -578,15 +619,19 @@ namespace BOB
 			}
 
 			// Add selected prefab to list of variations and regenerate UI fastlist.
-			currentVariations.Add(selectedLoadedPrefab);
+			BOBVariant newVariant = new BOBVariant { prefab = selectedLoadedPrefab, probability = 0 };
+			currentVariations.Add(newVariant);
 			VariationsList();
 
 			// Select variation.
-			variationsList.FindItem(selectedLoadedPrefab);
-			selectedVariation = selectedLoadedPrefab;
+			variationsList.FindItem(newVariant);
+			selectedVariation = newVariant;
 
 			// Update the random prefab with the new variation.
 			UpdateCurrentRandomPrefab();
+
+			// Update slider value.
+			probSlider.value = newVariant.probability;
 		}
 
 
@@ -619,6 +664,9 @@ namespace BOB
 		{
 			int variationCount = currentVariations.Count;
 
+			// Recalculate probabilities.
+			RecalculateProbabilities();
+
 			// Trees or props?
 			if (selectedRandomPrefab is TreeInfo randomTree)
 			{
@@ -630,7 +678,7 @@ namespace BOB
 				{
 					randomTree.m_variations[i] = new TreeInfo.Variation()
 					{
-						m_finalTree = currentVariations[i] as TreeInfo,
+						m_finalTree = currentVariations[i].prefab as TreeInfo,
 						m_probability = 100 / variationCount
 					};
 				}
@@ -646,12 +694,97 @@ namespace BOB
 				{
 					randomProp.m_variations[i] = new PropInfo.Variation()
 					{
-						m_finalProp = currentVariations[i] as PropInfo,
-						m_probability = 100 / variationCount
+						m_finalProp = currentVariations[i].prefab as PropInfo,
+						m_probability = currentVariations[i].probability
 					};
 				}
 			}
 		}
+
+
+		/// <summary>
+		/// Recalculates the current component probabilities.
+		/// </summary>
+		private void RecalculateProbabilities()
+		{
+			Logging.Message("recalculating probabilities");
+
+			// Get last changed variant - ignore if locked.
+			bool validLastChanged = lastChangedVariant != null;
+
+			// Number of locked and unlocked entries and their summative probabilities.
+			int lockedProbs = 0, unlockedProbs = 0, lockedCount = 0, unlockedCount = 0;
+
+			// Iterate through all current variations, identifying locked probabilties.
+			for (int i = 0; i < currentVariations.Count; ++i)
+			{
+				// Ignore last changed variant.
+				if (!validLastChanged || (validLastChanged && currentVariations[i] != lastChangedVariant))
+				{
+					// If this variation has a locked probability, add the probability to the total locked percentage and increment the locked counter - ignoring most recently changed item.
+					if (currentVariations[i].probLocked)
+					{
+						lockedProbs += currentVariations[i].probability;
+						++lockedCount;
+					}
+					else
+					{
+						// Unlocked.
+						unlockedProbs += currentVariations[i].probability;
+						++unlockedCount;
+					}
+				}
+			}
+
+			// Get the probability of the most recently changed probability.
+			int changedProb = validLastChanged ? lastChangedVariant.probability : 0;
+
+			// If total probs are more than 100, reduce unlocked probs to fit.
+			if (lockedProbs + unlockedProbs + changedProb > 100)
+			{
+				// Assign unlocked probabilities, except to most recently changed item.
+				int remainderProb = 100 - lockedProbs - changedProb;
+				for (int i = 0; i < currentVariations.Count; ++i)
+				{
+					if (!currentVariations[i].probLocked && (!validLastChanged || currentVariations[i] != lastChangedVariant))
+					{
+						// Minimum probability of one; decrement remaining count and recalculate remaining probabilities as we go, to avoid rounding errors.
+						int thisProb = Math.Max(1, remainderProb / unlockedCount--);
+						currentVariations[i].probability = thisProb;
+						remainderProb -= thisProb;
+
+						// Abort if for some reason unlockedCount is zero.
+						if (unlockedCount == 0)
+						{
+							break;
+						}
+					}
+				}
+
+				// Now, review probabilities that we've assigned.
+				int residualProb = 100;
+				for (int i = 0; i < currentVariations.Count; ++i)
+				{
+					residualProb -= currentVariations[i].probability;
+				}
+
+				// Change the 'last changed' variant if we need to to keep total probability to 100.
+				if (residualProb < 1 && lastChangedVariant != null)
+				{
+					lastChangedVariant.probability += (residualProb - 1);
+				}
+				
+				// Update probability slider.
+				if (selectedVariation != null)
+				{
+					probSlider.value = selectedVariation.probability;
+				}
+			}
+
+			// Regenerate list.
+			variationsList.Refresh();
+		}
+		
 
 
 		/// <summary>

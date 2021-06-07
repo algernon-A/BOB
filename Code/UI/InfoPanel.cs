@@ -53,13 +53,13 @@ namespace BOB
 
 			// Probability.
 			UIPanel probabilityPanel = Sliderpanel(this, MidControlX, ProbabilityY, SliderHeight);
-			probabilitySlider = AddBOBSlider(probabilityPanel, 0f, "BOB_PNL_PRB", 0, 100, 1, "Probability");
+			probabilitySlider = AddBOBSlider(probabilityPanel, Margin, 0f, MidControlWidth - (Margin * 2f), "BOB_PNL_PRB", 0, 100, 1, "Probability");
 			probabilitySlider.TrueValue = 100f;
 			probabilitySlider.LimitToVisible = true;
 
 			// Angle.
 			UIPanel anglePanel = Sliderpanel(this, MidControlX, AngleY, SliderHeight);
-			angleSlider = AddBOBSlider(anglePanel, 0f, "BOB_PNL_ANG", -180, 180, 1, "Angle");
+			angleSlider = AddBOBSlider(anglePanel, Margin, 0f, MidControlWidth - (Margin * 2f), "BOB_PNL_ANG", -180, 180, 1, "Angle");
 
 			// Offset panel.
 			UIPanel offsetPanel = Sliderpanel(this, MidControlX, OffsetPanelY, OffsetPanelHeight);
@@ -73,9 +73,9 @@ namespace BOB
 			offsetLabel.relativePosition = new Vector2((offsetPanel.width - offsetLabel.width) / 2f, OffsetLabelY);
 
 			// Offset sliders.
-			xSlider = AddBOBSlider(offsetPanel, XOffsetY, "BOB_PNL_XOF", -8f, 8f, 0.01f, "X offset");
-			ySlider = AddBOBSlider(offsetPanel, YOffsetY, "BOB_PNL_YOF", -8f, 8f, 0.01f, "Y offset");
-			zSlider = AddBOBSlider(offsetPanel, ZOffsetY, "BOB_PNL_ZOF", -8f, 8f, 0.01f, "Z offset");
+			xSlider = AddBOBSlider(offsetPanel, Margin, XOffsetY, MidControlWidth - (Margin * 2f), "BOB_PNL_XOF", -8f, 8f, 0.01f, "X offset");
+			ySlider = AddBOBSlider(offsetPanel, Margin, YOffsetY, MidControlWidth - (Margin * 2f), "BOB_PNL_YOF", -8f, 8f, 0.01f, "Y offset");
+			zSlider = AddBOBSlider(offsetPanel, Margin, ZOffsetY, MidControlWidth - (Margin * 2f), "BOB_PNL_ZOF", -8f, 8f, 0.01f, "Z offset");
 
 			// Set initial button states);
 			UpdateButtonStates();
@@ -193,75 +193,6 @@ namespace BOB
 		{
 			// Regenerate loaded list.
 			LoadedList();
-		}
-
-
-		/// <summary>
-		/// Adds a BOB slider to the specified component.
-		/// </summary>
-		/// <param name="parent">Parent component</param>
-		/// <param name="yPos">Relative Y position</param>
-		/// <param name="labelKey">Text label translation key</param>
-		/// <param name="minValue">Minimum displayed value</param
-		/// <param name="maxValue">Maximum displayed value</param>
-		/// <param name="stepSize">Minimum slider step size</param>
-		/// <param name="name">Slider name</param>
-		/// <returns>New BOBSlider</returns>
-		private BOBSlider AddBOBSlider(UIComponent parent, float yPos, string labelKey, float minValue, float maxValue, float stepSize, string name)
-		{
-			const float SliderY = 18f;
-			const float ValueY = 3f;
-			const float LabelY = -13f;
-			const float SliderHeight = 18f;
-			const float FloatTextFieldWidth = 45f;
-			const float IntTextFieldWidth = 38f;
-
-
-			// Slider control.
-			BOBSlider newSlider = parent.AddUIComponent<BOBSlider>();
-			newSlider.size = new Vector2(MidControlWidth - (Margin * 2f), SliderHeight);
-			newSlider.relativePosition = new Vector2(Margin, yPos + SliderY);
-			newSlider.name = name;
-
-			// Value field - added to parent, not to slider, otherwise slider catches all input attempts.  Integer textfields (stepsize == 1) have shorter widths.
-			float textFieldWidth = stepSize == 1 ? IntTextFieldWidth : FloatTextFieldWidth;
-			UITextField valueField = UIControls.TinyTextField(parent, Margin + newSlider.width - textFieldWidth, yPos + ValueY, textFieldWidth);
-
-			// Title label.
-			UILabel titleLabel = UIControls.AddLabel(newSlider, 0f, LabelY, Translations.Translate(labelKey), textScale: 0.7f);
-
-			// Autoscale tile label text, with minimum size 0.35.
-			while (titleLabel.width > newSlider.width - textFieldWidth && titleLabel.textScale > 0.35f)
-			{
-				titleLabel.textScale -= 0.05f;
-			}
-
-			// Slider track.
-			UISlicedSprite sliderSprite = newSlider.AddUIComponent<UISlicedSprite>();
-			sliderSprite.atlas = TextureUtils.InGameAtlas;
-			sliderSprite.spriteName = "BudgetSlider";
-			sliderSprite.size = new Vector2(newSlider.width, 9f);
-			sliderSprite.relativePosition = new Vector2(0f, 4f);
-
-			// Slider thumb.
-			UISlicedSprite sliderThumb = newSlider.AddUIComponent<UISlicedSprite>();
-			sliderThumb.atlas = TextureUtils.InGameAtlas;
-			sliderThumb.spriteName = "SliderBudget";
-			newSlider.thumbObject = sliderThumb;
-
-			// Set references.
-			newSlider.ValueField = valueField;
-
-			// Event handler for textfield.
-			newSlider.ValueField.eventTextSubmitted += newSlider.OnTextSubmitted;
-
-			// Set initial values.
-			newSlider.StepSize = stepSize;
-			newSlider.maxValue = maxValue;
-			newSlider.minValue = minValue;
-			newSlider.TrueValue = 0f;
-
-			return newSlider;
 		}
 
 

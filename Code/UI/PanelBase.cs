@@ -295,6 +295,77 @@ namespace BOB
 
 
 		/// <summary>
+		/// Adds a BOB slider to the specified component.
+		/// </summary>
+		/// <param name="parent">Parent component</param>
+		/// <param name="xPos">Relative X position</param
+		/// <param name="yPos">Relative Y position</param
+		/// <param name="width">Slider width</param>
+		/// <param name="labelKey">Text label translation key</param>
+		/// <param name="minValue">Minimum displayed value</param
+		/// <param name="maxValue">Maximum displayed value</param>
+		/// <param name="stepSize">Minimum slider step size</param>
+		/// <param name="name">Slider name</param>
+		/// <returns>New BOBSlider</returns>
+		protected BOBSlider AddBOBSlider(UIComponent parent, float xPos, float yPos, float width, string labelKey, float minValue, float maxValue, float stepSize, string name)
+		{
+			const float SliderY = 18f;
+			const float ValueY = 3f;
+			const float LabelY = -13f;
+			const float SliderHeight = 18f;
+			const float FloatTextFieldWidth = 45f;
+			const float IntTextFieldWidth = 38f;
+
+
+			// Slider control.
+			BOBSlider newSlider = parent.AddUIComponent<BOBSlider>();
+			newSlider.size = new Vector2(width, SliderHeight);
+			newSlider.relativePosition = new Vector2(xPos, yPos + SliderY);
+			newSlider.name = name;
+
+			// Value field - added to parent, not to slider, otherwise slider catches all input attempts.  Integer textfields (stepsize == 1) have shorter widths.
+			float textFieldWidth = stepSize == 1 ? IntTextFieldWidth : FloatTextFieldWidth;
+			UITextField valueField = UIControls.TinyTextField(parent, Margin + newSlider.width - textFieldWidth, yPos + ValueY, textFieldWidth);
+
+			// Title label.
+			UILabel titleLabel = UIControls.AddLabel(newSlider, 0f, LabelY, Translations.Translate(labelKey), textScale: 0.7f);
+
+			// Autoscale tile label text, with minimum size 0.35.
+			while (titleLabel.width > newSlider.width - textFieldWidth && titleLabel.textScale > 0.35f)
+			{
+				titleLabel.textScale -= 0.05f;
+			}
+
+			// Slider track.
+			UISlicedSprite sliderSprite = newSlider.AddUIComponent<UISlicedSprite>();
+			sliderSprite.atlas = TextureUtils.InGameAtlas;
+			sliderSprite.spriteName = "BudgetSlider";
+			sliderSprite.size = new Vector2(newSlider.width, 9f);
+			sliderSprite.relativePosition = new Vector2(0f, 4f);
+
+			// Slider thumb.
+			UISlicedSprite sliderThumb = newSlider.AddUIComponent<UISlicedSprite>();
+			sliderThumb.atlas = TextureUtils.InGameAtlas;
+			sliderThumb.spriteName = "SliderBudget";
+			newSlider.thumbObject = sliderThumb;
+
+			// Set references.
+			newSlider.ValueField = valueField;
+
+			// Event handler for textfield.
+			newSlider.ValueField.eventTextSubmitted += newSlider.OnTextSubmitted;
+
+			// Set initial values.
+			newSlider.StepSize = stepSize;
+			newSlider.maxValue = maxValue;
+			newSlider.minValue = minValue;
+			newSlider.TrueValue = 0f;
+
+			return newSlider;
+		}
+
+
+		/// <summary>
 		/// Adds an icon toggle checkbox.
 		/// </summary>
 		/// <param name="parent">Parent component</param>

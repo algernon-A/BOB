@@ -139,6 +139,7 @@
     <Content Include="Resources\bob_cursor_dark.png" />
     <Content Include="Resources\bob_cursor_light.png" />
     <Content Include="Resources\bob_minus.png" />
+    <Content Include="Resources\bob_padlock_small.png" />
     <Content Include="Resources\bob_plus.png" />
     <Content Include="Resources\bob_props3.png" />
     <Content Include="Resources\bob_props3_large.png" />
@@ -185,6 +186,7 @@ del "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName
 xcopy /y "$(ProjectDir)\ReplacementPacks\" "$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\ReplacementPacks" /s /e
 
 
-xcopy /y "$(ProjectDir)\PrefabTemplates\" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)"</PostBuildEvent>
+xcopy /y "$(ProjectDir)\PrefabTemplates\" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)"
+xcopy /y "$(ProjectDir)\PrefabTemplates\" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Assets\"</PostBuildEvent>
   </PropertyGroup>
 </Project>
