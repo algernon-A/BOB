@@ -364,10 +364,8 @@ namespace BOB
             // Iterate through the rows list.
             for (int i = 0; i < m_rowsData.m_size; ++i)
             {
-                BOBVariant listItem = m_rowsData.m_buffer[i] as BOBVariant;
-
                 // Look for an index match; individual or grouped (contained within propListItem.indexes list).
-                if (listItem != null && listItem == variant)
+                if (m_rowsData.m_buffer[i] is BOBVariant listItem && listItem == variant)
                 {
                     // Found a match; set the selected index to this one.
                     selectedIndex = i;

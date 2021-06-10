@@ -21,7 +21,6 @@ namespace BOB
         public static IEnumerable<CodeInstruction> BuildingTranspiler(MethodBase original, IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
             // ILCode local variable indexes.
-            const int PositionIndex = 8;
             const int IVarIndex = 11;
             const int BuildingInfoPropIndex = 12;
             const int TreeVarIndex = 15;
@@ -53,20 +52,18 @@ namespace BOB
                     // Is this stloc.s 17 (should be only one in entire method)?
                     if (localBuilder.LocalIndex == 17)
                     {
-                        // Yes - insert call to RenderOverlays.HighlightBuildingProp(i, prop, ref building, position)
+                        // Yes - insert call to RenderOverlays.HighlightBuildingProp(i, prop, ref building)
                         Logging.KeyMessage("adding building HighlightBuildingProp call after stloc.s 17");
                         yield return new CodeInstruction(OpCodes.Ldarg_1);
                         yield return new CodeInstruction(OpCodes.Ldloc_S, IVarIndex);
                         yield return new CodeInstruction(OpCodes.Ldloc_S, BuildingInfoPropIndex);
                         yield return new CodeInstruction(OpCodes.Ldarg_S, BuildingArg);
-                        yield return new CodeInstruction(OpCodes.Ldloc_S, PositionIndex);
                         yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(RenderOverlays), nameof(RenderOverlays.HighlightBuildingProp)));
                     }
                     // Otherwise, is this the first instance of stloc.s 15?
                     else if (!foundTreeInfo && localBuilder.LocalIndex == TreeVarIndex)
                     {
                         // Yes - record the original tree reference and flag that we've already got it (so no need to get again).
-                        Logging.KeyMessage("adding building HighlightBuildingProp call after stloc.s 17");
                         foundTreeInfo = true;
                         yield return new CodeInstruction(OpCodes.Ldloc_S, TreeVarIndex);
                         yield return new CodeInstruction(OpCodes.Stloc_S, originalTreeInfo);

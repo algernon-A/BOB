@@ -1,6 +1,7 @@
 ﻿- Add random prop and tree support
 - Add support for map editor
 - Fix slider text values not updating for some users
+- Fix prop highlighting offset for sub-buildings
 
 
 Version 0.6.2 -

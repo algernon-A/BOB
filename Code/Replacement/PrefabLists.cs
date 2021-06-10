@@ -130,9 +130,8 @@ namespace BOB
 				randomProp.m_prefabInitialized = false;
 				randomProp.InitializePrefab();
 
-				// Add new tree to list, order list by name, and return direct reference.
+				// Add new tree to list and return direct reference.
 				randomProps.Add(randomProp);
-				randomProps.OrderBy(x => x.name);
 				return randomProp;
 			}
 
@@ -174,9 +173,8 @@ namespace BOB
 				randomTree.m_prefabInitialized = false;
 				randomTree.InitializePrefab();
 
-				// Add new tree to list, order list by name, and return direct reference.
+				// Add new tree to list and return direct reference.
 				randomTrees.Add(randomTree);
-				randomTrees.OrderBy(x => x.name);
 				return randomTree;
 			}
 

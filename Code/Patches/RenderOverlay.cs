@@ -119,14 +119,13 @@ namespace BOB
         /// <param name="index">Prop index</param>
         /// <param name="prop">Prop info</param>
         /// <param name="building">Building data</param>
-        /// <param name="position">Prop position</param>
-        public static void HighlightBuildingProp(RenderManager.CameraInfo camera, int index, BuildingInfo.Prop prop, ref Building building, Vector3 position)
+        public static void HighlightBuildingProp(RenderManager.CameraInfo camera, int index, BuildingInfo.Prop prop, ref Building building)
         {
             // Check for match - prop, index (if applicable) and building (if applicable).
             if (prop.m_finalProp == CurrentProp && (CurrentIndex < 0 || (CurrentIndex == index && CurrentBuilding != null && CurrentBuilding == building.Info)))
             {
                 // Get transform matrix for building and use to convert prop location to worldspace.
-                Matrix4x4 m = Matrix4x4.TRS(position, Quaternion.Euler(0, -Mathf.Rad2Deg * building.m_angle, 0), Vector3.one);
+                Matrix4x4 m = Matrix4x4.TRS(building.m_position, Quaternion.Euler(0, -Mathf.Rad2Deg * building.m_angle, 0), Vector3.one);
                 Vector3 propLocation = m.MultiplyPoint(prop.m_position);
 
                 // Don't render overlay is prop is beyond rendering distance.

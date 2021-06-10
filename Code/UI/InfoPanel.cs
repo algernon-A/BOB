@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using ColossalFramework.UI;
 using UnityEngine;
 
@@ -159,7 +160,7 @@ namespace BOB
 					// Trees.
 					loadedList.rowsData = new FastList<object>
 					{
-						m_buffer = PrefabLists.randomTrees.ToArray(),
+						m_buffer = PrefabLists.randomTrees.OrderBy(x => x.name.ToLower()).ToArray(),
 						m_size = PrefabLists.randomTrees.Count
 					};
 				}
@@ -168,16 +169,14 @@ namespace BOB
 					// Props.
 					loadedList.rowsData = new FastList<object>
 					{
-						m_buffer = PrefabLists.randomProps.ToArray(),
+						m_buffer = PrefabLists.randomProps.OrderBy(x=> x.name.ToLower()).ToArray(),
 						m_size = PrefabLists.randomProps.Count
 					};
 				}
 
-				// Master lists should already be sorted by display name so no need to sort again here.
 				// Reverse order of filtered list if we're searching name descending.
 				if (loadedSearchStatus == (int)OrderBy.NameDescending)
 				{
-					Logging.Message("reversing random prop order");
 					Array.Reverse(loadedList.rowsData.m_buffer);
 					loadedList.Refresh();
 				}
