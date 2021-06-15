@@ -359,13 +359,13 @@ namespace BOB
         /// If no item is found, clears the selection and resets the list.
         /// </summary>
         /// <param name="item">The item to find</param>
-        public virtual void FindItem(BOBVariant variant)
+        public virtual void FindItem(BOBVariation variant)
         {
             // Iterate through the rows list.
             for (int i = 0; i < m_rowsData.m_size; ++i)
             {
                 // Look for an index match; individual or grouped (contained within propListItem.indexes list).
-                if (m_rowsData.m_buffer[i] is BOBVariant listItem && listItem == variant)
+                if (m_rowsData.m_buffer[i] is BOBVariation listItem && listItem == variant)
                 {
                     // Found a match; set the selected index to this one.
                     selectedIndex = i;

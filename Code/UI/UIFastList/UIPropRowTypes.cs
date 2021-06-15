@@ -9,6 +9,11 @@ namespace BOB
 	/// </summary>
 	public class UILoadedPropRow : UIPropRow
 	{
+		protected PrefabInfo thisPrefab;
+		//private BOBRandomPrefab thisRandomPrefab;
+		private string displayName;
+
+
 		/// <summary>
 		/// Called when this item is selected.
 		/// </summary>
@@ -16,6 +21,71 @@ namespace BOB
 		{
 			// Update currently selected replacement prefab.
 			InfoPanelManager.Panel.ReplacementPrefab = thisPrefab;
+		}
+
+
+		/// <summary>
+		/// Generates and displays a list row.
+		/// </summary>
+		/// <param name="data">Object to list</param>
+		/// <param name="isRowOdd">If the row is an odd-numbered row (for background banding)</param>
+		public override void Display(object data, bool isRowOdd)
+		{
+
+			// Perform initial setup for new rows.
+			if (nameLabel == null)
+			{
+				isVisible = true;
+				canFocus = true;
+				isInteractive = true;
+				width = parent.width;
+				height = RowHeight;
+
+				// Add object name label.
+				nameLabel = AddUIComponent<UILabel>();
+				nameLabel.width = this.width - 10f;
+				nameLabel.textScale = TextScale;
+
+				labelX = LeftMargin;
+			}
+
+			// Set label position and default white colour.
+			nameLabel.relativePosition = new Vector2(LeftMargin, PaddingY);
+			nameLabel.textColor = Color.white;
+
+			// Set data record and calculate name - depends if 'pure' prefab or BOB random prefab.
+			if (data is BOBRandomPrefab randomPrefab)
+			{
+				// BOB random prefab.
+				if (randomPrefab.prop != null)
+				{
+					thisPrefab = randomPrefab.prop;
+				}
+				else
+				{
+					thisPrefab = randomPrefab.tree;
+				}
+				
+				displayName = PrefabLists.GetDisplayName(thisPrefab);
+
+				// Grey colour for random props with missing variants.
+				if (randomPrefab.missingVariant)
+                {
+					nameLabel.textColor = Color.grey;
+                }
+			}
+			else
+            {
+				// Standard PropInfo/TreeInfo prefab.
+				thisPrefab = data as PrefabInfo;
+				displayName = PrefabLists.GetDisplayName(thisPrefab);
+            }
+			
+			
+			nameLabel.text = displayName;
+
+			// Set initial background as deselected state.
+			Deselect(isRowOdd);
 		}
 	}
 
@@ -39,7 +109,7 @@ namespace BOB
 	/// <summary>
 	/// Prop row fastlist item for loaded props/trees for random setup.
 	/// </summary>
-	public class UILoadedRandomPropRow : UIPropRow
+	public class UILoadedRandomPropRow : UILoadedPropRow
 	{
 		/// <summary>
 		/// Called when this item is selected.
@@ -49,6 +119,54 @@ namespace BOB
 			// Update currently selected loaded prefab.
 			BOBRandomPanel.Panel.SelectedLoadedPrefab = thisPrefab;
 		}
+
+		public override void Display(object data, bool isRowOdd)
+		{
+			if (data is BOBRandomPrefab randomPrefab)
+            {
+				if (randomPrefab.prop != null)
+                {
+					thisPrefab = randomPrefab.prop;
+                }
+				else
+                {
+					thisPrefab = randomPrefab.tree;
+                }
+            }
+
+			// Perform initial setup for new rows.
+			if (nameLabel == null)
+			{
+				isVisible = true;
+				canFocus = true;
+				isInteractive = true;
+				width = parent.width;
+				height = RowHeight;
+
+				// Add object name label.
+				nameLabel = AddUIComponent<UILabel>();
+				nameLabel.width = this.width - 10f;
+				nameLabel.textScale = TextScale;
+
+				labelX = LeftMargin;
+			}
+
+			// Set label position
+			nameLabel.relativePosition = new Vector2(LeftMargin, PaddingY);
+
+			// Set text.
+			if (thisPrefab != null)
+			{
+				nameLabel.text = PrefabLists.GetDisplayName(thisPrefab);
+			}
+			else
+			{
+				nameLabel.text = "null";
+			}
+
+			// Set initial background as deselected state.
+			Deselect(isRowOdd);
+		}
 	}
 
 
@@ -57,7 +175,7 @@ namespace BOB
 	/// </summary>
 	public class UIRandomComponentRow : UIPropRow
 	{
-		private BOBVariant thisVariant;
+		private BOBVariation thisVariant;
 		private UILabel probLabel;
 		private UISprite lockSprite;
 
@@ -70,12 +188,17 @@ namespace BOB
 			BOBRandomPanel.Panel.SelectedVariation = thisVariant;
 		}
 
+
+		/// <summary>
+		/// Generates and displays a list row.
+		/// </summary>
+		/// <param name="data">Object to list</param>
+		/// <param name="isRowOdd">If the row is an odd-numbered row (for background banding)</param>
 		public override void Display(object data, bool isRowOdd)
 		{
-			thisVariant = data as BOBVariant;
+			thisVariant = data as BOBVariation;
 
 			// Perform initial setup for new rows.
-
 			if (nameLabel == null)
 			{
 				isVisible = true;
@@ -96,14 +219,15 @@ namespace BOB
 				indexLabel.relativePosition = new Vector2(IndexLabelX, PaddingY);
 			}
 
-			// Set label position
+			// Set label position, text and color.
 			nameLabel.relativePosition = new Vector2(labelX, PaddingY);
+			nameLabel.text = thisVariant?.DisplayName ?? "null";
+			nameLabel.textColor = thisVariant.prefab == null ? Color.gray : Color.white;
 
 			// Set initial background as deselected state.
 			Deselect(isRowOdd);
 
-			nameLabel.text = PrefabLists.GetDisplayName(thisVariant.prefab);
-
+			// Probability locked sprite.
 			if (lockSprite == null)
 			{
 				lockSprite = AddUIComponent<UISprite>();
@@ -123,6 +247,7 @@ namespace BOB
 				};
 			}
 
+			// Probability label.
 			if (probLabel == null)
 			{
 				probLabel = AddUIComponent<UILabel>();
@@ -132,6 +257,9 @@ namespace BOB
 		}
 
 
+		/// <summary>
+		/// Sets the state of the probability locked sprite.
+		/// </summary>
 		private void SetLockSprite()
 		{
 			if (thisVariant != null && lockSprite != null)

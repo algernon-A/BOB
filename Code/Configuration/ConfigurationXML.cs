@@ -154,7 +154,16 @@ namespace BOB
 		[XmlArray("variations")]
 		[XmlArrayItem("variation")]
 		public List<BOBVariation> variations;
-    }
+
+		[XmlIgnore]
+		public PropInfo prop;
+
+		[XmlIgnore]
+		public TreeInfo tree;
+
+		[XmlIgnore]
+		public bool missingVariant = false;
+	}
 
 
 	/// <summary>
@@ -165,7 +174,16 @@ namespace BOB
 		[XmlAttribute("name")]
 		public string name;
 
+		[XmlIgnore]
+		public string DisplayName => prefab == null ? PrefabLists.GetDisplayName(name) : PrefabLists.GetDisplayName(prefab);
+
 		[XmlAttribute("probability")]
 		public int probability;
-    }
+
+		[XmlIgnore]
+		public PrefabInfo prefab;
+
+		[XmlIgnore]
+		public bool probLocked;
+	}
 }

@@ -169,7 +169,7 @@ namespace BOB
 					// Props.
 					loadedList.rowsData = new FastList<object>
 					{
-						m_buffer = PrefabLists.randomProps.OrderBy(x=> x.name.ToLower()).ToArray(),
+						m_buffer = PrefabLists.randomProps.OrderBy(x => x.name.ToLower()).ToArray(),
 						m_size = PrefabLists.randomProps.Count
 					};
 				}

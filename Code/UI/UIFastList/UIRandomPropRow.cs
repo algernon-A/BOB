@@ -14,7 +14,7 @@ namespace BOB
         private const float TextScale = 0.8f;
 
         // Object references.
-        PrefabInfo thisPrefab;
+        private BOBRandomPrefab thisPrefab;
 
 
         // Background for each list item.
@@ -55,6 +55,8 @@ namespace BOB
         /// <param name="isRowOdd">If the row is an odd-numbered row (for background banding)</param>
         public override void Display(object data, bool isRowOdd)
         {
+            thisPrefab = data as BOBRandomPrefab;
+
             // Perform initial setup for new rows.
             if (rowLabel == null)
             {
@@ -70,8 +72,10 @@ namespace BOB
                 rowLabel.textScale = TextScale;
             }
 
+            // Show grey if not all prefabs are loaded.
+            rowLabel.textColor = thisPrefab == null || thisPrefab.missingVariant ? Color.gray : Color.white;
+
             // Set selected prop.
-            thisPrefab = data as PrefabInfo;
             rowLabel.text = thisPrefab?.name ?? "null";
 
             // Set initial background as deselected state.

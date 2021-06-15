@@ -522,7 +522,7 @@ namespace BOB
 			if (replacementPrefab == null)
 			{
 				// If we couldn't load from prefab collection, attempt to find in our list of replacement prefabs.
-				replacementPrefab = isTree ? (PrefabInfo)PrefabLists.randomTrees.Find(x => x.name.Equals(replacementName)) : (PrefabInfo)PrefabLists.randomProps.Find(x => x.name.Equals(replacementName));
+				replacementPrefab = isTree ? (PrefabInfo)PrefabLists.randomTrees.Find(x => x.name.Equals(replacementName)).tree : (PrefabInfo)PrefabLists.randomProps.Find(x => x.name.Equals(replacementName)).prop;
 			}
 
 			// Return what we have.

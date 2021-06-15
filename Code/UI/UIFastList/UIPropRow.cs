@@ -14,7 +14,7 @@ namespace BOB
         public const float RowHeight = 23f;
         protected const float PaddingY = 5f;
         protected const float TextScale = 0.8f;
-        private const float LeftMargin = 10f;
+        protected const float LeftMargin = 10f;
         private const float PackageMargin = 20f;
         protected const float IndexWidth = 20f;
         protected const float IndexLabelX = LeftMargin + PackageMargin;
@@ -28,7 +28,6 @@ namespace BOB
         private UISprite lineSprite;
 
         // ObjectData.
-		protected PrefabInfo thisPrefab;
 		protected PropListItem thisItem;
 		protected int index;
 
@@ -60,10 +59,15 @@ namespace BOB
         {
             base.OnSizeChanged();
 
+            Background.width = width;
+
             if (nameLabel != null)
             {
-                Background.width = width;
                 nameLabel.relativePosition = new Vector2(labelX, PaddingY);
+            }
+
+            if (indexLabel != null)
+            {
                 indexLabel.relativePosition = new Vector2(IndexLabelX, PaddingY);
             }
         }
@@ -90,7 +94,7 @@ namespace BOB
 
 
         /// <summary>
-        /// Generates and displays a building row.
+        /// Generates and displays a list row.
         /// </summary>
         /// <param name="data">Object to list</param>
         /// <param name="isRowOdd">If the row is an odd-numbered row (for background banding)</param>
@@ -129,9 +133,8 @@ namespace BOB
             // Set initial label position.
             labelX = LeftMargin;
 
-            // See if our attached data is a raw PropInfo (e.g an available prop item as opposed to a PropListItem replacment record).
-            thisPrefab = data as PrefabInfo;
-            if (thisPrefab == null)
+            // See if our attached data is a PropListItem replacement record).
+            if (data is PropListItem propListItem)
             {
                 // Hide any existing line sprites; it will be re-shown as necessary.
                 if (lineSprite != null)
@@ -145,9 +148,8 @@ namespace BOB
                 // Text to display - StringBuilder due to the amount of manipulation we're doing.
                 StringBuilder displayText = new StringBuilder();
 
-                // Not a raw PropInfo, so it should be a PropListItem replacement record.
                 // Set local references.
-                thisItem = data as PropListItem;
+                thisItem = propListItem;
                 index = thisItem.index;
 
                 // See if this is a network prop.
@@ -269,11 +271,6 @@ namespace BOB
 
                 // Set display text.
                 nameLabel.text = displayText.ToString();
-            }
-            else
-            {
-                // Attached data is a raw PropInfo; just display its (cleaned-up) name.
-                nameLabel.text = PrefabLists.GetDisplayName(thisPrefab);
             }
 
             // Set label position

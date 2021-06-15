@@ -7,13 +7,6 @@ using ColossalFramework.UI;
 
 namespace BOB
 {
-	public class BOBVariant
-    {
-		public PrefabInfo prefab;
-		public int probability;
-		public bool probLocked = false;
-    }
-
 	/// <summary>
 	/// Panel to setup random props/trees.
 	/// </summary>
@@ -55,10 +48,10 @@ namespace BOB
 		private readonly BOBSlider probSlider;
 
 		// Current selections.
-		private PrefabInfo selectedRandomPrefab, selectedLoadedPrefab;
-		private BOBVariant selectedVariation;
-		private readonly List<BOBVariant> currentVariations;
-		private BOBVariant lastChangedVariant;
+		private BOBRandomPrefab selectedRandomPrefab;
+		private PrefabInfo selectedLoadedPrefab;
+		private BOBVariation selectedVariation;
+		private BOBVariation lastChangedVariant;
 		private bool ignoreValueChange = false;
 
 
@@ -158,7 +151,7 @@ namespace BOB
 		/// <summary>
 		/// Sets the currently selected random component.
 		/// </summary>
-		internal BOBVariant SelectedVariation
+		internal BOBVariation SelectedVariation
 		{
 			set
 			{
@@ -175,7 +168,7 @@ namespace BOB
 		/// <summary>
 		/// Sets the currently selected random prefab.
 		/// </summary>
-		internal PrefabInfo SelectedRandomPrefab
+		internal BOBRandomPrefab SelectedRandomPrefab
         {
 			set
             {
@@ -190,26 +183,7 @@ namespace BOB
 
 				// Reset variation lists.
 				selectedVariation = null;
-				currentVariations.Clear();
 				variationsList.selectedIndex = -1;
-
-				// Generate component list to reflect new selection.
-				if (selectedRandomPrefab is PropInfo randomProp && randomProp.m_variations != null)
-                {
-					// Prop- iterate through variations and add to list.
-					for (int i = 0; i < randomProp.m_variations.Length; ++i)
-                    {
-						currentVariations.Add(new BOBVariant { prefab = randomProp.m_variations[i].m_finalProp, probability = randomProp.m_variations[i].m_probability });
-                    }
-				}
-				else if (selectedRandomPrefab is TreeInfo randomTree && randomTree.m_variations != null)
-				{
-					// Tree - iterate through variations and add to list.
-					for (int i = 0; i < randomTree.m_variations.Length; ++i)
-					{
-						currentVariations.Add(new BOBVariant { prefab = randomTree.m_variations[i].m_finalTree, probability = randomTree.m_variations[i].m_probability });
-					}
-				}
 
 				// Regenerate variation UI fastlist.
 				VariationsList();
@@ -249,9 +223,6 @@ namespace BOB
 			selectedPanel.relativePosition = new Vector2(SelectedX, ListY);
 			variationsList = UIFastList.Create<UIRandomComponentRow>(selectedPanel);
 			ListSetup(variationsList);
-
-			// Initialize curren variations list.
-			currentVariations = new List<BOBVariant>();
 
 			// Loaded prop list.
 			UIPanel loadedPanel = AddUIComponent<UIPanel>();
@@ -485,7 +456,7 @@ namespace BOB
 		private void NewRandomPrefab(UIComponent control, UIMouseEventParameter clickEvent)
         {
 			// New prefab record.
-			PrefabInfo newPrefab;
+			BOBRandomPrefab newPrefab;
 
 			// Name conflict deteciton.
 			int existingCount = 1;
@@ -501,25 +472,29 @@ namespace BOB
 				TreeInfo existingTree = null;
 				do
 				{
-					existingTree = PrefabLists.randomTrees.Find(x => x.name.Equals(treeName));
+					existingTree = PrefabLists.randomTrees.Find(x => x.name.Equals(treeName)).tree;
 					if (existingTree != null)
 					{
 						treeName = treeNameBase + " " + (++existingCount).ToString();
 					}
 				}
 				while (existingTree != null);
-				
+
 				// Create new random tree prefab.
+				Logging.Message("creating new random tree");
 				newPrefab = PrefabLists.NewRandomTree(treeName);
 			}
 			else
 			{
+				Logging.Message("creating new prop");
+
 				// Props - generate unique name.
 				string propNameBase = "BOB random prop";
 				string propName = propNameBase + " 1";
 
-				// Interate through existing names, incrementing post numeral until we've got a unique name.
-				PropInfo existingProp = null;
+				// Interate through existing names, incrementing post numeral until we've got a unique name.10
+				Logging.Message("checking new prop name");
+				BOBRandomPrefab existingProp = null;
 				do
 				{
 					existingProp = PrefabLists.randomProps.Find(x => x.name.Equals(propName));
@@ -530,7 +505,8 @@ namespace BOB
 				}
 				while (existingProp != null);
 
-				// Create new random tree prefab.
+				// Create new random prop prefab.
+				Logging.Message("creating new random prop");
 				newPrefab = PrefabLists.NewRandomProp(propName);
 			}
 
@@ -539,7 +515,7 @@ namespace BOB
 			{
 				// Yes - regenerate random list to reflect the change, and select the new item.
 				RandomList();
-				randomList.FindItem(newPrefab);
+				randomList.FindItem(newPrefab.name);
 				SelectedRandomPrefab = newPrefab;
 			}
 		}
@@ -559,13 +535,13 @@ namespace BOB
             }
 
 			// Remove tree or prop from relevant list of random prefabs.
-			if (selectedRandomPrefab is TreeInfo randomTree)
+			if (selectedRandomPrefab.tree != null)
 			{
-				PrefabLists.randomTrees.Remove(randomTree);
+				PrefabLists.RemoveRandomTree(selectedRandomPrefab.tree);
 			}
-			else if (selectedRandomPrefab is PropInfo randomProp)
+			else if (selectedRandomPrefab.prop != null)
 			{
-				PrefabLists.randomProps.Remove(randomProp);
+				PrefabLists.RemoveRandomProp(selectedRandomPrefab.prop);
 			}
 
 			// Reset selection and regenerate UI fastlist.
@@ -591,7 +567,7 @@ namespace BOB
 			string trimmedName = nameField.text.Trim();
 
 			// Need unique name.
-			if ((selectedRandomPrefab is PropInfo && PrefabLists.DuplicatePropName(trimmedName)) || (selectedRandomPrefab is TreeInfo && PrefabLists.DuplicateTreeName(trimmedName)))
+			if ((selectedRandomPrefab.prop != null & PrefabLists.DuplicatePropName(trimmedName)) || (selectedRandomPrefab.tree != null && PrefabLists.DuplicateTreeName(trimmedName)))
 			{
 				Logging.Error("duplicate name");
 				return;
@@ -619,8 +595,8 @@ namespace BOB
 			}
 
 			// Add selected prefab to list of variations and regenerate UI fastlist.
-			BOBVariant newVariant = new BOBVariant { prefab = selectedLoadedPrefab, probability = 0 };
-			currentVariations.Add(newVariant);
+			BOBVariation newVariant = new BOBVariation { name = selectedLoadedPrefab.name, prefab = selectedLoadedPrefab, probability = 0 };
+			selectedRandomPrefab.variations.Add(newVariant);
 			VariationsList();
 
 			// Select variation.
@@ -649,7 +625,7 @@ namespace BOB
 			}
 
 			// Remove selected prefab from list of variations and regenerate UI fastlist.
-			currentVariations.Remove(selectedVariation);
+			selectedRandomPrefab.variations.Remove(selectedVariation);
 			VariationsList();
 
 			// Update the random prefab to reflect the removal
@@ -662,40 +638,40 @@ namespace BOB
 		/// </summary>
 		private void UpdateCurrentRandomPrefab()
 		{
-			int variationCount = currentVariations.Count;
+			int variationCount = selectedRandomPrefab.variations.Count;
 
 			// Recalculate probabilities.
 			RecalculateProbabilities();
 
 			// Trees or props?
-			if (selectedRandomPrefab is TreeInfo randomTree)
+			if (selectedRandomPrefab.tree != null)
 			{
 				// Trees - create new variations array.
-				randomTree.m_variations = new TreeInfo.Variation[variationCount];
+				selectedRandomPrefab.tree.m_variations = new TreeInfo.Variation[variationCount];
 
 				// Iterate through current variations list and add to prefab variation list.
 				for (int i = 0; i < variationCount; ++i)
 				{
-					randomTree.m_variations[i] = new TreeInfo.Variation()
+					selectedRandomPrefab.tree.m_variations[i] = new TreeInfo.Variation()
 					{
-						m_finalTree = currentVariations[i].prefab as TreeInfo,
+						m_finalTree = selectedRandomPrefab.variations[i].prefab as TreeInfo,
 						m_probability = 100 / variationCount
 					};
 				}
 
 			}
-			else if (selectedRandomPrefab is PropInfo randomProp)
+			else if (selectedRandomPrefab.prop != null)
 			{
 				// Props - create new variations array.
-				randomProp.m_variations = new PropInfo.Variation[variationCount];
+				selectedRandomPrefab.prop.m_variations = new PropInfo.Variation[variationCount];
 
 				// Iterate through current variations list and add to prefab variation list.
 				for (int i = 0; i < variationCount; ++i)
 				{
-					randomProp.m_variations[i] = new PropInfo.Variation()
+					selectedRandomPrefab.prop.m_variations[i] = new PropInfo.Variation()
 					{
-						m_finalProp = currentVariations[i].prefab as PropInfo,
-						m_probability = currentVariations[i].probability
+						m_finalProp = selectedRandomPrefab.variations[i].prefab as PropInfo,
+						m_probability = selectedRandomPrefab.variations[i].probability
 					};
 				}
 			}
@@ -716,21 +692,21 @@ namespace BOB
 			int lockedProbs = 0, unlockedProbs = 0, lockedCount = 0, unlockedCount = 0;
 
 			// Iterate through all current variations, identifying locked probabilties.
-			for (int i = 0; i < currentVariations.Count; ++i)
+			for (int i = 0; i < selectedRandomPrefab.variations.Count; ++i)
 			{
 				// Ignore last changed variant.
-				if (!validLastChanged || (validLastChanged && currentVariations[i] != lastChangedVariant))
+				if (!validLastChanged || (validLastChanged && selectedRandomPrefab.variations[i] != lastChangedVariant))
 				{
 					// If this variation has a locked probability, add the probability to the total locked percentage and increment the locked counter - ignoring most recently changed item.
-					if (currentVariations[i].probLocked)
+					if (selectedRandomPrefab.variations[i].probLocked)
 					{
-						lockedProbs += currentVariations[i].probability;
+						lockedProbs += selectedRandomPrefab.variations[i].probability;
 						++lockedCount;
 					}
 					else
 					{
 						// Unlocked.
-						unlockedProbs += currentVariations[i].probability;
+						unlockedProbs += selectedRandomPrefab.variations[i].probability;
 						++unlockedCount;
 					}
 				}
@@ -744,13 +720,13 @@ namespace BOB
 			{
 				// Assign unlocked probabilities, except to most recently changed item.
 				int remainderProb = 100 - lockedProbs - changedProb;
-				for (int i = 0; i < currentVariations.Count; ++i)
+				for (int i = 0; i < selectedRandomPrefab.variations.Count; ++i)
 				{
-					if (!currentVariations[i].probLocked && (!validLastChanged || currentVariations[i] != lastChangedVariant))
+					if (!selectedRandomPrefab.variations[i].probLocked && (!validLastChanged || selectedRandomPrefab.variations[i] != lastChangedVariant))
 					{
 						// Minimum probability of one; decrement remaining count and recalculate remaining probabilities as we go, to avoid rounding errors.
 						int thisProb = Math.Max(1, remainderProb / unlockedCount--);
-						currentVariations[i].probability = thisProb;
+						selectedRandomPrefab.variations[i].probability = thisProb;
 						remainderProb -= thisProb;
 
 						// Abort if for some reason unlockedCount is zero.
@@ -763,9 +739,9 @@ namespace BOB
 
 				// Now, review probabilities that we've assigned.
 				int residualProb = 100;
-				for (int i = 0; i < currentVariations.Count; ++i)
+				for (int i = 0; i < selectedRandomPrefab.variations.Count; ++i)
 				{
-					residualProb -= currentVariations[i].probability;
+					residualProb -= selectedRandomPrefab.variations[i].probability;
 				}
 
 				// Change the 'last changed' variant if we need to to keep total probability to 100.
@@ -826,8 +802,8 @@ namespace BOB
 			// Create return fastlist from our filtered list.
 			variationsList.rowsData = new FastList<object>
 			{
-				m_buffer = currentVariations.ToArray(),
-				m_size = currentVariations.Count
+				m_buffer = selectedRandomPrefab.variations.ToArray(),
+				m_size = selectedRandomPrefab.variations.Count
 			};
 		}
 
