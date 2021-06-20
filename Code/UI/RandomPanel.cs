@@ -258,9 +258,9 @@ namespace BOB
 			// Order buttons.
 			loadedNameButton = ArrowButton(this, LoadedX + 10f, ListY - 20f);
 			loadedNameButton.eventClicked += SortLoaded;
-
+	
 			// Probability slider.
-			probSlider = AddBOBSlider(this, SelectedX + Margin, ToolY, SelectedWidth - (Margin * 2f), "BOB_PNL_PRB", 0, 100, 1, "Probability");
+			probSlider = AddBOBSlider(this, SelectedX + Margin, ToolY + 25f, SelectedWidth - (Margin * 2f), "BOB_PNL_PRB", 0, 100, 1, "Probability");
 			probSlider.eventValueChanged += (control, value) =>
 			{
 				if (selectedVariation != null)
@@ -716,7 +716,7 @@ namespace BOB
 			int changedProb = validLastChanged ? lastChangedVariant.probability : 0;
 
 			// If total probs are more than 100, reduce unlocked probs to fit.
-			if (lockedProbs + unlockedProbs + changedProb > 100)
+			/*if (lockedProbs + unlockedProbs + changedProb > 100)
 			{
 				// Assign unlocked probabilities, except to most recently changed item.
 				int remainderProb = 100 - lockedProbs - changedProb;
@@ -755,6 +755,34 @@ namespace BOB
 				{
 					probSlider.value = selectedVariation.probability;
 				}
+			}*/
+
+			// Cap changed probability slider amount.
+			changedProb = Mathf.Clamp(changedProb, 1, 100 - lockedProbs - unlockedCount);
+			if (validLastChanged)
+			{
+				lastChangedVariant.probability = changedProb;
+			}
+
+			// Now, assign probabilities.
+			int residualProb = Mathf.Max(0, 100 - lockedProbs - changedProb);
+			for (int i = 0; i < selectedRandomPrefab.variations.Count; ++i)
+			{
+				// Ignore last changed variant.
+				if (!validLastChanged || (validLastChanged && selectedRandomPrefab.variations[i] != lastChangedVariant))
+				{
+					if (!selectedRandomPrefab.variations[i].probLocked)
+					{
+						selectedRandomPrefab.variations[i].probability = Mathf.Max(1, residualProb / unlockedCount--);
+						residualProb -= selectedRandomPrefab.variations[i].probability;
+					}
+				}
+			}
+
+			// Update probability slider.
+			if (selectedVariation != null)
+			{
+				probSlider.value = selectedVariation.probability;
 			}
 
 			// Regenerate list.

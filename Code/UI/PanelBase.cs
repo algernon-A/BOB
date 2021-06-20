@@ -325,7 +325,7 @@ namespace BOB
 
 			// Value field - added to parent, not to slider, otherwise slider catches all input attempts.  Integer textfields (stepsize == 1) have shorter widths.
 			float textFieldWidth = stepSize == 1 ? IntTextFieldWidth : FloatTextFieldWidth;
-			UITextField valueField = UIControls.TinyTextField(parent, Margin + newSlider.width - textFieldWidth, yPos + ValueY, textFieldWidth);
+			UITextField valueField = UIControls.TinyTextField(parent, xPos + Margin + newSlider.width - textFieldWidth, yPos + ValueY, textFieldWidth);
 
 			// Title label.
 			UILabel titleLabel = UIControls.AddLabel(newSlider, 0f, LabelY, Translations.Translate(labelKey), textScale: 0.7f);

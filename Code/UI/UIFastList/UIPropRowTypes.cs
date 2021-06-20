@@ -66,8 +66,6 @@ namespace BOB
 					thisPrefab = randomPrefab.tree;
 				}
 				
-				displayName = PrefabLists.GetDisplayName(thisPrefab);
-
 				// Grey colour for random props with missing variants.
 				if (randomPrefab.missingVariant)
                 {
@@ -78,10 +76,9 @@ namespace BOB
             {
 				// Standard PropInfo/TreeInfo prefab.
 				thisPrefab = data as PrefabInfo;
-				displayName = PrefabLists.GetDisplayName(thisPrefab);
             }
-			
-			
+
+			displayName = PrefabLists.GetDisplayName(thisPrefab);
 			nameLabel.text = displayName;
 
 			// Set initial background as deselected state.
@@ -118,54 +115,6 @@ namespace BOB
 		{
 			// Update currently selected loaded prefab.
 			BOBRandomPanel.Panel.SelectedLoadedPrefab = thisPrefab;
-		}
-
-		public override void Display(object data, bool isRowOdd)
-		{
-			if (data is BOBRandomPrefab randomPrefab)
-            {
-				if (randomPrefab.prop != null)
-                {
-					thisPrefab = randomPrefab.prop;
-                }
-				else
-                {
-					thisPrefab = randomPrefab.tree;
-                }
-            }
-
-			// Perform initial setup for new rows.
-			if (nameLabel == null)
-			{
-				isVisible = true;
-				canFocus = true;
-				isInteractive = true;
-				width = parent.width;
-				height = RowHeight;
-
-				// Add object name label.
-				nameLabel = AddUIComponent<UILabel>();
-				nameLabel.width = this.width - 10f;
-				nameLabel.textScale = TextScale;
-
-				labelX = LeftMargin;
-			}
-
-			// Set label position
-			nameLabel.relativePosition = new Vector2(LeftMargin, PaddingY);
-
-			// Set text.
-			if (thisPrefab != null)
-			{
-				nameLabel.text = PrefabLists.GetDisplayName(thisPrefab);
-			}
-			else
-			{
-				nameLabel.text = "null";
-			}
-
-			// Set initial background as deselected state.
-			Deselect(isRowOdd);
 		}
 	}
 
