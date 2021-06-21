@@ -88,6 +88,9 @@ namespace BOB
 					// Create new panel instance and add it to GameObject.
 					panel = uiGameObject.AddComponent<BOBRandomPanel>();
 					panel.transform.parent = uiGameObject.transform.parent;
+
+					// Hide previous window, if any.
+					InfoPanelManager.Panel?.Hide();
 				}
 			}
 			catch (Exception e)
@@ -135,6 +138,9 @@ namespace BOB
 			// Let the garbage collector do its work (and also let us know that we've closed the object).
 			panel = null;
 			uiGameObject = null;
+
+			// Show previous window, if any.
+			InfoPanelManager.Panel?.Show();
 		}
 
 

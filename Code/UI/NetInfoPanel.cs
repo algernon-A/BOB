@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
-using UnityEngine;
 using ColossalFramework.UI;
 
 
@@ -12,7 +11,7 @@ namespace BOB
 	internal class BOBNetInfoPanel : BOBInfoPanel
 	{
 		// Current selection reference.
-		NetInfo currentNet;
+		private NetInfo currentNet;
 
 
 		// Button tooltips.
