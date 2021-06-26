@@ -289,6 +289,9 @@ namespace BOB
 				// Escape key pressed - disable tool.
 				e.Use();
 				ToolsModifierControl.SetTool<DefaultTool>();
+
+				// Close window, if open.
+				InfoPanelManager.Close();
 			}
 
 			// Don't do anything if mouse is inside UI or if there are any errors other than failed raycast.
@@ -307,9 +310,9 @@ namespace BOB
 					// Got one; use the event.
 					UIInput.MouseUsed();
 
-					// Restore the default tool and create the info panel with the hovered building prefab.
-					ToolsModifierControl.SetTool<DefaultTool>();
-					InfoPanelManager.Create(Singleton<BuildingManager>.instance.m_buildings.m_buffer[building].Info);
+					// Create the info panel with the hovered building prefab.
+					//ToolsModifierControl.SetTool<DefaultTool>();
+					InfoPanelManager.SetTarget(Singleton<BuildingManager>.instance.m_buildings.m_buffer[building].Info);
 				}
 			}
 			else
@@ -324,9 +327,9 @@ namespace BOB
 						// Got one; use the event.
 						UIInput.MouseUsed();
 
-						// Restore the default tool and create the info panel with the hovered network prefab.
-						ToolsModifierControl.SetTool<DefaultTool>();
-						InfoPanelManager.Create(Singleton<NetManager>.instance.m_segments.m_buffer[segment].Info);
+						// Create the info panel with the hovered network prefab.
+						//ToolsModifierControl.SetTool<DefaultTool>();
+						InfoPanelManager.SetTarget(Singleton<NetManager>.instance.m_segments.m_buffer[segment].Info);
 					}
 				}
 				else
@@ -342,9 +345,9 @@ namespace BOB
 							// Got one; use the event.
 							UIInput.MouseUsed();
 
-							// Restore the default tool and create the info panel with the hovered network prefab.
-							ToolsModifierControl.SetTool<DefaultTool>();
-							InfoPanelManager.Create(Singleton<TreeManager>.instance.m_trees.m_buffer[tree].Info);
+							// Create the info panel with the hovered network prefab.
+							//ToolsModifierControl.SetTool<DefaultTool>();
+							InfoPanelManager.SetTarget(Singleton<TreeManager>.instance.m_trees.m_buffer[tree].Info);
 						}
 					}
 					else
@@ -359,9 +362,9 @@ namespace BOB
 								// Got one; use the event.
 								UIInput.MouseUsed();
 
-								// Restore the default tool and create the info panel with the hovered network prefab.
-								ToolsModifierControl.SetTool<DefaultTool>();
-								InfoPanelManager.Create(Singleton<PropManager>.instance.m_props.m_buffer[prop].Info);
+								// Create the info panel with the hovered network prefab.
+								// ToolsModifierControl.SetTool<DefaultTool>();
+								InfoPanelManager.SetTarget(Singleton<PropManager>.instance.m_props.m_buffer[prop].Info);
 							}
 						}
 					}

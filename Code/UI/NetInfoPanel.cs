@@ -69,20 +69,33 @@ namespace BOB
 
 
 		/// <summary>
-		/// Performs initial setup 
+		/// Constructor.
 		/// </summary>
-		/// <param name="targetPrefabInfo">Currently selected target prefab</param>
-		internal override void Setup(PrefabInfo targetPrefabInfo)
+		internal BOBNetInfoPanel()
+        {
+			// Add pack button.
+			UIButton packButton = AddIconButton(this, MiddleX + ToggleSize, TitleHeight + Margin, ToggleSize, "BOB_PNL_PKB", TextureUtils.LoadSpriteAtlas("bob_prop_pack"));
+			packButton.eventClicked += (component, clickEvent) => PackPanelManager.Create();
+		}
+
+
+		/// <summary>
+		/// Sets the target prefab.
+		/// </summary>
+		/// <param name="targetPrefabInfo">Target prefab to set</param>
+		internal override void SetTarget(PrefabInfo targetPrefabInfo)
 		{
+			// Don't do anything if target hasn't changed.
+			if (currentNet == targetPrefabInfo)
+			{
+				return;
+			}
+
 			// Set target reference.
 			currentNet = targetPrefabInfo as NetInfo;
 
 			// Base setup.
-			base.Setup(targetPrefabInfo);
-
-			// Add pack button.
-			UIButton packButton = AddIconButton(this, MiddleX + ToggleSize, TitleHeight + Margin, ToggleSize, "BOB_PNL_PKB", TextureUtils.LoadSpriteAtlas("bob_prop_pack"));
-			packButton.eventClicked += (component, clickEvent) => PackPanelManager.Create();
+			base.SetTarget(targetPrefabInfo);
 
 			// Populate target list and select target item.
 			TargetList();

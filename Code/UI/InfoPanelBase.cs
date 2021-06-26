@@ -103,6 +103,7 @@ namespace BOB
 				}
 				else
 				{
+					targetList.selectedIndex = -1;
 					loadedList.selectedIndex = -1;
 					RenderOverlays.CurrentIndex = -1;
 					RenderOverlays.CurrentProp = null;
@@ -219,13 +220,22 @@ namespace BOB
 
 
 		/// <summary>
-		/// Performs initial setup 
+		/// Sets the target prefab.
 		/// </summary>
-		/// <param name="targetPrefabInfo">Currently selected target prefab</param>
-		internal virtual void Setup(PrefabInfo targetPrefabInfo)
+		/// <param name="targetPrefabInfo">Target prefab to set</param>
+		internal virtual void SetTarget(PrefabInfo targetPrefabInfo)
 		{
-			// Set target reference.
-			selectedPrefab = targetPrefabInfo;
+			// Don't do anything if we're already selected.
+			if (selectedPrefab != targetPrefabInfo)
+			{
+				// Set target reference.
+				selectedPrefab = targetPrefabInfo;
+
+				// Clear selection.
+				CurrentTargetItem = null;
+				targetList.listPosition = 0;
+				targetList.selectedIndex = -1;
+			}
 		}
 
 

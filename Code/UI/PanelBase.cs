@@ -33,6 +33,7 @@ namespace BOB
 		protected UICheckBox hideVanilla;
 		protected UICheckBox treeCheck, propCheck;
 		protected UIButton loadedNameButton;
+		private UILabel titleLabel;
 
 		// Search settings.
 		protected int loadedSearchStatus;
@@ -249,10 +250,15 @@ namespace BOB
 		/// Adds the title text label.
 		/// </summary>
 		/// <param name="title">Title text</param>
-		protected void AddTitle(string title)
+		protected void SetTitle(string title)
         {
-			// Title label.
-			UILabel titleLabel = AddUIComponent<UILabel>();
+			// Create new title lablel if none already set.
+			if (titleLabel == null)
+			{
+				titleLabel = AddUIComponent<UILabel>();
+			}
+
+			// Set text.
 			titleLabel.text = title;
 			titleLabel.relativePosition = new Vector2(50f, (TitleHeight - titleLabel.height) / 2f);
 		}

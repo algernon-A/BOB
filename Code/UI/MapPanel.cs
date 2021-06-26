@@ -26,16 +26,16 @@ namespace BOB
 
 
 		/// <summary>
-		/// Performs initial setup 
+		/// Sets the target prefab.
 		/// </summary>
-		/// <param name="targetPrefabInfo">Currently selected target prefab</param>
-		internal override void Setup(PrefabInfo targetPrefabInfo)
+		/// <param name="targetPrefabInfo">Target prefab to set</param>
+		internal override void SetTarget(PrefabInfo targetPrefabInfo)
 		{
 			// Base setup.
-			base.Setup(targetPrefabInfo);
+			base.SetTarget(targetPrefabInfo);
 
 			// Title label.
-			AddTitle(Translations.Translate("BOB_NAM"));
+			SetTitle(Translations.Translate("BOB_NAM"));
 
 			// Set trees/props.
 			propCheck.isChecked = !InitialTreeCheckedState;

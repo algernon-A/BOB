@@ -212,7 +212,7 @@ namespace BOB
 			relativePosition = new Vector2(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
 
 			// Title label.
-			AddTitle(Translations.Translate("BOB_NAM") + " : " + Translations.Translate("BOB_RND_TIT"));
+			SetTitle(Translations.Translate("BOB_NAM") + " : " + Translations.Translate("BOB_RND_TIT"));
 
 			// Selected random prop list.
 			UIPanel randomizerPanel = AddUIComponent<UIPanel>();
@@ -475,10 +475,10 @@ namespace BOB
 				string treeName = treeNameBase + " 1";
 
 				// Interate through existing names, incrementing post numeral until we've got a unique name.
-				TreeInfo existingTree = null;
+				BOBRandomPrefab existingTree = null;
 				do
 				{
-					existingTree = PrefabLists.randomTrees.Find(x => x.name.Equals(treeName)).tree;
+					existingTree = PrefabLists.randomTrees.Find(x => x.name.Equals(treeName));
 					if (existingTree != null)
 					{
 						treeName = treeNameBase + " " + (++existingCount).ToString();

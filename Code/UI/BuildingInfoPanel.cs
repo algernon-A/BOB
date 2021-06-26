@@ -17,7 +17,7 @@ namespace BOB
 		BuildingInfo[] subBuildings;
 
 		// Panel components.
-		private UICheckBox indCheck;
+		private readonly UICheckBox indCheck;
 		private UIDropDown subBuildingMenu;
 
 
@@ -105,20 +105,56 @@ namespace BOB
 
 
 		/// <summary>
-		/// Performs initial setup 
+		/// Constructor.
 		/// </summary>
-		/// <param name="parentTransform">Parent transform</param>
-		/// <param name="targetPrefabInfo">Currently selected target prefab</param>
-		internal override void Setup(PrefabInfo targetPrefabInfo)
+		internal BOBBuildingInfoPanel()
 		{
+			// Add group checkbox.
+			indCheck = UIControls.LabelledCheckBox(this, 155f, TitleHeight + Margin, Translations.Translate("BOB_PNL_IND"), 12f, 0.7f);
+
+			// Event handler for group checkbox.
+			indCheck.eventCheckChanged += (control, isChecked) =>
+			{
+				// Rebuild target list.
+				TargetList();
+
+				// Clear selection.
+				targetList.selectedIndex = -1;
+				CurrentTargetItem = null;
+
+				// Store current group state as most recent state.
+				ModSettings.lastInd = isChecked;
+
+				// Toggle replace all button visibility.
+				if (isChecked)
+				{
+					replaceAllButton.Hide();
+				}
+				else
+				{
+					replaceAllButton.Show();
+				}
+			};
+		}
+
+
+		/// <summary>
+		/// Sets the target prefab.
+		/// </summary>
+		/// <param name="targetPrefabInfo">Target prefab to set</param>
+		internal override void SetTarget(PrefabInfo targetPrefabInfo)
+		{
+			// Don't do anything if target hasn't changed.
+			if (currentBuilding == targetPrefabInfo)
+            {
+				return;
+            }
+
 			// Set target reference.
 			currentBuilding = targetPrefabInfo as BuildingInfo;
 
 			// Base setup.
-			base.Setup(targetPrefabInfo);
-
-			// Add group checkbox.
-			indCheck = UIControls.LabelledCheckBox(this, 155f, TitleHeight + Margin, Translations.Translate("BOB_PNL_IND"), 12f, 0.7f);
+			base.SetTarget(targetPrefabInfo);
 
 			// Does this building have sub-buildings?
 			if (currentBuilding.m_subBuildings != null && currentBuilding.m_subBuildings.Length > 0)
@@ -137,51 +173,35 @@ namespace BOB
 					subBuildings[i + 1] = currentBuilding.m_subBuildings[i].m_buildingInfo;
 				}
 
-				// Add sub-building menu.
-				subBuildingMenu = UIControls.AddLabelledDropDown(this, 155f, indCheck.relativePosition.y + indCheck.height + (Margin / 2f), Translations.Translate("BOB_PNL_SUB"), 250f, 20f, 0.7f, 15, 4);
-				subBuildingMenu.listBackground = "GenericPanelDark";
+				// Add sub-building menu, if it doesn't already exist.
+				if (subBuildingMenu == null)
+				{
+					subBuildingMenu = UIControls.AddLabelledDropDown(this, 155f, indCheck.relativePosition.y + indCheck.height + (Margin / 2f), Translations.Translate("BOB_PNL_SUB"), 250f, 20f, 0.7f, 15, 4);
+					subBuildingMenu.listBackground = "GenericPanelDark";
+
+					// Sub-building menu event handler.
+					subBuildingMenu.eventSelectedIndexChanged += (control, index) =>
+					{
+						// Set current building.
+						currentBuilding = subBuildings[index];
+
+						// Reset current items.
+						CurrentTargetItem = null;
+						replacementPrefab = null;
+
+						// Reset loaded lists.
+						LoadedList();
+						TargetList();
+					};
+				}
 				subBuildingMenu.items = subBuildingNames;
 				subBuildingMenu.selectedIndex = 0;
-
-				// Sub-building menu event handler.
-				subBuildingMenu.eventSelectedIndexChanged += (control, index) =>
-				{
-					// Set current building.
-					currentBuilding = subBuildings[index];
-
-					// Reset current items.
-					CurrentTargetItem = null;
-					replacementPrefab = null;
-
-					// Reset loaded lists.
-					LoadedList();
-					TargetList();
-				};
 			}
-
-			// Event handler for group checkbox.
-			indCheck.eventCheckChanged += (control, isChecked) =>
-			{
-				// Rebuild target list.
-				TargetList();
-
-				// Clear selection.
-				targetList.selectedIndex = -1;
-				CurrentTargetItem = null;
-
-				// Store current group state as most recent state.
-				ModSettings.lastInd = isChecked;
-
-				// Toggle replace all button visibility.
-				if (isChecked)
-                {
-					replaceAllButton.Hide();
-                }
-				else
-                {
-					replaceAllButton.Show();
-                }
-			};
+			else
+            {
+				// Otherwise, hide the sub-building menu (if it exists).
+				subBuildingMenu?.Hide();
+            }
 
 			// Set grouped checkbox initial state according to preferences.
 			switch (ModSettings.indDefault)
