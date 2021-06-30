@@ -836,8 +836,8 @@ namespace BOB
 			// Create return fastlist from our filtered list.
 			variationsList.rowsData = new FastList<object>
 			{
-				m_buffer = selectedRandomPrefab.variations.ToArray(),
-				m_size = selectedRandomPrefab.variations.Count
+				m_buffer = selectedRandomPrefab?.variations?.ToArray() ?? new BOBVariation[0],
+				m_size = selectedRandomPrefab?.variations?.Count ?? 0
 			};
 		}
 
