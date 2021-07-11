@@ -78,7 +78,7 @@ namespace BOB
 		internal void Revert(BuildingInfo building, PrefabInfo target, bool removeEntries = true)
 		{
 			// Safety check.
-			if (building == null || !replacements.ContainsKey(building))
+			if (building == null || !replacements.ContainsKey(building) || !replacements[building].ContainsKey(target))
 			{
 				return;
 			}
