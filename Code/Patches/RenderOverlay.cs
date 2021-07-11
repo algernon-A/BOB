@@ -126,7 +126,12 @@ namespace BOB
             {
                 // Get transform matrix for building and use to convert prop location to worldspace.
                 Matrix4x4 m = Matrix4x4.TRS(building.m_position, Quaternion.Euler(0, -Mathf.Rad2Deg * building.m_angle, 0), Vector3.one);
-                Vector3 propLocation = m.MultiplyPoint(prop.m_position);
+                
+                // Offset building position to account for extensible yards.
+                Vector3 propPosition = prop.m_position;
+                propPosition.z += (building.m_length - building.Info.m_cellLength) * 4f;
+
+                Vector3 propLocation = m.MultiplyPoint(propPosition);
 
                 // Don't render overlay is prop is beyond rendering distance.
                 if (camera.CheckRenderDistance(propLocation, MaxBuildingPropDistance))
