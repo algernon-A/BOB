@@ -186,6 +186,12 @@ namespace BOB
 
                     // Set flag.
                     hasReplacement = true;
+
+                    // Show building replacement sprite.
+                    lineSprite.atlas = TextureUtils.LoadSpriteAtlas(thisNetItem == null ? "bob_single_building_small" : "bob_road_small");
+                    lineSprite.spriteName = "normal";
+                    lineSprite.tooltip = Translations.Translate(thisNetItem == null ? "BOB_SPR_SBL" : "BOB_SPR_SNT");
+                    lineSprite.Show();
                 }
                 // If no current individual replacement, check to see if there's a currently active building/network replacement.
                 else if (thisItem.replacementPrefab != null)
