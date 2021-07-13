@@ -11,7 +11,7 @@ namespace BOB
     public class BOBMod : IUserMod
     {
         public static string ModName => "BOB - the tree and prop replacer";
-        public static string Version => "0.6.2";
+        public static string Version => "0.7";
 
         public string Name => ModName + " " + Version;
         public string Description => Translations.Translate("BOB_DESC");

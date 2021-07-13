@@ -1,7 +1,10 @@
-﻿- Add random prop and tree support
+﻿Version 0.7 -
+
+- Add random prop and tree support
 - Add support for map editor
 - Fix slider text values not updating for some users
-- Fix prop highlighting offset for sub-buildings
+- Fix prop highlighting offset for sub-buildings and buildings with extensible yards
+- BOB tool remains active while panel is open (for quick target changes)
 
 
 Version 0.6.2 -
