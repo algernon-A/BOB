@@ -12,6 +12,7 @@
         <replacement target="No Parking Sign" replacement="2543270627.R5-82 No Parking Area_Data" rotation="-90" />
         <replacement target="No Right Turn Sign" replacement="2540523220.R2-6R No Right Turn_Data" rotation="-90" />
         <replacement target="No Left Turn Sign" replacement="2540523220.R2-6L No Left Turn_Data" rotation="-90" />
+        <replacement target="Motorway Sign" replacement="2540523220.R6-AR1 Freeway Start Assembly_Data" rotation="-90" />        
       </propReplacements>
     </replacementpack>       
     <replacementpack name="Australian speed signs by Feare">
