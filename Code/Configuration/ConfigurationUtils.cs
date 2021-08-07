@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
+using ColossalFramework;
 
 
 namespace BOB
@@ -516,6 +517,13 @@ namespace BOB
 		/// <returns>Requested prefab, or null if not found</returns>
 		private static PrefabInfo FindReplacementPrefab(string replacementName, bool isTree)
         {
+			// Null check.
+			if (replacementName.IsNullOrWhiteSpace())
+            {
+				Logging.Error("invalid replacement prop name");
+				return null;
+            }
+
 			// Attempt to load from prefab collection.
 			PrefabInfo replacementPrefab = isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacementName) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacementName);
 
