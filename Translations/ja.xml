@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Language UniqueName="ja" ReadableName="日本語">
+  <Translations>
+    <Translation ID="BOB_NAM" String="BOB: the tree and prop replacer"/>
+    <Translation ID="BOB_DESC" String="開発中: ツリーやProp類を置き換えます"/>
+    <Translation ID="TRN_CHOICE" String="言語設定"/>
+    <Translation ID="TRN_SYS" String="ゲームの言語を使用"/>
+    <Translation ID="MES_CLS" String="閉じる"/>
+    <Translation ID="MES_DSA" String="次回から非表示"/>
+    <Translation ID="BOB_MBX_OK" String="OK"/>
+    <Translation ID="BOB_ROW_WAS" String="置換中 →"/>
+    <Translation ID="BOB_PNL_NOP" String="Propがありません"/>
+    <Translation ID="BOB_PNL_NOT" String="ツリーがありません"/>
+    <Translation ID="BOB_PNL_TRE" String="ツリー"/>
+    <Translation ID="BOB_PNL_PRP" String="Prop"/>
+    <Translation ID="BOB_PNL_IND" String="個々のPropを表示"/>
+    <Translation ID="BOB_PNL_HDV" String="バニラを非表示"/>
+    <Translation ID="BOB_PNL_REP" String="Replace"/>
+    <Translation ID="BOB_PNL_RTB" String="このタイプの建物"/>
+    <Translation ID="BOB_PNL_RAB" String="全ての建物"/>
+    <Translation ID="BOB_PNL_RTN" String="このタイプのネットワーク"/>
+    <Translation ID="BOB_PNL_RAN" String="全てのネットワーク"/>
+    <Translation ID="BOB_PNL_RTT" String="マップ上のツリー"/>
+    <Translation ID="BOB_PNL_RTP" String="マップ上のProp"/>
+    <Translation ID="BOB_PNL_REV" String="元に戻す"/>
+    <Translation ID="BOB_PNL_REV_TIP" String="このアイテムに対応する有効な置き換えが無く、元に戻せません"/>
+    <Translation ID="BOB_PNL_PKB" String="リプレースパック"/>
+    <Translation ID="BOB_PNL_PRB" String="出現率"/>
+    <Translation ID="BOB_PNL_ANG" String="角度"/>
+    <Translation ID="BOB_PNL_OFF" String="オフセット"/>
+    <Translation ID="BOB_PNL_XOF" String="X"/>
+    <Translation ID="BOB_PNL_YOF" String="Y"/>
+    <Translation ID="BOB_PNL_ZOF" String="Z"/>
+    <Translation ID="BOB_PNL_SUB" String="サブビルディング"/>
+    <Translation ID="BOB_SPR_SBL" String="このタイプの建物に置き換えが適用中"/>
+    <Translation ID="BOB_SPR_ABL" String="全ての建物に置き換えが適用中"/>
+    <Translation ID="BOB_SPR_SNT" String="このタイプのネットワークに置き換えが適用中"/>
+    <Translation ID="BOB_SPR_ANT" String="全てのネットワークに置き換えが適用中"/>
+    <Translation ID="BOB_SPR_PCK" String="リプレースパックが既に適用されています"/>
+    <Translation ID="BOB_PCK_APP" String="パックを適用"/>
+    <Translation ID="BOB_PCK_APP_A" String="選択したリプレースパックを適用"/>
+    <Translation ID="BOB_PCK_APP_C" String="適用中のリプレースパックと競合するため変更できません"/>
+    <Translation ID="BOB_PCK_APP_I" String="リプレースパックが適用されています"/>
+    <Translation ID="BOB_PCK_RVT" String="パックを戻す"/>
+    <Translation ID="BOB_PCK_RVT_A" String="選択したリプレースパックを解除"/>
+    <Translation ID="BOB_PCK_RVT_I" String="リプレースパックは適用されていません"/>
+    <Translation ID="BOB_PCK_NAL" String="全ての置き換えが利用可能ではありません"/>
+    <Translation ID="BOB_CFG_UCS" String="選択された構成を使用して保存(グローバル側の構成では無く)"/>
+    <Translation ID="BOB_CFG_SAC" String="現在の構成を保存"/>
+    <Translation ID="BOB_CFG_SSC" String="選択した構成をコピー"/>
+    <Translation ID="BOB_CFG_SEC" String="新しい空の構成"/>
+    <Translation ID="BOB_CFG_DEL" String="選択した構成を削除"/>
+    <Translation ID="BOB_OPT_GEN" String="一般設定"/>
+    <Translation ID="BOB_OPT_CFG" String="構成"/>
+    <Translation ID="BOB_OPT_RUI" String="荒れ地"/>
+    <Translation ID="BOB_OPT_KEY" String="ホットキー"/>
+    <Translation ID="BOB_OPT_PRS" String="任意のキーを押してください"/>
+    <Translation ID="BOB_OPT_RGL" String="変更はゲームの再起動時に反映"/>
+    <Translation ID="BOB_OPT_RRT" String="ツリーの地面に出来る荒れ地を防止"/>
+    <Translation ID="BOB_OPT_RRP" String="Propの地面に出来る荒れ地を防止"/>
+    <Translation ID="BOB_NUKE" String="構成をリセット"/>
+    <Translation ID="BOB_PER_IND" String="デフォルトで個々のアイテムを表示"/>
+    <Translation ID="BOB_PER_SIN" String="常にオフ"/>
+    <Translation ID="BOB_PER_GRP" String="常にオン"/>
+    <Translation ID="BOB_PER_LST" String="前回の設定で保存"/>
+    <Translation ID="BOB_OPT_POS" String="前回のパネル位置を記憶"/>
+    <Translation ID="BOB_FIL_NAME" String="検索:"/>
+    <Translation ID="MES_PAGE" String="詳細は、MODがあるSteamのワークショップを確認してください。"/>
+    <Translation ID="BOB_ERR_FAT" String="正常にMODが起動できないため、動作をシャットダウンしました。"/>
+    <Translation ID="BOB_ERR_HAR" String="BOB: the tree and prop replacerは、必要なHarmony 2.0 MODのパッチ動作を完了できません。"/>
+    <Translation ID="ERR_HAR0" String="Harmony 2.0 MODでエラーが発生しました"/>
+    <Translation ID="ERR_HAR1" String="エラーが起きる原因として、考えられるのは以下の通りです。"/>
+    <Translation ID="ERR_HAR2" String="依存関係にある、必要なHarmony 2 MODがインストールされていません。"/>
+    <Translation ID="ERR_HAR3" String="古いMODや壊れたMODが、Harmony 2.0 MODの動作を妨げています。"/>
+    <Translation ID="BOB_UPD_040_0" String="Introducing map tree replacement!  Activate the BOB tool as usual and click on a free-standing tree."/>
+    <Translation ID="BOB_UPD_041_0" String="Fix intermittent building replacement panel exception when changing target item."/>
+    <Translation ID="BOB_UPD_042_0" String="Enable selection of sub-buildings"/>
+    <Translation ID="BOB_UPD_042_1" String="Fix potential race conditions on game load"/>
+    <Translation ID="BOB_UPD_043_0" String="Fix probability refresh when reverting TO an all-building or all-network replacement"/>
+    <Translation ID="BOB_UPD_043_1" String="Fix LODs not refreshing after reverting all-network or all-building replacements"/>
+    <Translation ID="BOB_UPD_043_2" String="Adjust info panel textfield labels to fit longer translation strings"/>
+    <Translation ID="BOB_UPD_050_0" String="Initial implementation of network replacement packs"/>
+    <Translation ID="BOB_UPD_050_1" String="Now properly compatible with Network Skins 2"/>
+    <Translation ID="BOB_UPD_050_2" String="Faster replacement processing"/>
+    <Translation ID="BOB_UPD_051_0" String="New tree/prop list layout, with icons to indicate which type of replacement is active"/>
+    <Translation ID="BOB_UPD_052_0" String="Add configurations management for handling multiple different configuration files, accessible through the options panel"/>
+    <Translation ID="BOB_UPD_060_0" String="Standalone prop replacement"/>
+    <Translation ID="BOB_UPD_060_1" String="Highlight selected props or trees"/>
+    <Translation ID="BOB_UPD_060_2" String="Can now select networks in buildings"/>
+    <Translation ID="BOB_UPD_060_3" String="Can now select decoration buildings"/>
+    <Translation ID="BOB_UPD_060_4" String="Redesigned smaller replacer panel"/>
+    <Translation ID="BOB_UPD_061_0" String="Add ascending/descending name sort filters to lists"/>
+    <Translation ID="BOB_UPD_062_0" String="Add ability to remove terrain ruining from all trees and/or props (in the options panel)"/>
+    <Translation ID="BOB_UPD_062_1" String="Ferry paths are now selectable (to change/hide those ferry path marker buoys)"/>
+    <Translation ID="BOB_UPD_062_2" String="Fix network prop angles sometimes being incorrectly displayed on selection"/>
+    <Translation ID="BOB_PNL_RSW" String="ランダムに表示"/>
+    <Translation ID="BOB_PNL_RST" String="ランダム構成を設定"/>
+    <Translation ID="BOB_RND_TIT" String="ランダムなツリーとPropを構成"/>
+    <Translation ID="BOB_RND_NEW" String="新規"/>
+    <Translation ID="BOB_RND_DEL" String="削除"/>
+    <Translation ID="BOB_RND_REN" String="名前変更"/>
+    <Translation ID="BOB_RND_ADD" String="バリエーションに追加"/>
+    <Translation ID="BOB_RND_SUB" String="バリエーションから削除"/>
+  </Translations>
+</Language>
