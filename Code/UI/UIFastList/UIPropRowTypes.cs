@@ -104,6 +104,22 @@ namespace BOB
 
 
 	/// <summary>
+	/// Prop row fastlist item for loaded props/trees for scaling.
+	/// </summary>
+	public class UILoadedScalingPropRow : UILoadedPropRow
+	{
+		/// <summary>
+		/// Called when this item is selected.
+		/// </summary>
+		public override void UpdateSelection()
+		{
+			// Update currently selected loaded prefab.
+			BOBScalePanel.Panel.SelectedLoadedPrefab = thisPrefab;
+		}
+	}
+
+
+	/// <summary>
 	/// Prop row fastlist item for loaded props/trees for random setup.
 	/// </summary>
 	public class UILoadedRandomPropRow : UILoadedPropRow

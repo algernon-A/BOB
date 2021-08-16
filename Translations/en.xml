@@ -95,11 +95,15 @@
     <Translation ID="BOB_UPD_062_2" String="Fix network prop angles sometimes being incorrectly displayed on selection" />
     <Translation ID="BOB_PNL_RSW" String="Show random" />
     <Translation ID="BOB_PNL_RST" String="Random setup" />
+    <Translation ID="BOB_PNL_SCA" String="Prop and tree scaling" />
     <Translation ID="BOB_RND_TIT" String="configure random trees and props" />
     <Translation ID="BOB_RND_NEW" String="New" />
     <Translation ID="BOB_RND_DEL" String="Delete" />
     <Translation ID="BOB_RND_REN" String="Rename" />
     <Translation ID="BOB_RND_ADD" String="Add to variations" />
     <Translation ID="BOB_RND_SUB" String="Remove from variations" />
+    <Translation ID="BOB_SCA_TIT" String="configure prop scaling" />
+    <Translation ID="BOB_SCA_MIN" String="Minimum scale" />
+    <Translation ID="BOB_SCA_MAX" String="Maximum scale" />
   </Translations>
 </Language>

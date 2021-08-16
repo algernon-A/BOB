@@ -261,7 +261,7 @@ namespace BOB
 			UIButton removeVariationButton = AddIconButton(this, MidControlX, ListY + ToggleSize, ToggleSize, "BOB_RND_SUB", TextureUtils.LoadSpriteAtlas("bob_minus"));
 			removeVariationButton.eventClicked += RemoveVariation;
 
-			// Order buttons.
+			// Order button.
 			loadedNameButton = ArrowButton(this, LoadedX + 10f, ListY - 20f);
 			loadedNameButton.eventClicked += SortLoaded;
 	
@@ -839,29 +839,6 @@ namespace BOB
 				m_buffer = selectedRandomPrefab?.variations?.ToArray() ?? new BOBVariation[0],
 				m_size = selectedRandomPrefab?.variations?.Count ?? 0
 			};
-		}
-
-
-		/// <summary>
-		/// Performs initial fastlist setup.
-		/// </summary>
-		/// <param name="fastList">Fastlist to set up</param>
-		private void ListSetup(UIFastList fastList)
-		{
-			// Apperance, size and position.
-			fastList.backgroundSprite = "UnlockingPanel";
-			fastList.width = fastList.parent.width;
-			fastList.height = fastList.parent.height;
-			fastList.relativePosition = Vector2.zero;
-			fastList.rowHeight = UIPropRow.RowHeight;
-
-			// Behaviour.
-			fastList.canSelect = true;
-			fastList.autoHideScrollbar = true;
-
-			// Data.
-			fastList.rowsData = new FastList<object>();
-			fastList.selectedIndex = -1;
 		}
 	}
 }

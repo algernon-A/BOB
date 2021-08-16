@@ -211,6 +211,10 @@ namespace BOB
 				// Revert button.
 				revertButton = UIControls.AddSmallerButton(this, MidControlX, RevertY, Translations.Translate("BOB_PNL_REV"), MidControlWidth);
 				revertButton.eventClicked += Revert;
+
+				// Scale button.
+				UIButton scaleButton = AddIconButton(this, MiddleX, TitleHeight + Margin, ToggleSize, Translations.Translate("BOB_PNL_SCA"), TextureUtils.LoadSpriteAtlas("bob_prop_tree_scale_small"));
+				scaleButton.eventClicked += (control, clickEvent) => BOBScalePanel.Create();
 			}
 			catch (Exception e)
 			{
@@ -527,29 +531,6 @@ namespace BOB
 
 			// Regenerate loaded list.
 			TargetList();
-		}
-
-
-		/// <summary>
-		/// Performs initial fastlist setup.
-		/// </summary>
-		/// <param name="fastList">Fastlist to set up</param>
-		protected void ListSetup(UIFastList fastList)
-		{
-			// Apperance, size and position.
-			fastList.backgroundSprite = "UnlockingPanel";
-			fastList.width = fastList.parent.width;
-			fastList.height = fastList.parent.height;
-			fastList.relativePosition = Vector2.zero;
-			fastList.rowHeight = UIPropRow.RowHeight;
-
-			// Behaviour.
-			fastList.canSelect = true;
-			fastList.autoHideScrollbar = true;
-
-			// Data.
-			fastList.rowsData = new FastList<object>();
-			fastList.selectedIndex = -1;
 		}
 	}
 }
