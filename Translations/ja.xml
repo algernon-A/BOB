@@ -96,12 +96,12 @@
     <Translation ID="BOB_PNL_RSW" String="ランダム構成を表示"/>
     <Translation ID="BOB_PNL_RST" String="ランダム構成をセットアップ"/>
     <Translation ID="BOB_PNL_SCA" String="Propとツリーの拡大率"/>
-    <Translation ID="BOB_RND_TIT" String="ランダムに選択するPropとツリーを構成"/>
+    <Translation ID="BOB_RND_TIT" String="ランダム構成にPropやツリーを追加"/>
     <Translation ID="BOB_RND_NEW" String="新規"/>
     <Translation ID="BOB_RND_DEL" String="削除"/>
     <Translation ID="BOB_RND_REN" String="名前の変更"/>
-    <Translation ID="BOB_RND_ADD" String="選択のバリエーションに追加"/>
-    <Translation ID="BOB_RND_SUB" String="選択のバリエーションから削除"/>
+    <Translation ID="BOB_RND_ADD" String="バリエーションに追加"/>
+    <Translation ID="BOB_RND_SUB" String="バリエーションから除く"/>
     <Translation ID="BOB_SCA_TIT" String="Propの拡大率を設定"/>
     <Translation ID="BOB_SCA_MIN" String="最小スケール"/>
     <Translation ID="BOB_SCA_MAX" String="最大スケール"/>
