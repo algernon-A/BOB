@@ -111,7 +111,7 @@ namespace BOB
 
 				Logging.Message("replacing tree ", target.name, " with ", replacement.name);
 
-				// Iterate through each tree in map.
+				// Iterate through each prop in map.
 				for (uint propIndex = 0; propIndex < props.Length; ++propIndex)
 				{
 					// Local reference.

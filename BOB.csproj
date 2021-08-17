@@ -68,6 +68,7 @@
     <Compile Include="Code\UI\MapPanel.cs" />
     <Compile Include="Code\UI\PanelBase.cs" />
     <Compile Include="Code\UI\RandomPanel.cs" />
+    <Compile Include="Code\UI\ScalePanel.cs" />
     <Compile Include="Code\UI\UIFastList\UIRandomPropRow.cs" />
     <Compile Include="Code\Utils\Logging.cs" />
     <Compile Include="Code\PackUtils\PackUtils.cs" />
@@ -145,6 +146,7 @@
     <Content Include="Resources\bob_props3_large.png" />
     <Content Include="Resources\bob_prop_pack.png" />
     <Content Include="Resources\bob_prop_pack_small.png" />
+    <Content Include="Resources\bob_prop_tree_scale_small.png" />
     <Content Include="Resources\bob_random_small.png" />
     <Content Include="Resources\bob_road.png" />
     <Content Include="Resources\bob_road_small.png" />

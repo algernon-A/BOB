@@ -247,7 +247,7 @@ namespace BOB
 
 					// Update current target.
 					CurrentTargetItem.replacementPrefab = replacementPrefab;
-					CurrentTargetItem.replacementProb = probability;
+					CurrentTargetItem.replacementProb = (int)probabilitySlider.TrueValue;
 				}
 				else
 				{
@@ -256,7 +256,7 @@ namespace BOB
 
 					// Update current target.
 					CurrentTargetItem.individualPrefab = replacementPrefab;
-					CurrentTargetItem.individualProb = probability;
+					CurrentTargetItem.individualProb = (int)probabilitySlider.TrueValue;
 				}
 
 				// Perform post-replacment updates.
@@ -339,7 +339,7 @@ namespace BOB
 
 			// Update current target.
 			CurrentTargetItem.allPrefab = replacementPrefab;
-			CurrentTargetItem.allProb = probability;
+			CurrentTargetItem.allProb = (int)probabilitySlider.TrueValue;
 
 			// Perform post-replacment updates.
 			FinishUpdate();
