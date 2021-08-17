@@ -15,7 +15,7 @@
     <Translation ID="BOB_PNL_PRP" String="Prop"/>
     <Translation ID="BOB_PNL_IND" String="Propの内訳を表示"/>
     <Translation ID="BOB_PNL_HDV" String="バニラを非表示"/>
-    <Translation ID="BOB_PNL_REP" String="置換"/>
+    <Translation ID="BOB_PNL_REP" String="Replace"/>
     <Translation ID="BOB_PNL_RTB" String="このタイプの建物"/>
     <Translation ID="BOB_PNL_RAB" String="全ての建物"/>
     <Translation ID="BOB_PNL_RTN" String="このタイプのネットワーク"/>
