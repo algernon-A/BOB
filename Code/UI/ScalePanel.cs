@@ -110,7 +110,9 @@ namespace BOB
 		/// <summary>
 		/// Creates the panel object in-game and displays it.
 		/// </summary>
-		internal static void Create()
+		/// <param name="isTree">True if it should be created with trees selected, false for props</param>
+		/// <param name="selectedPrefab">Already selected prefab (null if none)</param>
+		internal static void Create(bool isTree, PrefabInfo selectedPrefab)
 		{
 			try
 			{
@@ -124,6 +126,19 @@ namespace BOB
 					// Create new panel instance and add it to GameObject.
 					panel = uiGameObject.AddComponent<BOBScalePanel>();
 					panel.transform.parent = uiGameObject.transform.parent;
+
+					// Set tree status.
+					if (isTree)
+                    {
+						panel.treeCheck.isChecked = true;
+                    }
+
+					// Select previously selected prefab, if any.
+					if (selectedPrefab != null)
+					{
+						panel.SelectedLoadedPrefab = selectedPrefab;
+						panel.loadedList.FindItem(selectedPrefab);
+					}
 
 					// Hide previous window, if any.
 					InfoPanelManager.Panel?.Hide();
@@ -159,6 +174,10 @@ namespace BOB
 			InfoPanelManager.Panel?.Show();
 		}
 
+
+		/// <summary>
+		/// Constructor - creates panel.
+		/// </summary>
 		internal BOBScalePanel()
 		{
 			// Default position - centre in screen.
@@ -283,6 +302,17 @@ namespace BOB
 				m_buffer = list.ToArray(),
 				m_size = list.Count
 			};
+
+			// Select currently selected prefab, if any.
+			if (selectedLoadedPrefab != null)
+			{
+				loadedList.FindItem(selectedLoadedPrefab);
+			}
+			else
+			{
+				// No current selection.
+				loadedList.selectedIndex = -1;
+			}
 		}
 
 
