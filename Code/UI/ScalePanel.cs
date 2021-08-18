@@ -63,8 +63,10 @@ namespace BOB
 		{
 			set
 			{
+				// Set value.
 				selectedLoadedPrefab = value;
 
+				// Prop or tree?  Set slider values accordingly.
 				if (selectedLoadedPrefab is PropInfo prop)
 				{
 					minScaleSlider.value = prop.m_minScale;
@@ -75,6 +77,13 @@ namespace BOB
 					minScaleSlider.value = tree.m_minScale;
 					maxScaleSlider.value = tree.m_maxScale;
 				}
+				else
+                {
+					// Neither prop nor tree, presumably null - set sliders to default values.
+					minScaleSlider.value = 1f;
+					maxScaleSlider.value = 1f;
+                }
+
 			}
 		}
 
@@ -321,16 +330,7 @@ namespace BOB
 		/// <param name="value">New value</param>
 		private void MinScaleValue(UIComponent control, float value)
 		{
-			if (selectedLoadedPrefab is PropInfo prop)
-			{
-				prop.m_minScale = value;
-				ConfigurationUtils.SaveConfig();
-			}
-			else if (selectedLoadedPrefab is TreeInfo tree)
-			{
-				tree.m_minScale = value;
-				ConfigurationUtils.SaveConfig();
-			}
+			Scaling.instance.ApplyMinScale(selectedLoadedPrefab, value);
 		}
 
 
@@ -341,16 +341,7 @@ namespace BOB
 		/// <param name="value">New value</param>
 		private void MaxScaleValue(UIComponent control, float value)
 		{
-			if (selectedLoadedPrefab is PropInfo prop)
-			{
-				prop.m_maxScale = value;
-				ConfigurationUtils.SaveConfig();
-			}
-			else if (selectedLoadedPrefab is TreeInfo tree)
-			{
-				tree.m_maxScale = value;
-				ConfigurationUtils.SaveConfig();
-			}
+			Scaling.instance.ApplyMaxScale(selectedLoadedPrefab, value);
 		}
 
 
