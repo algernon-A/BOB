@@ -70,6 +70,9 @@ namespace BOB
 		public float maxScale = 1f;
 
 		[XmlIgnore]
+		public PrefabInfo prefab;
+
+		[XmlIgnore]
 		public float originalMin = 1f;
 
 		[XmlIgnore]

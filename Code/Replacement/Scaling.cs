@@ -52,8 +52,9 @@ namespace BOB
 				if (thisProp != null)
 				{
 					// Found it - record original values.
+					element.prefab = thisProp;
 					element.originalMin = thisProp.m_minScale;
-					element.originalMax = thisProp.m_minScale;
+					element.originalMax = thisProp.m_maxScale;
 
 					// Apply new values.
 					thisProp.m_minScale = element.minScale;
@@ -79,8 +80,9 @@ namespace BOB
 				if (thisTree != null)
 				{
 					// Found it - record original values.
+					element.prefab = thisTree;
 					element.originalMin = thisTree.m_minScale;
-					element.originalMax = thisTree.m_minScale;
+					element.originalMax = thisTree.m_maxScale;
 
 					// Apply new values.
 					thisTree.m_minScale = element.minScale;
@@ -129,6 +131,76 @@ namespace BOB
 
 
 		/// <summary>
+		/// Revert a prefab to original scaling.
+		/// </summary>
+		/// <param name="prefab">Prefab to revert</param>
+		internal void Revert(PrefabInfo prefab)
+		{
+			// Prop or tree?
+			if (prefab is PropInfo prop)
+			{
+				// Prop - check if we have a record.
+				if (propScales.ContainsKey(prop.name))
+				{
+					// Local reference.
+					BOBScalingElement element = propScales[prop.name];
+
+					// Reset prop scale.
+					prop.m_minScale = element.originalMin;
+					prop.m_maxScale = element.originalMax;
+
+					// Remove record from dictionary.
+					propScales.Remove(prop.name);
+
+					// Save configuration file.
+					ConfigurationUtils.SaveConfig();
+				}
+			}
+			else if (prefab is TreeInfo tree)
+			{
+				// Tree - check if we have a record.
+				if (treeScales.ContainsKey(tree.name))
+				{
+					// Local reference.
+					BOBScalingElement element = treeScales[tree.name];
+
+					// Reset prop scale.
+					tree.m_minScale = element.originalMin;
+					tree.m_maxScale = element.originalMax;
+
+					// Remove record from dictionary.
+					treeScales.Remove(tree.name);
+
+					// Save configuration file.
+					ConfigurationUtils.SaveConfig();
+				}
+			}
+		}
+
+
+		/// <summary>
+		/// Reverts all applied scaling and resets dictionaries.
+		/// </summary>
+		internal void RevertAll()
+		{
+			// Revert props - iterate through each recorded element.
+			foreach(BOBScalingElement propElement in propScales.Values)
+            {
+				Revert(propElement.prefab);
+			}
+
+			// Revert trees - iterate through each recorded element.
+			foreach (BOBScalingElement treeElement in treeScales.Values)
+			{
+				Revert(treeElement.prefab);
+			}
+
+			// Reset dictionaries.
+			Setup();
+		}
+
+
+		/// <summary>
 		/// Applies scaling to props and updates the dictionary records.
 		/// </summary>
 		/// <param name="prop">Prop prefab</param>
@@ -143,6 +215,7 @@ namespace BOB
 				propScales.Add(prop.name, new BOBScalingElement
 				{
 					prefabName = prop.name,
+					prefab = prop,
 					originalMin = prop.m_minScale,
 					originalMax = prop.m_maxScale
 				});
@@ -183,6 +256,7 @@ namespace BOB
 				treeScales.Add(tree.name, new BOBScalingElement
 				{
 					prefabName = tree.name,
+					prefab = tree,
 					originalMin = tree.m_minScale,
 					originalMax = tree.m_maxScale
 				});

@@ -24,6 +24,7 @@ namespace BOB
 		private const float ListY = ToolY + ToolbarHeight + Margin;
 		private const float MinOffsetY = ListY;
 		private const float MaxOffsetY = MinOffsetY + SliderHeight;
+		private const float RevertY = MaxOffsetY + SliderHeight + 45f;
 		private const float ListHeight = UIPropRow.RowHeight * 16f;
 
 
@@ -35,9 +36,13 @@ namespace BOB
 		// Panel components.
 		private readonly UIFastList loadedList;
 		private readonly BOBSlider minScaleSlider, maxScaleSlider;
+		private readonly UIButton revertButton;
 
 		// Current selection.
 		private PrefabInfo selectedLoadedPrefab;
+
+		// Status.
+		private bool disableEvents = false;
 
 
 		/// <summary>
@@ -63,6 +68,9 @@ namespace BOB
 		{
 			set
 			{
+				// Disable events, otherwise slider value changes will mess things up.
+				disableEvents = true;
+
 				// Set value.
 				selectedLoadedPrefab = value;
 
@@ -71,19 +79,30 @@ namespace BOB
 				{
 					minScaleSlider.value = prop.m_minScale;
 					maxScaleSlider.value = prop.m_maxScale;
+
+					// Enable revert button.
+					revertButton.Enable();
 				}
 				else if (selectedLoadedPrefab is TreeInfo tree)
                 {
 					minScaleSlider.value = tree.m_minScale;
 					maxScaleSlider.value = tree.m_maxScale;
+
+					// Enable revert button.
+					revertButton.Enable();
 				}
 				else
                 {
 					// Neither prop nor tree, presumably null - set sliders to default values.
 					minScaleSlider.value = 1f;
 					maxScaleSlider.value = 1f;
+
+					// Disable revert button if no valid selection.
+					revertButton.Disable();
                 }
 
+				// Restore events.
+				disableEvents = false;
 			}
 		}
 
@@ -149,12 +168,17 @@ namespace BOB
 			SetTitle(Translations.Translate("BOB_NAM") + " : " + Translations.Translate("BOB_SCA_TIT"));
 
 			// Minimum scale slider.
-			minScaleSlider = AddBOBSlider(this, ControlX, MinOffsetY, ControlWidth - (Margin * 2f), Translations.Translate("BOB_SCA_MIN"), 0.1f, 2f, 0.1f, "MinScale");
+			minScaleSlider = AddBOBSlider(this, ControlX, MinOffsetY, ControlWidth - (Margin * 2f), Translations.Translate("BOB_SCA_MIN"), 0.5f, 2f, 0.5f, "MinScale");
 			minScaleSlider.eventValueChanged += MinScaleValue;
 			minScaleSlider.value = 1f;
-			maxScaleSlider = AddBOBSlider(this, ControlX, MaxOffsetY + 40f, ControlWidth - (Margin * 2f), Translations.Translate("BOB_SCA_MAX"), 0.1f, 2f, 0.1f, "MaxScale");
+			maxScaleSlider = AddBOBSlider(this, ControlX, MaxOffsetY + 40f, ControlWidth - (Margin * 2f), Translations.Translate("BOB_SCA_MAX"), 0.5f, 2f, 0.5f, "MaxScale");
 			maxScaleSlider.eventValueChanged += MaxScaleValue;
 			maxScaleSlider.value = 1f;
+
+			// Revert button.
+			revertButton = UIControls.AddSmallerButton(this, ControlX, RevertY, Translations.Translate("BOB_PNL_REV"), ControlWidth);
+			revertButton.eventClicked += Revert;
+			revertButton.Disable();
 
 			// Loaded prop list.
 			UIPanel loadedPanel = AddUIComponent<UIPanel>();
@@ -173,9 +197,6 @@ namespace BOB
 
 			// Populate loaded list.
 			LoadedList();
-
-			// Update button states.
-			//UpdateButtonStates();
 
 			// Bring to front.
 			BringToFront();
@@ -322,6 +343,24 @@ namespace BOB
 			}
 		}
 
+		/// <summary>
+		/// Revert button event handler.
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="mouseEvent">Mouse event (unused)</param>
+		/// </summary>
+		private void Revert(UIComponent control, UIMouseEventParameter mouseEvent)
+		{
+			// Null check.
+			if (selectedLoadedPrefab?.name != null)
+			{
+				// Revert current selection.
+				Scaling.instance.Revert(selectedLoadedPrefab);
+
+				// Reset prefab record to reset slider valies.
+				SelectedLoadedPrefab = selectedLoadedPrefab;
+			}
+		}
+
 
 		/// <summary>
 		/// Minimum scale slider event handler.
@@ -330,7 +369,11 @@ namespace BOB
 		/// <param name="value">New value</param>
 		private void MinScaleValue(UIComponent control, float value)
 		{
-			Scaling.instance.ApplyMinScale(selectedLoadedPrefab, value);
+			// Don't apply changes if events are disabled.
+			if (!disableEvents)
+			{
+				Scaling.instance.ApplyMinScale(selectedLoadedPrefab, value);
+			}
 		}
 
 
@@ -341,7 +384,11 @@ namespace BOB
 		/// <param name="value">New value</param>
 		private void MaxScaleValue(UIComponent control, float value)
 		{
-			Scaling.instance.ApplyMaxScale(selectedLoadedPrefab, value);
+			// Don't apply changes if events are disabled.
+			if (!disableEvents)
+			{
+				Scaling.instance.ApplyMaxScale(selectedLoadedPrefab, value);
+			}
 		}
 
 
