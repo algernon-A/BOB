@@ -187,10 +187,10 @@ namespace BOB
 			SetTitle(Translations.Translate("BOB_NAM") + " : " + Translations.Translate("BOB_SCA_TIT"));
 
 			// Minimum scale slider.
-			minScaleSlider = AddBOBSlider(this, ControlX, MinOffsetY, ControlWidth - (Margin * 2f), Translations.Translate("BOB_SCA_MIN"), 0.5f, 2f, 0.5f, "MinScale");
+			minScaleSlider = AddBOBSlider(this, ControlX, MinOffsetY, ControlWidth - (Margin * 2f), "BOB_SCA_MIN", 0.5f, 2f, 0.5f, "MinScale");
 			minScaleSlider.eventValueChanged += MinScaleValue;
 			minScaleSlider.value = 1f;
-			maxScaleSlider = AddBOBSlider(this, ControlX, MaxOffsetY + 40f, ControlWidth - (Margin * 2f), Translations.Translate("BOB_SCA_MAX"), 0.5f, 2f, 0.5f, "MaxScale");
+			maxScaleSlider = AddBOBSlider(this, ControlX, MaxOffsetY + 40f, ControlWidth - (Margin * 2f), "BOB_SCA_MAX", 0.5f, 2f, 0.5f, "MaxScale");
 			maxScaleSlider.eventValueChanged += MaxScaleValue;
 			maxScaleSlider.value = 1f;
 
