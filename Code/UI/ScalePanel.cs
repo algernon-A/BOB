@@ -267,12 +267,6 @@ namespace BOB
 				{
 					PropInfo loadedProp = PrefabLists.loadedProps[i];
 
-					// Skip any props that require height or water maps.
-					if (loadedProp.m_requireHeightMap || loadedProp.m_requireWaterMap)
-					{
-						continue;
-					}
-
 					// Set display name.
 					string displayName = PrefabLists.GetDisplayName(loadedProp);
 
