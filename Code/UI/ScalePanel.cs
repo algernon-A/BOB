@@ -74,6 +74,11 @@ namespace BOB
 				// Set value.
 				selectedLoadedPrefab = value;
 
+				// Clear highlighting by default (re-enable it later if needed).
+				RenderOverlays.CurrentIndex = -1;
+				RenderOverlays.CurrentProp = null;
+				RenderOverlays.CurrentTree = null;
+
 				// Prop or tree?  Set slider values accordingly.
 				if (selectedLoadedPrefab is PropInfo prop)
 				{
@@ -82,24 +87,30 @@ namespace BOB
 
 					// Enable revert button.
 					revertButton.Enable();
+
+					// Set highlighting.
+					RenderOverlays.CurrentProp = prop;
 				}
 				else if (selectedLoadedPrefab is TreeInfo tree)
-                {
+				{
 					minScaleSlider.value = tree.m_minScale;
 					maxScaleSlider.value = tree.m_maxScale;
 
 					// Enable revert button.
 					revertButton.Enable();
+
+					// Set highlighting.
+					RenderOverlays.CurrentTree = tree;
 				}
 				else
-                {
+				{
 					// Neither prop nor tree, presumably null - set sliders to default values.
 					minScaleSlider.value = 1f;
 					maxScaleSlider.value = 1f;
 
 					// Disable revert button if no valid selection.
 					revertButton.Disable();
-                }
+				}
 
 				// Restore events.
 				disableEvents = false;
@@ -323,7 +334,7 @@ namespace BOB
 				treeCheck.isChecked = false;
 
 				// Reset current item.
-				selectedLoadedPrefab = null;
+				SelectedLoadedPrefab = null;
 
 				// Set loaded lists to 'props'.
 				LoadedList();
@@ -352,7 +363,7 @@ namespace BOB
 				propCheck.isChecked = false;
 
 				// Reset current item.
-				selectedLoadedPrefab = null;
+				SelectedLoadedPrefab = null;
 
 				// Set loaded lists to 'trees'.
 				LoadedList();
