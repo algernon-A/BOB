@@ -1,4 +1,8 @@
-﻿Version 0.7 -
+﻿- Add experimental prop and tree scaling
+- Fix random prop renaming not always being correctly applied
+
+
+Version 0.7 -
 
 - Add random prop and tree support
 - Add support for map editor

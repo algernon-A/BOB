@@ -21,6 +21,14 @@ namespace BOB
 		[XmlArrayItem("randomtree")]
 		public List<BOBRandomPrefab> randomTrees;
 
+		[XmlArray("propscaling")]
+		[XmlArrayItem("propscale")]
+		public List<BOBScalingElement> propScales;
+
+		[XmlArray("treescaling")]
+		[XmlArrayItem("treescale")]
+		public List<BOBScalingElement> treeScales;
+
 		[XmlArray("buildprops")]
 		[XmlArrayItem("buildprop")]
 		public List<BOBBuildingReplacement> allBuildingProps;
@@ -44,6 +52,31 @@ namespace BOB
 		[XmlArray("activePacks")]
 		[XmlArrayItem("activePacks")]
 		public List<string> activePacks;
+	}
+
+
+	/// <summary>
+	/// Tree or prop scaling record XML format.
+	/// </summary>
+	public class BOBScalingElement
+    {
+		[XmlAttribute("prefab")]
+		public string prefabName = string.Empty;
+
+		[XmlAttribute("min")]
+		public float minScale = 1f;
+
+		[XmlAttribute("max")]
+		public float maxScale = 1f;
+
+		[XmlIgnore]
+		public PrefabInfo prefab;
+
+		[XmlIgnore]
+		public float originalMin = 1f;
+
+		[XmlIgnore]
+		public float originalMax = 1f;
 	}
 
 

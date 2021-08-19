@@ -20,6 +20,7 @@ namespace BOB
 			PackReplacement.instance?.RevertAll();
 			AllNetworkReplacement.instance?.RevertAll();
 			NetworkReplacement.instance?.RevertAll();
+			Scaling.instance?.RevertAll();
 		}
 	}
 }

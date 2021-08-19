@@ -65,6 +65,10 @@ namespace BOB
 						PrefabLists.DeserializeRandomProps(configFile.randomProps);
 						PrefabLists.DeserializeRandomTrees(configFile.randomTrees);
 
+						// Deserialize scaling.
+						Scaling.instance.DeserializeProps(configFile.propScales);
+						Scaling.instance.DeserializeTrees(configFile.treeScales);
+
 						// Deserialize all-building replacements.
 						DeserializeAllBuilding(configFile.allBuildingProps);
 
@@ -155,6 +159,10 @@ namespace BOB
 						// Serialise random prefabs.
 						configFile.randomProps = PrefabLists.SerializeRandomProps();
 						configFile.randomTrees = PrefabLists.SerializeRandomTrees();
+
+						// Serialise scales.
+						configFile.propScales = Scaling.instance.propScales.Values.ToList();
+						configFile.treeScales = Scaling.instance.treeScales.Values.ToList();
 
 						// Serialise all-building replacements.
 						configFile.allBuildingProps = AllBuildingReplacement.replacements.Values.ToList();

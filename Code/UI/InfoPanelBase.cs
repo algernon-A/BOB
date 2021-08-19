@@ -214,7 +214,7 @@ namespace BOB
 
 				// Scale button.
 				UIButton scaleButton = AddIconButton(this, MiddleX, TitleHeight + Margin, ToggleSize, Translations.Translate("BOB_PNL_SCA"), TextureUtils.LoadSpriteAtlas("bob_prop_tree_scale_small"));
-				scaleButton.eventClicked += (control, clickEvent) => BOBScalePanel.Create();
+				scaleButton.eventClicked += (control, clickEvent) => BOBScalePanel.Create(IsTree, replacementPrefab);
 			}
 			catch (Exception e)
 			{

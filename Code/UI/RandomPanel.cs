@@ -579,8 +579,16 @@ namespace BOB
 				return;
 			}
 
-			// If we got here, all good; rename prefab.
+			// If we got here, all good; rename random prop reference and PrefabInfo.
 			selectedRandomPrefab.name = trimmedName;
+			if (selectedRandomPrefab.prop != null)
+            {
+				selectedRandomPrefab.prop.name = selectedRandomPrefab.name;
+			}
+			if (selectedRandomPrefab.tree != null)
+			{
+				selectedRandomPrefab.tree.name = selectedRandomPrefab.name;
+			}
 
 			// Refresh list.
 			randomList.Refresh();

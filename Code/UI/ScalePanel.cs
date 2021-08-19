@@ -24,6 +24,7 @@ namespace BOB
 		private const float ListY = ToolY + ToolbarHeight + Margin;
 		private const float MinOffsetY = ListY;
 		private const float MaxOffsetY = MinOffsetY + SliderHeight;
+		private const float RevertY = MaxOffsetY + SliderHeight + 45f;
 		private const float ListHeight = UIPropRow.RowHeight * 16f;
 
 
@@ -35,9 +36,13 @@ namespace BOB
 		// Panel components.
 		private readonly UIFastList loadedList;
 		private readonly BOBSlider minScaleSlider, maxScaleSlider;
+		private readonly UIButton revertButton;
 
 		// Current selection.
 		private PrefabInfo selectedLoadedPrefab;
+
+		// Status.
+		private bool disableEvents = false;
 
 
 		/// <summary>
@@ -63,18 +68,52 @@ namespace BOB
 		{
 			set
 			{
+				// Disable events, otherwise slider value changes will mess things up.
+				disableEvents = true;
+
+				// Set value.
 				selectedLoadedPrefab = value;
 
+				// Clear highlighting by default (re-enable it later if needed).
+				RenderOverlays.CurrentIndex = -1;
+				RenderOverlays.CurrentProp = null;
+				RenderOverlays.CurrentTree = null;
+
+				// Prop or tree?  Set slider values accordingly.
 				if (selectedLoadedPrefab is PropInfo prop)
 				{
 					minScaleSlider.value = prop.m_minScale;
 					maxScaleSlider.value = prop.m_maxScale;
+
+					// Enable revert button.
+					revertButton.Enable();
+
+					// Set highlighting.
+					RenderOverlays.CurrentProp = prop;
 				}
 				else if (selectedLoadedPrefab is TreeInfo tree)
-                {
+				{
 					minScaleSlider.value = tree.m_minScale;
 					maxScaleSlider.value = tree.m_maxScale;
+
+					// Enable revert button.
+					revertButton.Enable();
+
+					// Set highlighting.
+					RenderOverlays.CurrentTree = tree;
 				}
+				else
+				{
+					// Neither prop nor tree, presumably null - set sliders to default values.
+					minScaleSlider.value = 1f;
+					maxScaleSlider.value = 1f;
+
+					// Disable revert button if no valid selection.
+					revertButton.Disable();
+				}
+
+				// Restore events.
+				disableEvents = false;
 			}
 		}
 
@@ -82,7 +121,9 @@ namespace BOB
 		/// <summary>
 		/// Creates the panel object in-game and displays it.
 		/// </summary>
-		internal static void Create()
+		/// <param name="isTree">True if it should be created with trees selected, false for props</param>
+		/// <param name="selectedPrefab">Already selected prefab (null if none)</param>
+		internal static void Create(bool isTree, PrefabInfo selectedPrefab)
 		{
 			try
 			{
@@ -96,6 +137,19 @@ namespace BOB
 					// Create new panel instance and add it to GameObject.
 					panel = uiGameObject.AddComponent<BOBScalePanel>();
 					panel.transform.parent = uiGameObject.transform.parent;
+
+					// Set tree status.
+					if (isTree)
+                    {
+						panel.treeCheck.isChecked = true;
+                    }
+
+					// Select previously selected prefab, if any.
+					if (selectedPrefab != null)
+					{
+						panel.SelectedLoadedPrefab = selectedPrefab;
+						panel.loadedList.FindItem(selectedPrefab);
+					}
 
 					// Hide previous window, if any.
 					InfoPanelManager.Panel?.Hide();
@@ -131,6 +185,10 @@ namespace BOB
 			InfoPanelManager.Panel?.Show();
 		}
 
+
+		/// <summary>
+		/// Constructor - creates panel.
+		/// </summary>
 		internal BOBScalePanel()
 		{
 			// Default position - centre in screen.
@@ -140,12 +198,17 @@ namespace BOB
 			SetTitle(Translations.Translate("BOB_NAM") + " : " + Translations.Translate("BOB_SCA_TIT"));
 
 			// Minimum scale slider.
-			minScaleSlider = AddBOBSlider(this, ControlX, MinOffsetY, ControlWidth - (Margin * 2f), Translations.Translate("BOB_SCA_MIN"), 0.1f, 2f, 0.1f, "MinScale");
+			minScaleSlider = AddBOBSlider(this, ControlX, MinOffsetY, ControlWidth - (Margin * 2f), "BOB_SCA_MIN", 0.5f, 2f, 0.5f, "MinScale");
 			minScaleSlider.eventValueChanged += MinScaleValue;
 			minScaleSlider.value = 1f;
-			maxScaleSlider = AddBOBSlider(this, ControlX, MaxOffsetY + 40f, ControlWidth - (Margin * 2f), Translations.Translate("BOB_SCA_MAX"), 0.1f, 2f, 0.1f, "MaxScale");
+			maxScaleSlider = AddBOBSlider(this, ControlX, MaxOffsetY + 40f, ControlWidth - (Margin * 2f), "BOB_SCA_MAX", 0.5f, 2f, 0.5f, "MaxScale");
 			maxScaleSlider.eventValueChanged += MaxScaleValue;
 			maxScaleSlider.value = 1f;
+
+			// Revert button.
+			revertButton = UIControls.AddSmallerButton(this, ControlX, RevertY, Translations.Translate("BOB_PNL_REV"), ControlWidth);
+			revertButton.eventClicked += Revert;
+			revertButton.Disable();
 
 			// Loaded prop list.
 			UIPanel loadedPanel = AddUIComponent<UIPanel>();
@@ -164,9 +227,6 @@ namespace BOB
 
 			// Populate loaded list.
 			LoadedList();
-
-			// Update button states.
-			//UpdateButtonStates();
 
 			// Bring to front.
 			BringToFront();
@@ -218,12 +278,6 @@ namespace BOB
 				{
 					PropInfo loadedProp = PrefabLists.loadedProps[i];
 
-					// Skip any props that require height or water maps.
-					if (loadedProp.m_requireHeightMap || loadedProp.m_requireWaterMap)
-					{
-						continue;
-					}
-
 					// Set display name.
 					string displayName = PrefabLists.GetDisplayName(loadedProp);
 
@@ -253,6 +307,17 @@ namespace BOB
 				m_buffer = list.ToArray(),
 				m_size = list.Count
 			};
+
+			// Select currently selected prefab, if any.
+			if (selectedLoadedPrefab != null)
+			{
+				loadedList.FindItem(selectedLoadedPrefab);
+			}
+			else
+			{
+				// No current selection.
+				loadedList.selectedIndex = -1;
+			}
 		}
 
 
@@ -269,7 +334,7 @@ namespace BOB
 				treeCheck.isChecked = false;
 
 				// Reset current item.
-				selectedLoadedPrefab = null;
+				SelectedLoadedPrefab = null;
 
 				// Set loaded lists to 'props'.
 				LoadedList();
@@ -298,7 +363,7 @@ namespace BOB
 				propCheck.isChecked = false;
 
 				// Reset current item.
-				selectedLoadedPrefab = null;
+				SelectedLoadedPrefab = null;
 
 				// Set loaded lists to 'trees'.
 				LoadedList();
@@ -313,6 +378,24 @@ namespace BOB
 			}
 		}
 
+		/// <summary>
+		/// Revert button event handler.
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="mouseEvent">Mouse event (unused)</param>
+		/// </summary>
+		private void Revert(UIComponent control, UIMouseEventParameter mouseEvent)
+		{
+			// Null check.
+			if (selectedLoadedPrefab?.name != null)
+			{
+				// Revert current selection.
+				Scaling.instance.Revert(selectedLoadedPrefab);
+
+				// Reset prefab record to reset slider valies.
+				SelectedLoadedPrefab = selectedLoadedPrefab;
+			}
+		}
+
 
 		/// <summary>
 		/// Minimum scale slider event handler.
@@ -321,15 +404,10 @@ namespace BOB
 		/// <param name="value">New value</param>
 		private void MinScaleValue(UIComponent control, float value)
 		{
-			if (selectedLoadedPrefab is PropInfo prop)
+			// Don't apply changes if events are disabled.
+			if (!disableEvents)
 			{
-				prop.m_minScale = value;
-				ConfigurationUtils.SaveConfig();
-			}
-			else if (selectedLoadedPrefab is TreeInfo tree)
-			{
-				tree.m_minScale = value;
-				ConfigurationUtils.SaveConfig();
+				Scaling.instance.ApplyMinScale(selectedLoadedPrefab, value);
 			}
 		}
 
@@ -341,15 +419,10 @@ namespace BOB
 		/// <param name="value">New value</param>
 		private void MaxScaleValue(UIComponent control, float value)
 		{
-			if (selectedLoadedPrefab is PropInfo prop)
+			// Don't apply changes if events are disabled.
+			if (!disableEvents)
 			{
-				prop.m_maxScale = value;
-				ConfigurationUtils.SaveConfig();
-			}
-			else if (selectedLoadedPrefab is TreeInfo tree)
-			{
-				tree.m_maxScale = value;
-				ConfigurationUtils.SaveConfig();
+				Scaling.instance.ApplyMaxScale(selectedLoadedPrefab, value);
 			}
 		}
 
