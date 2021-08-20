@@ -1,4 +1,6 @@
-﻿- Add experimental prop and tree scaling
+﻿Version 0.7.1 -
+
+- Add experimental prop and tree scaling
 - Fix random prop renaming not always being correctly applied
 
 
