@@ -13,7 +13,7 @@
     <Translation ID="BOB_PNL_NOT" String="ツリーがありません"/>
     <Translation ID="BOB_PNL_TRE" String="ツリー"/>
     <Translation ID="BOB_PNL_PRP" String="Prop"/>
-    <Translation ID="BOB_PNL_IND" String="個々のPropを表示"/>
+    <Translation ID="BOB_PNL_IND" String="Propの内訳を表示"/>
     <Translation ID="BOB_PNL_HDV" String="バニラを非表示"/>
     <Translation ID="BOB_PNL_REP" String="Replace"/>
     <Translation ID="BOB_PNL_RTB" String="このタイプの建物"/>
@@ -51,15 +51,15 @@
     <Translation ID="BOB_CFG_SEC" String="新しい空の構成"/>
     <Translation ID="BOB_CFG_DEL" String="選択した構成を削除"/>
     <Translation ID="BOB_OPT_GEN" String="一般設定"/>
-    <Translation ID="BOB_OPT_CFG" String="構成"/>
+    <Translation ID="BOB_OPT_CFG" String="構成の設定"/>
     <Translation ID="BOB_OPT_RUI" String="荒れ地"/>
     <Translation ID="BOB_OPT_KEY" String="ホットキー"/>
-    <Translation ID="BOB_OPT_PRS" String="任意のキーを押してください"/>
+    <Translation ID="BOB_OPT_PRS" String="Press any key"/>
     <Translation ID="BOB_OPT_RGL" String="変更はゲームの再起動時に反映"/>
     <Translation ID="BOB_OPT_RRT" String="ツリーの地面に出来る荒れ地を防止"/>
     <Translation ID="BOB_OPT_RRP" String="Propの地面に出来る荒れ地を防止"/>
     <Translation ID="BOB_NUKE" String="構成をリセット"/>
-    <Translation ID="BOB_PER_IND" String="デフォルトで個々のアイテムを表示"/>
+    <Translation ID="BOB_PER_IND" String="デフォルトでアイテムの内訳を表示"/>
     <Translation ID="BOB_PER_SIN" String="常にオフ"/>
     <Translation ID="BOB_PER_GRP" String="常にオン"/>
     <Translation ID="BOB_PER_LST" String="前回の設定で保存"/>
@@ -93,13 +93,17 @@
     <Translation ID="BOB_UPD_062_0" String="Add ability to remove terrain ruining from all trees and/or props (in the options panel)"/>
     <Translation ID="BOB_UPD_062_1" String="Ferry paths are now selectable (to change/hide those ferry path marker buoys)"/>
     <Translation ID="BOB_UPD_062_2" String="Fix network prop angles sometimes being incorrectly displayed on selection"/>
-    <Translation ID="BOB_PNL_RSW" String="ランダムに表示"/>
-    <Translation ID="BOB_PNL_RST" String="ランダム構成を設定"/>
-    <Translation ID="BOB_RND_TIT" String="ランダムなツリーとPropを構成"/>
+    <Translation ID="BOB_PNL_RSW" String="ランダム構成を表示"/>
+    <Translation ID="BOB_PNL_RST" String="ランダム構成をセットアップ"/>
+    <Translation ID="BOB_PNL_SCA" String="Propとツリーの拡大率"/>
+    <Translation ID="BOB_RND_TIT" String="ランダム構成にPropやツリーを追加"/>
     <Translation ID="BOB_RND_NEW" String="新規"/>
     <Translation ID="BOB_RND_DEL" String="削除"/>
-    <Translation ID="BOB_RND_REN" String="名前変更"/>
+    <Translation ID="BOB_RND_REN" String="名前の変更"/>
     <Translation ID="BOB_RND_ADD" String="バリエーションに追加"/>
-    <Translation ID="BOB_RND_SUB" String="バリエーションから削除"/>
+    <Translation ID="BOB_RND_SUB" String="バリエーションから除く"/>
+    <Translation ID="BOB_SCA_TIT" String="Propの拡大率を設定"/>
+    <Translation ID="BOB_SCA_MIN" String="最小スケール"/>
+    <Translation ID="BOB_SCA_MAX" String="最大スケール"/>
   </Translations>
 </Language>
