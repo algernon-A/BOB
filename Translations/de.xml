@@ -22,7 +22,11 @@
     <Translation ID="BOB_PNL_RAN" String="Alle Netzwerke" />
     <Translation ID="BOB_PNL_RTT" String="Bäume dieser Karte" />
     <Translation ID="BOB_PNL_RTP" String="Dekorationen dieser Karte" />
+    <Translation ID="BOB_PNL_RSW" String="Zufallspakete anzeigen" />
+    <Translation ID="BOB_PNL_RST" String="Zufallspakete erstellen" />
+    <Translation ID="BOB_PNL_SCA" String="Dekorationen und Bäume skalieren" />
     <Translation ID="BOB_PNL_REV" String="Zurücksetzen" />
+    <Translation ID="BOB_PNL_REV_TIP" String="Zurücksetzen ist nicht verfügbar, da es keine aktive Ersetzung für dieses Element gibt" />
     <Translation ID="BOB_PNL_PKB" String="Austausch-Pakete" />
     <Translation ID="BOB_PNL_PRB" String="Wahrscheinlichkeit" />
     <Translation ID="BOB_PNL_ANG" String="Winkel" />
@@ -31,6 +35,15 @@
     <Translation ID="BOB_PNL_YOF" String="Y" />
     <Translation ID="BOB_PNL_ZOF" String="Z" />
     <Translation ID="BOB_PNL_SUB" String="Untergebäude" />
+    <Translation ID="BOB_RND_TIT" String="Zufällige Bäume und Dekorationen einrichten" />
+    <Translation ID="BOB_RND_NEW" String="Neu" />
+    <Translation ID="BOB_RND_DEL" String="Löschen" />
+    <Translation ID="BOB_RND_REN" String="Umbenennen" />
+    <Translation ID="BOB_RND_ADD" String="Zu Variationen hinzufügen" />
+    <Translation ID="BOB_RND_SUB" String="Von Variationen entfernen" />
+    <Translation ID="BOB_SCA_TIT" String="Skalierung einstellen" />
+    <Translation ID="BOB_SCA_MIN" String="Kleinster Skalierungs-Faktor" />
+    <Translation ID="BOB_SCA_MAX" String="Maximaler Skalierungs-Faktor" />
     <Translation ID="BOB_SPR_SBL" String="Ein Austausch ist für dieses Gebäude angewendet" />
     <Translation ID="BOB_SPR_ABL" String="Ein Austausch ist für alle Gebäude angewendet" />
     <Translation ID="BOB_SPR_SNT" String="Ein Austausch ist für dieses Netwerk angewendet" />

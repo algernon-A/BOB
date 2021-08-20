@@ -246,7 +246,7 @@ namespace BOB
 			addRandomButton.eventClicked += NewRandomPrefab;
 
 			// Remove random prefab button.
-			removeRandomButton = AddIconButton(this, addRandomButton.relativePosition.x + ToggleSize, RandomButtonY, ToggleSize, "BOB_RND_NEW", TextureUtils.LoadSpriteAtlas("bob_buttons_minus_round_small"));
+			removeRandomButton = AddIconButton(this, addRandomButton.relativePosition.x + ToggleSize, RandomButtonY, ToggleSize, "BOB_RND_DEL", TextureUtils.LoadSpriteAtlas("bob_buttons_minus_round_small"));
 			removeRandomButton.eventClicked += RemoveRandomPrefab;
 
 			// Rename button.
