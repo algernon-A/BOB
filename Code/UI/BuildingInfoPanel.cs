@@ -43,8 +43,14 @@ namespace BOB
 				base.CurrentTargetItem = value;
 
 				// Check for null.
-				if (value == null)
+				if (value == null || currentBuilding == null)
 				{
+					// Set all slider fields to zero and exit.
+					angleSlider.TrueValue = 0f;
+					xSlider.TrueValue = 0f;
+					ySlider.TrueValue = 0f;
+					zSlider.TrueValue = 0f;
+					probabilitySlider.TrueValue = 0f;
 					return;
 				}
 
