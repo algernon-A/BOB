@@ -8,17 +8,75 @@ using ColossalFramework.UI;
 namespace BOB
 {
 	/// <summary>
+	/// Prop row fastlist item for sub-buildings.
+	/// </summary>
+	public class UISubBuildingRow : UIPropRow
+	{
+		// Sub-building reference index.
+		private int subBuildingIndex;
+
+		/// <summary>
+		/// Called when this item is selected.
+		/// </summary>
+		public override void UpdateSelection()
+		{
+			// Update currently selected target prefab.
+			if (InfoPanelManager.Panel is BOBBuildingInfoPanel buildingPanel)
+            {
+				buildingPanel.SetSubBuilding(subBuildingIndex);
+			}
+		}
+
+
+		public override void Display(object data, bool isRowOdd)
+		{
+
+			// Perform initial setup for new rows.
+			if (nameLabel == null)
+			{
+				isVisible = true;
+				canFocus = true;
+				isInteractive = true;
+				width = parent.width;
+				height = RowHeight;
+
+				// Add object name label.
+				nameLabel = AddUIComponent<UILabel>();
+				nameLabel.width = this.width - 10f;
+				nameLabel.textScale = TextScale;
+			}
+
+			// Get sub-building index number.
+			subBuildingIndex = (int)data;
+
+			// Set display text.
+			nameLabel.text = ((InfoPanelManager.Panel as BOBBuildingInfoPanel).SubBuildingNames[subBuildingIndex] ?? "");
+
+			// Set label position
+			nameLabel.relativePosition = new Vector2(labelX, PaddingY);
+
+			// Set initial background as deselected state.
+			Deselect(isRowOdd);
+		}
+	}
+
+
+	/// <summary>
 	/// BOB building tree/prop replacement panel.
 	/// </summary>
 	internal class BOBBuildingInfoPanel : BOBInfoPanel
 	{
 		// Current selection reference.
-		BuildingInfo currentBuilding;
-		BuildingInfo[] subBuildings;
+		private BuildingInfo currentBuilding;
+
+		// Sub-buildings.
+		private BuildingInfo[] subBuildings;
+		internal string[] SubBuildingNames { get; private set; }
 
 		// Panel components.
 		private readonly UICheckBox indCheck;
-		private UIDropDown subBuildingMenu;
+		private UIPanel subBuildingPanel;
+		private UIFastList subBuildingList;
 
 
 		// Button tooltips.
@@ -30,6 +88,24 @@ namespace BOB
 		protected override UITextureAtlas ReplaceAtlas => TextureUtils.LoadSpriteAtlas("bob_single_building");
 		protected override UITextureAtlas ReplaceAllAtlas => TextureUtils.LoadSpriteAtlas("bob_buildings");
 
+
+		/// <summary>
+		/// Sets the current sub-building selection to the specified index.
+		/// </summary>
+		/// <param name="index">Index number of specified sub-building</param>
+		internal void SetSubBuilding(int index)
+		{
+			// Set current building.
+			currentBuilding = subBuildings[index];
+
+			// Reset current items.
+			CurrentTargetItem = null;
+			replacementPrefab = null;
+
+			// Reset loaded lists.
+			LoadedList();
+			TargetList();
+		}
 
 
 		/// <summary>
@@ -168,45 +244,72 @@ namespace BOB
 				// Yes - create lists of sub-buildings (names and infos).
 				int numSubs = currentBuilding.m_subBuildings.Length;
 				int numChoices = numSubs + 1;
-				string[] subBuildingNames = new string[numChoices];
+				SubBuildingNames = new string[numChoices];
 				subBuildings = new BuildingInfo[numChoices];
-				subBuildingNames[0] = PrefabLists.GetDisplayName(currentBuilding);
+				SubBuildingNames[0] = PrefabLists.GetDisplayName(currentBuilding);
 				subBuildings[0] = currentBuilding;
+
+				object[] subBuildingIndexes = new object[numChoices];
+				subBuildingIndexes[0] = 0;
 
 				for (int i = 0; i < numSubs; ++i)
                 {
-					subBuildingNames[i + 1] = PrefabLists.GetDisplayName(currentBuilding.m_subBuildings[i].m_buildingInfo);
+					SubBuildingNames[i + 1] = PrefabLists.GetDisplayName(currentBuilding.m_subBuildings[i].m_buildingInfo);
 					subBuildings[i + 1] = currentBuilding.m_subBuildings[i].m_buildingInfo;
+					subBuildingIndexes[i + 1] = i + 1;
 				}
 
 				// Add sub-building menu, if it doesn't already exist.
-				if (subBuildingMenu == null)
+				if (subBuildingPanel == null)
 				{
-					subBuildingMenu = UIControls.AddLabelledDropDown(this, 155f, indCheck.relativePosition.y + indCheck.height + (Margin / 2f), Translations.Translate("BOB_PNL_SUB"), 250f, 20f, 0.7f, 15, 4);
-					subBuildingMenu.listBackground = "GenericPanelDark";
+					subBuildingPanel = this.AddUIComponent<UIPanel>();
 
-					// Sub-building menu event handler.
-					subBuildingMenu.eventSelectedIndexChanged += (control, index) =>
+					// Basic behaviour.
+					subBuildingPanel.autoLayout = false;
+					subBuildingPanel.canFocus = true;
+					subBuildingPanel.isInteractive = true;
+
+					// Appearance.
+					subBuildingPanel.backgroundSprite = "MenuPanel2";
+					subBuildingPanel.opacity = PanelOpacity;
+
+					// Size and position.
+					subBuildingPanel.size = new Vector2(200f, PanelHeight - TitleHeight);
+					subBuildingPanel.relativePosition = new Vector2(-205f, TitleHeight);
+
+					// Heading.
+					UILabel subTitleLabel = UIControls.AddLabel(subBuildingPanel, 5f, 5f, Translations.Translate("BOB_PNL_SUB"), 190f);
+					subTitleLabel.textAlignment = UIHorizontalAlignment.Center;
+					subTitleLabel.relativePosition = new Vector2(5f, (TitleHeight - subTitleLabel.height) / 2f);
+
+					// List panel.
+					UIPanel subBuildingListPanel = subBuildingPanel.AddUIComponent<UIPanel>();
+					subBuildingListPanel.relativePosition = new Vector2(5f, TitleHeight);
+					subBuildingListPanel.width = subBuildingPanel.width - 10f;
+					subBuildingListPanel.height = subBuildingPanel.height - TitleHeight - 10f;
+
+
+					subBuildingList = UIFastList.Create<UISubBuildingRow>(subBuildingListPanel);
+					ListSetup(subBuildingList);
+
+					// Create return fastlist from our filtered list.
+					subBuildingList.m_rowsData = new FastList<object>
 					{
-						// Set current building.
-						currentBuilding = subBuildings[index];
-
-						// Reset current items.
-						CurrentTargetItem = null;
-						replacementPrefab = null;
-
-						// Reset loaded lists.
-						LoadedList();
-						TargetList();
+						m_buffer = subBuildingIndexes,
+						m_size = subBuildingIndexes.Length
 					};
+					subBuildingList.Refresh();
 				}
-				subBuildingMenu.items = subBuildingNames;
-				subBuildingMenu.selectedIndex = 0;
+				else
+                {
+					// If the sub-building panel has already been created. just make sure it's visible.
+					subBuildingPanel.Show();
+                }
 			}
 			else
             {
-				// Otherwise, hide the sub-building menu (if it exists).
-				subBuildingMenu?.Hide();
+				// Otherwise, hide the sub-building panel (if it exists).
+				subBuildingPanel?.Hide();
             }
 
 			// Set grouped checkbox initial state according to preferences.
@@ -411,9 +514,6 @@ namespace BOB
 		/// </summary>
 		protected override void TargetList()
 		{
-			System.Diagnostics.Stopwatch targetStopwatch = new System.Diagnostics.Stopwatch();
-			targetStopwatch.Start();
-
 			// Clear current selection.
 			targetList.selectedIndex = -1;
 
@@ -428,7 +528,6 @@ namespace BOB
                 targetList.m_rowsData = new FastList<object>();
 				return;
 			}
-
 
 			// Iterate through each prop in building.
 			for (int propIndex = 0; propIndex < currentBuilding.m_props.Length; ++propIndex)
@@ -520,8 +619,6 @@ namespace BOB
 				propList.Add(propListItem);
 			}
 
-			Logging.Message("basic target list setup time ", targetStopwatch.ElapsedMilliseconds.ToString());
-
 			// Create return fastlist from our filtered list, ordering by name.
 			targetList.m_rowsData = new FastList<object>
 			{
@@ -539,9 +636,6 @@ namespace BOB
 			{
 				noPropsLabel.Hide();
 			}
-
-			targetStopwatch.Stop();
-			Logging.Message("target list sort time ", targetStopwatch.ElapsedMilliseconds.ToString());
 		}
 
 

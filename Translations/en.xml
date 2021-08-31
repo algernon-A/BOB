@@ -34,7 +34,7 @@
     <Translation ID="BOB_PNL_XOF" String="X" />
     <Translation ID="BOB_PNL_YOF" String="Y" />
     <Translation ID="BOB_PNL_ZOF" String="Z" />
-    <Translation ID="BOB_PNL_SUB" String="Sub-building" />
+    <Translation ID="BOB_PNL_SUB" String="Sub-buildings" />
     <Translation ID="BOB_RND_TIT" String="configure random trees and props" />
     <Translation ID="BOB_RND_NEW" String="New" />
     <Translation ID="BOB_RND_DEL" String="Delete" />
