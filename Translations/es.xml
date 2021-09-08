@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Language UniqueName="es" ReadableName="Español">
-  <Translations>
+<Translations>
     <Translation ID="BOB_NAM" String="BOB: the tree and prop replacer" />
     <Translation ID="BOB_DESC" String="UNDER DEVELOPMENT: Reemplaza árboles y props." />
     <Translation ID="TRN_CHOICE" String="Elegir idioma" />
@@ -8,10 +8,10 @@
     <Translation ID="MES_CLS" String="Cerrar" />
     <Translation ID="MES_DSA" String="No mostrar de nuevo" />
     <Translation ID="BOB_MBX_OK" String="OK" />
-    <Translation ID="BOB_ROW_NOW" String="ahora" />
+    <Translation ID="BOB_ROW_WAS" String="era" />    
     <Translation ID="BOB_PNL_NOP" String="No se encontraron props" />
     <Translation ID="BOB_PNL_NOT" String="No se encontraron árboles" />
-    <Translation ID="BOB_PNL_TRE" String="Arboles" />
+    <Translation ID="BOB_PNL_TRE" String="Árboles" />
     <Translation ID="BOB_PNL_PRP" String="Props" />
     <Translation ID="BOB_PNL_IND" String="Mostrtar props individuales" />
     <Translation ID="BOB_PNL_HDV" String="Esconder vanilla" />
@@ -20,24 +20,53 @@
     <Translation ID="BOB_PNL_RAB" String="Todos los edificios" />
     <Translation ID="BOB_PNL_RTN" String="Estas redes" />
     <Translation ID="BOB_PNL_RAN" String="Todas las redes" />
-    <Translation ID="BOB_PNL_RTT" String="Arboles del mapa" />
+    <Translation ID="BOB_PNL_RTT" String="Árboles del mapa" />
     <Translation ID="BOB_PNL_REV" String="Restablecer" />
     <Translation ID="BOB_PNL_PRB" String="Probabilidad" />
-    <Translation ID="BOB_PNL_ANG" String="Angulo" />
+   <Translation ID="BOB_PNL_ANG" String="Ángulo" />
     <Translation ID="BOB_PNL_XOF" String="Desplazamiento en eje X" />
     <Translation ID="BOB_PNL_YOF" String="Desplazamiento en eje Y" />
     <Translation ID="BOB_PNL_ZOF" String="Desplazamiento en eje Z" />
-    <Translation ID="BOB_PNL_SUB" String="Edificio Secundario" />
-    <Translation ID="BOB_OPT_KEY" String="Acceso directo" />
-    <Translation ID="BOB_OPT_PRS" String="Presiona cualquier tecla" />
+    <Translation ID="BOB_PNL_SUB" String="Edificio Secundario" />    
+    <Translation ID="BOB_SPR_SBL" String="Ya existe un reemplazo para estos edificios" />
+    <Translation ID="BOB_SPR_ABL" String="Ya existe un reemplazo para todos los edificios" />
+    <Translation ID="BOB_SPR_SNT" String="Ya existe un reemplazo para estas redes" />
+    <Translation ID="BOB_SPR_ANT" String="Ya existe un reemplazo para todas las redes" />
+    <Translation ID="BOB_SPR_PCK" String="Ya se aplicó un paquete de reemplazo" />
+    <Translation ID="BOB_PCK_APP" String="Aplicar paquete" />
+    <Translation ID="BOB_PCK_APP_A" String="Aplica el paquete de reemplazo seleccionado" />
+    <Translation ID="BOB_PCK_APP_C" String="El paquete no se puede aplicar porque existe un conflicto con el paquete aplicado actualmente" />
+    <Translation ID="BOB_PCK_APP_I" String="El paquete ya está aplicado" />
+    <Translation ID="BOB_PCK_RVT" String="Revertir paquete" />
+    <Translation ID="BOB_PCK_RVT_A" String="Desintala el paquete de reemplazo seleccionado" />
+    <Translation ID="BOB_PCK_RVT_I" String="El paquete no está aplicado" />
+    <Translation ID="BOB_PCK_NAL" String="No están disponibles todos los reemplazos" />    
+    <Translation ID="BOB_OPT_KEY" String="Atajo" />
+    <Translation ID="BOB_OPT_PRS" String="Pulsa cualquier tecla" />
     <Translation ID="BOB_NUKE" String="Restablecer configuración" />
     <Translation ID="BOB_PER_IND" String="Mostrar props individuales de forma predeterminanda" />
     <Translation ID="BOB_PER_SIN" String="Siempre apagado" />
     <Translation ID="BOB_PER_GRP" String="Siempre encendido" />
     <Translation ID="BOB_PER_LST" String="Recordar configuración anterior" />
     <Translation ID="BOB_OPT_POS" String="Recordar posición anterior del panel" />
-    <Translation ID="BOB_FIL_NAME" String="Buscar:" />
+    <Translation ID="BOB_FIL_NAME" String="Buscar:" />    
+    <Translation ID="MES_PAGE" String="Visita el Workshop de Steam para más información acerca del mod." />
+    <Translation ID="BOB_ERR_FAT" String="Esto significa que el mod no puede opererar, se ha desactivado." />
+    <Translation ID="BOB_ERR_HAR" String="BOB, the tree and prop replacer, no ha podido completar parches requeridos con Harmony." />
+    <Translation ID="ERR_HAR0" String="Error con Harmony" />
+    <Translation ID="ERR_HAR1" String="Las posibles causas de este problema incluyen:" />
+    <Translation ID="ERR_HAR2" String="La dependencia del mod Harmony no ha sido instalada" />
+    <Translation ID="ERR_HAR3" String="Un mod desactualizado o fuera de funcionamiento esta evitando que Harmony 2 funcione correctamente" />
     <Translation ID="BOB_UPD_040_0" String="Presentando reemplazo de árboles en el mapa!  Activa BOB como siempre y has clic en cualquier arbol." />
     <Translation ID="BOB_UPD_041_0" String="Arreglada excepción en el panel de reemplazo del edificio al cambiar un detalle/artículo destino." />
+    <Translation ID="BOB_UPD_042_0" String="Habilitar selección de edificios secundarios" />
+    <Translation ID="BOB_UPD_042_1" String="Arreglado condiciones de carga al iniciar una partida guardada" />
+    <Translation ID="BOB_UPD_043_0" String="Arreglado refrescamiento de probabilidad cuando se revierte al reemplazo de todo un edificio o redes" />
+    <Translation ID="BOB_UPD_043_1" String="Arreglado LODs que no refrescaban luego de revertir al reemplazo de todo un edificio o redes" />
+    <Translation ID="BOB_UPD_043_2" String="Ajustado el panel de información para mostrar traducciones de forma correcta" />
+    <Translation ID="BOB_UPD_050_0" String="Implementación inicial de paquetes de reemplazo para redes" />
+    <Translation ID="BOB_UPD_050_1" String="Compatibilidad con Network Skins 2" />
+    <Translation ID="BOB_UPD_050_2" String="Proces de reeamplazo mejorado, ahora más rápido" />
+    <Translation ID="BOB_UPD_051_0" String="Nueva interfaz para la lista de árboles y props, ahora con íconos para indicar el tipo de reemplazo activo" />
   </Translations>
 </Language>
