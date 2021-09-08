@@ -170,7 +170,7 @@ namespace BOB
 
 			// Record replacement prop.
 			replacements[target].replacementInfo = replacement;
-			replacements[target].replacement = replacement.name;
+			replacements[target].Replacement = replacement.name;
 
 			// Iterate through each loaded building and record props to be replaced.
 			for (int i = 0; i < PrefabCollection<BuildingInfo>.LoadedCount(); ++i)

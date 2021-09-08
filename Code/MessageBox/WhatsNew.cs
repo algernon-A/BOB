@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Reflection;
-using System.Collections.Generic;
 using BOB.MessageBox;
-
 
 
 namespace BOB
@@ -13,51 +11,105 @@ namespace BOB
     internal static class WhatsNew
     {
         // List of versions and associated update message lines (as translation keys).
-        private static Dictionary<Version, List<string>> Versions => new Dictionary<Version, List<String>>
+        private readonly static WhatsNewMessage[] WhatsNewMessages = new WhatsNewMessage[]
         {
+            new WhatsNewMessage
             {
-                new Version("0.5.1"),
-                new List<string>
+                version = new Version("0.6.2.0"),
+                versionHeader = "",
+                messageKeys = true,
+                messages = new string[]
+                {
+                    "BOB_UPD_062_0",
+                    "BOB_UPD_062_1",
+                    "BOB_UPD_062_2"
+                }
+            },
+            new WhatsNewMessage
+            {
+                version = new Version("0.6.1.0"),
+                versionHeader = "",
+                messageKeys = true,
+                messages = new string[]
+                {
+                    "BOB_UPD_061_0"
+                }
+            },
+            new WhatsNewMessage
+            {
+                version = new Version("0.6.0.0"),
+                versionHeader = "",
+                messageKeys = true,
+                messages = new string[]
+                {
+                    "BOB_UPD_060_0",
+                    "BOB_UPD_060_1",
+                    "BOB_UPD_060_2",
+                    "BOB_UPD_060_3",
+                    "BOB_UPD_060_4"
+                }
+            },
+            new WhatsNewMessage
+            {
+                version = new Version("0.5.1.0"),
+                versionHeader = "",
+                messageKeys = true,
+                messages = new string[]
                 {
                     "BOB_UPD_051_0"
                 }
             },
+            new WhatsNewMessage
             {
-                new Version("0.5"),
-                new List<string>
+                version = new Version("0.5.0.0"),
+                versionHeader = "",
+                messageKeys = true,
+                messages = new string[]
                 {
                     "BOB_UPD_050_0",
                     "BOB_UPD_050_1",
                     "BOB_UPD_050_2"
                 }
             },
+            new WhatsNewMessage
             {
-                new Version("0.4.3"),
-                new List<string>
+                version = new Version("0.4.3.0"),
+                versionHeader = "",
+                messageKeys = true,
+                messages = new string[]
                 {
                     "BOB_UPD_043_0",
                     "BOB_UPD_043_1",
                     "BOB_UPD_043_2"
                 }
             },
+            new WhatsNewMessage
             {
-                new Version("0.4.2"),
-                new List<string>
+                version = new Version("0.4.2.0"),
+                versionHeader = "",
+                messageKeys = true,
+                messages = new string[]
                 {
                     "BOB_UPD_042_0",
                     "BOB_UPD_042_1"
                 }
             },
+            new WhatsNewMessage
             {
-                new Version("0.4.1"),
-                new List<string>
+                version = new Version("0.4.1.0"),
+                versionHeader = "",
+                messageKeys = true,
+                messages = new string[]
                 {
                     "BOB_UPD_041_0"
                 }
             },
+            new WhatsNewMessage
             {
-                new Version("0.4"),
-                new List<string>
+                version = new Version("0.4.0.0"),
+                versionHeader = "",
+                messageKeys = true,
+                messages = new string[]
                 {
                     "BOB_UPD_040_0"
                 }
@@ -69,16 +121,19 @@ namespace BOB
         /// Close button action.
         /// </summary>
         /// <returns>True (always)</returns>
-        public static bool Confirm() => true;
+        internal static bool Confirm() => true;
 
         /// <summary>
         /// 'Don't show again' button action.
         /// </summary>
         /// <returns>True (always)</returns>
-        public static bool DontShowAgain()
+        internal static bool DontShowAgain()
         {
             // Save current version to settings file.
             ModSettings.whatsNewVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
+            // Save current version header as beta.
+            ModSettings.whatsNewBetaVersion = WhatsNewMessages[0].betaVersion;
             SettingsUtils.SaveSettings();
 
             return true;
@@ -92,19 +147,32 @@ namespace BOB
         {
             // Get last notified version and current mod version.
             Version whatsNewVersion = new Version(ModSettings.whatsNewVersion);
-            Version modVersion = Assembly.GetExecutingAssembly().GetName().Version;
+            WhatsNewMessage latestMessage = WhatsNewMessages[0];
 
-            // Don't show notification if we're already up to (or ahead of) this version.
-            if (whatsNewVersion >= modVersion)
+            // Don't show notification if we're already up to (or ahead of) the first what's new message.
+            if (whatsNewVersion < latestMessage.version)
             {
-                return;
-            }
+                Logging.Message("displaying what's new message");
 
-            // Show messagebox.
-            WhatsNewMessageBox messageBox = MessageBoxBase.ShowModal<WhatsNewMessageBox>();
-            messageBox.Title = BOBMod.ModName + " " + BOBMod.Version;
-            messageBox.DSAButton.eventClicked += (component, clickEvent) => DontShowAgain();
-            messageBox.SetMessages(whatsNewVersion, Versions);
+                // Show messagebox.
+                WhatsNewMessageBox messageBox = MessageBoxBase.ShowModal<WhatsNewMessageBox>();
+                messageBox.Title = BOBMod.ModName + " " + BOBMod.Version;
+                messageBox.DSAButton.eventClicked += (component, clickEvent) => DontShowAgain();
+                messageBox.SetMessages(whatsNewVersion, WhatsNewMessages);
+            }
         }
+    }
+
+
+    /// <summary>
+    /// Version message struct.
+    /// </summary>
+    public struct WhatsNewMessage
+    {
+        public Version version;
+        public string versionHeader;
+        public int betaVersion;
+        public bool messageKeys;
+        public string[] messages;
     }
 }

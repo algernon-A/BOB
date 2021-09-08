@@ -1,4 +1,56 @@
-﻿Version 0.5.1 -
+﻿Version 0.7.1 -
+
+- Add experimental prop and tree scaling
+- Fix random prop renaming not always being correctly applied
+
+
+Version 0.7 -
+
+- Add random prop and tree support
+- Add support for map editor
+- Fix slider text values not updating for some users
+- Fix prop highlighting offset for sub-buildings and buildings with extensible yards
+- BOB tool remains active while panel is open (for quick target changes)
+
+
+Version 0.6.2 -
+
+- Add options to remove ruining from trees and props
+- Fix network prop rotation sometimes being incorrectly displayed when first selected
+- Ferry paths are now selectable (to change/hide those ferry path marker buoys)
+
+
+Version 0.6.1 -
+
+- Add ascending/descending name sort filters to both target and replacement lists
+- Fix overlay not properly recognising randomized trees in buildings
+- Fix ".png.png" reference to replacement pack icon file
+- Fix infinite loop when trying to resize slider text when Enhanced Mouse Light mod is active (only stops the hang - EML still breaks text scaling and layout)
+
+
+Version 0.6 -
+
+- Add standalone prop replacement
+- Highlight selected props or trees
+- Decoration buildings (e.g. rocks) are now selectable
+- Network segments embedded in buildings are now directly selectable
+- Overhaul replacer panel UI, including reducing overall size and replace text-based controls with visual equivalents.
+- Fix parent building LODs not being refreshed on load when replacements are applied to sub-buildings
+- Fix target list selection not resetting on update
+
+
+Version 0.5.2.1 hotfix -
+
+- Fix custom configs not being creatable when no configs already exist
+
+
+Version 0.5.2 -
+
+- Add configurations management system
+- Update bundled road arrow packs
+
+
+Version 0.5.1 -
 
 - Add icons to indicate which type of replacement is active
 - Change orignal/replacement name display order

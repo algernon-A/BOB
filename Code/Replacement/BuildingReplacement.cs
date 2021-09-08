@@ -78,7 +78,7 @@ namespace BOB
 		internal void Revert(BuildingInfo building, PrefabInfo target, bool removeEntries = true)
 		{
 			// Safety check.
-			if (building == null || !replacements.ContainsKey(building))
+			if (building == null || !replacements.ContainsKey(building) || !replacements[building].ContainsKey(target))
 			{
 				return;
 			}
@@ -214,7 +214,7 @@ namespace BOB
 
 			// Record replacement prop.
 			replacements[building][target].replacementInfo = replacement;
-			replacements[building][target].replacement = replacement.name;
+			replacements[building][target].Replacement = replacement.name;
 
 			// Iterate through each prop in building.
 			for (int propIndex = 0; propIndex < building.m_props.Length; ++propIndex)

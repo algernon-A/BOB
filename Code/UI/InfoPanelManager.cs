@@ -12,17 +12,113 @@ namespace BOB
 	{
 		// Instance references.
 		private static GameObject uiGameObject;
-		private static BOBInfoPanelBase _panel;
-		internal static BOBInfoPanelBase Panel => _panel;
+		private static BOBInfoPanelBase panel;
+		internal static BOBInfoPanelBase Panel => panel;
 
 		// Recent state.
 		internal static float lastX, lastY;
 
 
 		/// <summary>
+		/// Sets the BOB target to the selected prefab, creating the relevant info window if necessary.
+		/// </summary>
+		/// <param name="selectedPrefab">Target prefab</param>
+		internal static void SetTarget(PrefabInfo selectedPrefab)
+        {
+			// If no existing panel, create it.
+			if (Panel == null)
+			{
+				Create(selectedPrefab);
+			}
+			else
+			{
+				// Otherwise, check for panel and prefab type match; if they match, update existing panel, otherwise close the existing panel (retaining BOB tool) and create new one with the new selection. 
+				if (selectedPrefab is BuildingInfo)
+                {
+					// Building.
+					if (Panel is BOBBuildingInfoPanel)
+                    {
+						Panel.SetTarget(selectedPrefab);
+                    }
+					else
+                    {
+						Close(false);
+						Create(selectedPrefab);
+                    }
+                }
+				else if (selectedPrefab is NetInfo)
+				{
+					// Network.
+					if (Panel is BOBNetInfoPanel)
+					{
+						Panel.SetTarget(selectedPrefab);
+					}
+					else
+					{
+						Close(false);
+						Create(selectedPrefab);
+					}
+				}
+				else if (selectedPrefab is TreeInfo || selectedPrefab is PropInfo)
+				{
+					// Standalone tree/prop.
+					if (Panel is BOBMapInfoPanel)
+					{
+						Panel.SetTarget(selectedPrefab);
+					}
+					else
+					{
+						Close(false);
+						Create(selectedPrefab);
+					}
+				}
+			}
+        }
+
+
+		/// <summary>
+		/// Closes the panel by destroying the object (removing any ongoing UI overhead).
+		/// </summary>
+		/// <param name="resetTool">True to reset to default tool; false to leave current tool untouched (default true)</param>
+		internal static void Close(bool resetTool = true)
+		{
+			// Check for null, just in case - this is also called by pressing Esc when BOB tool is active.
+			if (panel != null)
+			{
+				// Stop highlighting.
+				panel.CurrentTargetItem = null;
+				RenderOverlays.CurrentBuilding = null;
+
+				// Revert overlay patches.
+				Patcher.PatchBuildingOverlays(false);
+				Patcher.PatchNetworkOverlays(false);
+				Patcher.PatchMapOverlays(false);
+
+				// Store previous position.
+				lastX = Panel.relativePosition.x;
+				lastY = Panel.relativePosition.y;
+
+				// Destroy game objects.
+				GameObject.Destroy(Panel);
+				GameObject.Destroy(uiGameObject);
+
+				// Let the garbage collector do its work (and also let us know that we've closed the object).
+				panel = null;
+				uiGameObject = null;
+
+				// Restore default tool if needed.
+				if (resetTool)
+				{
+					ToolsModifierControl.SetTool<DefaultTool>();
+				}
+			}
+		}
+
+
+		/// <summary>
 		/// Creates the panel object in-game and displays it.
 		/// </summary>
-		internal static void Create(PrefabInfo selectedPrefab)
+		private static void Create(PrefabInfo selectedPrefab)
 		{
 			try
 			{
@@ -36,7 +132,7 @@ namespace BOB
 						uiGameObject = new GameObject("BOBBuildingPanel");
 						uiGameObject.transform.parent = UIView.GetAView().transform;
 
-						_panel = uiGameObject.AddComponent<BOBBuildingInfoPanel>();
+						panel = uiGameObject.AddComponent<BOBBuildingInfoPanel>();
 					}
 					else if (selectedPrefab is NetInfo)
 					{
@@ -45,50 +141,32 @@ namespace BOB
 						uiGameObject = new GameObject("BOBNetPanel");
 						uiGameObject.transform.parent = UIView.GetAView().transform;
 
-						_panel = uiGameObject.AddComponent<BOBNetInfoPanel>();
+						panel = uiGameObject.AddComponent<BOBNetInfoPanel>();
 					}
-					else if (selectedPrefab is TreeInfo)
+					else if (selectedPrefab is TreeInfo || selectedPrefab is PropInfo)
 					{
 						// A tree prefab is selected; create a TreeInfo panel.
 						// Give it a unique name for easy finding with ModTools.
-						uiGameObject = new GameObject("BOBTreePanel");
+						uiGameObject = new GameObject("BOBMapPanel");
 						uiGameObject.transform.parent = UIView.GetAView().transform;
 
-						_panel = uiGameObject.AddComponent<BOBTreeInfoPanel>();
+						panel = uiGameObject.AddComponent<BOBMapInfoPanel>();
 					}
 					else
-                    {
+					{
 						Logging.Message("unsupported prefab type ", selectedPrefab.ToString());
 						return;
 					}
 
 					// Set up panel with selected prefab.
-					Panel.Setup(uiGameObject.transform.parent, selectedPrefab);
+					Panel.transform.parent = uiGameObject.transform.parent;
+					Panel.SetTarget(selectedPrefab);
 				}
 			}
 			catch (Exception e)
 			{
 				Logging.LogException(e, "exception creating InfoPanel");
 			}
-		}
-
-
-		/// <summary>
-		/// Closes the panel by destroying the object (removing any ongoing UI overhead).
-		/// </summary>
-		internal static void Close()
-		{
-			// Store previous position.
-			lastX = _panel.relativePosition.x;
-			lastY = _panel.relativePosition.y;
-
-			// Destroy game objects.
-			GameObject.Destroy(_panel);
-			GameObject.Destroy(uiGameObject);
-
-			// Let the garbage collector do its work (and also let us know that we've closed the object).
-			_panel = null;
-			uiGameObject = null;
 		}
 	}
 }

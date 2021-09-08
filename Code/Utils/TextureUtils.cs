@@ -1,54 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
+using System.Collections.Generic;
+using UnityEngine;
 using ColossalFramework;
 using ColossalFramework.UI;
-using ColossalFramework.Plugins;
-using ICities;
-using UnityEngine;
 
 
 namespace BOB
 {
-	/// <summary>
-	/// Static class for texture management utilities.
-	/// </summary>
-	internal static class FileUtils
+	internal static class TextureUtils
 	{
-		/// <summary>
-		/// Returns the filepath of the mod assembly.
-		/// </summary>
-		/// <returns>Mod assembly filepath</returns>
-		internal static string GetAssemblyPath()
-		{
-			// Get list of currently active plugins.
-			IEnumerable<PluginManager.PluginInfo> plugins = PluginManager.instance.GetPluginsInfo();
-
-			// Iterate through list.
-			foreach (PluginManager.PluginInfo plugin in plugins)
-			{
-				try
-				{
-					// Get all (if any) mod instances from this plugin.
-					IUserMod[] mods = plugin.GetInstances<IUserMod>();
-
-					// Check to see if the primary instance is this mod.
-					if (mods.FirstOrDefault() is BOBMod)
-					{
-						// Found it! Return path.
-						return plugin.modPath;
-					}
-				}
-				catch
-				{
-					// Don't care.
-				}
-			}
-
-			// If we got here, then we didn't find the assembly.
-			Logging.Message("assembly path not found");
-			throw new FileNotFoundException(BOBMod.ModName + ": assembly path not found!");
-		}
+		// Dictionary to cache texture atlas lookups.
+		private readonly static Dictionary<string, UITextureAtlas> textureCache = new Dictionary<string, UITextureAtlas>();
 
 
 		/// <summary>
@@ -73,36 +36,90 @@ namespace BOB
 		/// <param name="atlasName">Atlas name (".png" will be appended fto make the filename)</param>
 		/// <returns>New texture atlas</returns>
 		internal static UITextureAtlas LoadSpriteAtlas(string atlasName)
-        {
-			// Create new texture atlas for button.
-			UITextureAtlas newAtlas = ScriptableObject.CreateInstance<UITextureAtlas>();
-			newAtlas.name = atlasName;
-			newAtlas.material = UnityEngine.Object.Instantiate<Material>(UIView.GetAView().defaultAtlas.material);
-
-			// Load texture from file.
-			Texture2D newTexture = FileUtils.LoadTexture(atlasName + ".png");
-			newAtlas.material.mainTexture = newTexture;
-
-			// Setup sprites.
-			string[] spriteNames = new string[] { "disabled", "normal", "pressed", "hovered" };
-			int numSprites = spriteNames.Length;
-			float spriteWidth = 1f / spriteNames.Length;
-
-			// Iterate through each sprite (counter increment is in region setup).
-			for (int i = 0; i < numSprites; ++i)
+		{
+			try
 			{
-				UITextureAtlas.SpriteInfo sprite = new UITextureAtlas.SpriteInfo
+				// Check if we've already cached this atlas.
+				if (textureCache.ContainsKey(atlasName))
 				{
-					name = spriteNames[i],
-					texture = newTexture,
-					// Sprite regions are horizontally arranged, evenly spaced.
-					region = new Rect(i * spriteWidth, 0f, spriteWidth, 1f)
-				};
-				newAtlas.AddSprite(sprite);
+					// Cached - return cached result.
+					return textureCache[atlasName];
+				}
+
+				// Create new texture atlas for button.
+				UITextureAtlas newAtlas = ScriptableObject.CreateInstance<UITextureAtlas>();
+				newAtlas.name = atlasName;
+				newAtlas.material = UnityEngine.Object.Instantiate<Material>(UIView.GetAView().defaultAtlas.material);
+
+				// Load texture from file.
+				Texture2D newTexture = LoadTexture(atlasName + ".png");
+				newAtlas.material.mainTexture = newTexture;
+
+				// Setup sprites.
+				string[] spriteNames = new string[] { "disabled", "normal", "pressed", "hovered" };
+				int numSprites = spriteNames.Length;
+				float spriteWidth = 1f / spriteNames.Length;
+
+				// Iterate through each sprite (counter increment is in region setup).
+				for (int i = 0; i < numSprites; ++i)
+				{
+					UITextureAtlas.SpriteInfo sprite = new UITextureAtlas.SpriteInfo
+					{
+						name = spriteNames[i],
+						texture = newTexture,
+						// Sprite regions are horizontally arranged, evenly spaced.
+						region = new Rect(i * spriteWidth, 0f, spriteWidth, 1f)
+					};
+					newAtlas.AddSprite(sprite);
+				}
+
+				// Add to cache and return.
+				textureCache.Add(atlasName, newAtlas);
+				return newAtlas;
+			}
+			catch (Exception e)
+            {
+				Logging.LogException(e, "exception loading texture atlas from file ", atlasName);
+				return null;
+            }
+		}
+
+
+		/// <summary>
+		/// Returns the "ingame" atlas.
+		/// </summary>
+		internal static UITextureAtlas InGameAtlas => GetTextureAtlas("ingame");
+
+
+		/// <summary>
+		/// Returns a reference to the specified named atlas.
+		/// </summary>
+		/// <param name="atlasName">Atlas name</param>
+		/// <returns>Atlas reference (null if not found)</returns>
+		internal static UITextureAtlas GetTextureAtlas(string atlasName)
+		{
+			// Check if we've already cached this atlas.
+			if (textureCache.ContainsKey(atlasName))
+			{
+				// Cached - return cached result.
+				return textureCache[atlasName];
 			}
 
-			return newAtlas;
-        }
+			// No cache entry - get game atlases and iterate through, looking for a name match.
+			UITextureAtlas[] atlases = Resources.FindObjectsOfTypeAll(typeof(UITextureAtlas)) as UITextureAtlas[];
+			for (int i = 0; i < atlases.Length; ++i)
+			{
+				if (atlases[i].name.Equals(atlasName))
+				{
+					// Got it - add to cache and return.
+					textureCache.Add(atlasName, atlases[i]);
+					return atlases[i];
+				}
+			}
+
+			// IF we got here, we couldn't find the specified atlas.
+			return null;
+		}
 
 
 		/// <summary>
@@ -139,7 +156,7 @@ namespace BOB
 		/// <returns>Read-only file stream</returns>
 		private static Stream OpenResourceFile(string fileName)
 		{
-			string path = Path.Combine(GetAssemblyPath(), "Resources");
+			string path = Path.Combine(ModUtils.GetAssemblyPath(), "Resources");
 			return File.OpenRead(Path.Combine(path, fileName));
 		}
 	}

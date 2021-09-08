@@ -21,7 +21,7 @@ namespace BOB
             Logging.KeyMessage("version ", BOBMod.Version, " loading");
 
             // Don't do anything if not in game (e.g. if we're going into an editor).
-            if (loading.currentMode != AppMode.Game)
+            if (loading.currentMode != AppMode.Game && loading.currentMode != AppMode.MapEditor)
             {
                 isModEnabled = false;
                 Logging.KeyMessage("not loading into game, skipping activation");
@@ -41,6 +41,8 @@ namespace BOB
             new NetworkReplacement();
             new IndividualReplacement();
             new MapTreeReplacement();
+            new MapPropReplacement();
+            new Scaling();
 
             base.OnCreated(loading);
         }
@@ -52,6 +54,8 @@ namespace BOB
         /// <param name="mode">Loading mode (e.g. game, editor, scenario, etc.)</param>
         public override void OnLevelLoaded(LoadMode mode)
         {
+            Logging.Message("commencing loading checks");
+
             base.OnLevelLoaded(mode);
 
             // Don't do anything further if we're not operating.
@@ -83,6 +87,36 @@ namespace BOB
                 // Don't do anything further.
                 return;
             }
+
+            Logging.Message("loading checks passed");
+
+            // Build lists of loaded prefabs.
+            PrefabLists.BuildLists();
+
+            // Load prop packs.
+            new PackReplacement();
+
+            // Load configuration file.
+            ConfigurationUtils.LoadConfig();
+
+            // Initialise select tool.
+            ToolsModifierControl.toolController.gameObject.AddComponent<BOBTool>();
+
+            // Display update notification.
+            WhatsNew.ShowWhatsNew();
+
+            // Set up Network Skins 2 reflection.
+            ModUtils.NS2Reflection();
+
+            // Force update of any dirty net or building prefabs from replacement process.
+            Logging.Message("updating dirty prefabs");
+            BuildingData.Update();
+            NetData.Update();
+
+            // Set up options panel event handler.
+            OptionsPanel.OptionsEventHook();
+
+            Logging.Message("loading complete");
         }
     }
 }

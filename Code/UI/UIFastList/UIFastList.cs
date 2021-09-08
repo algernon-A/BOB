@@ -319,42 +319,39 @@ namespace BOB
 
 
         /// <summary>
-        /// Sets the selection to the given prop list item.
+        /// Sets the selection to the given prefab item.
         /// If no item is found, clears the selection and resets the list.
         /// </summary>
         /// <param name="item">The item to find</param>
-        public void FindItem(PropListItem item)
+        public string FindItem(string item)
         {
             // Iterate through the rows list.
-            for (int i = 0; i < m_rowsData.m_size; ++i)
+            for (int i = 0; i < m_rowsData.m_buffer.Length; ++i)
             {
-                if (m_rowsData.m_buffer[i] is PropListItem propListItem)
+                // Look for a string match.
+                if (m_rowsData.m_buffer[i] is string itemString && itemString.Equals(item))
                 {
-                    // Look for an index match; individual or grouped (contained within propListItem.indexes list).
-                    if (item.index >= 0 && (item.index == propListItem.index) || (item.index < 0 && propListItem.indexes.Contains(item.indexes[0])))
+                    // Found a match; set the selected index to this one.
+                    selectedIndex = i;
+
+
+                    // If the selected index is outside the current visibility range, move the to show it.
+                    if (selectedIndex < listPosition || selectedIndex > listPosition + m_rows.m_size)
                     {
-                        // Found a match; set the selected index to this one.
-                        selectedIndex = i;
-
-                        // Set current panel selection.
-                        InfoPanelManager.Panel.CurrentTargetItem = propListItem;
-
-                        // If the selected index is outside the current visibility range, move the to show it.
-                        if (selectedIndex < listPosition || selectedIndex > listPosition + m_rows.m_size)
-                        {
-                            listPosition = selectedIndex;
-                        }
-
-                        // Done here; return.
-                        return;
+                        listPosition = selectedIndex;
                     }
 
-                    // If we got here, we didn't find a match; clear the selection and reset the list position.
-                    selectedIndex = -1;
-                    listPosition = 0f;
+                    // Done here; return.
+                    return itemString;
                 }
             }
+
+            // If we got here, we didn't find a match; clear the selection and reset the list position.
+            selectedIndex = -1;
+            listPosition = 0f;
+            return null;
         }
+
 
 
         /// <summary>
@@ -362,7 +359,40 @@ namespace BOB
         /// If no item is found, clears the selection and resets the list.
         /// </summary>
         /// <param name="item">The item to find</param>
-        public void FindItem(PrefabInfo prefab)
+        public virtual void FindItem(BOBVariation variant)
+        {
+            // Iterate through the rows list.
+            for (int i = 0; i < m_rowsData.m_size; ++i)
+            {
+                // Look for an index match; individual or grouped (contained within propListItem.indexes list).
+                if (m_rowsData.m_buffer[i] is BOBVariation listItem && listItem == variant)
+                {
+                    // Found a match; set the selected index to this one.
+                    selectedIndex = i;
+
+                    // If the selected index is outside the current visibility range, move the to show it.
+                    if (selectedIndex < listPosition || selectedIndex > listPosition + m_rows.m_size)
+                    {
+                        listPosition = selectedIndex;
+                    }
+
+                    // Done here; return.
+                    return;
+                }
+            }
+
+            // If we got here, we didn't find a match; clear the selection and reset the list position.
+            selectedIndex = -1;
+            listPosition = 0f;
+        }
+
+
+        /// <summary>
+        /// Sets the selection to the given prefab item.
+        /// If no item is found, clears the selection and resets the list.
+        /// </summary>
+        /// <param name="prefab">The prefab to find</param>
+        public virtual void FindItem(PrefabInfo prefab)
         {
             // Iterate through the rows list.
             for (int i = 0; i < m_rowsData.m_size; ++i)

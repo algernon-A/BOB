@@ -46,7 +46,7 @@ namespace BOB
 
 
         /// <summary>
-        /// The current language index number (equals the index number of the language names list provied bye LanguageList).
+        /// The current language index number (equals the index number of the language names list provied by LanguageList).
         /// Useful for easy automatic drop-down language selection menus, working in conjunction with LanguageList:
         /// Set to set the language to the equivalent LanguageList index.
         /// Get to return the LanguageList index of the current languge.
@@ -191,24 +191,16 @@ namespace BOB
                 // Check that the current key is included in the translation.
                 if (currentLanguage.translationDictionary.ContainsKey(key))
                 {
-                    string translation = currentLanguage.translationDictionary[key];
-
-                    if (!string.IsNullOrEmpty(translation))
-                    {
-                        // All good!  Return translation.
-                        return currentLanguage.translationDictionary[key];
-                    }
-
-                    // If we got here, there's a null key.
-                    Logging.Error("null or empty shortened fallback translation for key ", key);
+                    // All good!  Return translation.
+                    return currentLanguage.translationDictionary[key];
                 }
                 else
                 {
                     Logging.Message("no translation for language ", currentLanguage.uniqueName, " found for key " + key);
-                }
 
-                // Attempt fallack translation.
-                return FallbackTranslation(currentLanguage.uniqueName, key);
+                    // Attempt fallack translation.
+                    return FallbackTranslation(currentLanguage.uniqueName, key);
+                }
             }
             else
             {
@@ -322,16 +314,8 @@ namespace BOB
                     Language fallbackLanguage = languages[newName];
                     if (fallbackLanguage.translationDictionary.ContainsKey(key))
                     {
-                        string fallback = fallbackLanguage.translationDictionary[key];
-
-                        if (!string.IsNullOrEmpty(fallback))
-                        {
-                            // All good!  Return translation.
-                            return fallback;
-                        }
-
-                        // If we got here, there's a null key.
-                        Logging.Error("null or empty shortened fallback translation for key ", key);
+                        // All good!  Return translation.
+                        return fallbackLanguage.translationDictionary[key];
                     }
                 }
             }
@@ -341,16 +325,8 @@ namespace BOB
             {
                 if (systemLanguage.translationDictionary.ContainsKey(key))
                 {
-                    string fallback = systemLanguage.translationDictionary[key];
-
-                    if (!string.IsNullOrEmpty(fallback))
-                    {
-                        // All good!  Return translation.
-                        return fallback;
-                    }
-
-                    // If we got here, there's a null key.
-                    Logging.Error("null or empty system fallback translation for key ", key);
+                    // All good!  Return translation.
+                    return systemLanguage.translationDictionary[key];
                 }
             }
 
@@ -358,16 +334,7 @@ namespace BOB
             try
             {
                 Language fallbackLanguage = languages[defaultLanguage];
-                string fallback = fallbackLanguage.translationDictionary.ContainsKey(key) ? fallbackLanguage.translationDictionary[key] : null;
-
-                if (!string.IsNullOrEmpty(fallback))
-                {
-                    // All good!  Return translation.
-                    return fallback;
-                }
-
-                // If we got here, there's a null key.
-                Logging.Error("null or empty default fallback translation for key ", key);
+                return fallbackLanguage.translationDictionary[key];
             }
             catch (Exception e)
             {
@@ -389,7 +356,7 @@ namespace BOB
             languages.Clear();
 
             // Get the current assembly path and append our locale directory name.
-            string assemblyPath = FileUtils.GetAssemblyPath();
+            string assemblyPath = ModUtils.GetAssemblyPath();
             if (!assemblyPath.IsNullOrWhiteSpace())
             {
                 string localePath = Path.Combine(assemblyPath, "Translations");
@@ -406,8 +373,15 @@ namespace BOB
                             XmlSerializer xmlSerializer = new XmlSerializer(typeof(Language));
                             if (xmlSerializer.Deserialize(reader) is Language translation)
                             {
-                                // Got one!  add it to the list.
-                                languages.Add(translation.uniqueName, translation);
+                                // Got one!  add it to the list, if we don't already have a copy.
+                                if (!languages.ContainsKey(translation.uniqueName))
+                                {
+                                    languages.Add(translation.uniqueName, translation);
+                                }
+                                else
+                                {
+                                    Logging.Error("duplicate translation for ", translation.uniqueName);
+                                }
                             }
                             else
                             {

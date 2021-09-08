@@ -169,7 +169,7 @@ namespace BOB
 
 			// Record replacement prop.
 			replacements[building][targetIndex].replacementInfo = replacement;
-			replacements[building][targetIndex].replacement = replacement.name;
+			replacements[building][targetIndex].Replacement = replacement.name;
 
 			// Create replacement record.
 			BuildingPropReference propReference = new BuildingPropReference

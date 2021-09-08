@@ -1,5 +1,9 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Collections.Generic;
+using ICities;
 using ColossalFramework.Plugins;
 
 
@@ -17,11 +21,49 @@ namespace BOB
 
 
         /// <summary>
+        /// Returns the filepath of the current mod assembly.
+        /// </summary>
+        /// <returns>Mod assembly filepath</returns>
+        internal static string GetAssemblyPath()
+        {
+            // Get list of currently active plugins.
+            IEnumerable<PluginManager.PluginInfo> plugins = PluginManager.instance.GetPluginsInfo();
+
+            // Iterate through list.
+            foreach (PluginManager.PluginInfo plugin in plugins)
+            {
+                try
+                {
+                    // Get all (if any) mod instances from this plugin.
+                    IUserMod[] mods = plugin.GetInstances<IUserMod>();
+
+                    // Check to see if the primary instance is this mod.
+                    if (mods.FirstOrDefault() is BOBMod)
+                    {
+                        // Found it! Return path.
+                        return plugin.modPath;
+                    }
+                }
+                catch
+                {
+                    // Don't care.
+                }
+            }
+
+            // If we got here, then we didn't find the assembly.
+            Logging.Error("assembly path not found");
+            throw new FileNotFoundException(BOBMod.ModName + ": assembly path not found!");
+        }
+
+
+        /// <summary>
         /// Uses reflection to find the NetworkSkinManager.instance.AppliedSkin.Recalculate method of Network Skins 2.
         /// If successful, sets ns2Recalculate field.
         /// </summary>
         internal static void NS2Reflection()
         {
+            Logging.Message("looking for Network Skins");
+
             // Iterate through each loaded plugin assembly.
             foreach (PluginManager.PluginInfo plugin in PluginManager.instance.GetPluginsInfo())
             {

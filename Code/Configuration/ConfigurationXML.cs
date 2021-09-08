@@ -13,6 +13,22 @@ namespace BOB
 		[XmlAttribute("version")]
 		public int version = 1;
 
+		[XmlArray("randomprops")]
+		[XmlArrayItem("randomprop")]
+		public List<BOBRandomPrefab> randomProps;
+
+		[XmlArray("randomtrees")]
+		[XmlArrayItem("randomtree")]
+		public List<BOBRandomPrefab> randomTrees;
+
+		[XmlArray("propscaling")]
+		[XmlArrayItem("propscale")]
+		public List<BOBScalingElement> propScales;
+
+		[XmlArray("treescaling")]
+		[XmlArrayItem("treescale")]
+		public List<BOBScalingElement> treeScales;
+
 		[XmlArray("buildprops")]
 		[XmlArrayItem("buildprop")]
 		public List<BOBBuildingReplacement> allBuildingProps;
@@ -36,6 +52,31 @@ namespace BOB
 		[XmlArray("activePacks")]
 		[XmlArrayItem("activePacks")]
 		public List<string> activePacks;
+	}
+
+
+	/// <summary>
+	/// Tree or prop scaling record XML format.
+	/// </summary>
+	public class BOBScalingElement
+    {
+		[XmlAttribute("prefab")]
+		public string prefabName = string.Empty;
+
+		[XmlAttribute("min")]
+		public float minScale = 1f;
+
+		[XmlAttribute("max")]
+		public float maxScale = 1f;
+
+		[XmlIgnore]
+		public PrefabInfo prefab;
+
+		[XmlIgnore]
+		public float originalMin = 1f;
+
+		[XmlIgnore]
+		public float originalMax = 1f;
 	}
 
 
@@ -100,7 +141,11 @@ namespace BOB
 		public string target = string.Empty;
 
 		[XmlAttribute("replacement")]
-		public string replacement = string.Empty;
+		public string Replacement
+		{
+			get => replacementInfo?.name ?? replacementName ?? string.Empty;
+			set => replacementName = value;
+		}
 
 		[XmlAttribute("angle")]
 		public float angle = 0f;
@@ -118,6 +163,9 @@ namespace BOB
 		public int probability = 100;
 
 		[XmlIgnore]
+		private string replacementName;
+
+		[XmlIgnore]
 		public PrefabInfo replacementInfo;
 
 		[XmlIgnore]
@@ -125,5 +173,50 @@ namespace BOB
 
 		[XmlIgnore]
 		public List<NetPropReference> references;
+	}
+
+
+	/// <summary>
+	/// Random prefab XML record.
+	/// </summary>
+	public class BOBRandomPrefab
+    {
+		[XmlAttribute("name")]
+		public string name = string.Empty;
+
+		[XmlArray("variations")]
+		[XmlArrayItem("variation")]
+		public List<BOBVariation> variations;
+
+		[XmlIgnore]
+		public PropInfo prop;
+
+		[XmlIgnore]
+		public TreeInfo tree;
+
+		[XmlIgnore]
+		public bool missingVariant = false;
+	}
+
+
+	/// <summary>
+	/// Random prefab variation XML record.
+	/// </summary>
+	public class BOBVariation
+    {
+		[XmlAttribute("name")]
+		public string name;
+
+		[XmlIgnore]
+		public string DisplayName => prefab == null ? PrefabLists.GetDisplayName(name) : PrefabLists.GetDisplayName(prefab);
+
+		[XmlAttribute("probability")]
+		public int probability;
+
+		[XmlIgnore]
+		public PrefabInfo prefab;
+
+		[XmlIgnore]
+		public bool probLocked;
 	}
 }

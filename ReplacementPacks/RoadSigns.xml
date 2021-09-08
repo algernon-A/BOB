@@ -1,45 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BOBPackFile>
   <propPacks>
-    <replacementpack name="US DOT regulatory signs by Spence!">
+ <replacementpack name="Aussieroads Regulatory Signs by The Federation">
       <propReplacements>
-        <replacement target="Stop Sign" replacement="1779508928.R2 R1-1 Stop Sign_Data" rotation="90" />
-        <replacement target="No Parking Sign" replacement="1779508928.R2 R-3A No Parking Sign_Data" rotation="90" />
-        <replacement target="No Right Turn Sign" replacement="1779508928.R2 R3-1 No Right Turn Sign_Data" rotation="90" />
-        <replacement target="No Left Turn Sign" replacement="1779508928.R2 R3-2 No Left Turn Sign_Data" rotation="90" />
+        <replacement target="30 Speed Limit" replacement="2543270627.R4-1 30 km/h speed limit_Data" rotation="-90" />
+        <replacement target="40 Speed Limit" replacement="2543270627.R4-1 40 km/h speed limit_Data" rotation="-90" />
+        <replacement target="50 Speed Limit" replacement="2543270627.R4-1 50 km/h speed limit_Data" rotation="-90" />
+        <replacement target="60 Speed Limit" replacement="2543270627.R4-1 60 km/h speed limit_Data" rotation="-90" />
+        <replacement target="100 Speed Limit" replacement="2543270627.R4-1 100 km/h speed limit_Data" rotation="-90" />
+        <replacement target="Stop Sign" replacement="2540523220.R1-1 Stop_Data" rotation="-90" />
+        <replacement target="No Parking Sign" replacement="2543270627.R5-82 No Parking Area_Data" rotation="-90" />
+        <replacement target="No Right Turn Sign" replacement="2540523220.R2-6R No Right Turn_Data" rotation="-90" />
+        <replacement target="No Left Turn Sign" replacement="2540523220.R2-6L No Left Turn_Data" rotation="-90" />
+        <replacement target="Motorway Sign" replacement="2540523220.R6-AR1 Freeway Start Assembly_Data" rotation="-90" />        
       </propReplacements>
-    </replacementpack>
-    <replacementpack name="UK Road Project: Essential Prop Pack by Macwelshman">
-      <propReplacements>
-        <replacement target="Stop Sign" replacement="1406118102.UKR-S GW_Data" rotation="0" />
-        <replacement target="No Right Turn Sign" replacement="1406118102.UKR-S NR_Data" rotation="0" />
-        <replacement target="No Left Turn Sign" replacement="1406118102.UKR-S NL_Data" rotation="0" />
-        <replacement target="No Parking Sign" replacement="1611965517.UKR-S No Stopping_Data" rotation="0" />
-        <replacement target="Motorway Sign" replacement="1406118102.UKR-MWS MW Start_Data" rotation="0" />
-      </propReplacements>
-    </replacementpack>
-    <replacementpack name="Latinoamerican Road Signs by zeldslayer [Pare]">
-      <propReplacements>
-        <replacement target="Stop Sign" replacement="1774368440.ZDS RD StopA_Data" rotation="0" />
-        <replacement target="No Right Turn Sign" replacement="1774368440.ZDS RD NR_Data" rotation="0" />
-        <replacement target="No Left Turn Sign" replacement="1774368440.ZDS RD NL_Data" rotation="0" />
-      </propReplacements>
-    </replacementpack>
-    <replacementpack name="Latinoamerican Road Signs by zeldslayer [Alto]">
-      <propReplacements>
-        <replacement target="Stop Sign" replacement="1774368440.ZDS RD StopB_Data" rotation="0" />
-        <replacement target="No Right Turn Sign" replacement="1774368440.ZDS RD NR_Data" rotation="0" />
-        <replacement target="No Left Turn Sign" replacement="1774368440.ZDS RD NL_Data" rotation="0" />
-      </propReplacements>
-    </replacementpack>
-    <replacementpack name="UK Road Sign &amp; Street Furniture Pack by Sparky66">
-      <propReplacements>
-        <replacement target="Stop Sign" replacement="1293188397.UK Give Way Sign_Data" rotation="0" />
-        <replacement target="No Parking Sign" replacement="1293188397.UK No Parking Sign_Data" rotation="0" />
-        <replacement target="No Right Turn Sign" replacement="1293188397.UK No Right Turn Sign_Data" rotation="0" />
-        <replacement target="No Left Turn Sign" replacement="1293188397.UK No Left Turn Sign_Data" rotation="0" />
-      </propReplacements>
-    </replacementpack>
+    </replacementpack>       
     <replacementpack name="Australian speed signs by Feare">
       <propReplacements>
         <replacement target="30 Speed Limit" replacement="1263918586.AUS Speed Limit 30 km/h small_Data" rotation="0" />
@@ -47,110 +22,6 @@
         <replacement target="50 Speed Limit" replacement="1263918586.AUS Speed Limit 50 km/h small_Data" rotation="0" />
         <replacement target="60 Speed Limit" replacement="1263918586.AUS Speed Limit 60 km/h small_Data" rotation="0" />
         <replacement target="100 Speed Limit" replacement="1263918586.AUS Speed Limit 100 km/h small_Data" rotation="0" />
-      </propReplacements>
-    </replacementpack>
-    <replacementpack name="US DOT regulatory signs by Spence!">
-      <propReplacements>
-        <replacement target="30 Speed Limit" replacement="1779508928.R2 R2-1 Spd. Limit 15 Sign_Data" rotation="90" />
-        <replacement target="40 Speed Limit" replacement="1779508928.R2 R2-1 Spd. Limit 25 Sign_Data" rotation="90" />
-        <replacement target="50 Speed Limit" replacement="1779508928.R2 R2-1 Spd. Limit 30 Sign_Data" rotation="90" />
-        <replacement target="60 Speed Limit" replacement="1779508928.R2 R2-1 Speed Limit 35 Sign_Data" rotation="90" />
-        <replacement target="100 Speed Limit" replacement="1779508928.R2 R2-1 Spd. Limit 65 Sign_Data" rotation="90" />
-      </propReplacements>
-    </replacementpack>
-    <replacementpack name="Singapore Road Sign Pack V1: Speed Limit by [MY] H4F1Z">
-      <propReplacements>
-        <replacement target="30 Speed Limit" replacement="1799160248.SG Speed Limit 30_Data" rotation="270" />
-        <replacement target="40 Speed Limit" replacement="1799160248.SG Speed Limit 40_Data" rotation="270" />
-        <replacement target="50 Speed Limit" replacement="1799160248.SG Speed Limit 50_Data" rotation="270" />
-        <replacement target="60 Speed Limit" replacement="1799160248.SG Speed Limit 60_Data" rotation="270" />
-        <replacement target="100 Speed Limit" replacement="1799160248.SG Speed Limit 90_Data" rotation="270" />
-      </propReplacements>
-    </replacementpack>
-    <replacementpack name="UK Road Project: Essential Prop Pack by Macwelshman">
-      <propReplacements>
-        <replacement target="30 Speed Limit" replacement="1406118102.UKR-S 30_Data" rotation="0" />
-        <replacement target="40 Speed Limit" replacement="1406118102.UKR-S 40_Data" rotation="0" />
-        <replacement target="50 Speed Limit" replacement="1406118102.UKR-S 50_Data" rotation="0" />
-        <replacement target="60 Speed Limit" replacement="1406118102.UKR-S 60_Data" rotation="0" />
-        <replacement target="100 Speed Limit" replacement="1406118102.UKR-S NatS_Data" rotation="0" />
-      </propReplacements>
-    </replacementpack>
-    <replacementpack name="UK Road Sign &amp; Street Furniture Pack by Sparky66">
-      <propReplacements>
-        <replacement target="30 Speed Limit" replacement="1293188397.UK 20MPH Sign_Data" rotation="0" />
-        <replacement target="40 Speed Limit" replacement="1293188397.UK 20MPH Sign_Data" rotation="0" />
-        <replacement target="50 Speed Limit" replacement="1293188397.UK 30MPH Sign_Data" rotation="0" />
-        <replacement target="60 Speed Limit" replacement="1293188397.UK 40MPH Sign_Data" rotation="0" />
-        <replacement target="100 Speed Limit" replacement="1293188397.UK National Speed Limit Sign_Data" rotation="0" />
-      </propReplacements>
-    </replacementpack>
-    <replacementpack name="Italy road signs - PACK by Arnold J. Rimmer, Bsc. Ssc.">
-      <propReplacements>
-        <replacement target="30 Speed Limit" replacement="1685731764.ITA Max speed 30_Data" rotation="0" />
-        <replacement target="40 Speed Limit" replacement="1685731764.ITA Max speed 50_Data" rotation="0" />
-        <replacement target="50 Speed Limit" replacement="1685731764.ITA Max speed 50_Data" rotation="0" />
-        <replacement target="60 Speed Limit" replacement="1685731764.ITA Max speed 60_Data" rotation="0" />
-        <replacement target="100 Speed Limit" replacement="1685731764.ITA Max speed 80_Data" rotation="0" />
-        <replacement target="Stop Sign" replacement="1685731764.ITA Stop_Data" rotation="0" />
-        <replacement target="No Parking Sign" replacement="1685731764.ITA No parking_Data" rotation="0" />
-        <replacement target="Motorway Sign" replacement="1685731764.ITA Fast-traffic highway_Data" rotation="0" />
-        <replacement target="No Right Turn Sign" replacement="1685731764.ITA Drive straight or left_Data" rotation="0" />
-        <replacement target="No Left Turn Sign" replacement="1685731764.ITA Drive straight or right_Data" rotation="0" />
-      </propReplacements>
-    </replacementpack>
-    <replacementpack name="German sign pack for Highway/National Road/Road-work-sites and other random signs by UFF">
-      <propReplacements>
-        <replacement target="30 Speed Limit" replacement="1178771213.30km/h Höchstgeschwindigkeit_Data" rotation="0" />
-        <replacement target="40 Speed Limit" replacement="1178771213.50km/h Höchstgeschwindigkeit_Data" rotation="0" />
-        <replacement target="50 Speed Limit" replacement="1178771213.50km/h Höchstgeschwindigkeit_Data" rotation="0" />
-        <replacement target="60 Speed Limit" replacement="1178771213.60km/h Höchstgeschwindigkeit_Data" rotation="0" />
-        <replacement target="100 Speed Limit" replacement="1178771213.120km/h Höchstgeschwindigkeit_Data" rotation="0" />
-        <replacement target="Stop Sign" replacement="1178771213.Halt! Vorfahrt gewähren!_Data" rotation="0" />
-        <replacement target="No Right Turn Sign" replacement="1178771213.Vorgeschriebene Fahrtrichtung GL_Data" rotation="0" />
-        <replacement target="No Left Turn Sign" replacement="1178771213.Vorgeschriebene Fahrtrichtung GR_Data" rotation="0" />
-        <replacement target="Motorway Overroad Signs" replacement="1178771213.AUTOBAHN 3Sp-2G,1R KP_Data" rotation="0" />
-      </propReplacements>
-    </replacementpack>
-    <replacementpack name="French road signs by Raymond Pelletier">
-      <propReplacements>
-        <replacement target="30 Speed Limit" replacement="1073554884.French Road Sign - B14.30_Data" rotation="0" />
-        <replacement target="40 Speed Limit" replacement="1073554884.French Road Sign - B14.50_Data" rotation="0" />
-        <replacement target="50 Speed Limit" replacement="1073554884.French Road Sign - B14.50_Data" rotation="0" />
-        <replacement target="60 Speed Limit" replacement="1073554884.French Road Sign - B14.70_Data" rotation="0" />
-        <replacement target="100 Speed Limit" replacement="1073554884.French Road Sign - B14.110_Data" rotation="0" />
-        <replacement target="Stop Sign" replacement="1003078914.French Road Sign - AB4_Data" rotation="0" />
-        <replacement target="No Parking Sign" replacement="1073554884.French Road Sign - B6b_Data" rotation="0" />
-        <replacement target="No Right Turn Sign" replacement="1073554884.French Road Sign - B2b_Data" rotation="0" />
-        <replacement target="No Left Turn Sign" replacement="1073554884.French Road Sign - B2a_Data" rotation="0" />
-        <replacement target="Motorway Sign" replacement="1074496614.French Road Sign - C207_Data" rotation="0" />
-      </propReplacements>
-    </replacementpack>
-    <replacementpack name="Traffic Signs (Custom) by Ellysmere Haven">
-      <propReplacements>
-        <replacement target="30 Speed Limit" replacement="2013164837.30km/h Speed Limit_Data" rotation="0" />
-        <replacement target="40 Speed Limit" replacement="2013164837.40km/h Speed Limit_Data" rotation="0" />
-        <replacement target="50 Speed Limit" replacement="2013164837.50km/h Speed Limit_Data" rotation="0" />
-        <replacement target="60 Speed Limit" replacement="2013164837.60km/h Speed Limit_Data" rotation="0" />
-        <replacement target="100 Speed Limit" replacement="2013164837.100km/h Speed Limit_Data" rotation="0" />
-        <replacement target="Stop Sign" replacement="2013164837.Stop_Data" rotation="0" />
-        <replacement target="No Parking Sign" replacement="2013164837.No Parking_Data" rotation="0" />
-        <replacement target="No Right Turn Sign" replacement="2013164837.No Right Turn_Data" rotation="0" />
-        <replacement target="No Left Turn Sign" replacement="2013164837.No Left Turn_Data" rotation="0" />
-        <replacement target="Motorway Sign" replacement="2013164837.Motorway Road_Data" rotation="0" />
-      </propReplacements>
-    </replacementpack>
-    <replacementpack name="Swedish road signs pack by SvenBerlin">
-      <propReplacements>
-        <replacement target="30 Speed Limit" replacement="2258591646.swedish road sign C31-3_Data" rotation="0" />
-        <replacement target="40 Speed Limit" replacement="2258591646.swedish road sign C31-4_Data" rotation="0" />
-        <replacement target="50 Speed Limit" replacement="2258591646.swedish road sign C31-5_Data" rotation="0" />
-        <replacement target="60 Speed Limit" replacement="2258591646.swedish road sign C31-6_Data" rotation="0" />
-        <replacement target="100 Speed Limit" replacement="2258591646.swedish road sign C31-10_Data" rotation="0" />
-        <replacement target="Stop Sign" replacement="2260057509.swedish road sign B2_Data" rotation="0" />
-        <replacement target="No Parking Sign" replacement="2260057509.swedish road sign C39_Data" rotation="0" />
-        <replacement target="No Right Turn Sign" replacement="2258591646.swedish road sign C25-2_Data" rotation="0" />
-        <replacement target="No Left Turn Sign" replacement="2258591646.swedish road sign C25-1_Data" rotation="0" />
       </propReplacements>
     </replacementpack>
     <replacementpack name="Canadian (Ontario) Road Signs Pack by Nochin98">
@@ -166,11 +37,142 @@
         <replacement target="No Left Turn Sign" replacement="2287634130.NO LEFT TURN SIGN_Data" rotation="270" />
         <replacement target="Motorway Sign" replacement="2287634130.HIGHWAY ROUTE SIGN_Data" rotation="270" />
       </propReplacements>
+    </replacementpack>    
+    <replacementpack name="French road signs by Raymond Pelletier">
+      <propReplacements>
+        <replacement target="30 Speed Limit" replacement="1073554884.French Road Sign - B14.30_Data" rotation="0" />
+        <replacement target="40 Speed Limit" replacement="1073554884.French Road Sign - B14.50_Data" rotation="0" />
+        <replacement target="50 Speed Limit" replacement="1073554884.French Road Sign - B14.50_Data" rotation="0" />
+        <replacement target="60 Speed Limit" replacement="1073554884.French Road Sign - B14.70_Data" rotation="0" />
+        <replacement target="100 Speed Limit" replacement="1073554884.French Road Sign - B14.110_Data" rotation="0" />
+        <replacement target="Stop Sign" replacement="1003078914.French Road Sign - AB4_Data" rotation="0" />
+        <replacement target="No Parking Sign" replacement="1073554884.French Road Sign - B6b_Data" rotation="0" />
+        <replacement target="No Right Turn Sign" replacement="1073554884.French Road Sign - B2b_Data" rotation="0" />
+        <replacement target="No Left Turn Sign" replacement="1073554884.French Road Sign - B2a_Data" rotation="0" />
+        <replacement target="Motorway Sign" replacement="1074496614.French Road Sign - C207_Data" rotation="0" />
+      </propReplacements>
+    </replacementpack>
+    <replacementpack name="German sign pack for Highway/National Road/Road-work-sites and other random signs by CcampoO">
+      <propReplacements>
+        <replacement target="30 Speed Limit" replacement="1178771213.30km/h Höchstgeschwindigkeit_Data" rotation="0" />
+        <replacement target="40 Speed Limit" replacement="1178771213.50km/h Höchstgeschwindigkeit_Data" rotation="0" />
+        <replacement target="50 Speed Limit" replacement="1178771213.50km/h Höchstgeschwindigkeit_Data" rotation="0" />
+        <replacement target="60 Speed Limit" replacement="1178771213.60km/h Höchstgeschwindigkeit_Data" rotation="0" />
+        <replacement target="100 Speed Limit" replacement="1178771213.120km/h Höchstgeschwindigkeit_Data" rotation="0" />
+        <replacement target="Stop Sign" replacement="1178771213.Halt! Vorfahrt gewähren!_Data" rotation="0" />
+        <replacement target="No Right Turn Sign" replacement="1178771213.Vorgeschriebene Fahrtrichtung GL_Data" rotation="0" />
+        <replacement target="No Left Turn Sign" replacement="1178771213.Vorgeschriebene Fahrtrichtung GR_Data" rotation="0" />
+        <replacement target="Motorway Overroad Signs" replacement="1178771213.AUTOBAHN 3Sp-2G,1R KP_Data" rotation="0" />
+      </propReplacements>
+    </replacementpack>
+    <replacementpack name="Italy road signs - PACK by Arnold J. Rimmer, Bsc. Ssc.">
+      <propReplacements>
+        <replacement target="30 Speed Limit" replacement="1685731764.ITA Max speed 30_Data" rotation="0" />
+        <replacement target="40 Speed Limit" replacement="1685731764.ITA Max speed 50_Data" rotation="0" />
+        <replacement target="50 Speed Limit" replacement="1685731764.ITA Max speed 50_Data" rotation="0" />
+        <replacement target="60 Speed Limit" replacement="1685731764.ITA Max speed 60_Data" rotation="0" />
+        <replacement target="100 Speed Limit" replacement="1685731764.ITA Max speed 80_Data" rotation="0" />
+        <replacement target="Stop Sign" replacement="1685731764.ITA Stop_Data" rotation="0" />
+        <replacement target="No Parking Sign" replacement="1685731764.ITA No parking_Data" rotation="0" />
+        <replacement target="Motorway Sign" replacement="1685731764.ITA Fast-traffic highway_Data" rotation="0" />
+        <replacement target="No Right Turn Sign" replacement="1685731764.ITA Drive straight or left_Data" rotation="0" />
+        <replacement target="No Left Turn Sign" replacement="1685731764.ITA Drive straight or right_Data" rotation="0" />
+      </propReplacements>
+    </replacementpack>    
+    <replacementpack name="Latinoamerican Road Signs by zeldslayer [Pare]">
+      <propReplacements>
+        <replacement target="Stop Sign" replacement="1774368440.ZDS RD StopA_Data" rotation="0" />
+        <replacement target="No Right Turn Sign" replacement="1774368440.ZDS RD NR_Data" rotation="0" />
+        <replacement target="No Left Turn Sign" replacement="1774368440.ZDS RD NL_Data" rotation="0" />
+      </propReplacements>
+    </replacementpack>
+    <replacementpack name="Latinoamerican Road Signs by zeldslayer [Alto]">
+      <propReplacements>
+        <replacement target="Stop Sign" replacement="1774368440.ZDS RD StopB_Data" rotation="0" />
+        <replacement target="No Right Turn Sign" replacement="1774368440.ZDS RD NR_Data" rotation="0" />
+        <replacement target="No Left Turn Sign" replacement="1774368440.ZDS RD NL_Data" rotation="0" />
+      </propReplacements>
+    </replacementpack>
+    <replacementpack name="Singapore Road Sign Pack V1: Speed Limit by [MY] H4F1Z">
+      <propReplacements>
+        <replacement target="30 Speed Limit" replacement="1799160248.SG Speed Limit 30_Data" rotation="270" />
+        <replacement target="40 Speed Limit" replacement="1799160248.SG Speed Limit 40_Data" rotation="270" />
+        <replacement target="50 Speed Limit" replacement="1799160248.SG Speed Limit 50_Data" rotation="270" />
+        <replacement target="60 Speed Limit" replacement="1799160248.SG Speed Limit 60_Data" rotation="270" />
+        <replacement target="100 Speed Limit" replacement="1799160248.SG Speed Limit 90_Data" rotation="270" />
+      </propReplacements>
+    </replacementpack>
+    <replacementpack name="Swedish road signs pack by SvenBerlin">
+      <propReplacements>
+        <replacement target="30 Speed Limit" replacement="2258591646.swedish road sign C31-3_Data" rotation="0" />
+        <replacement target="40 Speed Limit" replacement="2258591646.swedish road sign C31-4_Data" rotation="0" />
+        <replacement target="50 Speed Limit" replacement="2258591646.swedish road sign C31-5_Data" rotation="0" />
+        <replacement target="60 Speed Limit" replacement="2258591646.swedish road sign C31-6_Data" rotation="0" />
+        <replacement target="100 Speed Limit" replacement="2258591646.swedish road sign C31-10_Data" rotation="0" />
+        <replacement target="Stop Sign" replacement="2260057509.swedish road sign B2_Data" rotation="0" />
+        <replacement target="No Parking Sign" replacement="2260057509.swedish road sign C39_Data" rotation="0" />
+        <replacement target="No Right Turn Sign" replacement="2258591646.swedish road sign C25-2_Data" rotation="0" />
+        <replacement target="No Left Turn Sign" replacement="2258591646.swedish road sign C25-1_Data" rotation="0" />
+      </propReplacements>
+    </replacementpack>
+    <replacementpack name="Traffic Signs (Custom) by Ellysmere Haven">
+      <propReplacements>
+        <replacement target="30 Speed Limit" replacement="2013164837.30km/h Speed Limit_Data" rotation="0" />
+        <replacement target="40 Speed Limit" replacement="2013164837.40km/h Speed Limit_Data" rotation="0" />
+        <replacement target="50 Speed Limit" replacement="2013164837.50km/h Speed Limit_Data" rotation="0" />
+        <replacement target="60 Speed Limit" replacement="2013164837.60km/h Speed Limit_Data" rotation="0" />
+        <replacement target="100 Speed Limit" replacement="2013164837.100km/h Speed Limit_Data" rotation="0" />
+        <replacement target="Stop Sign" replacement="2013164837.Stop_Data" rotation="0" />
+        <replacement target="No Parking Sign" replacement="2013164837.No Parking_Data" rotation="0" />
+        <replacement target="No Right Turn Sign" replacement="2013164837.No Right Turn_Data" rotation="0" />
+        <replacement target="No Left Turn Sign" replacement="2013164837.No Left Turn_Data" rotation="0" />
+        <replacement target="Motorway Sign" replacement="2013164837.Motorway Road_Data" rotation="0" />
+      </propReplacements>
+    </replacementpack>    
+    <replacementpack name="UK Road Project: Essential Prop Pack by Macwelshman">
+      <propReplacements>
+        <replacement target="30 Speed Limit" replacement="1406118102.UKR-S 30_Data" rotation="0" />
+        <replacement target="40 Speed Limit" replacement="1406118102.UKR-S 40_Data" rotation="0" />
+        <replacement target="50 Speed Limit" replacement="1406118102.UKR-S 50_Data" rotation="0" />
+        <replacement target="60 Speed Limit" replacement="1406118102.UKR-S 60_Data" rotation="0" />
+        <replacement target="100 Speed Limit" replacement="1406118102.UKR-S NatS_Data" rotation="0" />
+        <replacement target="Stop Sign" replacement="1406118102.UKR-S GW_Data" rotation="0" />
+        <replacement target="No Right Turn Sign" replacement="1406118102.UKR-S NR_Data" rotation="0" />
+        <replacement target="No Left Turn Sign" replacement="1406118102.UKR-S NL_Data" rotation="0" />
+        <replacement target="No Parking Sign" replacement="1611965517.UKR-S No Stopping_Data" rotation="0" />
+        <replacement target="Motorway Sign" replacement="1406118102.UKR-MWS MW Start_Data" rotation="0" />
+      </propReplacements>
+    </replacementpack>
+    <replacementpack name="UK Road Sign &amp; Street Furniture Pack by Sparky66">
+      <propReplacements>
+        <replacement target="30 Speed Limit" replacement="1293188397.UK 20MPH Sign_Data" rotation="0" />
+        <replacement target="40 Speed Limit" replacement="1293188397.UK 20MPH Sign_Data" rotation="0" />
+        <replacement target="50 Speed Limit" replacement="1293188397.UK 30MPH Sign_Data" rotation="0" />
+        <replacement target="60 Speed Limit" replacement="1293188397.UK 40MPH Sign_Data" rotation="0" />
+        <replacement target="100 Speed Limit" replacement="1293188397.UK National Speed Limit Sign_Data" rotation="0" />
+        <replacement target="Stop Sign" replacement="1293188397.UK Give Way Sign_Data" rotation="0" />
+        <replacement target="No Parking Sign" replacement="1293188397.UK No Parking Sign_Data" rotation="0" />
+        <replacement target="No Right Turn Sign" replacement="1293188397.UK No Right Turn Sign_Data" rotation="0" />
+        <replacement target="No Left Turn Sign" replacement="1293188397.UK No Left Turn Sign_Data" rotation="0" />
+      </propReplacements>
     </replacementpack>
     <replacementpack name="US CA Freeway Props by GhostRaiderMX">
       <propReplacements>
         <replacement target="Motorway Overroad Signs" replacement="2322292112.3L US CA I Highway Gantry Medium_Data" rotation="0" />
         <replacement target="Motorway Sign" replacement="2322292540.US CA I Highway Sign Entrance_Data" rotation="0" />
+      </propReplacements>
+    </replacementpack>    
+    <replacementpack name="US DOT regulatory signs by Spence!">
+      <propReplacements>
+        <replacement target="30 Speed Limit" replacement="1779508928.R2 R2-1 Spd. Limit 15 Sign_Data" rotation="90" />
+        <replacement target="40 Speed Limit" replacement="1779508928.R2 R2-1 Spd. Limit 25 Sign_Data" rotation="90" />
+        <replacement target="50 Speed Limit" replacement="1779508928.R2 R2-1 Spd. Limit 30 Sign_Data" rotation="90" />
+        <replacement target="60 Speed Limit" replacement="1779508928.R2 R2-1 Speed Limit 35 Sign_Data" rotation="90" />
+        <replacement target="100 Speed Limit" replacement="1779508928.R2 R2-1 Spd. Limit 65 Sign_Data" rotation="90" />
+        <replacement target="Stop Sign" replacement="1779508928.R2 R1-1 Stop Sign_Data" rotation="90" />
+        <replacement target="No Parking Sign" replacement="1779508928.R2 R-3A No Parking Sign_Data" rotation="90" />
+        <replacement target="No Right Turn Sign" replacement="1779508928.R2 R3-1 No Right Turn Sign_Data" rotation="90" />
+        <replacement target="No Left Turn Sign" replacement="1779508928.R2 R3-2 No Left Turn Sign_Data" rotation="90" />
       </propReplacements>
     </replacementpack>
   </propPacks>

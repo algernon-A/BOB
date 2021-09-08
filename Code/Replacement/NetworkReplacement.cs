@@ -167,7 +167,7 @@ namespace BOB
 
 			// Record replacement prop.
 			replacements[network][target].replacementInfo = replacement;
-			replacements[network][target].replacement = replacement.name;
+			replacements[network][target].Replacement = replacement.name;
 
 			// Iterate through each lane.
 			for (int laneIndex = 0; laneIndex < network.m_lanes.Length; ++laneIndex)
@@ -221,7 +221,6 @@ namespace BOB
 				AllNetworkReplacement.instance.RemoveEntry(network, target, propReference.laneIndex, propReference.propIndex);
 
 				// Apply the replacement.
-				Logging.Message("replacing ", target.name, " with ", replacement.name, " in ", network.name);
 				ReplaceProp(replacements[network][target], propReference);
 			}
 		}

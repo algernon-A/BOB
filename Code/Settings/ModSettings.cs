@@ -1,4 +1,7 @@
-﻿namespace BOB
+﻿using UnityEngine;
+
+
+namespace BOB
 {
 	/// <summary>
 	/// Static class to hold global mod settings.
@@ -20,7 +23,12 @@
 		// Remember last panel position.
 		internal static bool rememberPosition = false;
 
+		// Ruining.
+		internal static bool StopTreeRuining { get; set; } = false;
+		internal static bool StopPropRuining { get; set; } = false;
+
 		// What's new notification version.
 		internal static string whatsNewVersion = "0.0";
+		internal static int whatsNewBetaVersion = 0;
 	}
 }

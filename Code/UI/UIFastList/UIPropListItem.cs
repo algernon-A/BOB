@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 
 
 namespace BOB
@@ -37,6 +36,12 @@ namespace BOB
 
 		// Whether or not to show probabilities.
 		public bool showProbs = false;
+
+		// Current prefab.
+		public PrefabInfo CurrentPrefab => individualPrefab ?? replacementPrefab ?? allPrefab ?? packagePrefab ?? originalPrefab;
+
+		// Display name.
+		public string DisplayName => PrefabLists.GetDisplayName(CurrentPrefab);
 	}
 
 

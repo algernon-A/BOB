@@ -1,7 +1,7 @@
-﻿using ColossalFramework.UI;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using ColossalFramework.UI;
 
 
 namespace BOB.MessageBox
@@ -14,21 +14,21 @@ namespace BOB.MessageBox
         /// <summary>
         /// Sets the 'what's new' messages to display.
         /// </summary>
-        /// <param name="messages">Version update messages to display, in order (newest versions first), with a list of items (as translation keys) for each version</param>
         /// <param name="lastNotifiedVersion">Last notified version (version messages equal to or earlier than this will be minimized</param>
-        public void SetMessages(Version lastNotifiedVersion, Dictionary<Version, List<string>> messages)
+        /// <param name="messages">Version update messages to display, in order (newest versions first), with a list of items (as translation keys) for each version</param>
+        public void SetMessages(Version lastNotifiedVersion, WhatsNewMessage[] messages)
         {
             // Iterate through each provided version and add it to the messagebox.
-            foreach (KeyValuePair<Version, List<string>> message in messages)
+            foreach (WhatsNewMessage message in messages)
             {
                 VersionMessage versionMessage = ScrollableContent.AddUIComponent<VersionMessage>();
-                versionMessage.width = ScrollableContent.width;
-                versionMessage.SetText(message.Key, message.Value);
+                versionMessage.width = ContentWidth;
+                versionMessage.SetText(message);
                 // Add spacer below.
                 AddSpacer();
 
-                // Hide version messages that have already been notified.
-                if (message.Key <= lastNotifiedVersion)
+                // Hide version messages that have already been notified (always showing versions with headers).
+                if ((message.version < lastNotifiedVersion) || (message.version == lastNotifiedVersion && message.betaVersion <= ModSettings.whatsNewBetaVersion))
                 {
                     versionMessage.IsCollapsed = true;
                 }
@@ -87,22 +87,29 @@ namespace BOB.MessageBox
             /// <summary>
             /// Sets version message text.
             /// </summary>
-            /// <param name="version">Version</param>
-            /// <param name="messageKeys">Message text as list of translation keys for individual points</param>
-            public void SetText(Version version, List<string> messageKeys)
+            /// <param name="message">What's new message to display</param>
+            public void SetText(WhatsNewMessage message)
             {
                 // Set version header and message text.
-                versionTitle = BOBMod.ModName + " " + version.ToString();
+                versionTitle = BOBMod.ModName + " " + message.version.ToString(message.version.Minor > 0 ? 3 : 2) + message.versionHeader;
 
-                // Add messages as separate list items.
-                foreach (string messageKey in messageKeys)
+                // Add message elements as separate list items.
+                for (int i = 0; i < message.messages.Length; ++i)
                 {
-                    ListItem newMessageLabel = AddUIComponent<ListItem>();
-                    listItems.Add(newMessageLabel);
-                    newMessageLabel.Text = Translations.Translate(messageKey);
+                    try
+                    {
+                        // Message text is either a translation key or direct text, depending on the messageKeys setting.
+                        ListItem newMessageLabel = AddUIComponent<ListItem>();
+                        listItems.Add(newMessageLabel);
+                        newMessageLabel.Text = message.messageKeys ? Translations.Translate(message.messages[i]) : message.messages[i];
 
-                    // Make sure initial width is set properly.
-                    newMessageLabel.width = width;
+                        // Make sure initial width is set properly.
+                        newMessageLabel.width = width;
+                    }
+                    catch (Exception e)
+                    {
+                        Logging.LogException(e, "Exception showing what's new message");
+                    }
                 }
 
                 // Always start maximized.

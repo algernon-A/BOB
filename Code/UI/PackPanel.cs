@@ -5,7 +5,6 @@ using ColossalFramework.UI;
 
 namespace BOB
 {
-
 	/// <summary>
 	/// Static class to manage the BOB pack panel.
 	/// </summary>
@@ -75,9 +74,9 @@ namespace BOB
 		private const float PanelWidth = ListWidth + (Margin * 2f);
 		private const float ListHeight = 300f;
 		private const float TitleBarHeight = 40f;
-        private const float FooterX = TitleBarHeight + ListHeight + Margin;
+        private const float FooterY = TitleBarHeight + ListHeight + Margin;
         private const float FooterHeight = 30f;
-        private const float PanelHeight = FooterX + FooterHeight + Margin;
+        private const float PanelHeight = FooterY + FooterHeight + Margin;
 
 
         // Panel components.
@@ -165,8 +164,8 @@ namespace BOB
             packSelection.selectedIndex = -1;
 
             // Apply and revert button.
-            applyButton = UIControls.AddButton(this, Margin, FooterX, Translations.Translate("BOB_PCK_APP"));
-            revertButton = UIControls.AddButton(this, (ListWidth / 2) + (Margin * 2), FooterX, Translations.Translate("BOB_PCK_RVT"));
+            applyButton = UIControls.AddButton(this, Margin, FooterY, Translations.Translate("BOB_PCK_APP"));
+            revertButton = UIControls.AddButton(this, (ListWidth / 2) + (Margin * 2), FooterY, Translations.Translate("BOB_PCK_RVT"));
             applyButton.eventClicked += (control, clickEvent) => SetPackStatus(true);
             revertButton.eventClicked += (control, clickEvent) => SetPackStatus(false);
 
@@ -260,53 +259,13 @@ namespace BOB
 
 
     /// <summary>
-    /// An individual row in the list of sign packs.
+    /// An individual row in the list of replacement packs.
     /// </summary>
-    public class UIPackRow : UIPanel, IUIFastListRow
+    public class UIPackRow : UIBasicRow
     {
-        // Layout constants.
-        private const float TextX = 60f;
-
         // Panel components.
-        private UIPanel panelBackground;
-        private UILabel packLabel;
         private UISprite statusSprite, notLoadedSprite;
         private string thisPack;
-
-
-        // Background for each list item.
-        public UIPanel Background
-        {
-            get
-            {
-                if (panelBackground == null)
-                {
-                    panelBackground = AddUIComponent<UIPanel>();
-                    panelBackground.width = width;
-                    panelBackground.height = BOBPackPanel.RowHeight;
-                    panelBackground.relativePosition = Vector2.zero;
-
-                    panelBackground.zOrder = 0;
-                }
-
-                return panelBackground;
-            }
-        }
-
-
-        /// <summary>
-        /// Called when dimensions are changed, including as part of initial setup (required to set correct relative position of label).
-        /// </summary>
-        protected override void OnSizeChanged()
-        {
-            base.OnSizeChanged();
-
-            if (packLabel != null)
-            {
-                Background.width = width;
-                packLabel.relativePosition = new Vector3(TextX, 6f);
-            }
-        }
 
 
         /// <summary>
@@ -321,14 +280,14 @@ namespace BOB
 
 
         /// <summary>
-        /// Generates and displays a building row.
+        /// Generates and displays a pack row.
         /// </summary>
         /// <param name="data">Object to list</param>
         /// <param name="isRowOdd">If the row is an odd-numbered row (for background banding)</param>
-        public void Display(object data, bool isRowOdd)
+        public override void Display(object data, bool isRowOdd)
         {
             // Perform initial setup for new rows.
-            if (packLabel == null)
+            if (rowLabel == null)
             {
                 isVisible = true;
                 canFocus = true;
@@ -336,9 +295,9 @@ namespace BOB
                 width = parent.width;
                 height = BOBPackPanel.RowHeight;
 
-                packLabel = AddUIComponent<UILabel>();
-                packLabel.width = BOBPackPanel.ListWidth;
-                packLabel.relativePosition = new Vector3(TextX, 6f);
+                rowLabel = AddUIComponent<UILabel>();
+                rowLabel.width = BOBPackPanel.ListWidth;
+                rowLabel.relativePosition = new Vector3(TextX, 6f);
             }
 
             if (statusSprite == null)
@@ -358,7 +317,7 @@ namespace BOB
 
             // Set selected pack.
             thisPack = data as string;
-            packLabel.text = thisPack;
+            rowLabel.text = thisPack;
 
             // Set sprite status.
             bool packStatus = PackReplacement.instance.GetPackStatus(thisPack);
@@ -377,37 +336,6 @@ namespace BOB
 
             // Set initial background as deselected state.
             Deselect(isRowOdd);
-        }
-
-
-        /// <summary>
-        /// Highlights the selected row.
-        /// </summary>
-        /// <param name="isRowOdd">If the row is an odd-numbered row (for background banding)</param>
-        public void Select(bool isRowOdd)
-        {
-            Background.backgroundSprite = "ListItemHighlight";
-            Background.color = new Color32(255, 255, 255, 255);
-        }
-
-
-        /// <summary>
-        /// Unhighlights the (un)selected row.
-        /// </summary>
-        /// <param name="isRowOdd">If the row is an odd-numbered row (for background banding)</param>
-        public void Deselect(bool isRowOdd)
-        {
-            if (isRowOdd)
-            {
-                // Lighter background for odd rows.
-                Background.backgroundSprite = "UnlockingItemBackground";
-                Background.color = new Color32(0, 0, 0, 128);
-            }
-            else
-            {
-                // Darker background for even rows.
-                Background.backgroundSprite = null;
-            }
         }
     }
 }

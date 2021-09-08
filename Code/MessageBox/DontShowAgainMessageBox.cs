@@ -11,6 +11,9 @@ namespace BOB.MessageBox
         // Don't Show Again button.
         private UIButton dsaButton;
 
+        // Number of buttons for this panel (for layout).
+        protected override int NumButtons => 2;
+
         // Accessor.
         public UIButton DSAButton => dsaButton;
 
@@ -19,12 +22,10 @@ namespace BOB.MessageBox
         /// </summary>
         public override void AddButtons()
         {
-            // Add close button.
-            closeButton = AddButton(1, 2, Close);
-            closeButton.text = Translations.Translate("MES_CLS");
+            base.AddButtons();
 
             // Add don't show again button.
-            dsaButton = AddButton(2, 2, Close);
+            dsaButton = AddButton(2, NumButtons, Close);
             dsaButton.text = Translations.Translate("MES_DSA");
         }
     }

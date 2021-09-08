@@ -21,14 +21,14 @@ namespace BOB
         /// </summary>
         private InputKey CurrentHotkey
         {
-            get => SavedInputKey.Encode(UIThreading.hotKey, UIThreading.hotCtrl, UIThreading.hotShift, UIThreading.hotAlt);
+            get => SavedInputKey.Encode(UIThreading.HotKey, UIThreading.HotCtrl, UIThreading.HotShift, UIThreading.HotAlt);
 
             set
             {
-                UIThreading.hotKey = (KeyCode)(value & 0xFFFFFFF);
-                UIThreading.hotCtrl = (value & 0x40000000) != 0;
-                UIThreading.hotShift = (value & 0x20000000) != 0;
-                UIThreading.hotAlt = (value & 0x10000000) != 0;
+                UIThreading.HotKey = (KeyCode)(value & 0xFFFFFFF);
+                UIThreading.HotCtrl = (value & 0x40000000) != 0;
+                UIThreading.HotShift = (value & 0x20000000) != 0;
+                UIThreading.HotAlt = (value & 0x10000000) != 0;
             }
         }
 

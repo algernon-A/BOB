@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Language UniqueName="de" ReadableName="Deutsch">
+  <Translations>
+    <Translation ID="BOB_NAM" String="BOB: the tree and prop replacer" />
+    <Translation ID="BOB_DESC" String="UNDER DEVELOPMENT: Ersetzt Bäume und Dekorationen." />
+    <Translation ID="TRN_CHOICE" String="Sprache einstellen" />
+    <Translation ID="TRN_SYS" String="Verwende die Spiel-Sprache" />
+    <Translation ID="MES_CLS" String="Schließen" />
+    <Translation ID="MES_DSA" String="Nicht erneut zeigen" />
+    <Translation ID="BOB_MBX_OK" String="OK" />
+    <Translation ID="BOB_ROW_WAS" String="war" />
+    <Translation ID="BOB_PNL_NOP" String="Keine Dekorationen gefunden" />
+    <Translation ID="BOB_PNL_NOT" String="Keine Bäume gefunden" />
+    <Translation ID="BOB_PNL_TRE" String="Bäume" />
+    <Translation ID="BOB_PNL_PRP" String="Dekorationen" />
+    <Translation ID="BOB_PNL_IND" String="Zeige einzelne Dekorationen" />
+    <Translation ID="BOB_PNL_HDV" String="Verstecke Vanilla" />
+    <Translation ID="BOB_PNL_REP" String="Ersetze" />
+    <Translation ID="BOB_PNL_RTB" String="Diese Gebäude" />
+    <Translation ID="BOB_PNL_RAB" String="Alle Gebäude" />
+    <Translation ID="BOB_PNL_RTN" String="Diese Netzwerke" />
+    <Translation ID="BOB_PNL_RAN" String="Alle Netzwerke" />
+    <Translation ID="BOB_PNL_RTT" String="Bäume dieser Karte" />
+    <Translation ID="BOB_PNL_RTP" String="Dekorationen dieser Karte" />
+    <Translation ID="BOB_PNL_RSW" String="Zufallspakete anzeigen" />
+    <Translation ID="BOB_PNL_RST" String="Zufallspakete erstellen" />
+    <Translation ID="BOB_PNL_SCA" String="Dekorationen und Bäume skalieren" />
+    <Translation ID="BOB_PNL_REV" String="Zurücksetzen" />
+    <Translation ID="BOB_PNL_REV_TIP" String="Zurücksetzen ist nicht verfügbar, da es keine aktive Ersetzung für dieses Element gibt" />
+    <Translation ID="BOB_PNL_PKB" String="Austausch-Pakete" />
+    <Translation ID="BOB_PNL_PRB" String="Wahrscheinlichkeit" />
+    <Translation ID="BOB_PNL_ANG" String="Winkel" />
+    <Translation ID="BOB_PNL_OFF" String="Versatz" />
+    <Translation ID="BOB_PNL_XOF" String="X" />
+    <Translation ID="BOB_PNL_YOF" String="Y" />
+    <Translation ID="BOB_PNL_ZOF" String="Z" />
+    <Translation ID="BOB_PNL_SUB" String="Untergebäude" />
+    <Translation ID="BOB_RND_TIT" String="Zufällige Bäume und Dekorationen einrichten" />
+    <Translation ID="BOB_RND_NEW" String="Neu" />
+    <Translation ID="BOB_RND_DEL" String="Löschen" />
+    <Translation ID="BOB_RND_REN" String="Umbenennen" />
+    <Translation ID="BOB_RND_ADD" String="Zu Variationen hinzufügen" />
+    <Translation ID="BOB_RND_SUB" String="Von Variationen entfernen" />
+    <Translation ID="BOB_SCA_TIT" String="Skalierung einstellen" />
+    <Translation ID="BOB_SCA_MIN" String="Kleinster Skalierungs-Faktor" />
+    <Translation ID="BOB_SCA_MAX" String="Maximaler Skalierungs-Faktor" />
+    <Translation ID="BOB_SPR_SBL" String="Ein Austausch ist für dieses Gebäude angewendet" />
+    <Translation ID="BOB_SPR_ABL" String="Ein Austausch ist für alle Gebäude angewendet" />
+    <Translation ID="BOB_SPR_SNT" String="Ein Austausch ist für dieses Netwerk angewendet" />
+    <Translation ID="BOB_SPR_ANT" String="Ein Austausch ist für alle Netzwerke angewendet" />
+    <Translation ID="BOB_SPR_PCK" String="Ein Austausch-Paket ist angewendet" />
+    <Translation ID="BOB_PCK_APP" String="Paket anwenden" />
+    <Translation ID="BOB_PCK_APP_A" String="Wendet das ausgewählte Austausch-Paket an" />
+    <Translation ID="BOB_PCK_APP_C" String="Diese Paket kann nicht angewendet werden, da es mit einem bereits aktivierten Paket in Konflikt steht" />
+    <Translation ID="BOB_PCK_APP_I" String="Paket ist angewendet" />
+    <Translation ID="BOB_PCK_RVT" String="Zurücksetzen" />
+    <Translation ID="BOB_PCK_RVT_A" String="Das ausgewählte Paket wird nicht mehr angewendet" />
+    <Translation ID="BOB_PCK_RVT_I" String="Paket wird nicht angewendet" />
+    <Translation ID="BOB_PCK_NAL" String="Nicht alle Austausch-Optionen sind verfügbar" />
+    <Translation ID="BOB_CFG_UCS" String="Verwende die ausgewählte Konfiguration (anstelle der globalen Konfiguration) für diesen Spielstand" />
+    <Translation ID="BOB_CFG_SAC" String="Speichere die aktuelle Konfiguration" />
+    <Translation ID="BOB_CFG_SSC" String="Kopiere die ausgewählte Konfiguration" />
+    <Translation ID="BOB_CFG_SEC" String="Neue, leere Konfiguration" />
+    <Translation ID="BOB_CFG_DEL" String="Lösche die ausgewählte Konfiguration" />
+    <Translation ID="BOB_OPT_GEN" String="Algemeine Einstellungen" />
+    <Translation ID="BOB_OPT_CFG" String="Konfigurationen" />
+    <Translation ID="BOB_OPT_RUI" String="Zerstörung von Gras" />
+    <Translation ID="BOB_OPT_KEY" String="Tastenkürzel" />
+    <Translation ID="BOB_OPT_PRS" String="Drücke eine Taste" />
+    <Translation ID="BOB_OPT_RGL" String="Änderungen werden nach dem Neustart übernommen" />
+    <Translation ID="BOB_OPT_RRT" String="Verhindert die Zerstörung von Gras durch Bäume" />
+    <Translation ID="BOB_OPT_RRP" String="Verhindert die Zerstörung von Gras durch Dekorationen" />
+    <Translation ID="BOB_NUKE" String="Konfiguration zurücksetzen" />
+    <Translation ID="BOB_PER_IND" String="Zeige standardmäßig einzelne Dekorationen" />
+    <Translation ID="BOB_PER_SIN" String="Immer aus" />
+    <Translation ID="BOB_PER_GRP" String="Immer an" />
+    <Translation ID="BOB_PER_LST" String="Vorherige Einstellung merken" />
+    <Translation ID="BOB_OPT_POS" String="Vorherige Position der Oberfläche merken" />
+    <Translation ID="BOB_FIL_NAME" String="Suche:" />
+    <Translation ID="MES_PAGE" String="Weitere Informationen sind auf der Steam Workshop-Seite des Mods zu finden." />
+    <Translation ID="BOB_ERR_FAT" String="Dies bedeutet, dass der Mod nicht funktioniert und deaktiviert wurde." />
+    <Translation ID="BOB_ERR_HAR" String="BOB, the tree and prop replacer, konnte die erforderlichen Harmony-Patches nicht fertigstellen." />
+    <Translation ID="ERR_HAR0" String="Harmony-Patching Fehler" />
+    <Translation ID="ERR_HAR1" String="Mögliche Ursachen für dieses Problem sind:" />
+    <Translation ID="ERR_HAR2" String="Die erforderliche Harmony 2-Mod-Abhängigkeit wurde nicht installiert" />
+    <Translation ID="ERR_HAR3" String="Ein alter und/oder defekter Mod verhindert, dass Harmony 2 ordnungsgemäß funktioniert" />
+    <Translation ID="BOB_UPD_040_0" String="Nun mit Karten-weitem Ersatz von Bäumen! Aktiviere das BOB-Tool wie gewohnt und klicke auf einen freistehenden Baum." />
+    <Translation ID="BOB_UPD_041_0" String="Behebung einer zeitweiligen Ausnahme beim Ändern des Zielelements." />
+    <Translation ID="BOB_UPD_042_0" String="Auswahl von Untergebäuden aktivert" />
+    <Translation ID="BOB_UPD_042_1" String="Potentieller Fehler beim Laden behoben" />
+    <Translation ID="BOB_UPD_043_0" String="Korrektur der Wahrscheinlichkeitsaktualisierung beim Zurücksetzen auf einen Ersatz für alle Gebäude/Netzwerke" />
+    <Translation ID="BOB_UPD_043_1" String="Korrektur zur Aktulaisierung von LODs, nachdem alle Netzwerk- oder Gebäudeersetzungen zurückgesetzt wurden" />
+    <Translation ID="BOB_UPD_043_2" String="Textfeldbeschriftungen des Infofensters an längere Übersetzungszeichenfolgen angepasst" />
+    <Translation ID="BOB_UPD_050_0" String="Erste Implementierung von Netzwerkersatzpaketen" />
+    <Translation ID="BOB_UPD_050_1" String="Jetzt vollständig kompatibel mit Network Skins 2" />
+    <Translation ID="BOB_UPD_050_2" String="Schnellere Bearbeitung" />
+    <Translation ID="BOB_UPD_051_0" String="Neues Layout der Baum-/Dekorationenliste mit Symbolen, die angeben, welche Art von Ersetzung aktiv ist" />
+    <Translation ID="BOB_UPD_052_0" String="Konfigurationsverwaltung für die Verarbeitung verschiedener Konfigurationsdateien in den Einstellungen hinzugefügt" />
+    <Translation ID="BOB_UPD_060_0" String="Austausch freistehender Dekorationen (Karten-weiter Ersatz)" />
+    <Translation ID="BOB_UPD_060_1" String="Ausgewählte Dekorationen oder Bäume werden visuell markiert" />
+    <Translation ID="BOB_UPD_060_2" String="Kann jetzt Netzwerke in Gebäuden auswählen" />
+    <Translation ID="BOB_UPD_060_3" String="Kann jetzt Dekorationsgebäude auswählen" />
+    <Translation ID="BOB_UPD_060_4" String="Neu gestaltete, kleinere Oberfläche" />
+    <Translation ID="BOB_UPD_061_0" String="Sortieren nach Name als Filter hinzugefügt" />
+    <Translation ID="BOB_UPD_062_0" String="Funktion hinzugefügt um die Zerstörung von Gras durch alle Bäume und/oder Dekorationen zu verhindern (In den Einstellungen)" />
+    <Translation ID="BOB_UPD_062_1" String="Fährstraßen sind nun anwählbar (um die Makierungs-Bojen auszutauschen oder zu verstecken)" />
+    <Translation ID="BOB_UPD_062_2" String="Fehler behoben, der manchmal die Winkel-Angaben von Netzwerk-Dekoration fehlerhaft anzeigte" />
+  </Translations>
+</Language>

@@ -14,7 +14,7 @@ namespace BOB
     {
         // Unique data ID.
         private readonly string dataID = "BOB";
-        private const uint DataVersion = 0;
+        public const int DataVersion = 2;
 
 
         /// <summary>
@@ -79,8 +79,7 @@ namespace BOB
     /// </summary>
     public class BOBSerializer : IDataContainer
     {
-        private const int CurrentDataVersion = 0;
-        string[] treeNames;
+        private const int CurrentDataVersion = Serializer.DataVersion;
 
         /// <summary>
         /// Serialise to savegame.
@@ -101,10 +100,23 @@ namespace BOB
                 treeNames.Add(replacement.Value.name);
             }
 
+            // Serialize prop replacement dictionary.
+            List<string> propNames = new List<string>();
+            foreach (KeyValuePair<PropInfo, PropInfo> replacement in MapPropReplacement.instance.replacements)
+            {
+                propNames.Add(replacement.Key.name);
+                propNames.Add(replacement.Value.name);
+            }
+
             // Write tree replacement lists to savegame.
             serializer.WriteUniqueStringArray(treeNames.ToArray());
-
+            serializer.WriteUniqueStringArray(propNames.ToArray());
             Logging.Message("wrote trees length ", treeNames.Count.ToString());
+            Logging.Message("wrote props length ", propNames.Count.ToString());
+
+            // Write current configuration name.
+            serializer.WriteSharedString(ConfigurationUtils.currentConfig);
+            Logging.Message("wrote current configuration name ", ConfigurationUtils.currentConfig ?? "null");
         }
 
 
@@ -114,6 +126,9 @@ namespace BOB
         /// <param name="serializer">Data serializer</param>
         public void Deserialize(DataSerializer serializer)
         {
+            // Map replacement arrays.
+            string[] treeNames, propNames = null;
+
             Logging.Message("reading data from save file");
 
             try
@@ -124,8 +139,21 @@ namespace BOB
 
                 // Deserialize tree replacement dictionary keys and values.
                 treeNames = serializer.ReadUniqueStringArray();
-
                 Logging.Message("read trees length ", treeNames.Length.ToString());
+
+                // Deserialize prop replacement dictionary keys and values if we're using version 2 or greater.
+                if (dataVersion > 1)
+                {
+                    propNames = serializer.ReadUniqueStringArray();
+                    Logging.Message("read props length ", propNames.Length.ToString());
+                }
+
+                // Read custom config name if we're using version 1 or greater.
+                if (dataVersion > 0)
+                {
+                    ConfigurationUtils.currentConfig = serializer.ReadSharedString();
+                    Logging.Message("read current configuration name ", (ConfigurationUtils.currentConfig ?? "null"));
+                }
             }
             catch
             {
@@ -134,6 +162,7 @@ namespace BOB
                 return;
             }
 
+            // Populate map tree replacement dictionary.
             if (treeNames != null && treeNames.Length > 1)
             {
                 // Iterate through each keyvalue pair read.
@@ -159,6 +188,35 @@ namespace BOB
 
                     // If we got here, success!  Add to dictionary.
                     MapTreeReplacement.instance.replacements.Add(targetTree, replacementTree);
+                }
+            }
+
+            // Populate map prop replacement dictionary.
+            if (propNames != null && propNames.Length > 1)
+            {
+                // Iterate through each keyvalue pair read.
+                for (int i = 0; i < propNames.Length; ++i)
+                {
+                    // Attempt to load replacement tree prefab (key).
+                    PropInfo targetProp = PrefabCollection<PropInfo>.FindLoaded(propNames[i]);
+                    if (targetProp == null)
+                    {
+                        // Failed to find matching tree prefab - skip this one.
+                        Logging.Message("couldn't find replacement tree ", treeNames[i]);
+                        continue;
+                    }
+
+                    // Attempt to load original tree prefab (value).
+                    PropInfo replacementProp = PrefabCollection<PropInfo>.FindLoaded(propNames[++i]);
+                    if (replacementProp == null)
+                    {
+                        // Failed to find matching tree prefab - skip this one.
+                        Logging.Message("couldn't find original tree ", treeNames[i]);
+                        continue;
+                    }
+
+                    // If we got here, success!  Add to dictionary.
+                    MapPropReplacement.instance.replacements.Add(targetProp, replacementProp);
                 }
             }
         }

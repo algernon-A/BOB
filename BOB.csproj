@@ -59,13 +59,30 @@
   <ItemGroup>
     <Compile Include="Code\Configuration\ConfigurationUtils.cs" />
     <Compile Include="Code\Configuration\ConfigurationXML.cs" />
-    <Compile Include="Code\Logging.cs" />
-    <Compile Include="Code\Patches\OnLevelLoaded.cs" />
+    <Compile Include="Code\Patches\OverlayTranspilers.cs" />
+    <Compile Include="Code\Patches\RenderOverlay.cs" />
+    <Compile Include="Code\Patches\RuiningPatches.cs" />
+    <Compile Include="Code\Replacement\MapPropReplacement.cs" />
+    <Compile Include="Code\Replacement\Scaling.cs" />
+    <Compile Include="Code\Settings\OptionsPanelTabs\RuiningOptions.cs" />
+    <Compile Include="Code\UI\BOBSlider.cs" />
+    <Compile Include="Code\UI\MapPanel.cs" />
+    <Compile Include="Code\UI\PanelBase.cs" />
+    <Compile Include="Code\UI\RandomPanel.cs" />
+    <Compile Include="Code\UI\ScalePanel.cs" />
+    <Compile Include="Code\UI\UIFastList\UIRandomPropRow.cs" />
+    <Compile Include="Code\Utils\Logging.cs" />
     <Compile Include="Code\PackUtils\PackUtils.cs" />
     <Compile Include="Code\PackUtils\PackXML.cs" />
     <Compile Include="Code\Replacement\BuildingData.cs" />
     <Compile Include="Code\Replacement\NetData.cs" />
+    <Compile Include="Code\Settings\OptionsPanel.cs" />
+    <Compile Include="Code\Settings\OptionsPanelTabs\ConfigurationsPanel.cs" />
+    <Compile Include="Code\Settings\OptionsPanelTabs\GeneralOptions.cs" />
+    <Compile Include="Code\Settings\PanelUtils.cs" />
     <Compile Include="Code\UI\PackPanel.cs" />
+    <Compile Include="Code\UI\UIFastList\UIBasicRow.cs" />
+    <Compile Include="Code\Utils\Textures.cs" />
     <Compile Include="Code\Utils\TextureUtils.cs" />
     <Compile Include="Code\MessageBox\DontShowAgainMessageBox.cs" />
     <Compile Include="Code\MessageBox\ListMessageBox.cs" />
@@ -97,7 +114,6 @@
     <Compile Include="Code\UI\NetInfoPanel.cs" />
     <Compile Include="Code\UI\BOBTool.cs" />
     <Compile Include="Code\UI\InfoPanel.cs" />
-    <Compile Include="Code\UI\TreeInfoPanel.cs" />
     <Compile Include="Code\Utils\ModUtils.cs" />
     <Compile Include="Code\Utils\UIControls.cs" />
     <Compile Include="Code\UI\UIFastList\UIFastList.cs" />
@@ -105,7 +121,6 @@
     <Compile Include="Code\UI\UIFastList\UIPropRow.cs" />
     <Compile Include="Code\UI\UIFastList\UIPropRowTypes.cs" />
     <Compile Include="Code\UI\UIThreading.cs" />
-    <Compile Include="Code\UI\UIUtils.cs" />
     <Compile Include="Code\Loading.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -117,37 +132,65 @@
     <Content Include="ReplacementPacks\RoadArrows.xml" />
     <Content Include="ReplacementPacks\RoadSigns.xml" />
     <Content Include="License.txt" />
+    <Content Include="Resources\bob_all_roads.png" />
     <Content Include="Resources\bob_all_roads_small.png" />
+    <Content Include="Resources\bob_buildings.png" />
     <Content Include="Resources\bob_buildings_small.png" />
+    <Content Include="Resources\bob_buttons_minus_round_small.png" />
+    <Content Include="Resources\bob_buttons_plus_round_small.png" />
     <Content Include="Resources\bob_cursor_dark.png" />
     <Content Include="Resources\bob_cursor_light.png" />
+    <Content Include="Resources\bob_minus.png" />
+    <Content Include="Resources\bob_padlock_small.png" />
+    <Content Include="Resources\bob_plus.png" />
+    <Content Include="Resources\bob_props3.png" />
+    <Content Include="Resources\bob_props3_large.png" />
+    <Content Include="Resources\bob_prop_pack.png" />
     <Content Include="Resources\bob_prop_pack_small.png" />
-    <Content Include="Resources\bob_roads_small.png" />
+    <Content Include="Resources\bob_prop_tree_scale_small.png" />
+    <Content Include="Resources\bob_random_small.png" />
+    <Content Include="Resources\bob_road.png" />
+    <Content Include="Resources\bob_road_small.png" />
+    <Content Include="Resources\bob_single_building.png" />
     <Content Include="Resources\bob_single_building_small.png" />
+    <Content Include="Resources\bob_trees.png" />
+    <Content Include="Resources\bob_trees_small.png" />
+    <Content Include="Resources\uui_bob_random.png" />
+    <Content Include="Translations\de.xml" />
     <Content Include="Translations\en.xml" />
     <Content Include="Translations\es.xml" />
+    <Content Include="Translations\ja.xml" />
+    <Content Include="Translations\ru.xml" />
     <Content Include="Translations\zh.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="PrefabTemplates\BOBRandomPropTemplate.crp" />
+    <None Include="PrefabTemplates\BOBRandomTreeTemplate.crp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>mkdir "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)"
 del "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\$(TargetFileName)"
 xcopy /y "$(TargetPath)" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)"
-del "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\CitiesHarmony.API.dll"
 
+del "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\CitiesHarmony.API.dll"
 xcopy /y "$(SolutionDir)packages\CitiesHarmony.API.2.0.0\lib\net35\CitiesHarmony.API.dll" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)"
 
 mkdir "$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\Translations"
 del "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\Translations\*"
 xcopy /y "$(ProjectDir)\Translations\" "$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\Translations" /s /e
+
 mkdir "$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\Resources"
 del "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\Resources\*"
 xcopy /y "$(ProjectDir)\Resources\" "$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\Resources" /s /e
+
 mkdir "$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\ReplacementPacks"
 del "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\ReplacementPacks\*"
-xcopy /y "$(ProjectDir)\ReplacementPacks\" "$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\ReplacementPacks" /s /e</PostBuildEvent>
+xcopy /y "$(ProjectDir)\ReplacementPacks\" "$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\ReplacementPacks" /s /e
+
+
+xcopy /y "$(ProjectDir)\PrefabTemplates\" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)"
+xcopy /y "$(ProjectDir)\PrefabTemplates\" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Assets\"</PostBuildEvent>
   </PropertyGroup>
 </Project>

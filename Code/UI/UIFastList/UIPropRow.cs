@@ -11,18 +11,23 @@ namespace BOB
     public class UIPropRow : UIPanel, IUIFastListRow
     {
         // Layout constants.
-        private const float RowHeight = 30f;
+        public const float RowHeight = 23f;
+        protected const float PaddingY = 5f;
+        protected const float TextScale = 0.8f;
+        protected const float LeftMargin = 10f;
+        private const float PackageMargin = 20f;
+        protected const float IndexWidth = 20f;
+        protected const float IndexLabelX = LeftMargin + PackageMargin;
 
         // Layout variables.
-        private float labelX;
+        protected float labelX;
 
         // Panel components.
         private UIPanel panelBackground;
-        private UILabel objectName;
+        protected UILabel indexLabel, nameLabel;
         private UISprite lineSprite;
 
         // ObjectData.
-		protected PrefabInfo thisPrefab;
 		protected PropListItem thisItem;
 		protected int index;
 
@@ -54,10 +59,16 @@ namespace BOB
         {
             base.OnSizeChanged();
 
-            if (objectName != null)
+            Background.width = width;
+
+            if (nameLabel != null)
             {
-                Background.width = width;
-                objectName.relativePosition = new Vector2(labelX, 5f);
+                nameLabel.relativePosition = new Vector2(labelX, PaddingY);
+            }
+
+            if (indexLabel != null)
+            {
+                indexLabel.relativePosition = new Vector2(IndexLabelX, PaddingY);
             }
         }
 
@@ -82,14 +93,14 @@ namespace BOB
 
 
         /// <summary>
-        /// Generates and displays a building row.
+        /// Generates and displays a list row.
         /// </summary>
         /// <param name="data">Object to list</param>
         /// <param name="isRowOdd">If the row is an odd-numbered row (for background banding)</param>
-        public void Display(object data, bool isRowOdd)
+        public virtual void Display(object data, bool isRowOdd)
         {
             // Perform initial setup for new rows.
-            if (objectName == null)
+            if (nameLabel == null)
             {
                 isVisible = true;
                 canFocus = true;
@@ -98,8 +109,15 @@ namespace BOB
                 height = RowHeight;
 
                 // Add object name label.
-                objectName = AddUIComponent<UILabel>();
-                objectName.width = this.width - 10f;
+                nameLabel = AddUIComponent<UILabel>();
+                nameLabel.width = this.width - 10f;
+                nameLabel.textScale = TextScale;
+
+                // Add index text label.
+                indexLabel = AddUIComponent<UILabel>();
+                indexLabel.width = IndexWidth;
+                indexLabel.textScale = TextScale;
+                indexLabel.relativePosition = new Vector2(IndexLabelX, PaddingY);
             }
 
             // Add line sprite if we need to (initially hidden).
@@ -107,27 +125,30 @@ namespace BOB
             {
                 lineSprite = AddUIComponent<UISprite>();
                 lineSprite.size = new Vector2(17f, 17f);
-                lineSprite.relativePosition = new Vector2(6.5f, 6.5f);
+                lineSprite.relativePosition = new Vector2(3f, 3f);
                 lineSprite.Hide();
             }
 
+            // Set initial label position.
+            labelX = LeftMargin;
 
-            // See if our attached data is a raw PropInfo (e.g an available prop item as opposed to a PropListItem replacment record).
-            thisPrefab = data as PrefabInfo;
-            if (thisPrefab == null)
+            // See if our attached data is a PropListItem replacement record).
+            if (data is PropListItem propListItem)
             {
                 // Hide any existing line sprites; it will be re-shown as necessary.
                 if (lineSprite != null)
                 {
                     lineSprite.Hide();
+
+                    // Adjust name label position to accomodate.
+                    labelX += PackageMargin;
                 }
 
                 // Text to display - StringBuilder due to the amount of manipulation we're doing.
                 StringBuilder displayText = new StringBuilder();
 
-                // Not a raw PropInfo, so it should be a PropListItem replacement record.
                 // Set local references.
-                thisItem = data as PropListItem;
+                thisItem = propListItem;
                 index = thisItem.index;
 
                 // See if this is a network prop.
@@ -136,8 +157,14 @@ namespace BOB
                 // Display index number if this is an individual reference.
                 if (thisItem.index >= 0)
                 {
-                    displayText.Append(thisItem.index);
-                    displayText.Append(" ");
+                    indexLabel.text = thisItem.index.ToString();
+
+                    // Adjust name label position to accomodate.
+                    labelX += IndexWidth;
+                }
+                else
+                {
+                    indexLabel.text = "";
                 }
 
                 bool hasReplacement = false;
@@ -146,7 +173,7 @@ namespace BOB
                 if (thisItem.individualPrefab != null)
                 {
                     // A replacement is currently active - include it in the text.
-                    displayText.Append(UIUtils.GetDisplayName(thisItem.individualPrefab.name));
+                    displayText.Append(PrefabLists.GetDisplayName(thisItem.individualPrefab));
 
                     // Append probability to the label, if we're showing it.
                     if (thisItem.showProbs)
@@ -158,12 +185,18 @@ namespace BOB
 
                     // Set flag.
                     hasReplacement = true;
+
+                    // Show building replacement sprite.
+                    lineSprite.atlas = TextureUtils.LoadSpriteAtlas(thisNetItem == null ? "bob_single_building_small" : "bob_road_small");
+                    lineSprite.spriteName = "normal";
+                    lineSprite.tooltip = Translations.Translate(thisNetItem == null ? "BOB_SPR_SBL" : "BOB_SPR_SNT");
+                    lineSprite.Show();
                 }
                 // If no current individual replacement, check to see if there's a currently active building/network replacement.
                 else if (thisItem.replacementPrefab != null)
                 {
                     // A replacement is currently active - include it in the text.
-                    displayText.Append(UIUtils.GetDisplayName(thisItem.replacementPrefab.name));
+                    displayText.Append(PrefabLists.GetDisplayName(thisItem.replacementPrefab));
 
                     // Append probability to the label, if we're showing it.
                     if (thisItem.showProbs)
@@ -177,7 +210,7 @@ namespace BOB
                     hasReplacement = true;
 
                     // Show building replacement sprite.
-                    lineSprite.atlas = thisNetItem == null ? UIUtils.SingleBuildingSprites : UIUtils.SingleNetworkSprites;
+                    lineSprite.atlas = TextureUtils.LoadSpriteAtlas(thisNetItem == null ? "bob_single_building_small" : "bob_road_small");
                     lineSprite.spriteName = "normal";
                     lineSprite.tooltip = Translations.Translate(thisNetItem == null ? "BOB_SPR_SBL" : "BOB_SPR_SNT");
                     lineSprite.Show();
@@ -186,7 +219,7 @@ namespace BOB
                 else if (thisItem.allPrefab != null)
                 {
                     // An all- replacement is currently active; append name to the label.
-                    displayText.Append(UIUtils.GetDisplayName(thisItem.allPrefab.name));
+                    displayText.Append(PrefabLists.GetDisplayName(thisItem.allPrefab));
 
                     // Append probability if this is not a network item and we're showing probs.
                     if (thisNetItem == null && thisItem.showProbs)
@@ -200,7 +233,7 @@ namespace BOB
                     hasReplacement = true;
 
                     // Show all- replacement sprite.
-                    lineSprite.atlas = thisNetItem == null ? UIUtils.AllBuildingSprites : UIUtils.AllNetworkSprites;
+                    lineSprite.atlas = TextureUtils.LoadSpriteAtlas(thisNetItem == null ? "bob_buildings_small" : "bob_all_roads_small");
                     lineSprite.spriteName = "normal";
                     lineSprite.tooltip = Translations.Translate(thisNetItem == null ? "BOB_SPR_ABL" : "BOB_SPR_ANT");
                     lineSprite.Show();
@@ -208,22 +241,20 @@ namespace BOB
                 // If no other replacements, chek to see if any pack replacement is currently active
                 else if (thisItem.packagePrefab != null)
                 {
-                    Logging.Message("UIPropRow displaying packagePrefab");
-
                     // Yes; append name to the label.
-                    displayText.Append(UIUtils.GetDisplayName(thisItem.packagePrefab.name));
+                    displayText.Append(PrefabLists.GetDisplayName(thisItem.packagePrefab));
 
                     // Set flag.
                     hasReplacement = true;
 
                     // Show package replacement sprite.
-                    lineSprite.atlas = UIUtils.PackageSprites;
+                    lineSprite.atlas = TextureUtils.LoadSpriteAtlas("bob_prop_pack_small");
                     lineSprite.spriteName = "normal";
                     lineSprite.tooltip = Translations.Translate("BOB_SPR_PCK");
                     lineSprite.Show();
                 }
 
-                // Do we have a replacement.
+                // Do we have a replacement?
                 if (hasReplacement)
                 {
                     // Yes; append "was" to the display name.
@@ -233,7 +264,7 @@ namespace BOB
                 }
 
                 // Original prefab display name.
-                displayText.Append(UIUtils.GetDisplayName(thisItem.originalPrefab.name));
+                displayText.Append(PrefabLists.GetDisplayName(thisItem.originalPrefab));
 
                 // Show original probability in brackets immediately afterwards.
                 if (thisItem.showProbs)
@@ -244,20 +275,11 @@ namespace BOB
                 }
 
                 // Set display text.
-                objectName.text = displayText.ToString();
-
-                // Indent label for line sprite.
-                labelX = 30f;
-            }
-            else
-            {
-                // Attached data is a raw PropInfo; just display its (cleaned-up) name.
-                objectName.text = UIUtils.GetDisplayName(thisPrefab.name);
-                labelX = 10f;
+                nameLabel.text = displayText.ToString();
             }
 
             // Set label position
-            objectName.relativePosition = new Vector2(labelX, 5f);
+            nameLabel.relativePosition = new Vector2(labelX, PaddingY);
 
             // Set initial background as deselected state.
             Deselect(isRowOdd);

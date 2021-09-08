@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Linq;
+using System.Collections.Generic;
+using ColossalFramework.UI;
 
 
 namespace BOB
@@ -7,16 +8,20 @@ namespace BOB
 	/// <summary>
 	/// BOB network tree/prop replacement panel.
 	/// </summary>
-	public class BOBNetInfoPanel : BOBInfoPanel
+	internal class BOBNetInfoPanel : BOBInfoPanel
 	{
 		// Current selection reference.
-		NetInfo currentNet;
+		private NetInfo currentNet;
 
 
-		// Button labels.
-		protected override string ReplaceLabel => Translations.Translate("BOB_PNL_RTN");
+		// Button tooltips.
+		protected override string ReplaceTooltipKey => "BOB_PNL_RTN";
+		protected override string ReplaceAllTooltipKey => "BOB_PNL_RAN";
 
-		protected override string ReplaceAllLabel => Translations.Translate("BOB_PNL_RAN");
+
+		// Replace button atlases.
+		protected override UITextureAtlas ReplaceAtlas => TextureUtils.LoadSpriteAtlas("bob_road");
+		protected override UITextureAtlas ReplaceAllAtlas => TextureUtils.LoadSpriteAtlas("bob_all_roads");
 
 
 		/// <summary>
@@ -29,211 +34,146 @@ namespace BOB
 				// Call base.
 				base.CurrentTargetItem = value;
 
-				// If we've got a replacement, update the offset fields with the replacement vlues
-				if (currentTargetItem.replacementPrefab != null)
+				if (value != null)
 				{
-					angleField.text = NetworkReplacement.instance.replacements[currentNet][currentTargetItem.originalPrefab].angle.ToString();
-					xField.text = NetworkReplacement.instance.replacements[currentNet][currentTargetItem.originalPrefab].offsetX.ToString();
-					yField.text = NetworkReplacement.instance.replacements[currentNet][currentTargetItem.originalPrefab].offsetY.ToString();
-					zField.text = NetworkReplacement.instance.replacements[currentNet][currentTargetItem.originalPrefab].offsetZ.ToString();
-					probabilityField.text = NetworkReplacement.instance.replacements[currentNet][currentTargetItem.originalPrefab].probability.ToString();
-				}
-				// Ditto for any all-network replacement.
-				else if (currentTargetItem.allPrefab != null)
-				{
-					angleField.text = AllNetworkReplacement.instance.replacements[currentTargetItem.originalPrefab].angle.ToString();
-					xField.text = AllNetworkReplacement.instance.replacements[currentTargetItem.originalPrefab].offsetX.ToString();
-					yField.text = AllNetworkReplacement.instance.replacements[currentTargetItem.originalPrefab].offsetY.ToString();
-					zField.text = AllNetworkReplacement.instance.replacements[currentTargetItem.originalPrefab].offsetZ.ToString();
-					probabilityField.text = AllNetworkReplacement.instance.replacements[currentTargetItem.originalPrefab].probability.ToString();
-				}
-				else
-                {
-					// No current replacement; set all offset fields to original prop.
-					angleField.text = value.originalAngle.ToString();
-					xField.text = "0";
-					yField.text = "0";
-					zField.text = "0";
-					probabilityField.text = value.originalProb.ToString();
+					// If we've got a replacement, update the offset fields with the replacement vlues
+					if (CurrentTargetItem.replacementPrefab != null)
+					{
+						angleSlider.TrueValue = NetworkReplacement.instance.replacements[currentNet][CurrentTargetItem.originalPrefab].angle;
+						xSlider.TrueValue = NetworkReplacement.instance.replacements[currentNet][CurrentTargetItem.originalPrefab].offsetX;
+						ySlider.TrueValue = NetworkReplacement.instance.replacements[currentNet][CurrentTargetItem.originalPrefab].offsetY;
+						zSlider.TrueValue = NetworkReplacement.instance.replacements[currentNet][CurrentTargetItem.originalPrefab].offsetZ;
+						probabilitySlider.TrueValue = NetworkReplacement.instance.replacements[currentNet][CurrentTargetItem.originalPrefab].probability;
+					}
+					// Ditto for any all-network replacement.
+					else if (CurrentTargetItem.allPrefab != null)
+					{
+						angleSlider.TrueValue = AllNetworkReplacement.instance.replacements[CurrentTargetItem.originalPrefab].angle;
+						xSlider.TrueValue = AllNetworkReplacement.instance.replacements[CurrentTargetItem.originalPrefab].offsetX;
+						ySlider.TrueValue = AllNetworkReplacement.instance.replacements[CurrentTargetItem.originalPrefab].offsetY;
+						zSlider.TrueValue = AllNetworkReplacement.instance.replacements[CurrentTargetItem.originalPrefab].offsetZ;
+						probabilitySlider.TrueValue = AllNetworkReplacement.instance.replacements[CurrentTargetItem.originalPrefab].probability;
+					}
+					else
+					{
+						// No current replacement; set all offset fields to original prop.
+						angleSlider.TrueValue = 0f;
+						xSlider.TrueValue = 0;
+						ySlider.TrueValue = 0;
+						zSlider.TrueValue = 0;
+						probabilitySlider.TrueValue = value.originalProb;
+					}
 				}
             }
 		}
 
 
 		/// <summary>
-		/// Performs initial setup 
+		/// Constructor.
 		/// </summary>
-		/// <param name="parentTransform">Parent transform</param>
-		/// <param name="targetPrefabInfo">Currently selected target prefab</param>
-		internal override void Setup(Transform parentTransform, PrefabInfo targetPrefabInfo)
+		internal BOBNetInfoPanel()
+        {
+			// Add pack button.
+			UIButton packButton = AddIconButton(this, MiddleX + ToggleSize, TitleHeight + Margin, ToggleSize, "BOB_PNL_PKB", TextureUtils.LoadSpriteAtlas("bob_prop_pack"));
+			packButton.eventClicked += (component, clickEvent) => PackPanelManager.Create();
+		}
+
+
+		/// <summary>
+		/// Sets the target prefab.
+		/// </summary>
+		/// <param name="targetPrefabInfo">Target prefab to set</param>
+		internal override void SetTarget(PrefabInfo targetPrefabInfo)
 		{
+			// Don't do anything if target hasn't changed.
+			if (currentNet == targetPrefabInfo)
+			{
+				return;
+			}
+
 			// Set target reference.
 			currentNet = targetPrefabInfo as NetInfo;
 
 			// Base setup.
-			base.Setup(parentTransform, targetPrefabInfo);
+			base.SetTarget(targetPrefabInfo);
 
-			// Add pack button.
-			ColossalFramework.UI.UIButton packButton = UIControls.AddButton(this, 250f, 50f, "Replacement packs");
+			// Populate target list and select target item.
+			TargetList();
 
-			packButton.eventClicked += (component, clickEvent) =>
+			// Apply Harmony rendering patches.
+			Patcher.PatchNetworkOverlays(true);
+		}
+
+
+		/// <summary>
+		/// Replace button event handler.
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="mouseEvent">Mouse event (unused)</param>
+		/// </summary>
+		protected override void Replace(UIComponent control, UIMouseEventParameter mouseEvent)
+		{
+			// Make sure we have valid a target and replacement.
+			if (CurrentTargetItem != null && replacementPrefab != null)
 			{
-				PackPanelManager.Create();
-			};
-
-			// Event handler for prop checkbox.
-			propCheck.eventCheckChanged += (control, isChecked) =>
-			{
-				if (isChecked)
-				{
-					// Props are now selected - unset tree check.
-					treeCheck.isChecked = false;
-
-					// Reset current items.
-					currentTargetItem = null;
-					replacementPrefab = null;
-
-					// Set loaded lists to 'props'.
-					loadedList.rowsData = LoadedList(isTree: false);
-					targetList.rowsData = TargetList(isTree: false);
-
-					// Set 'no props' label text.
-					noPropsLabel.text = Translations.Translate("BOB_PNL_NOP");
-				}
-				else
-				{
-					// Props are now unselected - set tree check if it isn't already (letting tree check event handler do the work required).
-					if (!treeCheck.isChecked)
-					{
-						treeCheck.isChecked = true;
-					}
-				}
-
-				// Save state.
-				ModSettings.treeSelected = !isChecked;
-			};
-
-			// Event handler for tree checkbox.
-			treeCheck.eventCheckChanged += (control, isChecked) =>
-			{
-				if (isChecked)
-				{
-					// Trees are now selected - unset prop check.
-					propCheck.isChecked = false;
-
-					// Reset current items.
-					currentTargetItem = null;
-					replacementPrefab = null;
-
-					// Set loaded lists to 'trees'.
-					loadedList.rowsData = LoadedList(isTree: true);
-					targetList.rowsData = TargetList(isTree: true);
-
-					// Set 'no props' label text.
-					noPropsLabel.text = Translations.Translate("BOB_PNL_NOT");
-				}
-				else
-				{
-					// Trees are now unselected - set prop check if it isn't already (letting prop check event handler do the work required).
-					if (!propCheck.isChecked)
-					{
-						propCheck.isChecked = true;
-					}
-				}
-
-				// Save state.
-				ModSettings.treeSelected = isChecked;
-			};
-
-			// Replace button event handler.
-			replaceButton.eventClicked += (control, clickEvent) =>
-			{
-				// Make sure we have valid a target and replacement.
-				if (currentTargetItem != null && replacementPrefab != null)
-				{
-					// Try to parse textfields.
-					float.TryParse(angleField.text, out float angle);
-					float.TryParse(xField.text, out float xOffset);
-					float.TryParse(yField.text, out float yOffset);
-					float.TryParse(zField.text, out float zOffset);
-					int.TryParse(probabilityField.text, out int probability);
-
-					// Update text fields to match parsed values.
-					angleField.text = angle.ToString();
-					xField.text = xOffset.ToString();
-					yField.text = yOffset.ToString();
-					zField.text = zOffset.ToString();
-					probabilityField.text = probability.ToString();
-
-					// Network replacements are always grouped.
-					NetworkReplacement.instance.Apply(currentNet, currentTargetItem.originalPrefab ?? currentTargetItem.replacementPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
-
-					// Perform post-replacment updates.
-					FinishUpdate();
-				}
-			};
-
-			// All network button event handler.
-			replaceAllButton.eventClicked += (control, clickEvent) =>
-			{
-				// Try to parse text fields.
-				float.TryParse(angleField.text, out float angle);
-				float.TryParse(xField.text, out float xOffset);
-				float.TryParse(yField.text, out float yOffset);
-				float.TryParse(zField.text, out float zOffset);
-				int.TryParse(probabilityField.text, out int probability);
-
-				// Update text fields to match parsed values.
-				angleField.text = angle.ToString();
-				xField.text = xOffset.ToString();
-				yField.text = yOffset.ToString();
-				zField.text = zOffset.ToString();
-				probabilityField.text = probability.ToString();
-
-				// Apply replacement.
-				AllNetworkReplacement.instance.Apply(currentTargetItem.originalPrefab ?? currentTargetItem.replacementPrefab, replacementPrefab, angle, xOffset, yOffset, zOffset, probability);
+				// Network replacements are always grouped.
+				NetworkReplacement.instance.Apply(currentNet, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, replacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
 
 				// Perform post-replacment updates.
 				FinishUpdate();
-			};
+			}
+		}
 
-			// Revert button event handler.
-			revertButton.eventClicked += (control, clickEvent) =>
+
+		/// <summary>
+		/// Revert button event handler.
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="mouseEvent">Mouse event (unused)</param>
+		/// </summary>
+		protected override void Revert(UIComponent control, UIMouseEventParameter mouseEvent)
+		{
+			// Network or all-network reversion?
+			if (CurrentTargetItem.replacementPrefab != null)
 			{
-				// Network or all-network reversion?
-				if (currentTargetItem.replacementPrefab != null)
+				// Individual network reversion - ensuire that we've got a current selection before doing anything.
+				if (CurrentTargetItem != null && CurrentTargetItem is NetPropListItem)
 				{
-					// Individual network reversion - ensuire that we've got a current selection before doing anything.
-					if (currentTargetItem != null && currentTargetItem is NetPropListItem currentNetItem)
-					{
-						// Network replacements are always grouped.
-						NetworkReplacement.instance.Revert(currentNet, currentTargetItem.originalPrefab, true);
+					// Network replacements are always grouped.
+					NetworkReplacement.instance.Revert(currentNet, CurrentTargetItem.originalPrefab, true);
 
-						// Perform post-reversion updates.
-						FinishUpdate();
-					}
+					// Perform post-reversion updates.
+					FinishUpdate();
 				}
-				else if (currentTargetItem.allPrefab != null)
+			}
+			else if (CurrentTargetItem.allPrefab != null)
+			{
+				// All-network reversion - make sure we've got a currently active replacement before doing anything.
+				if (CurrentTargetItem.originalPrefab)
 				{
-					// All-network reversion - make sure we've got a currently active replacement before doing anything.
-					if (currentTargetItem.originalPrefab)
-					{
-						// Apply all-network reversion.
-						AllNetworkReplacement.instance.Revert(currentTargetItem.originalPrefab, true);
+					// Apply all-network reversion.
+					AllNetworkReplacement.instance.Revert(CurrentTargetItem.originalPrefab, true);
 
-						// Save configuration file and refresh target list (to reflect our changes).
-						ConfigurationUtils.SaveConfig();
+					// Save configuration file and refresh target list (to reflect our changes).
+					ConfigurationUtils.SaveConfig();
 
-						// Perform post-reversion updates.
-						FinishUpdate();
-					}
+					// Perform post-reversion updates.
+					FinishUpdate();
 				}
-			};
+			}
+		}
 
-			// Set remaining check states from previous (OR default) settings and update button states.
-			propCheck.isChecked = !ModSettings.treeSelected;
-			treeCheck.isChecked = ModSettings.treeSelected;
-			UpdateButtonStates();
+
+		/// <summary>
+		/// Replace all button event handler.
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="mouseEvent">Mouse event (unused)</param>
+		/// </summary>
+		protected override void ReplaceAll(UIComponent control, UIMouseEventParameter mouseEvent)
+		{
+			// Apply replacement.
+			AllNetworkReplacement.instance.Apply(CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, replacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+
+			// Perform post-replacment updates.
+			FinishUpdate();
 		}
 
 
@@ -291,11 +231,9 @@ namespace BOB
 
 
 		/// <summary>
-		/// Populates a fastlist with a list of network-specific trees or props.
+		/// Populates the target fastlist with a list of target-specific trees or props.
 		/// </summary>
-		/// <param name="isTree">True for a list of trees, false for props</param>
-		/// <returns>Populated fastlist of loaded prefabs</returns>
-		protected override FastList<object> TargetList(bool isTree)
+		protected override void TargetList()
 		{
 			// List of prefabs that have passed filtering.
 			List<NetPropListItem> propList = new List<NetPropListItem>();
@@ -305,7 +243,8 @@ namespace BOB
 			{
 				// No props - show 'no props' label and return an empty list.
 				noPropsLabel.Show();
-				return new FastList<object>();
+				targetList.m_rowsData = new FastList<object>();
+				return;
 			}
 
 			// Local reference.
@@ -330,7 +269,7 @@ namespace BOB
 					NetPropListItem propListItem = new NetPropListItem();
 
 					// Try to get relevant prefab (prop/tree), using finalProp.
-					PrefabInfo finalInfo = isTree ? (PrefabInfo)laneProps[propIndex]?.m_finalTree : (PrefabInfo)laneProps[propIndex]?.m_finalProp;
+					PrefabInfo finalInfo = IsTree ? (PrefabInfo)laneProps[propIndex]?.m_finalTree : (PrefabInfo)laneProps[propIndex]?.m_finalProp;
 
 					// Check to see if we were succesful - if not (e.g. we only want trees and this is a prop), continue on to next building prop.
 					if (finalInfo?.name == null)
@@ -408,14 +347,15 @@ namespace BOB
 			}
 
 			// Create return fastlist from our filtered list, ordering by name.
-			FastList<object> fastList = new FastList<object>()
+			targetList.m_rowsData = new FastList<object>()
 			{
-				m_buffer = propList.ToArray(),
+				m_buffer = targetSearchStatus == (int)OrderBy.NameDescending ? propList.OrderByDescending(item => item.DisplayName).ToArray() : propList.OrderBy(item => item.DisplayName).ToArray(),
 				m_size = propList.Count
 			};
+			targetList.Refresh();
 
 			// If the list is empty, show the 'no props' label; otherwise, hide it.
-			if (fastList.m_size == 0)
+			if (targetList.m_rowsData.m_size == 0)
 			{
 				noPropsLabel.Show();
 			}
@@ -423,22 +363,15 @@ namespace BOB
 			{
 				noPropsLabel.Hide();
 			}
-
-			return fastList;
 		}
 
 
 		/// <summary>
 		/// Performs actions to be taken once an update (application or reversion) has been applied, including saving data, updating button states, and refreshing renders.
 		/// </summary>
-		private void FinishUpdate()
+		protected override void FinishUpdate()
         {
-			// Save configuration file and refresh target list (to reflect our changes).
-			ConfigurationUtils.SaveConfig();
-			UpdateTargetList();
-
-			// Update button states.
-			UpdateButtonStates();
+			base.FinishUpdate();
 
 			// Update any dirty net renders.
 			NetData.Update();
