@@ -51,21 +51,21 @@
     <Translation ID="BOB_CFG_DEL" String="Eliminar la configuración seleccionada" />
     <Translation ID="BOB_OPT_GEN" String="Opciones generales" />
     <Translation ID="BOB_OPT_CFG" String="Configuraciones" />
-    <Translation ID="BOB_OPT_RUI" String="Rinas del terreno" />
-    <Translation ID="BOB_OPT_KEY" String="Tecla de acceso rápido" />
+    <Translation ID="BOB_OPT_RUI" String="Ruinas del terreno" />
+    <Translation ID="BOB_OPT_KEY" String="Atajo" />
     <Translation ID="BOB_OPT_PRS" String="Presiona cualquier tecla" />
-    <Translation ID="BOB_OPT_RGL" String="Los cambios entrarán en vigor al reiniciar" />
+    <Translation ID="BOB_OPT_RGL" String="Los cambios harán efecto al reiniciar" />
     <Translation ID="BOB_OPT_RRT" String="Evita que los árboles arruinen el terreno" />
-    <Translation ID="BOB_OPT_RRP" String="Evita que los decoraciones arruinen el terreno" />
+    <Translation ID="BOB_OPT_RRP" String="Evita que las decoraciones arruinen el terreno" />
     <Translation ID="BOB_NUKE" String="Restablecer configuración" />
     <Translation ID="BOB_PER_IND" String="Mostrar elementos individuales de forma predeterminada" />
     <Translation ID="BOB_PER_SIN" String="Siempre apagado" />
     <Translation ID="BOB_PER_GRP" String="Siempre encendido" />
-    <Translation ID="BOB_PER_LST" String="Recuerda la configuración anterior" />
-    <Translation ID="BOB_OPT_POS" String="Recuerda la posición anterior del panel" />
+    <Translation ID="BOB_PER_LST" String="Recordar la configuración anterior" />
+    <Translation ID="BOB_OPT_POS" String="Recordar la posición anterior del panel" />
     <Translation ID="BOB_FIL_NAME" String="Búsqueda:" />
     <Translation ID="MES_PAGE" String="Consulta la página de Steam Workshop del mod para obtener más información." />
-    <Translation ID="BOB_ERR_FAT" String="Esto significa que el mod no puede funcionar y se ha apagado." />
+    <Translation ID="BOB_ERR_FAT" String="Esto significa que el mod no puede funcionar y se ha deshabilitado." />
     <Translation ID="BOB_ERR_HAR" String="BOB, the tree and prop replacer, no pudo completar los parches de Harmony requeridos." />
     <Translation ID="ERR_HAR0" String="Error de parcheo de Harmony" />
     <Translation ID="ERR_HAR1" String="Las posibles causas de este problema incluyen:" />
@@ -77,19 +77,19 @@
     <Translation ID="BOB_UPD_042_1" String="Se corrigió un error potencial al cargar el juego." />
     <Translation ID="BOB_UPD_043_0" String="Se corrigió la actualización de probabilidad al revertir a un reemplazo de todos los edificios o todas las redes" />
     <Translation ID="BOB_UPD_043_1" String="Se corrigieron los LOD que no se actualizan después de revertir los reemplazos de todas las redes o todos los edificios" />
-    <Translation ID="BOB_UPD_043_2" String="Ajuste las etiquetas de las casillas del panel de información para que se ajusten a cadenas de traducción más largas" />
+    <Translation ID="BOB_UPD_043_2" String="Ajuste en las etiquetas de las casillas del panel de información para que se ajusten a cadenas de traducción más largas" />
     <Translation ID="BOB_UPD_050_0" String="Implementación inicial de paquetes de reemplazo de red" />
     <Translation ID="BOB_UPD_050_1" String="Ahora correctamente compatible con Network Skins 2" />
     <Translation ID="BOB_UPD_050_2" String="Procesamiento de reemplazo más rápido" />
-    <Translation ID="BOB_UPD_051_0" String="Nuevo diseño de lista de árboles/decoraciones, con iconos para indicar qué tipo de reemplazo está activo" />
-    <Translation ID="BOB_UPD_052_0" String="Agregue administración de configuraciones para manejar múltiples archivos de configuración diferentes, accesibles a través del panel de opciones" />
+    <Translation ID="BOB_UPD_051_0" String="Nuevo diseño de lista de árboles/decoraciones, con íconos para indicar qué tipo de reemplazo está activo" />
+    <Translation ID="BOB_UPD_052_0" String="Agregado administración de configuraciones para manejar múltiples archivos de configuración diferentes, accesibles a través del panel de opciones" />
     <Translation ID="BOB_UPD_060_0" String="Reemplazo de decoración independiente" />
     <Translation ID="BOB_UPD_060_1" String="Resalte decoraciones o árboles seleccionados" />
     <Translation ID="BOB_UPD_060_2" String="Ahora puede seleccionar redes en edificios." />
     <Translation ID="BOB_UPD_060_3" String="Ahora puede seleccionar edificios de decoración." />
     <Translation ID="BOB_UPD_060_4" String="Rediseño panel de reemplazo más pequeño" />
     <Translation ID="BOB_UPD_061_0" String="Añadir filtros de clasificación por nombres ascendentes/descendentes" />
-    <Translation ID="BOB_UPD_062_0" String="Agregue la capacidad de eliminar las ruinas del terreno de todos los árboles y/o decoraciones (en el panel de opciones)" />
+    <Translation ID="BOB_UPD_062_0" String="Agregado la capacidad de eliminar las ruinas del terreno de todos los árboles y/o decoraciones (en el panel de opciones)" />
     <Translation ID="BOB_UPD_062_1" String="Ahora se puede seleccionar las rutas de los transbordadores (para cambiar/ocultar esas boyas marcadoras de ruta)" />
     <Translation ID="BOB_UPD_062_2" String="Se corrigieron los ángulos de decoraciones en redes que a veces se mostraban incorrectamente en la selección" />
   </Translations>
