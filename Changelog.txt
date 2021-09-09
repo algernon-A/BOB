@@ -1,4 +1,9 @@
-﻿Version 0.7.1 -
+﻿Version 0.7.2 -
+
+- Move sub-building selection to separate list panel (replacing drop-down menu)
+
+
+Version 0.7.1 -
 
 - Add experimental prop and tree scaling
 - Fix random prop renaming not always being correctly applied
