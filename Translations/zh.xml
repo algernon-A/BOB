@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Language UniqueName="zh" ReadableName="简体中文">
   <Translations>
-    <Translation ID="BOB_NAM" String="BOB: the tree and prop replacer BOB：树木与摆件替换器" />
+    <Translation ID="BOB_NAM" String="BOB：树木与摆件替换器" />
     <Translation ID="BOB_DESC" String="BOB：树木与摆件替换器" />
     <Translation ID="TRN_CHOICE" String="语言设定" />
     <Translation ID="TRN_SYS" String="使用游戏默认语言" />
