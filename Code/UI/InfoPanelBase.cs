@@ -44,6 +44,7 @@ namespace BOB
 		protected UILabel noPropsLabel;
 		protected UIButton replaceButton, revertButton;
 		private readonly UIButton targetNameButton;
+		private readonly PreviewPanel previewPanel;
 
 		// Search settings.
 		protected int targetSearchStatus;
@@ -124,6 +125,7 @@ namespace BOB
 			{
 				replacementPrefab = value;
 				UpdateButtonStates();
+				previewPanel.SetTarget(value);
 			}
 		}
 
@@ -215,6 +217,11 @@ namespace BOB
 				// Scale button.
 				UIButton scaleButton = AddIconButton(this, MiddleX, TitleHeight + Margin, ToggleSize, Translations.Translate("BOB_PNL_SCA"), TextureUtils.LoadSpriteAtlas("bob_prop_tree_scale_small"));
 				scaleButton.eventClicked += (control, clickEvent) => BOBScalePanel.Create(IsTree, replacementPrefab);
+
+				// Preview image.
+				previewPanel = AddUIComponent<PreviewPanel>();
+				previewPanel.relativePosition = new Vector2(this.width + Margin, ListY);
+				previewPanel.Setup();
 			}
 			catch (Exception e)
 			{

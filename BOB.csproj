@@ -62,6 +62,8 @@
     <Compile Include="Code\Patches\OverlayTranspilers.cs" />
     <Compile Include="Code\Patches\RenderOverlay.cs" />
     <Compile Include="Code\Patches\RuiningPatches.cs" />
+    <Compile Include="Code\PreviewRenderer\PreviewPanel.cs" />
+    <Compile Include="Code\PreviewRenderer\PreviewRenderer.cs" />
     <Compile Include="Code\Replacement\MapPropReplacement.cs" />
     <Compile Include="Code\Replacement\Scaling.cs" />
     <Compile Include="Code\Settings\OptionsPanelTabs\RuiningOptions.cs" />
