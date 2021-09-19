@@ -154,79 +154,71 @@ namespace BOB
 		/// Constructor.
 		/// </summary>
 		internal BOBInfoPanelBase()
-        {
-			try
+		{
+			// Position - are we restoring the previous position?.
+			if (ModSettings.rememberPosition && (InfoPanelManager.lastX != 0f || InfoPanelManager.lastY != 0f))
 			{
-				// Position - are we restoring the previous position?.
-				if (ModSettings.rememberPosition && (InfoPanelManager.lastX != 0f || InfoPanelManager.lastY != 0f))
-				{
-					// 'Remember default position' is active and at least one of X and Y positions is non-zero.
-					relativePosition = new Vector2(InfoPanelManager.lastX, InfoPanelManager.lastY);
-				}
-				else
-				{
-					// Default position - centre in screen.
-					relativePosition = new Vector2(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
-				}
-
-				// Order buttons.
-				targetNameButton = ArrowButton(this, 30f, FilterY);
-				loadedNameButton = ArrowButton(this, RightX + 10f, FilterY);
-
-				targetNameButton.eventClicked += SortTargets;
-				loadedNameButton.eventClicked += SortLoaded;
-
-				// Default is name ascending.
-				SetFgSprites(targetNameButton, "IconUpArrow2");
-				SetFgSprites(loadedNameButton, "IconUpArrow2");
-
-				// Target prop list.
-				UIPanel leftPanel = AddUIComponent<UIPanel>();
-				leftPanel.width = LeftWidth;
-				leftPanel.height = ListHeight;
-				leftPanel.relativePosition = new Vector2(Margin, ListY);
-				targetList = UIFastList.Create<UIPrefabPropRow>(leftPanel);
-				ListSetup(targetList);
-
-				// Loaded prop list.
-				rightPanel = AddUIComponent<UIPanel>();
-				rightPanel.width = RightWidth;
-				rightPanel.height = ListHeight;
-				rightPanel.relativePosition = new Vector2(RightX, ListY);
-				loadedList = UIFastList.Create<UILoadedPropRow>(rightPanel);
-				ListSetup(loadedList);
-
-				// 'No props' label (starts hidden).
-				noPropsLabel = leftPanel.AddUIComponent<UILabel>();
-				noPropsLabel.relativePosition = new Vector2(Margin, Margin);
-				noPropsLabel.Hide();
-
-				// Replace text label.
-				UILabel replaceLabel = AddUIComponent<UILabel>();
-				replaceLabel.text = Translations.Translate("BOB_PNL_REP");
-				replaceLabel.relativePosition = new Vector2(MidControlX, ReplaceLabelY);
-
-				// Replace button.
-				replaceButton = AddIconButton(this, MidControlX, ReplaceY, BigIconSize, ReplaceTooltipKey, ReplaceAtlas);
-				replaceButton.eventClicked += Replace;
-
-				// Revert button.
-				revertButton = UIControls.AddSmallerButton(this, MidControlX, RevertY, Translations.Translate("BOB_PNL_REV"), MidControlWidth);
-				revertButton.eventClicked += Revert;
-
-				// Scale button.
-				UIButton scaleButton = AddIconButton(this, MiddleX, TitleHeight + Margin, ToggleSize, "BOB_PNL_SCA", TextureUtils.LoadSpriteAtlas("bob_prop_tree_scale_small"));
-				scaleButton.eventClicked += (control, clickEvent) => BOBScalePanel.Create(IsTree, replacementPrefab);
-
-				// Preview image.
-				previewPanel = AddUIComponent<PreviewPanel>();
-				previewPanel.relativePosition = new Vector2(this.width + Margin, ListY);
-				previewPanel.Setup();
+				// 'Remember default position' is active and at least one of X and Y positions is non-zero.
+				relativePosition = new Vector2(InfoPanelManager.lastX, InfoPanelManager.lastY);
 			}
-			catch (Exception e)
+			else
 			{
-				Logging.LogException(e, "exception setting up InfoPanelBase");
+				// Default position - centre in screen.
+				relativePosition = new Vector2(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
 			}
+
+			// Order buttons.
+			targetNameButton = ArrowButton(this, 30f, FilterY);
+			loadedNameButton = ArrowButton(this, RightX + 10f, FilterY);
+
+			targetNameButton.eventClicked += SortTargets;
+			loadedNameButton.eventClicked += SortLoaded;
+
+			// Default is name ascending.
+			SetFgSprites(targetNameButton, "IconUpArrow2");
+			SetFgSprites(loadedNameButton, "IconUpArrow2");
+
+			// Target prop list.
+			UIPanel leftPanel = AddUIComponent<UIPanel>();
+			leftPanel.width = LeftWidth;
+			leftPanel.height = ListHeight;
+			leftPanel.relativePosition = new Vector2(Margin, ListY);
+			targetList = UIFastList.Create<UIPrefabPropRow>(leftPanel);
+			ListSetup(targetList);
+
+			// Loaded prop list.
+			rightPanel = AddUIComponent<UIPanel>();
+			rightPanel.width = RightWidth;
+			rightPanel.height = ListHeight;
+			rightPanel.relativePosition = new Vector2(RightX, ListY);
+			loadedList = UIFastList.Create<UILoadedPropRow>(rightPanel);
+			ListSetup(loadedList);
+
+			// 'No props' label (starts hidden).
+			noPropsLabel = leftPanel.AddUIComponent<UILabel>();
+			noPropsLabel.relativePosition = new Vector2(Margin, Margin);
+			noPropsLabel.Hide();
+
+			// Replace text label.
+			UILabel replaceLabel = AddUIComponent<UILabel>();
+			replaceLabel.text = Translations.Translate("BOB_PNL_REP");
+			replaceLabel.relativePosition = new Vector2(MidControlX, ReplaceLabelY);
+
+			// Replace button.
+			replaceButton = AddIconButton(this, MidControlX, ReplaceY, BigIconSize, ReplaceTooltipKey, ReplaceAtlas);
+			replaceButton.eventClicked += Replace;
+
+			// Revert button.
+			revertButton = UIControls.AddSmallerButton(this, MidControlX, RevertY, Translations.Translate("BOB_PNL_REV"), MidControlWidth);
+			revertButton.eventClicked += Revert;
+
+			// Scale button.
+			UIButton scaleButton = AddIconButton(this, MiddleX, TitleHeight + Margin, ToggleSize, "BOB_PNL_SCA", TextureUtils.LoadSpriteAtlas("bob_prop_tree_scale_small"));
+			scaleButton.eventClicked += (control, clickEvent) => BOBScalePanel.Create(IsTree, replacementPrefab);
+
+			// Preview image.
+			previewPanel = AddUIComponent<PreviewPanel>();
+			previewPanel.relativePosition = new Vector2(this.width + Margin, ListY);
 		}
 
 

@@ -166,6 +166,10 @@ namespace BOB
 			catch (Exception e)
 			{
 				Logging.LogException(e, "exception creating InfoPanel");
+
+				// Destroy the GameObjects rather than have a half-functional (at best) panel that confuses players.
+				GameObject.Destroy(Panel);
+				GameObject.Destroy(uiGameObject);
 			}
 		}
 	}
