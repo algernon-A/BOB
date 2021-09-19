@@ -217,6 +217,9 @@ namespace BOB
 					replaceAllButton.Show();
 				}
 			};
+
+			// Populate loaded list.
+			LoadedList();
 		}
 
 

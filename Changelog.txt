@@ -1,6 +1,7 @@
 ﻿- Add tree/prop preview window
 - Fix scaling button tooltip translation key reference
 - Panels are now automatically and instantly destroyed if an exception occurs during creation
+- Revert to loaded tree/prop lists being immediately populated
 
 
 Version 0.7.2 -

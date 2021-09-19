@@ -54,6 +54,16 @@ namespace BOB
 
 
 		/// <summary>
+		/// Constructor.
+		/// </summary>
+		internal BOBMapInfoPanel()
+        {
+			// Populate loaded list.
+			LoadedList();
+		}
+
+
+		/// <summary>
 		/// Replace button event handler.
 		/// <param name="control">Calling component (unused)</param>
 		/// <param name="mouseEvent">Mouse event (unused)</param>

@@ -76,6 +76,9 @@ namespace BOB
 			// Add pack button.
 			UIButton packButton = AddIconButton(this, MiddleX + ToggleSize, TitleHeight + Margin, ToggleSize, "BOB_PNL_PKB", TextureUtils.LoadSpriteAtlas("bob_prop_pack"));
 			packButton.eventClicked += (component, clickEvent) => PackPanelManager.Create();
+
+			// Populate loaded list.
+			LoadedList();
 		}
 
 
