@@ -9,6 +9,12 @@ namespace BOB
     /// </summary>
     public class PreviewPanel : UIPanel
     {
+        // Layout constants.
+        private const float Margin = 5f;
+        private const float RenderHeight = 150f;
+        private const float RenderWidth = RenderHeight;
+
+
         // Panel components.
         private UITextureSprite previewSprite;
         private UISprite noPreviewSprite;
@@ -107,19 +113,26 @@ namespace BOB
         internal void Setup()
         {
             // Size and position.
-            width = 110f;
-            height = 110f;
+            width = RenderWidth + (Margin * 2f);
+            height = RenderHeight + (Margin * 2f);
 
             // Appearance.
             backgroundSprite = "UnlockingPanel2";
             opacity = 1.0f;
 
+            // Drag bar.
+            UIDragHandle dragHandle = AddUIComponent<UIDragHandle>();
+            dragHandle.width = this.width ;
+            dragHandle.height = this.height;
+            dragHandle.relativePosition = Vector3.zero;
+            dragHandle.target = this;
+
             // Preview render panel.
             renderPanel = AddUIComponent<UIPanel>();
             renderPanel.backgroundSprite = "UnlockingItemBackground";
-            renderPanel.height = 100f;
-            renderPanel.width = 100f;
-            renderPanel.relativePosition = new Vector2(5f, 5f);
+            renderPanel.height = RenderHeight;
+            renderPanel.width = RenderWidth;
+            renderPanel.relativePosition = new Vector2(Margin, Margin);
 
             previewSprite = renderPanel.AddUIComponent<UITextureSprite>();
             previewSprite.size = renderPanel.size;
