@@ -110,7 +110,7 @@ namespace BOB
         /// <summary>
         /// Constructor.
         /// </summary>
-        internal void Setup()
+        internal PreviewPanel()
         {
             // Size and position.
             width = RenderWidth + (Margin * 2f);
