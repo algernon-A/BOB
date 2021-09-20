@@ -36,7 +36,7 @@ namespace BOB
 		// Current selections.
 		protected PrefabInfo selectedPrefab;
 		private PropListItem currentTargetItem;
-		protected PrefabInfo replacementPrefab;
+		private PrefabInfo replacementPrefab;
 
 		// Panel components.
 		protected UIPanel rightPanel;
@@ -121,6 +121,8 @@ namespace BOB
 		/// </summary>
 		internal PrefabInfo ReplacementPrefab
 		{
+			get => replacementPrefab;
+
 			set
 			{
 				replacementPrefab = value;
@@ -291,7 +293,7 @@ namespace BOB
 
 				// Reset current items.
 				CurrentTargetItem = null;
-				replacementPrefab = null;
+				ReplacementPrefab = null;
 
 				// Set loaded lists to 'props'.
 				LoadedList();
@@ -328,7 +330,7 @@ namespace BOB
 
 				// Reset current items.
 				CurrentTargetItem = null;
-				replacementPrefab = null;
+				ReplacementPrefab = null;
 
 				// Set loaded lists to 'trees'.
 				LoadedList();
@@ -367,7 +369,7 @@ namespace BOB
 
 					// Reset current items.
 					CurrentTargetItem = null;
-					replacementPrefab = null;
+					ReplacementPrefab = null;
 
 					// Set loaded lists to 'props'.
 					LoadedList();

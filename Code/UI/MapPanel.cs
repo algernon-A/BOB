@@ -71,17 +71,17 @@ namespace BOB
 		protected override void Replace(UIComponent control, UIMouseEventParameter mouseEvent)
 		{
 			// Apply replacement.
-			if (replacementPrefab is TreeInfo replacementTree)
+			if (ReplacementPrefab is TreeInfo replacementTree)
 			{
 				MapTreeReplacement.instance.Apply((CurrentTargetItem.replacementPrefab ?? CurrentTargetItem.originalPrefab) as TreeInfo, replacementTree);
 			}
-			else if (replacementPrefab is PropInfo replacementProp)
+			else if (ReplacementPrefab is PropInfo replacementProp)
 			{
 				MapPropReplacement.instance.Apply((CurrentTargetItem.replacementPrefab ?? CurrentTargetItem.originalPrefab) as PropInfo, replacementProp);
 			}
 
 			// Update current target.
-			CurrentTargetItem.replacementPrefab = replacementPrefab;
+			CurrentTargetItem.replacementPrefab = ReplacementPrefab;
 
 			// Perform post-replacment updates.
 			FinishUpdate();
@@ -145,7 +145,7 @@ namespace BOB
 			if (CurrentTargetItem != null)
 			{
 				// Replacement requires a valid replacement selection.
-				if (replacementPrefab != null)
+				if (ReplacementPrefab != null)
 				{
 					replaceButton.Enable();
 				}

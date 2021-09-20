@@ -16,10 +16,10 @@ namespace BOB
 
 
         // Panel components.
-        private UITextureSprite previewSprite;
-        private UISprite noPreviewSprite;
-        private PreviewRenderer renderer;
-        private UIPanel renderPanel;
+        private readonly UITextureSprite previewSprite;
+        private readonly UISprite noPreviewSprite;
+        private readonly PreviewRenderer renderer;
+        private readonly UIPanel renderPanel;
 
         // Currently selected prefab.
         private PrefabInfo renderPrefab;

@@ -134,7 +134,7 @@ namespace BOB
 				}
 
 				// Replacement requires a valid replacement selection.
-				if (replacementPrefab != null)
+				if (ReplacementPrefab != null)
 				{
 					replaceButton.Enable();
 					replaceAllButton.Enable();

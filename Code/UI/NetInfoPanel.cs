@@ -116,10 +116,10 @@ namespace BOB
 		protected override void Replace(UIComponent control, UIMouseEventParameter mouseEvent)
 		{
 			// Make sure we have valid a target and replacement.
-			if (CurrentTargetItem != null && replacementPrefab != null)
+			if (CurrentTargetItem != null && ReplacementPrefab != null)
 			{
 				// Network replacements are always grouped.
-				NetworkReplacement.instance.Apply(currentNet, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, replacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+				NetworkReplacement.instance.Apply(currentNet, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
 
 				// Perform post-replacment updates.
 				FinishUpdate();
@@ -173,7 +173,7 @@ namespace BOB
 		protected override void ReplaceAll(UIComponent control, UIMouseEventParameter mouseEvent)
 		{
 			// Apply replacement.
-			AllNetworkReplacement.instance.Apply(CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, replacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+			AllNetworkReplacement.instance.Apply(CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
 
 			// Perform post-replacment updates.
 			FinishUpdate();
