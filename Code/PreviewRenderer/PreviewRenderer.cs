@@ -3,26 +3,24 @@ using UnityEngine;
 
 namespace BOB
 {
-    public class PreviewRenderer : MonoBehaviour
+    internal class PreviewRenderer : MonoBehaviour
     {
         private readonly Camera renderCamera;
         private Mesh _currentMesh;
-        private float currentRotation = 35f;
-        private float currentZoom = 4f;
+        private float _currentRotation = 35f;
+        private float _currentZoom = 4f;
         private Material _material;
-        public Shader PropFenceShader => Shader.Find("Custom/Props/Prop/Fence");
-        private bool isPropFenceShader = false;
+        private bool _isPropFenceShader = false;
 
-        /// <summary>
-        /// Sets material to render.
-        /// </summary>
-        public Material Material { set => _material = value; }
+
+        // Shader references.
+        internal Shader PropFenceShader => Shader.Find("Custom/Props/Prop/Fence");
 
 
         /// <summary>
-        /// Initialise the new renderer object.
+        /// Constructor - basic setup.
         /// </summary>
-        public PreviewRenderer()
+        internal PreviewRenderer()
         {
             // Set up camera.
             renderCamera = new GameObject("Camera").AddComponent<Camera>();
@@ -44,9 +42,9 @@ namespace BOB
         /// <summary>
         /// Image size.
         /// </summary>
-        public Vector2 Size
+        internal Vector2 Size
         {
-            get => new Vector2(renderCamera.targetTexture.width, renderCamera.targetTexture.height);
+            private get => new Vector2(renderCamera.targetTexture.width, renderCamera.targetTexture.height);
 
             set
             {
@@ -63,18 +61,29 @@ namespace BOB
         /// <summary>
         /// Currently rendered mesh.
         /// </summary>
-        public Mesh Mesh
+        internal Mesh Mesh
         {
-            get => _currentMesh;
+            private get => _currentMesh;
 
             set => _currentMesh = value;
         }
 
 
         /// <summary>
+        /// Sets material to render.
+        /// </summary>
+        internal Material Material
+        {
+            private get => _material;
+
+            set => _material = value;
+        }
+
+
+        /// <summary>
         /// Current building texture.
         /// </summary>
-        public RenderTexture Texture
+        internal RenderTexture Texture
         {
             get => renderCamera.targetTexture;
         }
@@ -83,32 +92,32 @@ namespace BOB
         /// <summary>
         /// Preview camera rotation (degrees).
         /// </summary>
-        public float CameraRotation
+        internal float CameraRotation
         {
-            get { return currentRotation; }
-            set { currentRotation = value % 360f; }
+            get => _currentRotation;
+
+            // Rotation in degrees is modulo 360.
+            set => _currentRotation = value % 360f;
         }
 
 
         /// <summary>
         /// Zoom level.
         /// </summary>
-        public float Zoom
+        internal float Zoom
         {
-            get { return currentZoom; }
-            set
-            {
-                currentZoom = Mathf.Clamp(value, 0.5f, 5f);
-            }
+            get => _currentZoom;
+            set => _currentZoom = Mathf.Clamp(value, 0.5f, 5f);
         }
 
         /// <summary>
         /// props with prop fence shader need to be handled differently or they are not viewable
         /// </summary>
-        public bool IsPropFenceShader
+        internal bool IsPropFenceShader
         {
-            get { return isPropFenceShader; }
-            set { isPropFenceShader = value; }
+            private get => _isPropFenceShader;
+
+            set => _isPropFenceShader = value;
         }
 
 
@@ -164,12 +173,12 @@ namespace BOB
             const float xRotation = 20f;
 
             // Apply model rotation with our camnera rotation into a quaternion.
-            Quaternion modelRotation = Quaternion.Euler(xRotation, 0f, 0f) * Quaternion.Euler(0f, currentRotation, 0f);
+            Quaternion modelRotation = Quaternion.Euler(xRotation, 0f, 0f) * Quaternion.Euler(0f, CameraRotation, 0f);
 
             // Allow for props using fence shader, beacause of course they have to be painful.
             if (IsPropFenceShader)
             {
-                modelRotation = Quaternion.Euler(-60f, 180f, 0f) * Quaternion.Euler(0f, currentRotation, 0f);
+                modelRotation = Quaternion.Euler(-60f, 180f, 0f) * Quaternion.Euler(0f, CameraRotation, 0f);
                 modelPosition = modelRotation * -Mesh.bounds.center;
             }
 
@@ -178,13 +187,13 @@ namespace BOB
             {
                 // Calculate rendering matrix and add mesh to scene.
                 Matrix4x4 matrix = Matrix4x4.TRS(modelPosition, modelRotation, Vector3.one);
-                Graphics.DrawMesh(Mesh, matrix, _material, 0, renderCamera, 0, null, true, true);
+                Graphics.DrawMesh(Mesh, matrix, Material, 0, renderCamera, 0, null, true, true);
             }
 
             // Set zoom to encapsulate entire model.
             float magnitude = currentBounds.extents.magnitude;
             float clipExtent = (magnitude + 16f) * 1.5f;
-            float clipCenter = magnitude * currentZoom;
+            float clipCenter = magnitude * Zoom;
 
             // Clip planes.
             renderCamera.nearClipPlane = Mathf.Max(clipCenter - clipExtent, 0.01f);
@@ -209,7 +218,7 @@ namespace BOB
             renderLight.color = Color.white;
 
             // Render!
-            renderCamera.RenderWithShader(_material.shader, "");
+            renderCamera.RenderWithShader(Material.shader, "");
 
             // Restore game lighting.
             RenderManager.instance.MainLight = gameMainLight;
