@@ -17,7 +17,7 @@ namespace BOB
 
         // Panel components.
         private readonly UITextureSprite previewSprite;
-        private readonly UISprite noPreviewSprite;
+        private readonly UISprite noPreviewSprite, thumbnailSprite;
         private readonly PreviewRenderer renderer;
         private readonly UIPanel renderPanel;
 
@@ -45,6 +45,25 @@ namespace BOB
 
             if (renderPrefab is PropInfo prop)
             {
+                if (prop.m_isDecal)
+                {
+                    // Special case for decals - use thumbnail preview instead if available.
+                    if (prop.m_Atlas != null && !string.IsNullOrEmpty(prop.m_Thumbnail))
+                    {
+                        // Set thumbnail.
+                        thumbnailSprite.atlas = prop.m_Atlas;
+                        thumbnailSprite.spriteName = prop.m_Thumbnail;
+
+                        // Show thumbnail sprite and hide others.
+                        noPreviewSprite.Hide();
+                        previewSprite.Hide();
+                        thumbnailSprite.Show();
+
+                        // All done here.
+                        return;
+                    }
+                }
+
                 // Don't render anything without a mesh or material.
                 if (prop?.m_mesh != null && prop.m_material != null && !prop.m_mesh.name.Equals("none"))
                 {
@@ -78,10 +97,6 @@ namespace BOB
                     // We got a valid render; set flag.
                     validRender = true;
                 }
-                else
-                {
-
-                }
             }
             else if (renderPrefab is TreeInfo tree)
             {
@@ -104,13 +119,16 @@ namespace BOB
             if (!validRender)
             {
                 previewSprite.texture = null;
-                noPreviewSprite.isVisible = true;
+                thumbnailSprite.Hide();
+                noPreviewSprite.Show();
                 return;
             }
 
             // If we got here, we should have a render; show it.
             previewSprite.texture = renderer.Texture;
-            noPreviewSprite.isVisible = false;
+            noPreviewSprite.Hide();
+            thumbnailSprite.Hide();
+            previewSprite.Show();
         }
 
 
@@ -145,9 +163,13 @@ namespace BOB
             previewSprite.size = renderPanel.size;
             previewSprite.relativePosition = Vector3.zero;
 
-            noPreviewSprite = AddUIComponent<UISprite>();
+            noPreviewSprite = renderPanel.AddUIComponent<UISprite>();
             noPreviewSprite.size = renderPanel.size;
             noPreviewSprite.relativePosition = Vector3.zero;
+
+            thumbnailSprite = renderPanel.AddUIComponent<UISprite>();
+            thumbnailSprite.size = renderPanel.size;
+            thumbnailSprite.relativePosition = Vector3.zero;
 
             // Initialise renderer; use double size for anti-aliasing.
             renderer = gameObject.AddComponent<PreviewRenderer>();
