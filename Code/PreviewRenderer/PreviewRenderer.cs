@@ -181,6 +181,9 @@ namespace BOB
                 currentBounds = Mesh.bounds;
             }
 
+            // Expand bounds slightly.
+            currentBounds.Expand(1f);
+
             // Set our model rotation parameters, so we look at it obliquely.
             const float xRotation = 20f;
 

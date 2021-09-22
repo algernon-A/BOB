@@ -46,7 +46,7 @@ namespace BOB
             if (renderPrefab is PropInfo prop)
             {
                 // Don't render anything without a mesh or material.
-                if (prop?.m_mesh != null && prop.m_material != null)
+                if (prop?.m_mesh != null && prop.m_material != null && !prop.m_mesh.name.Equals("none"))
                 {
                     // Set mesh and material for render.
                     renderer.Mesh = prop.m_mesh;
