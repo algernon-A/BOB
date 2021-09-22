@@ -10,11 +10,14 @@ namespace BOB
         private float _currentRotation = 35f;
         private float _currentZoom = 4f;
         private Material _material;
-        private bool _isPropFenceShader = false;
 
 
         // Shader references.
+        internal Shader PropShader => Shader.Find("Custom/Props/Prop/Default");
         internal Shader PropFenceShader => Shader.Find("Custom/Props/Prop/Fence");
+        private Shader DiffuseShader => Shader.Find("Diffuse");
+        private Shader TreeShader => Shader.Find("Custom/Trees/Default");
+        //Custom/Props/Decal/Blend
 
 
         /// <summary>
@@ -110,16 +113,6 @@ namespace BOB
             set => _currentZoom = Mathf.Clamp(value, 0.5f, 5f);
         }
 
-        /// <summary>
-        /// props with prop fence shader need to be handled differently or they are not viewable
-        /// </summary>
-        internal bool IsPropFenceShader
-        {
-            private get => _isPropFenceShader;
-
-            set => _isPropFenceShader = value;
-        }
-
 
         /// <summary>
         /// Render the current mesh.
@@ -131,6 +124,8 @@ namespace BOB
             {
                 return;
             }
+
+            Logging.Message(Material.shader.name ?? "null");
 
             // Set background.
             renderCamera.clearFlags = CameraClearFlags.Color;
@@ -175,11 +170,16 @@ namespace BOB
             // Apply model rotation with our camnera rotation into a quaternion.
             Quaternion modelRotation = Quaternion.Euler(xRotation, 0f, 0f) * Quaternion.Euler(0f, CameraRotation, 0f);
 
-            // Allow for props using fence shader, beacause of course they have to be painful.
-            if (IsPropFenceShader)
+            // Set material to use when previewing.
+            Material previewMaterial = Material;
+
+           // Override material for mssing or non-standard shaders.
+           if (Material?.shader != null && (Material.shader != TreeShader && Material.shader != PropShader))
             {
-                modelRotation = Quaternion.Euler(-60f, 180f, 0f) * Quaternion.Euler(0f, CameraRotation, 0f);
-                modelPosition = modelRotation * -Mesh.bounds.center;
+                previewMaterial = new Material(DiffuseShader)
+                {
+                    mainTexture = Material.mainTexture
+                };
             }
 
             // Don't render anything if we don't have a material.
@@ -187,7 +187,7 @@ namespace BOB
             {
                 // Calculate rendering matrix and add mesh to scene.
                 Matrix4x4 matrix = Matrix4x4.TRS(modelPosition, modelRotation, Vector3.one);
-                Graphics.DrawMesh(Mesh, matrix, Material, 0, renderCamera, 0, null, true, true);
+                Graphics.DrawMesh(Mesh, matrix, previewMaterial, 0, renderCamera, 0, null, true, true);
             }
 
             // Set zoom to encapsulate entire model.
@@ -218,7 +218,7 @@ namespace BOB
             renderLight.color = Color.white;
 
             // Render!
-            renderCamera.RenderWithShader(Material.shader, "");
+            renderCamera.RenderWithShader(previewMaterial.shader, "");
 
             // Restore game lighting.
             RenderManager.instance.MainLight = gameMainLight;

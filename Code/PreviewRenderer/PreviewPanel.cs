@@ -53,16 +53,6 @@ namespace BOB
                 renderer.Mesh = prop.m_mesh;
                 renderer.Material = prop.m_material;
 
-                // props with prop fence shader need to be handled differently or they are not viewable
-                renderer.IsPropFenceShader = false;
-                if (!prop.m_isCustomContent)
-                {
-                    if (prop.m_material.shader == renderer.PropFenceShader)
-                    {
-                        renderer.IsPropFenceShader = true;
-                    }
-                }
-
                 // If the selected prop has colour variations, temporarily set the colour to the default for rendering.
                 if (prop.m_useColorVariations)
                 {
@@ -88,7 +78,6 @@ namespace BOB
                 // Set mesh and material for render.
                 renderer.Mesh = tree.m_mesh;
                 renderer.Material = tree.m_material;
-                renderer.IsPropFenceShader = false;
 
                 // Render.
                 renderer.Render();
