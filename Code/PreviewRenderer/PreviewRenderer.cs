@@ -6,7 +6,7 @@ namespace BOB
     public class PreviewRenderer : MonoBehaviour
     {
         private readonly Camera renderCamera;
-        private Mesh currentMesh;
+        private Mesh _currentMesh;
         private float currentRotation = 35f;
         private float currentZoom = 4f;
         private Material _material;
@@ -65,9 +65,9 @@ namespace BOB
         /// </summary>
         public Mesh Mesh
         {
-            get => currentMesh;
+            get => _currentMesh;
 
-            set => currentMesh = value;
+            set => _currentMesh = value;
         }
 
 
@@ -117,8 +117,8 @@ namespace BOB
         /// </summary>
         public void Render()
         {
-            // If no primary mesh and no other meshes, don't do anything here.
-            if (currentMesh == null)
+            // If no mesh, don't do anything here.
+            if (Mesh == null)
             {
                 return;
             }
@@ -158,7 +158,7 @@ namespace BOB
 
             // Reset the bounding box to be the smallest that can encapsulate all verticies of the new mesh.
             // That way the preview image is the largest size that fits cleanly inside the preview size.
-            Bounds currentBounds = new Bounds(Vector3.zero, Vector3.zero);
+            Bounds currentBounds = Mesh.bounds;
 
             // Set our model rotation parameters, so we look at it obliquely.
             const float xRotation = 20f;
@@ -170,22 +170,15 @@ namespace BOB
             if (IsPropFenceShader)
             {
                 modelRotation = Quaternion.Euler(-60f, 180f, 0f) * Quaternion.Euler(0f, currentRotation, 0f);
-                modelPosition = modelRotation * -currentMesh.bounds.center;
+                modelPosition = modelRotation * -Mesh.bounds.center;
             }
 
-            // Add our main mesh.
-            if (currentMesh != null)
+            // Don't render anything if we don't have a material.
+            if (_material != null)
             {
-                // Set preview bounds.
-                currentBounds = currentMesh.bounds;
-
-                // Don't render anything if we don't have a material.
-                if (_material != null)
-                {
-                    // Calculate rendering matrix and add mesh to scene.
-                    Matrix4x4 matrix = Matrix4x4.TRS(modelPosition, modelRotation, Vector3.one);
-                    Graphics.DrawMesh(currentMesh, matrix, _material, 0, renderCamera, 0, null, true, true);
-                }
+                // Calculate rendering matrix and add mesh to scene.
+                Matrix4x4 matrix = Matrix4x4.TRS(modelPosition, modelRotation, Vector3.one);
+                Graphics.DrawMesh(Mesh, matrix, _material, 0, renderCamera, 0, null, true, true);
             }
 
             // Set zoom to encapsulate entire model.
