@@ -159,7 +159,6 @@ namespace BOB
             // Reset the bounding box to be the smallest that can encapsulate all verticies of the new mesh.
             // That way the preview image is the largest size that fits cleanly inside the preview size.
             Bounds currentBounds = new Bounds(Vector3.zero, Vector3.zero);
-            Vector3[] vertices;
 
             // Set our model rotation parameters, so we look at it obliquely.
             const float xRotation = 20f;
@@ -167,38 +166,25 @@ namespace BOB
             // Apply model rotation with our camnera rotation into a quaternion.
             Quaternion modelRotation = Quaternion.Euler(xRotation, 0f, 0f) * Quaternion.Euler(0f, currentRotation, 0f);
 
-            // props with prop fence shader need to be handled differently or they are not viewable
+            // Allow for props using fence shader, beacause of course they have to be painful.
             if (IsPropFenceShader)
             {
                 modelRotation = Quaternion.Euler(-60f, 180f, 0f) * Quaternion.Euler(0f, currentRotation, 0f);
                 modelPosition = modelRotation * -currentMesh.bounds.center;
             }
 
-            // Add our main mesh, if any (some are null, because they only 'appear' through subbuildings - e.g. Boston Residence Garage).
-            if (currentMesh != null && _material != null)
+            // Add our main mesh.
+            if (currentMesh != null)
             {
-                // Calculate rendering matrix and add mesh to scene.
-                Matrix4x4 matrix = Matrix4x4.TRS(modelPosition, modelRotation, Vector3.one);
-                Graphics.DrawMesh(currentMesh, matrix, _material, 0, renderCamera, 0, null, true, true);
+                // Set preview bounds.
+                currentBounds = currentMesh.bounds;
 
-                if (currentMesh.isReadable)
+                // Don't render anything if we don't have a material.
+                if (_material != null)
                 {
-                    // Use separate verticies instance instead of accessing Mesh.vertices each time (which is slow).
-                    // >10x measured performance improvement by doing things this way instead.
-                    vertices = currentMesh.vertices;
-                    for (int i = 0; i < vertices.Length; i++)
-                    {
-                        // Exclude vertices with large negative Y values (underground) from our bounds (e.g. SoCal Laguna houses), otherwise the result doesn't look very good.
-                        if (vertices[i].y > -2)
-                        {
-                            currentBounds.Encapsulate(vertices[i]);
-                        }
-                    }
-                }
-                // some vanilla assets have locked meshes. Their vertices are not readable
-                else
-                {
-                    currentBounds = currentMesh.bounds;
+                    // Calculate rendering matrix and add mesh to scene.
+                    Matrix4x4 matrix = Matrix4x4.TRS(modelPosition, modelRotation, Vector3.one);
+                    Graphics.DrawMesh(currentMesh, matrix, _material, 0, renderCamera, 0, null, true, true);
                 }
             }
 
