@@ -41,59 +41,68 @@ namespace BOB
         /// <param name="building">The building to render</param>
         public void RenderPreview()
         {
+            bool validRender = false;
+
             if (renderPrefab is PropInfo prop)
             {
-                // Safety first!
-                if (prop?.m_mesh == null || prop.m_material == null)
+                // Don't render anything without a mesh or material.
+                if (prop?.m_mesh != null && prop.m_material != null)
                 {
-                    return;
-                }
+                    // Set mesh and material for render.
+                    renderer.Mesh = prop.m_mesh;
+                    renderer.Material = prop.m_material;
 
-                // Set mesh and material for render.
-                renderer.Mesh = prop.m_mesh;
-                renderer.Material = prop.m_material;
-
-                if (prop.m_material?.mainTexture == null)
-                {
-                    if (prop.m_variations != null && prop.m_variations.Length > 0 && prop.m_variations[0].m_prop != null)
+                    if (prop.m_material?.mainTexture == null)
                     {
-                        renderer.Mesh = prop.m_variations[0].m_prop.m_mesh;
-                        renderer.Material = prop.m_variations[0].m_prop.m_material;
+                        if (prop.m_variations != null && prop.m_variations.Length > 0 && prop.m_variations[0].m_prop != null)
+                        {
+                            renderer.Mesh = prop.m_variations[0].m_prop.m_mesh;
+                            renderer.Material = prop.m_variations[0].m_prop.m_material;
+                        }
                     }
-                }
 
-                // If the selected prop has colour variations, temporarily set the colour to the default for rendering.
-                if (prop.m_useColorVariations)
-                {
-                    Color originalColor = prop.m_material.color;
-                    prop.m_material.color = prop.m_color0;
-                    renderer.Render();
-                    prop.m_material.color = originalColor;
+                    // If the selected prop has colour variations, temporarily set the colour to the default for rendering.
+                    if (prop.m_useColorVariations)
+                    {
+                        Color originalColor = prop.m_material.color;
+                        prop.m_material.color = prop.m_color0;
+                        renderer.Render();
+                        prop.m_material.color = originalColor;
+                    }
+                    else
+                    {
+                        // No temporary colour change needed.
+                        renderer.Render();
+                    }
+
+                    // We got a valid render; set flag.
+                    validRender = true;
                 }
                 else
                 {
-                    // No temporary colour change needed.
-                    renderer.Render();
+
                 }
             }
             else if (renderPrefab is TreeInfo tree)
             {
-                // Safety first!
-                if (tree?.m_mesh == null || tree.m_material == null)
+                // Don't render anything without a mesh or material.
+                if (tree?.m_mesh != null && tree.m_material != null)
                 {
-                    return;
+                    // Set mesh and material for render.
+                    renderer.Mesh = tree.m_mesh;
+                    renderer.Material = tree.m_material;
+
+                    // Render.
+                    renderer.Render();
+
+                    // We got a valid render; set flag.
+                    validRender = true;
                 }
-
-                // Set mesh and material for render.
-                renderer.Mesh = tree.m_mesh;
-                renderer.Material = tree.m_material;
-
-                // Render.
-                renderer.Render();
             }
-            else
+
+            // Reset background if we didn't get a valid render.
+            if (!validRender)
             {
-                // No valid current selection with a mesh; reset background.
                 previewSprite.texture = null;
                 noPreviewSprite.isVisible = true;
                 return;

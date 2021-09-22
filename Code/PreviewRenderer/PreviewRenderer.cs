@@ -160,7 +160,26 @@ namespace BOB
 
             // Reset the bounding box to be the smallest that can encapsulate all verticies of the new mesh.
             // That way the preview image is the largest size that fits cleanly inside the preview size.
-            Bounds currentBounds = Mesh.bounds;
+            Bounds currentBounds = new Bounds(Vector3.zero, Vector3.zero);
+            Vector3[] vertices;
+            
+            // Is the mesh readable, i.e. not locked?
+            if (Mesh.isReadable)
+            {
+                // Readable mesh - calculate our own bounds, as some preset bounds are unreliable.
+                // Use separate verticies instance instead of accessing Mesh.vertices each time (which is slow).
+                // >10x measured performance improvement by doing things this way instead.
+                vertices = Mesh.vertices;
+                for (int i = 0; i < vertices.Length; i++)
+                {
+                    currentBounds.Encapsulate(vertices[i]);
+                }
+            }
+            else
+            {
+                // Locked mesh - use default bounds.
+                currentBounds = Mesh.bounds;
+            }
 
             // Set our model rotation parameters, so we look at it obliquely.
             const float xRotation = 20f;
