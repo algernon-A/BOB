@@ -53,6 +53,15 @@ namespace BOB
                 renderer.Mesh = prop.m_mesh;
                 renderer.Material = prop.m_material;
 
+                if (prop.m_material?.mainTexture == null)
+                {
+                    if (prop.m_variations != null && prop.m_variations.Length > 0 && prop.m_variations[0].m_prop != null)
+                    {
+                        renderer.Mesh = prop.m_variations[0].m_prop.m_mesh;
+                        renderer.Material = prop.m_variations[0].m_prop.m_material;
+                    }
+                }
+
                 // If the selected prop has colour variations, temporarily set the colour to the default for rendering.
                 if (prop.m_useColorVariations)
                 {

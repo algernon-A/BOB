@@ -125,8 +125,6 @@ namespace BOB
                 return;
             }
 
-            Logging.Message(Material.shader.name ?? "null");
-
             // Set background.
             renderCamera.clearFlags = CameraClearFlags.Color;
             renderCamera.backgroundColor = new Color32(33, 151, 199, 255);
