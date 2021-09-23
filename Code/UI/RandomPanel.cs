@@ -46,10 +46,11 @@ namespace BOB
 		private readonly UIButton removeRandomButton, renameButton;
 		private readonly UITextField nameField;
 		private readonly BOBSlider probSlider;
+		private readonly PreviewPanel previewPanel;
 
 		// Current selections.
 		private BOBRandomPrefab selectedRandomPrefab;
-		private PrefabInfo selectedLoadedPrefab;
+		private PrefabInfo _selectedLoadedPrefab;
 		private BOBVariation selectedVariation;
 		private BOBVariation lastChangedVariant;
 		private bool ignoreValueChange = false;
@@ -151,7 +152,16 @@ namespace BOB
 		/// <summary>
 		/// Sets the currently selected loaded prefab.
 		/// </summary>
-		internal PrefabInfo SelectedLoadedPrefab { set => selectedLoadedPrefab = value; }
+		internal PrefabInfo SelectedLoadedPrefab
+		{
+			private get => _selectedLoadedPrefab;
+
+			set
+			{
+				_selectedLoadedPrefab = value;
+				previewPanel.SetTarget(value);
+			}
+		}
 
 
 		/// <summary>
@@ -286,6 +296,10 @@ namespace BOB
 
 			// Default is name ascending.
 			SetFgSprites(loadedNameButton, "IconUpArrow2");
+
+			// Preview image.
+			previewPanel = AddUIComponent<PreviewPanel>();
+			previewPanel.relativePosition = new Vector2(this.width + Margin, ListY);
 
 			// Populate loaded lists.
 			RandomList();
@@ -603,13 +617,13 @@ namespace BOB
 		private void AddVariation(UIComponent control, UIMouseEventParameter clickEvent)
 		{
 			// Make sure we've got a valid selection first.
-			if (selectedLoadedPrefab == null || selectedRandomPrefab == null)
+			if (SelectedLoadedPrefab == null || selectedRandomPrefab == null)
 			{
 				return;
 			}
 
 			// Add selected prefab to list of variations and regenerate UI fastlist.
-			BOBVariation newVariant = new BOBVariation { name = selectedLoadedPrefab.name, prefab = selectedLoadedPrefab, probability = 0 };
+			BOBVariation newVariant = new BOBVariation { name = SelectedLoadedPrefab.name, prefab = SelectedLoadedPrefab, probability = 0 };
 			selectedRandomPrefab.variations.Add(newVariant);
 			VariationsList();
 
