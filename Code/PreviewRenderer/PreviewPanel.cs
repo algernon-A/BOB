@@ -50,6 +50,24 @@ namespace BOB
                     // Special case for decals - just use main texture directly.
                     previewSprite.texture = prop.m_material.mainTexture?.MakeReadable();
 
+                    // Change width of previw sprite for non-square decals and ensure preview is centred in window; use double multiplied by 100 to avoid bizarre rounding errors.
+                    double widthRatio = 100d, heightRatio = 100d;
+                    if (prop.m_material.mainTexture.width > prop.m_material.mainTexture.height)
+                    {
+                        // Wider than high.
+                        heightRatio = ((prop.m_material.mainTexture.height * 100d) / prop.m_material.mainTexture.width);
+                    }
+                    if (prop.m_material.mainTexture.width < prop.m_material.mainTexture.height)
+                    {
+                        // Higher than wide.
+                        widthRatio = ((prop.m_material.mainTexture.width * 100d) / prop.m_material.mainTexture.height);
+                    }
+
+                    // Set preview sprite size and centre in renderPanel.
+                    previewSprite.width = (float)((renderPanel.width * widthRatio) / 100d);
+                    previewSprite.height = (float)((renderPanel.height * heightRatio) / 100d);
+                    previewSprite.relativePosition = new Vector2((renderPanel.width - previewSprite.width) / 2f, (renderPanel.height - previewSprite.height) / 2f);
+
                     // Treat this as a valid render.
                     validRender = true;
                 }
@@ -85,7 +103,9 @@ namespace BOB
                             renderer.Render();
                         }
 
-                        // We got a valid render; set display texture and status flag.
+                        // We got a valid render; ensure preview sprite is square (decal previews can change width), set display texture, and set status flag.
+                        previewSprite.relativePosition = Vector3.zero;
+                        previewSprite.size = renderPanel.size;
                         previewSprite.texture = renderer.Texture;
                         validRender = true;
                     }
@@ -112,7 +132,9 @@ namespace BOB
                     // Render.
                     renderer.Render();
 
-                    // We got a valid render; set display texture and status flag.
+                    // We got a valid render; ensure preview sprite is square (decal previews can change width), set display texture, and set status flag.
+                    previewSprite.relativePosition = Vector3.zero;
+                    previewSprite.size = renderPanel.size;
                     previewSprite.texture = renderer.Texture;
                     validRender = true;
                 }
