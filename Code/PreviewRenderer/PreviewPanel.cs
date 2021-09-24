@@ -47,55 +47,57 @@ namespace BOB
             {
                 if (prop.m_isDecal)
                 {
-                    // Special case for decals - use thumbnail preview instead if available.
-                    if (prop.m_Atlas != null && !string.IsNullOrEmpty(prop.m_Thumbnail))
-                    {
-                        // Set thumbnail.
-                        thumbnailSprite.atlas = prop.m_Atlas;
-                        thumbnailSprite.spriteName = prop.m_Thumbnail;
+                    // Special case for decals - just use main texture directly.
+                    previewSprite.texture = prop.m_material.mainTexture?.MakeReadable();
 
-                        // Show thumbnail sprite and hide others.
-                        noPreviewSprite.Hide();
-                        previewSprite.Hide();
-                        thumbnailSprite.Show();
+                    // Treat this as a valid render.
+                    validRender = true;
+                }
+                else
+                {
+                    // Not a decal - don't render anything without a mesh or material.
+                    if (prop?.m_mesh != null && prop.m_material != null && !prop.m_mesh.name.Equals("none"))
+                    {
+                        // Set mesh and material for render.
+                        renderer.Mesh = prop.m_mesh;
+                        renderer.Material = prop.m_material;
+
+                        if (prop.m_material?.mainTexture == null)
+                        {
+                            if (prop.m_variations != null && prop.m_variations.Length > 0 && prop.m_variations[0].m_prop != null)
+                            {
+                                renderer.Mesh = prop.m_variations[0].m_prop.m_mesh;
+                                renderer.Material = prop.m_variations[0].m_prop.m_material;
+                            }
+                        }
+
+                        // If the selected prop has colour variations, temporarily set the colour to the default for rendering.
+                        if (prop.m_useColorVariations)
+                        {
+                            Color originalColor = prop.m_material.color;
+                            prop.m_material.color = prop.m_color0;
+                            renderer.Render();
+                            prop.m_material.color = originalColor;
+                        }
+                        else
+                        {
+                            // No temporary colour change needed.
+                            renderer.Render();
+                        }
+
+                        // We got a valid render; set display texture and status flag.
+                        previewSprite.texture = renderer.Texture;
+                        validRender = true;
+                    }
+                    // If not a valid render, try to show thumbnail instead.
+                    else if (prop.m_Atlas != null && !string.IsNullOrEmpty(prop.m_Thumbnail))
+                    {
+                        // Show thumbnail.
+                        ShowThumbnail(prop.m_Atlas, prop.m_Thumbnail);
 
                         // All done here.
                         return;
                     }
-                }
-
-                // Don't render anything without a mesh or material.
-                if (prop?.m_mesh != null && prop.m_material != null && !prop.m_mesh.name.Equals("none"))
-                {
-                    // Set mesh and material for render.
-                    renderer.Mesh = prop.m_mesh;
-                    renderer.Material = prop.m_material;
-
-                    if (prop.m_material?.mainTexture == null)
-                    {
-                        if (prop.m_variations != null && prop.m_variations.Length > 0 && prop.m_variations[0].m_prop != null)
-                        {
-                            renderer.Mesh = prop.m_variations[0].m_prop.m_mesh;
-                            renderer.Material = prop.m_variations[0].m_prop.m_material;
-                        }
-                    }
-
-                    // If the selected prop has colour variations, temporarily set the colour to the default for rendering.
-                    if (prop.m_useColorVariations)
-                    {
-                        Color originalColor = prop.m_material.color;
-                        prop.m_material.color = prop.m_color0;
-                        renderer.Render();
-                        prop.m_material.color = originalColor;
-                    }
-                    else
-                    {
-                        // No temporary colour change needed.
-                        renderer.Render();
-                    }
-
-                    // We got a valid render; set flag.
-                    validRender = true;
                 }
             }
             else if (renderPrefab is TreeInfo tree)
@@ -110,22 +112,31 @@ namespace BOB
                     // Render.
                     renderer.Render();
 
-                    // We got a valid render; set flag.
+                    // We got a valid render; set display texture and status flag.
+                    previewSprite.texture = renderer.Texture;
                     validRender = true;
+                }
+                // If not a valid render, try to show thumbnail instead.
+                else if (tree.m_Atlas != null && !string.IsNullOrEmpty(tree.m_Thumbnail))
+                {
+                    // Show thumbnail.
+                    ShowThumbnail(tree.m_Atlas, tree.m_Thumbnail);
+
+                    // All done here.
+                    return;
                 }
             }
 
             // Reset background if we didn't get a valid render.
             if (!validRender)
             {
-                previewSprite.texture = null;
+                previewSprite.Hide();
                 thumbnailSprite.Hide();
                 noPreviewSprite.Show();
                 return;
             }
 
             // If we got here, we should have a render; show it.
-            previewSprite.texture = renderer.Texture;
             noPreviewSprite.Hide();
             thumbnailSprite.Hide();
             previewSprite.Show();
@@ -154,7 +165,7 @@ namespace BOB
 
             // Preview render panel.
             renderPanel = AddUIComponent<UIPanel>();
-            renderPanel.backgroundSprite = "UnlockingItemBackground";
+            renderPanel.backgroundSprite = "AssetEditorItemBackgroundDisabled";
             renderPanel.height = RenderHeight;
             renderPanel.width = RenderWidth;
             renderPanel.relativePosition = new Vector2(Margin, Margin);
@@ -209,6 +220,24 @@ namespace BOB
 
             // Render updated image.
             RenderPreview();
+        }
+
+
+        /// <summary>
+        /// Displays a prefab's UI thumbnail (instead of a render or blank panel).
+        /// </summary>
+        /// <param name="atlas"></param>
+        /// <param name="thumbnail"></param>
+        private void ShowThumbnail(UITextureAtlas atlas, string thumbnail)
+        {
+            // Set thumbnail.
+            thumbnailSprite.atlas = atlas;
+            thumbnailSprite.spriteName = thumbnail;
+
+            // Show thumbnail sprite and hide others.
+            noPreviewSprite.Hide();
+            previewSprite.Hide();
+            thumbnailSprite.Show();
         }
     }
 }
