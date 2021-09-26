@@ -43,6 +43,12 @@
     <Reference Include="ColossalManaged">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\ColossalManaged.dll</HintPath>
     </Reference>
+    <Reference Include="EManagersLib">
+      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\workshop\content\255710\2607980391\EManagersLib.dll</HintPath>
+    </Reference>
+    <Reference Include="EManagersLib.API">
+      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\workshop\content\255710\2607980391\EManagersLib.API.dll</HintPath>
+    </Reference>
     <Reference Include="ICities">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\ICities.dll</HintPath>
     </Reference>
@@ -190,7 +196,6 @@ xcopy /y "$(ProjectDir)\Resources\" "$(LOCALAPPDATA)\Colossal Order\Cities_Skyli
 mkdir "$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\ReplacementPacks"
 del "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\ReplacementPacks\*"
 xcopy /y "$(ProjectDir)\ReplacementPacks\" "$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\ReplacementPacks" /s /e
-
 
 xcopy /y "$(ProjectDir)\PrefabTemplates\" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)"
 xcopy /y "$(ProjectDir)\PrefabTemplates\" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Assets\"</PostBuildEvent>

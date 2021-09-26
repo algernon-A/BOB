@@ -147,13 +147,13 @@ namespace BOB
 						// Buildings.
 						if (CheckBuilding(output.m_building, ref errors))
 						{
-							// CheckSigment passed - record hit position and set cursor to light.
+							// CheckBuilding passed - record hit position and set cursor to light.
 							output.m_hitPos = Singleton<BuildingManager>.instance.m_buildings.m_buffer[output.m_building].m_position;
 							m_cursor = lightCursor;
 						}
 						else
 						{
-							// CheckSegment failed - deselect building.
+							// CheckBuilding failed - deselect building.
 							output.m_building = 0;
 						}
 					}
@@ -162,13 +162,13 @@ namespace BOB
 						// Map props.
 						if (CheckProp(output.m_propInstance, ref errors))
 						{
-							// CheckSigment passed - record hit position and set cursor to light.
+							// CheckProp passed - record hit position and set cursor to light.
 							output.m_hitPos = Singleton<PropManager>.instance.m_props.m_buffer[output.m_propInstance].Position;
 							m_cursor = lightCursor;
 						}
 						else
 						{
-							// CheckSegment failed - deselect prop.
+							// CheckProp failed - deselect prop.
 							output.m_propInstance = 0;
 						}
 					}
@@ -177,13 +177,13 @@ namespace BOB
 						// Map trees.
 						if (CheckTree(output.m_treeInstance, ref errors))
 						{
-							// CheckSigment passed - record hit position and set cursor to light.
+							// CheckTree passed - record hit position and set cursor to light.
 							output.m_hitPos = Singleton<TreeManager>.instance.m_trees.m_buffer[output.m_treeInstance].Position;
 							m_cursor = lightCursor;
 						}
 						else
 						{
-							// CheckSegment failed - deselect tree.
+							// CheckTree failed - deselect tree.
 							output.m_treeInstance = 0u;
 						}
 					}
