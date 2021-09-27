@@ -18,7 +18,7 @@ namespace BOB
 
 
 	/// <summary>
-	/// Static class to manage building prop and tree replacements.
+	/// Class to manage building prop and tree replacements.
 	/// </summary>
 	internal class BuildingReplacement
 	{

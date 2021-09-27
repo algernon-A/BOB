@@ -5,7 +5,7 @@ using UnityEngine;
 namespace BOB
 {
 	/// <summary>
-	/// Static class to manage network prop and tree replacements.
+	/// Class to manage network prop and tree replacements.
 	/// </summary>
 	internal class NetworkReplacement
 	{

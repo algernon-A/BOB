@@ -4,6 +4,9 @@ using ColossalFramework;
 
 namespace BOB
 {
+	/// <summary>
+	/// Cass to manage map tree replacements.
+	/// </summary>
 	internal class MapTreeReplacement
 	{
 		// Instance reference.
@@ -108,8 +111,6 @@ namespace BOB
 				// Local references.
 				TreeManager treeManager = Singleton<TreeManager>.instance;
 				TreeInstance[] trees = treeManager.m_trees.m_buffer;
-
-				Logging.Message("replacing tree ", target.name, " with ", replacement.name);
 
 				// Iterate through each tree in map.
 				for (uint treeIndex = 0; treeIndex < trees.Length; ++treeIndex)

@@ -4,7 +4,7 @@
 namespace BOB
 {
 	/// <summary>
-	/// Static class to manage prop and tree scaling.
+	/// Class to manage prop and tree scaling.
 	/// </summary>
 	internal class Scaling
 	{

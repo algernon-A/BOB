@@ -3,7 +3,7 @@
 namespace BOB
 {
     /// <summary>
-    /// Static class to handle centralised network data.
+    /// Class to handle centralised network data.
     /// </summary>
     internal static class NetData
     {

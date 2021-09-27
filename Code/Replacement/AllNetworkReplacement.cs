@@ -19,7 +19,7 @@ namespace BOB
 
 
 	/// <summary>
-	/// Static class to manage all-network prop and tree replacements.
+	/// Class to manage all-network prop and tree replacements.
 	/// </summary>
 	internal class AllNetworkReplacement
 	{

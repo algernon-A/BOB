@@ -1,6 +1,8 @@
 ﻿using ColossalFramework;
 using ColossalFramework.UI;
+using ColossalFramework.Math; // *EML*
 using UnityEngine;
+using EManagersLib.API; // *EML*
 
 
 namespace BOB
@@ -8,65 +10,8 @@ namespace BOB
 	/// <summary>
 	/// The BOB selection tool.
 	/// </summary>
-	public class BOBTool : DefaultTool
+	public class EBOBTool : BOBTool
 	{
-		// Cursor textures.
-		protected CursorInfo lightCursor;
-		protected CursorInfo darkCursor;
-
-
-		public enum Mode
-		{
-			Select,
-			NodeOrSegment,
-			Building,
-			PropOrTree
-		}
-		/// <summary>
-		/// Instance reference.
-		/// </summary>
-		public static BOBTool Instance => ToolsModifierControl.toolController?.gameObject?.GetComponent<BOBTool>();
-
-
-		/// <summary>
-		/// Initialise the tool.
-		/// Called by unity when the tool is created.
-		/// </summary>
-		protected override void Awake()
-		{
-			base.Awake();
-			lightCursor = TextureUtils.LoadCursor("bob_cursor_light.png");
-			darkCursor = TextureUtils.LoadCursor("bob_cursor_dark.png");
-			m_cursor = darkCursor;
-		}
-
-		// Ignore nodes, citizens, disasters, districts, transport lines, and vehicles.
-		public override NetNode.Flags GetNodeIgnoreFlags() => NetNode.Flags.All;
-		public override CitizenInstance.Flags GetCitizenIgnoreFlags() => CitizenInstance.Flags.All;
-		public override DisasterData.Flags GetDisasterIgnoreFlags() => DisasterData.Flags.All;
-		public override District.Flags GetDistrictIgnoreFlags() => District.Flags.All;
-		public override TransportLine.Flags GetTransportIgnoreFlags() => TransportLine.Flags.None;
-		public override VehicleParked.Flags GetParkedVehicleIgnoreFlags() => VehicleParked.Flags.All;
-		public override TreeInstance.Flags GetTreeIgnoreFlags() => TreeInstance.Flags.None;
-		public override PropInstance.Flags GetPropIgnoreFlags() => PropInstance.Flags.None;
-		public override Vehicle.Flags GetVehicleIgnoreFlags() => Vehicle.Flags.LeftHandDrive | Vehicle.Flags.Created | Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted | Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped | Vehicle.Flags.Leaving | Vehicle.Flags.Arriving | Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff | Vehicle.Flags.Flying | Vehicle.Flags.Landing | Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack | Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing | Vehicle.Flags.Exporting | Vehicle.Flags.Parking | Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel | Vehicle.Flags.WaitingLoading | Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic | Vehicle.Flags.Underground | Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding;
-
-
-		// Select all buildings.
-		public override Building.Flags GetBuildingIgnoreFlags() => Building.Flags.None;
-
-		/// <summary>
-		/// Called by the game.  Sets which network segments are ignored by the tool (always returns none, i.e. all segments are selectable by the tool).
-		/// </summary>
-		/// <param name="nameOnly">Always set to false</param>
-		/// <returns>NetSegment.Flags.None</returns>
-		public override NetSegment.Flags GetSegmentIgnoreFlags(out bool nameOnly)
-		{
-			nameOnly = false;
-			return NetSegment.Flags.None;
-		}
-
-
 		/// <summary>
 		/// Called by the game every simulation step.
 		/// Performs raycasting to select hovered instance.
@@ -105,7 +50,7 @@ namespace BOB
 			input.m_netService.m_itemLayers |= ItemClass.Layer.FerryPaths;
 
 			ToolErrors errors = ToolErrors.None;
-			RaycastOutput output;
+			EToolBase.RaycastOutput output; // *EML* RaycastOutput output;
 
 			// Cursor is dark by default.
 			m_cursor = darkCursor;
@@ -114,7 +59,7 @@ namespace BOB
 			if (m_mouseRayValid)
 			{
 				// Yes - raycast.
-				if (RayCast(input, out output))
+				if (EToolBase.RayCast(input, out output)) // *EML* if (RayCast(input, out output))
 				{
 					// Set base tool accurate position.
 					m_accuratePosition = output.m_hitPos;
@@ -160,10 +105,10 @@ namespace BOB
 					else if (output.m_propInstance != 0)
 					{
 						// Map props.
-						if (CheckProp(output.m_propInstance, ref errors))
+						if (CheckProp(output.m_propInstance))
 						{
 							// CheckProp passed - record hit position and set cursor to light.
-							output.m_hitPos = Singleton<PropManager>.instance.m_props.m_buffer[output.m_propInstance].Position;
+							output.m_hitPos = EPropManager.m_props.m_buffer[output.m_propInstance].Position; // *EML* output.m_hitPos = Singleton<PropManager>.instance.m_props.m_buffer[output.m_propInstance].Position;
 							m_cursor = lightCursor;
 						}
 						else
@@ -201,7 +146,7 @@ namespace BOB
 					}
 					else if (output.m_propInstance != 0)
 					{
-						hoverInstance.Prop = output.m_propInstance;
+						hoverInstance.SetProp32(output.m_propInstance); // *EML* hoverInstance.Prop = output.m_propInstance;
 					}
 					else if (output.m_treeInstance != 0)
 					{
@@ -213,6 +158,8 @@ namespace BOB
 					{
 						// Hover instance has changed.
 						// Unhide any previously-hidden props, trees or buildings.
+
+						/* *EML* cut
 						if (m_hoverInstance.Prop != 0)
 						{
 							// Unhide previously hovered prop.
@@ -220,7 +167,20 @@ namespace BOB
 							{
 								Singleton<PropManager>.instance.m_props.m_buffer[m_hoverInstance.Prop].Hidden = false;
 							}
+						}*/
+
+						// *EML* start, replacing above cut
+						uint propID = m_hoverInstance.GetProp32();
+						if (propID != 0)
+						{
+							// Unhide previously hovered prop.
+							if (EPropManager.m_props.m_buffer[propID].Hidden) // *EML* if (Singleton<PropManager>.instance.m_props.m_buffer[propID].Hidden)
+							{
+								EPropManager.m_props.m_buffer[propID].Hidden = false;// *EML* Singleton<PropManager>.instance.m_props.m_buffer[propID].Hidden = false;
+							}
 						}
+						// *EML* end
+
 						else if (m_hoverInstance.Tree != 0)
 						{
 							// Unhide previously hovered tree.
@@ -260,19 +220,6 @@ namespace BOB
 			// Set mouse position and record errors.
 			m_mousePosition = output.m_hitPos;
 			m_selectErrors = errors;
-		}
-
-
-		/// <summary>
-		/// Unity late update handling.
-		/// Called by game every late update.
-		/// </summary>
-		protected override void OnToolLateUpdate()
-		{
-			base.OnToolLateUpdate();
-
-			// Force the info mode to none.
-			ToolBase.ForceInfoMode(InfoManager.InfoMode.None, InfoManager.SubInfoMode.None);
 		}
 
 
@@ -352,8 +299,8 @@ namespace BOB
 					}
 					else
 					{
-						ushort prop = m_hoverInstance.Prop;
-						// Try to get a hovered prop instance.
+						uint prop = m_hoverInstance.GetProp32(); // *EML* ushort prop = m_hoverInstance.Prop;
+																 // Try to get a hovered prop instance.
 						if (prop != 0)
 						{
 							// Check for mousedown events with button zero.
@@ -364,12 +311,33 @@ namespace BOB
 
 								// Create the info panel with the hovered network prefab.
 								// ToolsModifierControl.SetTool<DefaultTool>();
-								InfoPanelManager.SetTarget(Singleton<PropManager>.instance.m_props.m_buffer[prop].Info);
+								InfoPanelManager.SetTarget(EPropManager.m_props.m_buffer[prop].Info); // *EML* InfoPanelManager.SetTarget(Singleton<PropManager>.instance.m_props.m_buffer[prop].Info);
 							}
 						}
 					}
 				}
 			}
+		}
+
+
+		/// <summary>
+		/// For *EML* - prop raytrace check.
+		/// </summary>
+		/// <param name="prop">Prop ID</param>
+		/// <returns>True if raytrace confirmed, false otherwise</returns>
+		private  bool CheckProp(uint prop)
+		{
+			if ((m_toolController.m_mode & ItemClass.Availability.Editors) != ItemClass.Availability.None)
+			{
+				return true;
+			}
+			Vector2 a = VectorUtils.XZ(EPropManager.m_props.m_buffer[prop].Position);
+			Quad2 quad = default;
+			quad.a = a + new Vector2(-0.5f, -0.5f);
+			quad.b = a + new Vector2(-0.5f, 0.5f);
+			quad.c = a + new Vector2(0.5f, 0.5f);
+			quad.d = a + new Vector2(0.5f, -0.5f);
+			return !Singleton<GameAreaManager>.instance.QuadOutOfArea(quad);
 		}
 	}
 }

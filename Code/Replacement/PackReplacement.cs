@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace BOB
 {
 	/// <summary>
-	/// Static class to manage replacement packs.
+	/// Class to manage replacement packs.
 	/// </summary>
 	internal class PackReplacement
 	{
