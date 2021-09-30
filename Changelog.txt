@@ -1,4 +1,7 @@
-﻿- Add tree/prop preview window
+﻿Version 0.7.3 -
+
+- Add tree/prop preview window
+- Add compatibility with Extended Managers Library (EPropManager)
 - Fix scaling button tooltip translation key reference
 - Panels are now automatically and instantly destroyed if an exception occurs during creation
 - Revert to loaded tree/prop lists being immediately populated
