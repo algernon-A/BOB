@@ -22,7 +22,11 @@
     <Translation ID="BOB_PNL_RAN" String="Todas redes" />
     <Translation ID="BOB_PNL_RTT" String="Árboles del mapa" />
     <Translation ID="BOB_PNL_RTP" String="Decoraciones del mapa" />
+    <Translation ID="BOB_PNL_RSW" String="Mostrar aleatorio" />
+    <Translation ID="BOB_PNL_RST" String="Configuración aleatoria" />
+    <Translation ID="BOB_PNL_SCA" String="Escala de Decoraciones y Árboles" />
     <Translation ID="BOB_PNL_REV" String="Revertir" />
+    <Translation ID="BOB_PNL_REV_TIP" String="No se puede revertir ya que no hay ningún reemplazo disponible para este artículo" />
     <Translation ID="BOB_PNL_PKB" String="Paquetes de reemplazo" />
     <Translation ID="BOB_PNL_PRB" String="Probabilidad" />
     <Translation ID="BOB_PNL_ANG" String="Ángulo" />
@@ -31,6 +35,15 @@
     <Translation ID="BOB_PNL_YOF" String="Y" />
     <Translation ID="BOB_PNL_ZOF" String="Z" />
     <Translation ID="BOB_PNL_SUB" String="Subedificio" />
+    <Translation ID="BOB_RND_TIT" String="configura árboles y decoraciones aleatorias" />
+    <Translation ID="BOB_RND_NEW" String="Nuevo" />
+    <Translation ID="BOB_RND_DEL" String="Eliminar" />
+    <Translation ID="BOB_RND_REN" String="Renombrar" />
+    <Translation ID="BOB_RND_ADD" String="Agregar a variaciones" />
+    <Translation ID="BOB_RND_SUB" String="Remover de variaciones" />
+    <Translation ID="BOB_SCA_TIT" String="configurar escala de decoraciones" />
+    <Translation ID="BOB_SCA_MIN" String="Escala mínima" />
+    <Translation ID="BOB_SCA_MAX" String="Escala máxima" />
     <Translation ID="BOB_SPR_SBL" String="Actualmente se aplica un reemplazo para estos edificios" />
     <Translation ID="BOB_SPR_ABL" String="Actualmente se aplica un reemplazo para todos edificios" />
     <Translation ID="BOB_SPR_SNT" String="Actualmente se aplica un reemplazo para estas redes" />
