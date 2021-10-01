@@ -276,7 +276,7 @@ namespace BOB
 			loadedNameButton.eventClicked += SortLoaded;
 	
 			// Probability slider.
-			probSlider = AddBOBSlider(this, SelectedX + Margin, ToolY + 25f, SelectedWidth - (Margin * 2f), "BOB_PNL_PRB", 0, 100, 1, "Probability");
+			probSlider = AddBOBSlider(this, SelectedX + Margin, ToolY + Margin, SelectedWidth - (Margin * 2f), "BOB_PNL_PRB", 0, 100, 1, "Probability");
 			probSlider.eventValueChanged += (control, value) =>
 			{
 				if (selectedVariation != null)

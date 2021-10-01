@@ -1,4 +1,8 @@
-﻿Version 0.7.3 -
+﻿- Fix random panel probability slider placement
+- Fix revert button tooltip not changing when button state changes (LITERALLY UNPLAYABLE)
+
+
+Version 0.7.3 -
 
 - Add tree/prop preview window
 - Add compatibility with Extended Managers Library (EPropManager)
