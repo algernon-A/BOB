@@ -26,6 +26,7 @@
     <Translation ID="BOB_PNL_RST" String="Random setup" />
     <Translation ID="BOB_PNL_SCA" String="Prop and tree scaling" />
     <Translation ID="BOB_PNL_REV" String="Revert" />
+    <Translation ID="BOB_PNL_REV_UND" String="Undo the selected replacement" />
     <Translation ID="BOB_PNL_REV_TIP" String="Revert is not available as there is no active replacement for this item" />
     <Translation ID="BOB_PNL_PKB" String="Replacement packs" />
     <Translation ID="BOB_PNL_PRB" String="Probability" />

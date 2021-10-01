@@ -156,6 +156,11 @@ namespace BOB
 				if (CurrentTargetItem.replacementPrefab != null)
 				{
 					revertButton.Enable();
+					revertButton.tooltip = Translations.Translate("BOB_PNL_REV_UND");
+				}
+				else
+				{
+					revertButton.tooltip = Translations.Translate("BOB_PNL_REV_TIP");
 				}
 			}
 		}
