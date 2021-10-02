@@ -83,7 +83,7 @@ namespace BOB
 					propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = (TreeInfo)target;
 				}
 				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle;
-				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.postion;
+				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.position;
 				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_probability = propReference.probability;
 
 				// Restore any all-network replacement.
@@ -206,7 +206,7 @@ namespace BOB
 							laneIndex = laneIndex,
 							propIndex = propIndex,
 							angle = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_angle,
-							postion = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position,
+							position = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position,
 							probability = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_probability
 						});
 					}
@@ -327,7 +327,7 @@ namespace BOB
 
 			// Angle and offset.
 			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle + netElement.angle;
-			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.postion + offset;
+			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.position + offset;
 
 			// Probability.
 			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_probability = netElement.probability;
