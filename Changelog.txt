@@ -1,4 +1,5 @@
-﻿- Fix random panel probability slider placement
+﻿- Sort random prop and variation lists alphabetically
+- Fix random panel probability slider placement
 - Fix mirrored x offset for networks when props are placed outside of lane position
 - Fix revert button tooltip not changing when button state changes (LITERALLY UNPLAYABLE)
 
