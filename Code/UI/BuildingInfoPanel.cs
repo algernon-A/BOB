@@ -27,12 +27,12 @@ namespace BOB
 			}
 		}
 
+
 		/// <summary>
 		/// Called when list item is displayed.
 		/// </summary>
 		public override void Display(object data, bool isRowOdd)
 		{
-
 			// Perform initial setup for new rows.
 			if (nameLabel == null)
 			{
@@ -107,6 +107,9 @@ namespace BOB
 			// Reset loaded lists.
 			LoadedList();
 			TargetList();
+
+			// Update overlay.
+			RenderOverlays.CurrentBuilding = currentBuilding;
 		}
 
 
