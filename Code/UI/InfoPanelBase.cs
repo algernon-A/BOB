@@ -81,7 +81,7 @@ namespace BOB
 				currentTargetItem = value;
 
 				// Refresh loaded list if needed.
-				if (value != null && (loadedList.m_rowsData?.m_buffer == null || loadedList.m_rowsData.m_size == 0))
+				if (value != null && (loadedList.rowsData?.m_buffer == null || loadedList.rowsData.m_size == 0))
                 {
 					LoadedList();
 				}
@@ -138,7 +138,7 @@ namespace BOB
 		internal void UpdateTargetList()
 		{
 			// Iterate through each item in list.
-			foreach (object item in targetList.m_rowsData)
+			foreach (object item in targetList.rowsData)
 			{
 				if (item is PropListItem propListItem)
 				{
@@ -398,6 +398,9 @@ namespace BOB
 		/// </summary>
 		protected override void LoadedList()
 		{
+			// Clear current selection.
+			loadedList.selectedIndex = -1;
+
 			// List of prefabs that have passed filtering.
 			List<PrefabInfo> list = new List<PrefabInfo>();
 
@@ -456,12 +459,11 @@ namespace BOB
 			}
 
 			// Create return fastlist from our filtered list.
-			loadedList.m_rowsData = new FastList<object>
+			loadedList.rowsData = new FastList<object>
 			{
 				m_buffer = list.ToArray(),
 				m_size = list.Count
 			};
-			loadedList.Refresh();
 
 			// Select current replacement prefab, if any.
 			if (replacementPrefab != null)

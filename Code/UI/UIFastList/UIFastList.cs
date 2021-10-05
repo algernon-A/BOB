@@ -80,7 +80,7 @@ namespace BOB
         private UIPanel m_panel;
         private UIScrollbar m_scrollbar;
         private FastList<IUIFastListRow> m_rows;
-        public FastList<object> m_rowsData;
+        private FastList<object> m_rowsData;
 
         private Type m_rowType;
         private string m_backgroundSprite;

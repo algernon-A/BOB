@@ -281,15 +281,14 @@ namespace BOB
 			}
 
 			// Create return fastlist from our filtered list, ordering by name.
-			targetList.m_rowsData = new FastList<object>
+			targetList.rowsData = new FastList<object>
 			{
 				m_buffer = targetSearchStatus == (int)OrderBy.NameDescending ? itemList.OrderByDescending(item => item.DisplayName).ToArray() : itemList.OrderBy(item => item.DisplayName).ToArray(),
 				m_size = itemList.Count
 			};
-			targetList.Refresh();
 
 			// If the list is empty, show the 'no props' label; otherwise, hide it.
-			if (targetList.m_rowsData.m_size == 0)
+			if (itemList.Count == 0)
 			{
 				noPropsLabel.Show();
 			}
@@ -308,6 +307,9 @@ namespace BOB
 		/// </summary>
 		protected override void TargetList()
 		{
+			// Clear current selection.
+			targetList.selectedIndex = -1;
+
 			// List of prefabs that have passed filtering.
 			List<PropListItem> itemList = new List<PropListItem>();
 
@@ -424,15 +426,14 @@ namespace BOB
 			}
 
 			// Create return fastlist from our filtered list, ordering by name.
-			targetList.m_rowsData = new FastList<object>
+			targetList.rowsData = new FastList<object>
 			{
 				m_buffer = targetSearchStatus == (int)OrderBy.NameDescending ? itemList.OrderByDescending(item => item.DisplayName).ToArray() : itemList.OrderBy(item => item.DisplayName).ToArray(),
 				m_size = itemList.Count
 			};
-			targetList.Refresh();
 
 			// If the list is empty, show the 'no props' label; otherwise, hide it.
-			if (targetList.m_rowsData.m_size == 0)
+			if (itemList.Count == 0)
 			{
 				noPropsLabel.Show();
 			}

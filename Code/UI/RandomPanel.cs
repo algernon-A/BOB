@@ -826,12 +826,15 @@ namespace BOB
 		/// Regenerates the random prefab UI fastlist.
 		/// </summary>
 		private void RandomList()
-        {
+		{
+			// Remove selection.
+			randomList.selectedIndex = -1;
+
 			// Trees or props?
 			if (IsTree)
 			{
 				// Trees.
-				randomList.m_rowsData = new FastList<object>
+				randomList.rowsData = new FastList<object>
 				{
 					m_buffer = PrefabLists.randomTrees.OrderBy(x => x.name.ToLower()).ToArray(),
 					m_size = PrefabLists.randomTrees.Count
@@ -840,17 +843,13 @@ namespace BOB
 			else
 			{
 				// Props.
-				randomList.m_rowsData = new FastList<object>
+				randomList.rowsData = new FastList<object>
 				{
 					m_buffer = PrefabLists.randomProps.OrderBy(x => x.name.ToLower()).ToArray(),
 					m_size = PrefabLists.randomProps.Count
 				};
 			}
-
-			randomList.selectedIndex = -1;
-
-			randomList.Refresh();
-        }
+		}
 
 
 		/// <summary>
@@ -858,6 +857,9 @@ namespace BOB
 		/// </summary>
 		private void VariationsList()
 		{
+			// Remove selection.
+			variationsList.selectedIndex = -1;
+
 			// Create return fastlist from our filtered list.
 			variationsList.rowsData = new FastList<object>
 			{

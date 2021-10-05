@@ -154,9 +154,8 @@ namespace BOB
         /// </summary>
         private void RefreshList()
         {
-            configList.m_rowsData = ConfigurationUtils.GetConfigFastList();
-            configList.Refresh();
             configList.selectedIndex = -1;
+            configList.rowsData = ConfigurationUtils.GetConfigFastList();
             selectedConfig = null;
 
             // Update button states.
