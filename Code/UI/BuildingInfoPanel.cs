@@ -55,7 +55,7 @@ namespace BOB
 			nameLabel.text = ((InfoPanelManager.Panel as BOBBuildingInfoPanel).SubBuildingNames[subBuildingIndex] ?? "");
 
 			// Set label position
-			nameLabel.relativePosition = new Vector2(labelX, PaddingY);
+			nameLabel.relativePosition = new Vector2(5f, PaddingY);
 
 			// Set initial background as deselected state.
 			Deselect(isRowOdd);
@@ -289,9 +289,9 @@ namespace BOB
 
 					// List panel.
 					UIPanel subBuildingListPanel = subBuildingPanel.AddUIComponent<UIPanel>();
-					subBuildingListPanel.relativePosition = new Vector2(5f, TitleHeight);
-					subBuildingListPanel.width = subBuildingPanel.width - 10f;
-					subBuildingListPanel.height = subBuildingPanel.height - TitleHeight - 10f;
+					subBuildingListPanel.relativePosition = new Vector2(Margin, TitleHeight);
+					subBuildingListPanel.width = subBuildingPanel.width - (Margin * 2f);
+					subBuildingListPanel.height = subBuildingPanel.height - TitleHeight - (Margin * 2f);
 
 
 					subBuildingList = UIFastList.Create<UISubBuildingRow>(subBuildingListPanel);
