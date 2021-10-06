@@ -4,7 +4,7 @@
 namespace BOB
 {
 	/// <summary>
-	/// Static class to manage all-builing prop and tree replacements.
+	/// Class to manage all-builing prop and tree replacements.
 	/// </summary>
 	internal class AllBuildingReplacement
 	{

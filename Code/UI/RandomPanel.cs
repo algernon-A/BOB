@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using ColossalFramework;
@@ -276,7 +277,7 @@ namespace BOB
 			loadedNameButton.eventClicked += SortLoaded;
 	
 			// Probability slider.
-			probSlider = AddBOBSlider(this, SelectedX + Margin, ToolY + 25f, SelectedWidth - (Margin * 2f), "BOB_PNL_PRB", 0, 100, 1, "Probability");
+			probSlider = AddBOBSlider(this, SelectedX + Margin, ToolY + Margin, SelectedWidth - (Margin * 2f), "BOB_PNL_PRB", 0, 100, 1, "Probability");
 			probSlider.eventValueChanged += (control, value) =>
 			{
 				if (selectedVariation != null)
@@ -533,9 +534,11 @@ namespace BOB
 			// Did we succesfully create a new prefab?
 			if (newPrefab != null)
 			{
+				Logging.Message("Trying to find item");
+
 				// Yes - regenerate random list to reflect the change, and select the new item.
 				RandomList();
-				randomList.FindItem(newPrefab.name);
+				randomList.FindItem(newPrefab);
 				SelectedRandomPrefab = newPrefab;
 			}
 		}
@@ -604,8 +607,8 @@ namespace BOB
 				selectedRandomPrefab.tree.name = selectedRandomPrefab.name;
 			}
 
-			// Refresh list.
-			randomList.Refresh();
+			// Regenerate list.
+			RandomList();
 		}
 
 
@@ -823,31 +826,30 @@ namespace BOB
 		/// Regenerates the random prefab UI fastlist.
 		/// </summary>
 		private void RandomList()
-        {
+		{
+			// Remove selection.
+			randomList.selectedIndex = -1;
+
 			// Trees or props?
 			if (IsTree)
 			{
 				// Trees.
-				randomList.m_rowsData = new FastList<object>
+				randomList.rowsData = new FastList<object>
 				{
-					m_buffer = PrefabLists.randomTrees.ToArray(),
+					m_buffer = PrefabLists.randomTrees.OrderBy(x => x.name.ToLower()).ToArray(),
 					m_size = PrefabLists.randomTrees.Count
 				};
 			}
 			else
 			{
 				// Props.
-				randomList.m_rowsData = new FastList<object>
+				randomList.rowsData = new FastList<object>
 				{
-					m_buffer = PrefabLists.randomProps.ToArray(),
+					m_buffer = PrefabLists.randomProps.OrderBy(x => x.name.ToLower()).ToArray(),
 					m_size = PrefabLists.randomProps.Count
 				};
 			}
-
-			randomList.selectedIndex = -1;
-
-			randomList.Refresh();
-        }
+		}
 
 
 		/// <summary>
@@ -855,10 +857,13 @@ namespace BOB
 		/// </summary>
 		private void VariationsList()
 		{
+			// Remove selection.
+			variationsList.selectedIndex = -1;
+
 			// Create return fastlist from our filtered list.
 			variationsList.rowsData = new FastList<object>
 			{
-				m_buffer = selectedRandomPrefab?.variations?.ToArray() ?? new BOBVariation[0],
+				m_buffer = selectedRandomPrefab?.variations?.OrderBy(x => PrefabLists.GetDisplayName(x.name).ToLower()).ToArray(),
 				m_size = selectedRandomPrefab?.variations?.Count ?? 0
 			};
 		}

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace BOB
 {
 	/// <summary>
-	/// Static class to manage network prop and tree replacements.
+	/// Class to manage network prop and tree replacements.
 	/// </summary>
 	internal class NetworkReplacement
 	{
@@ -83,7 +83,7 @@ namespace BOB
 					propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = (TreeInfo)target;
 				}
 				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle;
-				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.postion;
+				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.position;
 				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_probability = propReference.probability;
 
 				// Restore any all-network replacement.
@@ -206,7 +206,7 @@ namespace BOB
 							laneIndex = laneIndex,
 							propIndex = propIndex,
 							angle = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_angle,
-							postion = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position,
+							position = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position,
 							probability = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_probability
 						});
 					}
@@ -319,15 +319,15 @@ namespace BOB
 				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = (TreeInfo)netElement.replacementInfo;
 			}
 
-			// Invert x offset if lane position is negative.
-			if (propReference.network.m_lanes[propReference.laneIndex].m_position < 0)
+			// Invert x offset if original prop x position is negative.
+			if (propReference.position.x < 0)
             {
 				offset.x = 0 - offset.x;
             }
 
 			// Angle and offset.
 			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle + netElement.angle;
-			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.postion + offset;
+			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.position + offset;
 
 			// Probability.
 			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_probability = netElement.probability;

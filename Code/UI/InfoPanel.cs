@@ -127,6 +127,7 @@ namespace BOB
 				if (CurrentTargetItem.individualPrefab != null || CurrentTargetItem.replacementPrefab != null || CurrentTargetItem.allPrefab != null)
 				{
 					revertButton.Enable();
+					revertButton.tooltip = Translations.Translate("BOB_PNL_REV_UND");
 				}
 				else
 				{

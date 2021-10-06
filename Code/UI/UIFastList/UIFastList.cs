@@ -80,7 +80,7 @@ namespace BOB
         private UIPanel m_panel;
         private UIScrollbar m_scrollbar;
         private FastList<IUIFastListRow> m_rows;
-        public FastList<object> m_rowsData;
+        private FastList<object> m_rowsData;
 
         private Type m_rowType;
         private string m_backgroundSprite;
@@ -353,9 +353,8 @@ namespace BOB
         }
 
 
-
         /// <summary>
-        /// Sets the selection to the given prefab item.
+        /// Sets the selection to the given random variation.
         /// If no item is found, clears the selection and resets the list.
         /// </summary>
         /// <param name="item">The item to find</param>
@@ -366,6 +365,39 @@ namespace BOB
             {
                 // Look for an index match; individual or grouped (contained within propListItem.indexes list).
                 if (m_rowsData.m_buffer[i] is BOBVariation listItem && listItem == variant)
+                {
+                    // Found a match; set the selected index to this one.
+                    selectedIndex = i;
+
+                    // If the selected index is outside the current visibility range, move the to show it.
+                    if (selectedIndex < listPosition || selectedIndex > listPosition + m_rows.m_size)
+                    {
+                        listPosition = selectedIndex;
+                    }
+
+                    // Done here; return.
+                    return;
+                }
+            }
+
+            // If we got here, we didn't find a match; clear the selection and reset the list position.
+            selectedIndex = -1;
+            listPosition = 0f;
+        }
+
+
+        /// <summary>
+        /// Sets the selection to the given random prop.
+        /// If no item is found, clears the selection and resets the list.
+        /// </summary>
+        /// <param name="item">The item to find</param>
+        public virtual void FindItem(BOBRandomPrefab randomPrefab)
+        {
+            // Iterate through the rows list.
+            for (int i = 0; i < m_rowsData.m_size; ++i)
+            {
+                // Look for an index match; individual or grouped (contained within propListItem.indexes list).
+                if (m_rowsData.m_buffer[i] is BOBRandomPrefab listItem && listItem == randomPrefab)
                 {
                     // Found a match; set the selected index to this one.
                     selectedIndex = i;

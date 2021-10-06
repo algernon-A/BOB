@@ -70,10 +70,12 @@
     <Compile Include="Code\Patches\RuiningPatches.cs" />
     <Compile Include="Code\PreviewRenderer\PreviewPanel.cs" />
     <Compile Include="Code\PreviewRenderer\PreviewRenderer.cs" />
+    <Compile Include="Code\Replacement\EMapPropReplacement.cs" />
     <Compile Include="Code\Replacement\MapPropReplacement.cs" />
     <Compile Include="Code\Replacement\Scaling.cs" />
     <Compile Include="Code\Settings\OptionsPanelTabs\RuiningOptions.cs" />
     <Compile Include="Code\UI\BOBSlider.cs" />
+    <Compile Include="Code\UI\EBOBTool.cs" />
     <Compile Include="Code\UI\MapPanel.cs" />
     <Compile Include="Code\UI\PanelBase.cs" />
     <Compile Include="Code\UI\RandomPanel.cs" />

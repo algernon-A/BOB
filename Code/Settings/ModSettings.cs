@@ -8,6 +8,9 @@ namespace BOB
 	/// </summary>
 	internal static class ModSettings
 	{
+		// Whether or not we're running with Extended Manager Library's EPropManager.
+		internal static bool ePropManager = false;
+
 		// Default behaviour of the show individual props setting.
 		internal static int indDefault;
 

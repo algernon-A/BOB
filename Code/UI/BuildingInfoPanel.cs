@@ -28,9 +28,11 @@ namespace BOB
 		}
 
 
+		/// <summary>
+		/// Called when list item is displayed.
+		/// </summary>
 		public override void Display(object data, bool isRowOdd)
 		{
-
 			// Perform initial setup for new rows.
 			if (nameLabel == null)
 			{
@@ -53,7 +55,7 @@ namespace BOB
 			nameLabel.text = ((InfoPanelManager.Panel as BOBBuildingInfoPanel).SubBuildingNames[subBuildingIndex] ?? "");
 
 			// Set label position
-			nameLabel.relativePosition = new Vector2(labelX, PaddingY);
+			nameLabel.relativePosition = new Vector2(5f, PaddingY);
 
 			// Set initial background as deselected state.
 			Deselect(isRowOdd);
@@ -105,6 +107,9 @@ namespace BOB
 			// Reset loaded lists.
 			LoadedList();
 			TargetList();
+
+			// Update overlay.
+			RenderOverlays.CurrentBuilding = currentBuilding;
 		}
 
 
@@ -287,21 +292,20 @@ namespace BOB
 
 					// List panel.
 					UIPanel subBuildingListPanel = subBuildingPanel.AddUIComponent<UIPanel>();
-					subBuildingListPanel.relativePosition = new Vector2(5f, TitleHeight);
-					subBuildingListPanel.width = subBuildingPanel.width - 10f;
-					subBuildingListPanel.height = subBuildingPanel.height - TitleHeight - 10f;
+					subBuildingListPanel.relativePosition = new Vector2(Margin, TitleHeight);
+					subBuildingListPanel.width = subBuildingPanel.width - (Margin * 2f);
+					subBuildingListPanel.height = subBuildingPanel.height - TitleHeight - (Margin * 2f);
 
 
 					subBuildingList = UIFastList.Create<UISubBuildingRow>(subBuildingListPanel);
 					ListSetup(subBuildingList);
 
 					// Create return fastlist from our filtered list.
-					subBuildingList.m_rowsData = new FastList<object>
+					subBuildingList.rowsData = new FastList<object>
 					{
 						m_buffer = subBuildingIndexes,
 						m_size = subBuildingIndexes.Length
 					};
-					subBuildingList.Refresh();
 				}
 				else
                 {
@@ -528,7 +532,7 @@ namespace BOB
 			{
 				// No props - show 'no props' label and return an empty list.
 				noPropsLabel.Show();
-                targetList.m_rowsData = new FastList<object>();
+                targetList.rowsData = new FastList<object>();
 				return;
 			}
 
@@ -623,15 +627,14 @@ namespace BOB
 			}
 
 			// Create return fastlist from our filtered list, ordering by name.
-			targetList.m_rowsData = new FastList<object>
+			targetList.rowsData = new FastList<object>
 			{
 				m_buffer = targetSearchStatus == (int)OrderBy.NameDescending ? propList.OrderByDescending(item => item.DisplayName).ToArray() : propList.OrderBy(item => item.DisplayName).ToArray(),
 				m_size = propList.Count
 			};
-			targetList.Refresh();
 
 			// If the list is empty, show the 'no props' label; otherwise, hide it.
-			if (targetList.m_rowsData.m_size == 0)
+			if (targetList.rowsData.m_size == 0)
 			{
 				noPropsLabel.Show();
 			}

@@ -4,6 +4,9 @@ using ColossalFramework;
 
 namespace BOB
 {
+	/// <summary>
+	/// Class to manage map prop replacements.
+	/// </summary>
 	internal class MapPropReplacement
 	{
 		// Instance reference.
@@ -100,7 +103,7 @@ namespace BOB
 		/// </summary>
 		/// <param name="target">Prop to replace</param>
 		/// <param name="replacement">Replacement prop</param>
-		private void ReplaceProps(PropInfo target, PropInfo replacement)
+		protected virtual void ReplaceProps(PropInfo target, PropInfo replacement)
 		{
 			// Check for valid parameters.
 			if (target != null && replacement != null)
@@ -108,8 +111,6 @@ namespace BOB
 				// Local references.
 				PropManager propManager = Singleton<PropManager>.instance;
 				PropInstance[] props = propManager.m_props.m_buffer;
-
-				Logging.Message("replacing tree ", target.name, " with ", replacement.name);
 
 				// Iterate through each prop in map.
 				for (uint propIndex = 0; propIndex < props.Length; ++propIndex)
@@ -128,7 +129,7 @@ namespace BOB
 					{
 						props[propIndex].Info = replacement;
 
-						// Refresh tree render (to update LOD).
+						// Refresh prop render (to update LOD).
 						propManager.UpdatePropRenderer((ushort)propIndex, true);
 					}
 				}

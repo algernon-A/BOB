@@ -108,7 +108,7 @@ namespace BOB
             if (inGame)
             {
                 // Use custom check box.
-                customCheck = UIControls.AddCheckBox(panel, Margin, ToolBarY, tooltip: Translations.Translate("BOB_CFG_UCS"));
+                customCheck = UIControls.LabelledCheckBox(panel, Margin, ToolBarY, Translations.Translate("BOB_CFG_UCS"));
                 customCheck.isChecked = !string.IsNullOrEmpty(ConfigurationUtils.currentConfig);
 
                 // Apply button.
@@ -154,9 +154,8 @@ namespace BOB
         /// </summary>
         private void RefreshList()
         {
-            configList.m_rowsData = ConfigurationUtils.GetConfigFastList();
-            configList.Refresh();
             configList.selectedIndex = -1;
+            configList.rowsData = ConfigurationUtils.GetConfigFastList();
             selectedConfig = null;
 
             // Update button states.

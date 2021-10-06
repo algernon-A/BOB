@@ -1,4 +1,17 @@
-﻿- Add tree/prop preview window
+﻿Version 0.7.4 -
+
+- Sort random prop and variation lists alphabetically
+- Fix mirrored X offset for networks when props are placed outside of lane position
+- Fix individual prop highlighting for sub-buildings
+- Fix random panel probability slider placement
+- Fix checkbox text in configurations option panel appearing only as tooltip
+- Fix revert button tooltip not changing when button state changes (LITERALLY UNPLAYABLE)
+
+
+Version 0.7.3 -
+
+- Add tree/prop preview window
+- Add compatibility with Extended Managers Library (EPropManager)
 - Fix scaling button tooltip translation key reference
 - Panels are now automatically and instantly destroyed if an exception occurs during creation
 - Revert to loaded tree/prop lists being immediately populated
