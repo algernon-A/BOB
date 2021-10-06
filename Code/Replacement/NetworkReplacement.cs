@@ -319,8 +319,8 @@ namespace BOB
 				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = (TreeInfo)netElement.replacementInfo;
 			}
 
-			// Invert x offset if original prop x position is negative.
-			if (propReference.position.x < 0)
+			// Invert x offset to match original prop x position.
+			if (propReference.network.m_lanes[propReference.laneIndex].m_position + propReference.position.x < 0)
             {
 				offset.x = 0 - offset.x;
             }
