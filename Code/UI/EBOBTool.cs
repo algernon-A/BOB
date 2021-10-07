@@ -64,42 +64,81 @@ namespace BOB
 					// Set base tool accurate position.
 					m_accuratePosition = output.m_hitPos;
 
-					// Select parent building of any 'untouchable' (sub-)building.
-					if (output.m_building != 0 && (Singleton<BuildingManager>.instance.m_buildings.m_buffer[output.m_building].m_flags & Building.Flags.Untouchable) != 0)
+					// Get ushort IDs for any manager not (yet) extended.
+					// Temporarily commented out and assign 0 default for temporary reflection (see below).
+					ushort buildingID = 0;// (ushort)output.m_building;
+					ushort netSegmentID = 0;//(ushort)output.m_netSegment;
+
+					/* ---------------
+					 * TEMPORARY REFLECTION UNTIL OTHER WORKSHOP MODS UPDATED TO NEW EML API
+					 * (otherwise lots of 'FieldNotFound' exceptions due to API changes)
+					 */
+					var buildingField = output.GetType().GetField("m_building");
+					var segmentField = output.GetType().GetField("m_netSegment");
+					object building = buildingField.GetValue(output);
+					object segment = segmentField.GetValue(output);
+
+					if (building is uint uBuilding)
 					{
-						output.m_building = Building.FindParentBuilding(output.m_building);
+						buildingID = (ushort)uBuilding;
+					}
+
+					if (building is ushort uShortBuilding)
+                    {
+						buildingID = uShortBuilding;
+                    }
+
+					if (segment is uint uSegment)
+					{
+						netSegmentID = (ushort)uSegment;
+					}
+
+					if (segment is ushort uShortSegment)
+					{
+						netSegmentID = uShortSegment;
+					}
+
+					/*----------------
+					 * END TEMPORARY REFLECTION
+					 */
+
+
+					// Select parent building of any 'untouchable' (sub-)building.
+					if (buildingID != 0 && (Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingID].m_flags & Building.Flags.Untouchable) != 0)
+					{
+						buildingID = Building.FindParentBuilding(buildingID);
 					}
 
 					// Check for valid hits by type - network, building, prop, tree, in that order (so e.g. embedded networks can be selected).
-					if (output.m_netSegment != 0)
+					if (netSegmentID != 0)
 					{
 						// Networks.
-						if (CheckSegment(output.m_netSegment, ref errors))
+						if (CheckSegment(netSegmentID, ref errors))
 						{
 							// CheckSegment passed - record hit position and set cursor to light.
-							output.m_hitPos = Singleton<NetManager>.instance.m_segments.m_buffer[output.m_netSegment].GetClosestPosition(output.m_hitPos);
+							output.m_hitPos = Singleton<NetManager>.instance.m_segments.m_buffer[netSegmentID].GetClosestPosition(output.m_hitPos);
 							m_cursor = lightCursor;
 
 						}
 						else
 						{
 							// CheckSegment failed - deselect segment.
-							output.m_netSegment = 0;
+							netSegmentID = 0;
 						}
 					}
-					else if (output.m_building != 0)
+					else if (buildingID != 0)
 					{
 						// Buildings.
-						if (CheckBuilding(output.m_building, ref errors))
+						if (CheckBuilding(buildingID, ref errors))
 						{
 							// CheckBuilding passed - record hit position and set cursor to light.
-							output.m_hitPos = Singleton<BuildingManager>.instance.m_buildings.m_buffer[output.m_building].m_position;
+							output.m_hitPos = Singleton<BuildingManager>.instance.m_buildings.m_buffer[buildingID].m_position;
 							m_cursor = lightCursor;
 						}
 						else
 						{
 							// CheckBuilding failed - deselect building.
-							output.m_building = 0;
+							buildingID = 0;
 						}
 					}
 					else if (output.m_propInstance != 0)
@@ -136,13 +175,13 @@ namespace BOB
 
 					// Create new hover instance and set hovered type (if applicable).
 					InstanceID hoverInstance = InstanceID.Empty;
-					if (output.m_netSegment != 0)
+					if (netSegmentID != 0)
 					{
-						hoverInstance.NetSegment = output.m_netSegment;
+						hoverInstance.NetSegment = netSegmentID;
 					}
-					else if (output.m_building != 0)
+					else if (buildingID != 0)
 					{
-						hoverInstance.Building = output.m_building;
+						hoverInstance.Building = buildingID;
 					}
 					else if (output.m_propInstance != 0)
 					{
