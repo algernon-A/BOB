@@ -2,6 +2,7 @@
 
 - Sort random prop and variation lists alphabetically
 - Fix mirrored X offset for networks when props are placed outside of lane position
+- Update Extended Managers Library API, allowing for temporary transitional process
 - Fix individual prop highlighting for sub-buildings
 - Fix random panel probability slider placement
 - Fix checkbox text in configurations option panel appearing only as tooltip
