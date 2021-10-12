@@ -22,7 +22,11 @@
     <Translation ID="BOB_PNL_RAN" String="全てのネットワーク"/>
     <Translation ID="BOB_PNL_RTT" String="マップ上のツリー"/>
     <Translation ID="BOB_PNL_RTP" String="マップ上のProp"/>
+    <Translation ID="BOB_PNL_RSW" String="ランダム構成を表示"/>
+    <Translation ID="BOB_PNL_RST" String="ランダム構成をセットアップ"/>
+    <Translation ID="BOB_PNL_SCA" String="Propとツリーの拡大率"/>
     <Translation ID="BOB_PNL_REV" String="元に戻す"/>
+    <Translation ID="BOB_PNL_REV_UND" String="選択した置換を元に戻す"/>
     <Translation ID="BOB_PNL_REV_TIP" String="このアイテムに対応する有効な置き換えが無く、元に戻せません"/>
     <Translation ID="BOB_PNL_PKB" String="リプレースパック"/>
     <Translation ID="BOB_PNL_PRB" String="出現率"/>
@@ -32,6 +36,15 @@
     <Translation ID="BOB_PNL_YOF" String="Y"/>
     <Translation ID="BOB_PNL_ZOF" String="Z"/>
     <Translation ID="BOB_PNL_SUB" String="サブビルディング"/>
+    <Translation ID="BOB_RND_TIT" String="ランダムなツリーとPropを構成"/>
+    <Translation ID="BOB_RND_NEW" String="新規"/>
+    <Translation ID="BOB_RND_DEL" String="削除"/>
+    <Translation ID="BOB_RND_REN" String="名前変更"/>
+    <Translation ID="BOB_RND_ADD" String="バリエーションに追加"/>
+    <Translation ID="BOB_RND_SUB" String="バリエーションから削除"/>
+    <Translation ID="BOB_SCA_TIT" String="Propの拡大率を設定"/>
+    <Translation ID="BOB_SCA_MIN" String="最小スケール"/>
+    <Translation ID="BOB_SCA_MAX" String="最大スケール"/>
     <Translation ID="BOB_SPR_SBL" String="このタイプの建物に置き換えが適用中"/>
     <Translation ID="BOB_SPR_ABL" String="全ての建物に置き換えが適用中"/>
     <Translation ID="BOB_SPR_SNT" String="このタイプのネットワークに置き換えが適用中"/>
@@ -93,17 +106,5 @@
     <Translation ID="BOB_UPD_062_0" String="Add ability to remove terrain ruining from all trees and/or props (in the options panel)"/>
     <Translation ID="BOB_UPD_062_1" String="Ferry paths are now selectable (to change/hide those ferry path marker buoys)"/>
     <Translation ID="BOB_UPD_062_2" String="Fix network prop angles sometimes being incorrectly displayed on selection"/>
-    <Translation ID="BOB_PNL_RSW" String="ランダム構成を表示"/>
-    <Translation ID="BOB_PNL_RST" String="ランダム構成をセットアップ"/>
-    <Translation ID="BOB_PNL_SCA" String="Propとツリーの拡大率"/>
-    <Translation ID="BOB_RND_TIT" String="ランダム構成にPropやツリーを追加"/>
-    <Translation ID="BOB_RND_NEW" String="新規"/>
-    <Translation ID="BOB_RND_DEL" String="削除"/>
-    <Translation ID="BOB_RND_REN" String="名前の変更"/>
-    <Translation ID="BOB_RND_ADD" String="バリエーションに追加"/>
-    <Translation ID="BOB_RND_SUB" String="バリエーションから除く"/>
-    <Translation ID="BOB_SCA_TIT" String="Propの拡大率を設定"/>
-    <Translation ID="BOB_SCA_MIN" String="最小スケール"/>
-    <Translation ID="BOB_SCA_MAX" String="最大スケール"/>
   </Translations>
 </Language>
