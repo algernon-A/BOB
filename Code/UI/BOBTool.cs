@@ -22,10 +22,18 @@ namespace BOB
 			Building,
 			PropOrTree
 		}
+
+
 		/// <summary>
 		/// Instance reference.
 		/// </summary>
 		public static BOBTool Instance => ToolsModifierControl.toolController?.gameObject?.GetComponent<BOBTool>();
+
+
+		/// <summary>
+		/// Returns true if the zoning tool is currently active, false otherwise.
+		/// </summary>
+		public static bool IsActiveTool => Instance != null && ToolsModifierControl.toolController.CurrentTool == Instance;
 
 
 		/// <summary>
@@ -260,6 +268,42 @@ namespace BOB
 			// Set mouse position and record errors.
 			m_mousePosition = output.m_hitPos;
 			m_selectErrors = errors;
+		}
+
+
+		/// <summary>
+		/// Toggles the current tool to/from the zoning tool.
+		/// </summary>
+		internal static void ToggleTool()
+		{
+			// Activate zoning tool if it isn't already; if already active, deactivate it by selecting the default tool instead.
+			if (!IsActiveTool)
+			{
+				// Activate RON tool.
+				ToolsModifierControl.toolController.CurrentTool = Instance;
+			}
+			else
+			{
+				// Activate default tool.
+				ToolsModifierControl.SetTool<DefaultTool>();
+			}
+		}
+
+
+		/// <summary>
+		/// Called by game when tool is disabled.
+		/// Used to close the BOB info panel.
+		/// </summary>
+		protected override void OnDisable()
+		{
+			base.OnDisable();
+
+			// Is a BOB info panel already open?
+			if (InfoPanelManager.Panel != null)
+			{
+				// Yes - close it.
+				InfoPanelManager.Close();
+			}
 		}
 
 

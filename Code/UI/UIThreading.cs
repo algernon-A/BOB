@@ -19,7 +19,7 @@ namespace BOB
 
         // Flags.
         private bool operating = true;
-        private bool _processed = false;
+        private bool processed = false;
 
 
         /// <summary>
@@ -156,40 +156,25 @@ namespace BOB
                     if (altOkay && ctrlOkay && shiftOkay)
                     {
                         // Only process if we're not already doing so.
-                        if (!_processed)
+                        if (!processed)
                         {
                             // Set processed flag.
-                            _processed = true;
+                            processed = true;
 
-                            // Is a BOB info panel already open?
-                            if (InfoPanelManager.Panel != null)
-                            {
-                                // Yes - close it.
-                                InfoPanelManager.Close();
-                            }
-                            // Otherwise, check to see if the select tool is currently active.
-                            else if (ToolsModifierControl.toolController?.CurrentTool is BOBTool)
-                            {
-                                // Select tool is currently active - deactivate it by activating the default tool instead.
-                                ToolsModifierControl.SetTool<DefaultTool>();
-                            }
-                            else
-                            {
-                                // Select tool is not currently active - select it.
-                                ToolsModifierControl.toolController.CurrentTool = BOBTool.Instance;
-                            }
+                            // Toggle tool status.
+                            BOBTool.ToggleTool();
                         }
                     }
                     else
                     {
                         // Relevant keys aren't pressed anymore; this keystroke is over, so reset and continue.
-                        _processed = false;
+                        processed = false;
                     }
                 }
                 else
                 {
                     // Relevant keys aren't pressed anymore; this keystroke is over, so reset and continue.
-                    _processed = false;
+                    processed = false;
                 }
             }
         }

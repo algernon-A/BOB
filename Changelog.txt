@@ -1,4 +1,7 @@
-﻿Version 0.7.4 -
+﻿- Add proper escape key handling
+
+
+Version 0.7.4 -
 
 - Sort random prop and variation lists alphabetically
 - Fix mirrored X offset for networks when props are placed outside of lane position
