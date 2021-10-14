@@ -112,7 +112,7 @@ namespace BOB
                 customCheck.isChecked = !string.IsNullOrEmpty(ConfigurationUtils.currentConfig);
 
                 // Apply button.
-                UIButton applyButton = UIControls.AddButton(panel, Margin, FooterY, "Save and apply", 300f, scale: 0.8f);
+                UIButton applyButton = UIControls.AddButton(panel, Margin, FooterY, Translations.Translate("BOB_CFG_LAA"), 300f, scale: 0.8f);
                 applyButton.eventClicked += Apply;
 
                 // Nuke all settings button.

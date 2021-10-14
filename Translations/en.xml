@@ -63,6 +63,7 @@
     <Translation ID="BOB_CFG_SSC" String="Copy selected configuration" />
     <Translation ID="BOB_CFG_SEC" String="New empty configuration" />
     <Translation ID="BOB_CFG_DEL" String="Delete selected configuration" />
+    <Translation ID="BOB_CFG_LAA" String="Load and apply selected configuration" />
     <Translation ID="BOB_OPT_GEN" String="General options" />
     <Translation ID="BOB_OPT_CFG" String="Configurations" />
     <Translation ID="BOB_OPT_RUI" String="Ruining" />
