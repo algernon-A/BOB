@@ -565,7 +565,7 @@ namespace BOB
 				}
 
 				// Get original (pre-replacement) tree/prop prefab and current probability (as default original probability).
-				propListItem.originalPrefab = BuildingReplacement.instance.GetOriginal(currentBuilding, propIndex) ?? AllBuildingReplacement.instance.GetOriginal(currentBuilding, propIndex) ?? finalInfo;
+				propListItem.originalPrefab = BuildingReplacement.instance.ActiveReplacement(currentBuilding, propIndex)?.targetInfo ?? AllBuildingReplacement.instance.ActiveReplacement(currentBuilding, propIndex)?.targetInfo ?? finalInfo;
 				propListItem.originalProb = currentBuilding.m_props[propIndex].m_probability;
 				propListItem.originalAngle = (currentBuilding.m_props[propIndex].m_radAngle * 180f) / Mathf.PI;
 

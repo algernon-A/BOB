@@ -6,7 +6,7 @@ namespace BOB
 	/// <summary>
 	/// Class to manage all-builing prop and tree replacements.
 	/// </summary>
-	internal class AllBuildingReplacement
+	internal class AllBuildingReplacement : BuildingReplacementBase
 	{
 		// Instance reference.
 		internal static AllBuildingReplacement instance;
@@ -16,19 +16,18 @@ namespace BOB
 
 
 		/// <summary>
-		/// Constructor - initializes instance reference and calls initial setup.
+		/// Constructor - initializes instance reference.
 		/// </summary>
 		internal AllBuildingReplacement()
 		{
 			instance = this;
-			Setup();
 		}
 
 
 		/// <summary>
 		/// Performs setup and initialises the master dictionary.  Must be called prior to use.
 		/// </summary>
-		internal void Setup()
+		protected override void Setup()
 		{
 			replacements = new Dictionary<PrefabInfo, BOBBuildingReplacement>();
 		}
@@ -37,7 +36,7 @@ namespace BOB
 		/// <summary>
 		/// Reverts all active all-building replacements and re-initialises the master dictionary.
 		/// </summary>
-		internal void RevertAll()
+		internal override void RevertAll()
 		{
 			// Iterate through each entry in the master prop dictionary.
 			foreach (PrefabInfo prop in replacements.Keys)
@@ -188,7 +187,7 @@ namespace BOB
 				for (int propIndex = 0; propIndex < building.m_props.Length; ++propIndex)
 				{
 					// Check for any currently active building or individual building prop replacement.
-					if (BuildingReplacement.instance.GetOriginal(building, propIndex) != null || IndividualBuildingReplacement.instance.GetOriginal(building, propIndex) != null)
+					if (BuildingReplacement.instance.ActiveReplacement(building, propIndex) != null || IndividualBuildingReplacement.instance.ActiveReplacement(building, propIndex) != null)
 					{
 						// Active building replacement; skip this one.
 						continue;
@@ -216,37 +215,8 @@ namespace BOB
 			// Now, iterate through each entry found and apply the replacement to each one.
 			foreach (BuildingPropReference propReference in replacements[target].references)
 			{
-				BuildingReplacement.instance.ReplaceProp(replacements[target], propReference);
+				ReplaceProp(replacements[target], propReference);
 			}
-		}
-
-
-		/// <summary>
-		/// Checks if there's a currently active all-building replacement applied to the given building prop index, and if so, returns the *original* prefab..
-		/// </summary>
-		/// <param name="buildingPrefab">Building prefab to check</param>
-		/// <param name="propIndex">Prop index to check</param>
-		/// <returns>Replacement record if an all-building replacement is currently applied, null if no all-building replacement is currently applied</returns>
-		internal PrefabInfo GetOriginal(BuildingInfo buildingPrefab, int propIndex)
-		{
-			// Iterate through each entry in master dictionary.
-			foreach (PrefabInfo target in replacements.Keys)
-			{
-				BOBBuildingReplacement reference = replacements[target];
-				// Iterate through each reference in this entry.
-				foreach (BuildingPropReference propRef in reference.references)
-				{
-					// Check for a building and prop index match.
-					if (propRef.building == buildingPrefab  && propRef.propIndex == propIndex)
-					{
-						// Match!  Return the original prefab.
-						return target;
-					}
-				}
-			}
-
-			// If we got here, no entry was found - return null to indicate no active replacement.
-			return null;
 		}
 
 
@@ -256,7 +226,7 @@ namespace BOB
 		/// <param name="buildingPrefab">Building prefab to check</param>
 		/// <param name="propIndex">Prop index to check</param>
 		/// <returns>Replacement record if an all-building replacement is currently applied, null if no all-building replacement is currently applied</returns>
-		internal BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingPrefab, int propIndex)
+		internal override BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingPrefab, int propIndex)
 		{
 			// Iterate through each entry in master dictionary.
 			foreach (PrefabInfo target in replacements.Keys)
@@ -303,7 +273,7 @@ namespace BOB
 				replacements[target].references.Add(newReference);
 
 				// Apply replacement.
-				BuildingReplacement.instance.ReplaceProp(replacements[target], newReference);
+				ReplaceProp(replacements[target], newReference);
 			}
 		}
 	}

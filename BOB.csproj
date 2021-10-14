@@ -69,6 +69,7 @@
     <Compile Include="Code\Patches\RuiningPatches.cs" />
     <Compile Include="Code\PreviewRenderer\PreviewPanel.cs" />
     <Compile Include="Code\PreviewRenderer\PreviewRenderer.cs" />
+    <Compile Include="Code\Replacement\BuildingReplacementBase.cs" />
     <Compile Include="Code\Replacement\EMapPropReplacement.cs" />
     <Compile Include="Code\Replacement\MapPropReplacement.cs" />
     <Compile Include="Code\Replacement\Scaling.cs" />
@@ -109,7 +110,7 @@
     <Compile Include="Code\Replacement\Replacement.cs" />
     <Compile Include="Code\Replacement\PackReplacement.cs" />
     <Compile Include="Code\Replacement\ReplacementUtils.cs" />
-    <Compile Include="Code\Replacement\IndividualReplacement.cs" />
+    <Compile Include="Code\Replacement\IndividualBuildingReplacement.cs" />
     <Compile Include="Code\Serialization.cs" />
     <Compile Include="Code\Settings\ModSettings.cs" />
     <Compile Include="Code\Settings\OptionsKeymapping.cs" />

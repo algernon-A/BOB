@@ -6,7 +6,7 @@ namespace BOB
 	/// <summary>
 	/// Class to manage individual building prop and tree replacements.
 	/// </summary>
-	internal class IndividualBuildingReplacement
+	internal class IndividualBuildingReplacement : BuildingReplacementBase
 	{
 		// Instance reference.
 		internal static IndividualBuildingReplacement instance;
@@ -16,19 +16,18 @@ namespace BOB
 
 
 		/// <summary>
-		/// Constructor - initializes instance reference and calls initial setup.
+		/// Constructor - initializes instance reference.
 		/// </summary>
 		internal IndividualBuildingReplacement()
 		{
 			instance = this;
-			Setup();
 		}
 
 
 		/// <summary>
 		/// Performs setup and initialises the master dictionary.  Must be called prior to use.
 		/// </summary>
-		internal void Setup()
+		protected override void Setup()
 		{
 			replacements = new Dictionary<BuildingInfo, Dictionary<int, BOBBuildingReplacement>>();
 		}
@@ -37,7 +36,7 @@ namespace BOB
 		/// <summary>
 		/// Reverts all active individual building replacements and re-initialises the master dictionary.
 		/// </summary>
-		internal void RevertAll()
+		internal override void RevertAll()
 		{
 			foreach (BuildingInfo building in replacements.Keys)
 			{
@@ -189,30 +188,7 @@ namespace BOB
 			AllBuildingReplacement.instance.RemoveEntry(building, target, targetIndex);
 
 			// Apply the replacement.
-			BuildingReplacement.instance.ReplaceProp(replacements[building][targetIndex], propReference);
-		}
-
-
-		/// <summary>
-		/// Checks if there's a currently active individual building prop replacement applied to the given building prop index, and if so, returns the *original* prefab.
-		/// </summary>
-		/// <param name="buildingPrefab">Building prefab to check</param>
-		/// <param name="propIndex">Prop index to check</param>
-		/// <returns>Original prefab if an invidividual building prop replacement is currently applied, null if no individual building prop replacement is currently applied</returns>
-		internal PrefabInfo GetOriginal(BuildingInfo buildingPrefab, int propIndex)
-		{
-			// Just check for a match in our dictionary.
-			if (buildingPrefab != null && replacements.ContainsKey(buildingPrefab))
-			{
-				if (replacements[buildingPrefab].ContainsKey(propIndex))
-				{
-					// Got a match - simply return the entry.
-					return replacements[buildingPrefab][propIndex].targetInfo;
-				}
-			}
-
-			// If we got here, no entry was found - return null to indicate no active replacement.
-			return null;
+			ReplaceProp(replacements[building][targetIndex], propReference);
 		}
 
 
@@ -222,7 +198,7 @@ namespace BOB
 		/// <param name="buildingPrefab">Building prefab to check</param>
 		/// <param name="propIndex">Prop index to check</param>
 		/// <returns>Replacement record if an invidividual building prop replacement is currently applied, null if no individual building prop replacement is currently applied</returns>
-		internal BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingPrefab, int propIndex)
+		internal override BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingPrefab, int propIndex)
 		{
 			// Just check for a match in our dictionary.
 			if (buildingPrefab != null && replacements.ContainsKey(buildingPrefab))

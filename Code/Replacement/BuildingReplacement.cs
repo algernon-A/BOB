@@ -5,22 +5,9 @@ using UnityEngine;
 namespace BOB
 {
 	/// <summary>
-	/// Records original prop data.
-	/// </summary>
-	public class BuildingPropReference
-	{
-		public BuildingInfo building;
-		public int propIndex;
-		public float radAngle;
-		public Vector3 postion;
-		public int probability;
-	}
-
-
-	/// <summary>
 	/// Class to manage building prop and tree replacements.
 	/// </summary>
-	internal class BuildingReplacement
+	internal class BuildingReplacement : BuildingReplacementBase
 	{
 		// Instance reference.
 		internal static BuildingReplacement instance;
@@ -30,19 +17,18 @@ namespace BOB
 
 
 		/// <summary>
-		/// Constructor - initializes instance reference and calls initial setup.
+		/// Constructor - initializes instance reference.
 		/// </summary>
 		internal BuildingReplacement()
-        {
+		{
 			instance = this;
-			Setup();
-        }
+		}
 
 
 		/// <summary>
 		/// Performs setup and initialises the master dictionary.  Must be called prior to use.
 		/// </summary>
-		internal void Setup()
+		protected override void Setup()
 		{
 			replacements = new Dictionary<BuildingInfo, Dictionary<PrefabInfo, BOBBuildingReplacement>>();
 		}
@@ -51,7 +37,7 @@ namespace BOB
 		/// <summary>
 		/// Reverts all active building replacements and re-initialises the master dictionary.
 		/// </summary>
-		internal void RevertAll()
+		internal override void RevertAll()
 		{
 			foreach (BuildingInfo building in replacements.Keys)
 			{
@@ -220,14 +206,14 @@ namespace BOB
 			for (int propIndex = 0; propIndex < building.m_props.Length; ++propIndex)
 			{
 				// Check for any currently active individual building prop replacement.
-				if (IndividualBuildingReplacement.instance.GetOriginal(building, propIndex) != null)
+				if (IndividualBuildingReplacement.instance.ActiveReplacement(building, propIndex) != null)
 				{
 					// Active individual building prop replacement; skip this one.
 					continue;
 				}
 
 				// Check for any existing all-building replacement.
-				PrefabInfo thisProp = AllBuildingReplacement.instance.GetOriginal(building, propIndex);
+				PrefabInfo thisProp = AllBuildingReplacement.instance.ActiveReplacement(building, propIndex)?.targetInfo;
 				if (thisProp == null)
 				{
 					// No active replacement; use current PropInfo.
@@ -269,45 +255,12 @@ namespace BOB
 
 
 		/// <summary>
-		/// Checks if there's a currently active building replacement applied to the given building prop index, and if so, returns the *original* prefab.
-		/// </summary>
-		/// <param name="buildingPrefab">Building prefab to check</param>
-		/// <param name="propIndex">Prop index to check</param>
-		/// <returns>Original prefab if a building replacement is currently applied, null if no building replacement is currently applied</returns>
-		internal PrefabInfo GetOriginal(BuildingInfo buildingPrefab, int propIndex)
-		{
-			// Safety check.
-			if (buildingPrefab != null && replacements.ContainsKey(buildingPrefab))
-			{
-				// Iterate through each entry in master dictionary.
-				foreach (PrefabInfo target in replacements[buildingPrefab].Keys)
-				{
-					BOBBuildingReplacement reference = replacements[buildingPrefab][target];
-					// Iterate through each prop reference in this entry.
-					foreach (BuildingPropReference propRef in reference.references)
-					{
-						// Check for a building and prop index match.
-						if (propRef.building == buildingPrefab && propRef.propIndex == propIndex)
-						{
-							// Match!  Return the original prefab.
-							return target;
-						}
-					}
-				}
-			}
-
-			// If we got here, no entry was found - return null to indicate no active replacement.
-			return null;
-		}
-
-
-		/// <summary>
 		/// Checks if there's a currently active building replacement applied to the given building prop index, and if so, returns the replacement record.
 		/// </summary>
 		/// <param name="buildingPrefab">Building prefab to check</param>
 		/// <param name="propIndex">Prop index to check</param>
 		/// <returns>Replacement record if a building replacement is currently applied, null if no building replacement is currently applied</returns>
-		internal BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingPrefab, int propIndex)
+		internal override BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingPrefab, int propIndex)
 		{
 			// Safety check.
 			if (buildingPrefab != null && replacements.ContainsKey(buildingPrefab))
@@ -331,43 +284,6 @@ namespace BOB
 
 			// If we got here, no entry was found - return null to indicate no active replacement.
 			return null;
-		}
-
-
-		/// <summary>
-		/// Replaces a prop using a building replacement.
-		/// </summary>
-		/// <param name="buildingElement">Building replacement element to apply</param>
-		/// <param name="propReference">Individual prop reference to apply to</param>
-		internal void ReplaceProp(BOBBuildingReplacement buildingElement, BuildingPropReference propReference)
-		{
-			// Convert offset to Vector3.
-			Vector3 offset = new Vector3
-			{
-				x = buildingElement.offsetX,
-				y = buildingElement.offsetY,
-				z = buildingElement.offsetZ
-			};
-
-			// Apply replacement.
-			if (buildingElement.replacementInfo is PropInfo propInfo)
-			{
-				propReference.building.m_props[propReference.propIndex].m_finalProp = propInfo;
-			}
-			else
-			{
-				propReference.building.m_props[propReference.propIndex].m_finalTree = (TreeInfo)buildingElement.replacementInfo;
-			}
-
-			// Angle and offset.
-			propReference.building.m_props[propReference.propIndex].m_radAngle = propReference.radAngle + ((buildingElement.angle * Mathf.PI) / 180f);
-			propReference.building.m_props[propReference.propIndex].m_position = propReference.postion + offset;
-
-			// Probability.
-			propReference.building.m_props[propReference.propIndex].m_probability = buildingElement.probability;
-
-			// Add building to dirty list.
-			BuildingData.DirtyList.Add(propReference.building);
 		}
 
 
