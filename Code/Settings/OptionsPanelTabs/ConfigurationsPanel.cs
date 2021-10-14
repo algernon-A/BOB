@@ -116,7 +116,7 @@ namespace BOB
                 applyButton.eventClicked += Apply;
 
                 // Nuke all settings button.
-                UIButton nukeButton = UIControls.AddButton(panel, Margin, FooterY + 50f, Translations.Translate("BOB_NUKE"));
+                UIButton nukeButton = UIControls.AddButton(panel, Margin, FooterY + 50f, Translations.Translate("BOB_NUKE"), 300f);
                 nukeButton.eventClicked += (control, clickEvent) =>
                 {
                     // Revert all-building and building settings.
