@@ -6,10 +6,10 @@ namespace BOB
 	/// <summary>
 	/// Class to manage individual building prop and tree replacements.
 	/// </summary>
-	internal class IndividualReplacement
+	internal class IndividualBuildingReplacement
 	{
 		// Instance reference.
-		internal static IndividualReplacement instance;
+		internal static IndividualBuildingReplacement instance;
 
 		// Master dictionary of replaced prop references.
 		internal Dictionary<BuildingInfo, Dictionary<int, BOBBuildingReplacement>> replacements;
@@ -18,7 +18,7 @@ namespace BOB
 		/// <summary>
 		/// Constructor - initializes instance reference and calls initial setup.
 		/// </summary>
-		internal IndividualReplacement()
+		internal IndividualBuildingReplacement()
 		{
 			instance = this;
 			Setup();

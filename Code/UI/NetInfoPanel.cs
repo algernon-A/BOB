@@ -10,6 +10,10 @@ namespace BOB
 	/// </summary>
 	internal class BOBNetInfoPanel : BOBInfoPanel
 	{
+		// Layout constants.
+		private const float PackButtonX = RandomButtonX + ToggleSize;
+
+
 		// Current selection reference.
 		private NetInfo currentNet;
 
@@ -74,7 +78,7 @@ namespace BOB
 		internal BOBNetInfoPanel()
         {
 			// Add pack button.
-			UIButton packButton = AddIconButton(this, MiddleX + ToggleSize, TitleHeight + Margin, ToggleSize, "BOB_PNL_PKB", TextureUtils.LoadSpriteAtlas("bob_prop_pack"));
+			UIButton packButton = AddIconButton(this, PackButtonX, TitleHeight + Margin, ToggleSize, "BOB_PNL_PKB", TextureUtils.LoadSpriteAtlas("bob_prop_pack"));
 			packButton.eventClicked += (component, clickEvent) => PackPanelManager.Create();
 
 			// Populate loaded list.

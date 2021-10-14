@@ -42,7 +42,7 @@ namespace BOB
             new AllNetworkReplacement();
             new BuildingReplacement();
             new NetworkReplacement();
-            new IndividualReplacement();
+            new IndividualBuildingReplacement();
             new MapTreeReplacement();
 
             // Using EPropManager?

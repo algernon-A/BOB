@@ -220,7 +220,7 @@ namespace BOB
 			for (int propIndex = 0; propIndex < building.m_props.Length; ++propIndex)
 			{
 				// Check for any currently active individual building prop replacement.
-				if (IndividualReplacement.instance.GetOriginal(building, propIndex) != null)
+				if (IndividualBuildingReplacement.instance.GetOriginal(building, propIndex) != null)
 				{
 					// Active individual building prop replacement; skip this one.
 					continue;

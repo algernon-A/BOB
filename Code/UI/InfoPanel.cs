@@ -21,6 +21,7 @@ namespace BOB
 		private const float ZOffsetY = YOffsetY + SliderHeight;
 		private const float OffsetPanelHeight = ZOffsetY + SliderHeight;
 		private const float OffsetPanelY = OffsetPanelBase - OffsetPanelHeight;
+		protected const float RandomButtonX = MiddleX + ToggleSize;
 
 		private const float AngleY = OffsetPanelY - FieldOffset;
 		private const float ProbabilityY = AngleY - FieldOffset;
@@ -84,7 +85,7 @@ namespace BOB
 			randomCheck.eventCheckChanged += RandomCheckChanged;
 
 			// Random settings button.
-			UIButton randomButton = AddIconButton(this, MiddleX + ToggleSize, TitleHeight + Margin, ToggleSize, "BOB_PNL_RST", TextureUtils.LoadSpriteAtlas("bob_random_small"));
+			UIButton randomButton = AddIconButton(this, RandomButtonX, TitleHeight + Margin, ToggleSize, "BOB_PNL_RST", TextureUtils.LoadSpriteAtlas("bob_random_small"));
 			randomButton.eventClicked += (control, clickEvent) => BOBRandomPanel.Create();
 		}
 

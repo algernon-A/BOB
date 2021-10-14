@@ -181,13 +181,13 @@ namespace BOB
 
 						// Serialise individual building prop replacements, per building.
 						configFile.indBuildings = new List<BOBBuildingElement>();
-						foreach (BuildingInfo building in IndividualReplacement.instance.replacements.Keys)
+						foreach (BuildingInfo building in IndividualBuildingReplacement.instance.replacements.Keys)
 						{
 							// Create new element.
 							configFile.indBuildings.Add(new BOBBuildingElement
 							{
 								building = building.name,
-								replacements = IndividualReplacement.instance.replacements[building].Values.ToList()
+								replacements = IndividualBuildingReplacement.instance.replacements[building].Values.ToList()
 							});
 						}
 
@@ -512,7 +512,7 @@ namespace BOB
 				}
 
 				// If we got here, it's all good; apply the building replacement.
-				IndividualReplacement.instance.Apply(buildingInfo, targetPrefab, replacement.index, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
+				IndividualBuildingReplacement.instance.Apply(buildingInfo, targetPrefab, replacement.index, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
 			}
 		}
 

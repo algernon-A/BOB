@@ -16,7 +16,7 @@ namespace BOB
 			// Revert all-building and building settings (assuming instances exist).
 			AllBuildingReplacement.instance?.RevertAll();
 			BuildingReplacement.instance?.RevertAll();
-			IndividualReplacement.instance?.RevertAll();
+			IndividualBuildingReplacement.instance?.RevertAll();
 			PackReplacement.instance?.RevertAll();
 			AllNetworkReplacement.instance?.RevertAll();
 			NetworkReplacement.instance?.RevertAll();
