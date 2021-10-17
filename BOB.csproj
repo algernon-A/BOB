@@ -72,6 +72,7 @@
     <Compile Include="Code\Replacement\BuildingReplacementBase.cs" />
     <Compile Include="Code\Replacement\EMapPropReplacement.cs" />
     <Compile Include="Code\Replacement\MapPropReplacement.cs" />
+    <Compile Include="Code\Replacement\NetworkReplacementBase.cs" />
     <Compile Include="Code\Replacement\Scaling.cs" />
     <Compile Include="Code\Settings\OptionsPanelTabs\RuiningOptions.cs" />
     <Compile Include="Code\UI\BOBSlider.cs" />
@@ -108,7 +109,7 @@
     <Compile Include="Code\Replacement\NetworkReplacement.cs" />
     <Compile Include="Code\Replacement\PrefabLists.cs" />
     <Compile Include="Code\Replacement\Replacement.cs" />
-    <Compile Include="Code\Replacement\PackReplacement.cs" />
+    <Compile Include="Code\Replacement\NetworkPackReplacement.cs" />
     <Compile Include="Code\Replacement\ReplacementUtils.cs" />
     <Compile Include="Code\Replacement\IndividualBuildingReplacement.cs" />
     <Compile Include="Code\Serialization.cs" />

@@ -174,7 +174,7 @@ namespace BOB
             revertButton.Disable();
 
             // Populate list.
-            packSelection.rowsData = PackReplacement.instance.GetPackFastList();
+            packSelection.rowsData = NetworkPackReplacement.instance.GetPackFastList();
 
             // Focus.
             BringToFront();
@@ -189,7 +189,7 @@ namespace BOB
         private void SetPackStatus(bool status)
         {
             // Set pack status,
-            PackReplacement.instance.SetPackStatus(selectedPack, status);
+            NetworkPackReplacement.instance.SetPackStatus(selectedPack, status);
             ConfigurationUtils.SaveConfig();
             packSelection.Refresh();
 
@@ -226,7 +226,7 @@ namespace BOB
             }    
 
             // Check status of current pack.
-            if (PackReplacement.instance.GetPackStatus(selectedPack))
+            if (NetworkPackReplacement.instance.GetPackStatus(selectedPack))
             {
                 // Pack is currently applied - enable revert button and disable apply button.
                 revertButton.tooltip = Translations.Translate("BOB_PCK_RVT_A");
@@ -237,7 +237,7 @@ namespace BOB
             else
             {
                 // Pack is not currently applied - check for pack conflicts.
-                if (PackReplacement.instance.Conflicts(selectedPack))
+                if (NetworkPackReplacement.instance.Conflicts(selectedPack))
                 {
                     // Conflict detected - disable apply button and add explanatory tooltip.
                     applyButton.tooltip = Translations.Translate("BOB_PCK_APP_C");
@@ -320,8 +320,8 @@ namespace BOB
             rowLabel.text = thisPack;
 
             // Set sprite status.
-            bool packStatus = PackReplacement.instance.GetPackStatus(thisPack);
-            bool notAllLoaded = PackReplacement.instance.PackNotAllLoaded(thisPack);
+            bool packStatus = NetworkPackReplacement.instance.GetPackStatus(thisPack);
+            bool notAllLoaded = NetworkPackReplacement.instance.PackNotAllLoaded(thisPack);
             statusSprite.spriteName = packStatus ? "AchievementCheckedTrue" : "AchievementCheckedFalse";
             statusSprite.tooltip = packStatus ? Translations.Translate("BOB_PCK_APP_I") : Translations.Translate("BOB_PCK_RVT_I");
             if (notAllLoaded)

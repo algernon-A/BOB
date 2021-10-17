@@ -7,7 +7,7 @@ namespace BOB
 	/// <summary>
 	/// Class to manage network prop and tree replacements.
 	/// </summary>
-	internal class NetworkReplacement
+	internal class NetworkReplacement : NetworkReplacementBase
 	{
 		// Instance reference.
 		internal static NetworkReplacement instance;
@@ -17,28 +17,18 @@ namespace BOB
 
 
 		/// <summary>
-		/// Constructor - initializes instance reference and calls initial setup.
+		/// Constructor - initializes instance reference.
 		/// </summary>
 		internal NetworkReplacement()
 		{
 			instance = this;
-			Setup();
-		}
-
-
-		/// <summary>
-		/// Performs setup and initialises the master dictionary.  Must be called prior to use.
-		/// </summary>
-		internal void Setup()
-		{
-			replacements = new Dictionary<NetInfo, Dictionary<PrefabInfo, BOBNetReplacement>>();
 		}
 
 
 		/// <summary>
 		/// Reverts all active network replacements and re-initialises the master dictionary.
 		/// </summary>
-		internal void RevertAll()
+		internal override void RevertAll()
 		{
 			foreach (NetInfo network in replacements.Keys)
 			{
@@ -90,7 +80,7 @@ namespace BOB
 				if (!AllNetworkReplacement.instance.Restore(network, target, propReference.laneIndex, propReference.propIndex))
 				{
 					// No all-network restoration occured - restore any pack replacement.
-					PackReplacement.instance.Restore(network, target, propReference.laneIndex, propReference.propIndex);
+					NetworkPackReplacement.instance.Restore(network, target, propReference.laneIndex, propReference.propIndex);
 				}
 
 				// Add network to dirty list.
@@ -182,7 +172,7 @@ namespace BOB
 				for (int propIndex = 0; propIndex < network.m_lanes[laneIndex].m_laneProps.m_props.Length; ++propIndex)
 				{
 					// Check for any existing pack or all-network replacement.
-					PrefabInfo thisProp = PackReplacement.instance.GetOriginal(network, laneIndex, propIndex) ?? AllNetworkReplacement.instance.GetOriginal(network, laneIndex, propIndex);
+					PrefabInfo thisProp = NetworkPackReplacement.instance.GetOriginal(network, laneIndex, propIndex) ?? AllNetworkReplacement.instance.GetOriginal(network, laneIndex, propIndex);
 					if (thisProp == null)
                     {
 						// No active replacement; use current PropInfo.
@@ -217,7 +207,7 @@ namespace BOB
 			foreach (NetPropReference propReference in replacements[network][target].references)
 			{
 				// Reset any pack or all-network replacements first.
-				PackReplacement.instance.RemoveEntry(network, target, propReference.laneIndex, propReference.propIndex);
+				NetworkPackReplacement.instance.RemoveEntry(network, target, propReference.laneIndex, propReference.propIndex);
 				AllNetworkReplacement.instance.RemoveEntry(network, target, propReference.laneIndex, propReference.propIndex);
 
 				// Apply the replacement.
@@ -267,7 +257,7 @@ namespace BOB
 		/// <param name="laneIndex">Lane index to check</param>
 		/// <param name="propIndex">Prop index to check</param>
 		/// <returns>Replacement record if a network replacement is currently applied, null if no network replacement is currently applied</returns>
-		internal BOBNetReplacement ActiveReplacement(NetInfo netPrefab, int laneIndex, int propIndex)
+		internal override BOBNetReplacement ActiveReplacement(NetInfo netPrefab, int laneIndex, int propIndex)
 		{
 			// Safety check.
 			if (netPrefab != null && replacements.ContainsKey(netPrefab))
@@ -295,45 +285,11 @@ namespace BOB
 
 
 		/// <summary>
-		/// Replaces a prop using a network replacement.
+		/// Performs setup and initialises the master dictionary.  Must be called prior to use.
 		/// </summary>
-		/// <param name="netElement">Network replacement element to apply</param>
-		/// <param name="propReference">Individual prop reference to apply to</param>
-		internal void ReplaceProp(BOBNetReplacement netElement, NetPropReference propReference)
+		protected override void Setup()
 		{
-			// Convert offset to Vector3.
-			Vector3 offset = new Vector3
-			{
-				x = netElement.offsetX,
-				y = netElement.offsetY,
-				z = netElement.offsetZ
-			};
-
-			// Apply replacement.
-			if (netElement.replacementInfo is PropInfo propInfo)
-			{
-				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = propInfo;
-			}
-			else
-			{
-				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = (TreeInfo)netElement.replacementInfo;
-			}
-
-			// Invert x offset to match original prop x position.
-			if (propReference.network.m_lanes[propReference.laneIndex].m_position + propReference.position.x < 0)
-            {
-				offset.x = 0 - offset.x;
-            }
-
-			// Angle and offset.
-			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle + netElement.angle;
-			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.position + offset;
-
-			// Probability.
-			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_probability = netElement.probability;
-
-			// Add network to dirty list.
-			NetData.DirtyList.Add(propReference.network);
+			replacements = new Dictionary<NetInfo, Dictionary<PrefabInfo, BOBNetReplacement>>();
 		}
 	}
 }

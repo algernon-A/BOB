@@ -26,15 +26,6 @@ namespace BOB
 
 
 		/// <summary>
-		/// Performs setup and initialises the master dictionary.  Must be called prior to use.
-		/// </summary>
-		protected override void Setup()
-		{
-			replacements = new Dictionary<BuildingInfo, Dictionary<PrefabInfo, BOBBuildingReplacement>>();
-		}
-
-
-		/// <summary>
 		/// Reverts all active building replacements and re-initialises the master dictionary.
 		/// </summary>
 		internal override void RevertAll()
@@ -321,6 +312,15 @@ namespace BOB
 
 			// If we got here, no restoration was made.
 			return false;
+		}
+
+
+		/// <summary>
+		/// Performs setup and initialises the master dictionary.  Must be called prior to use.
+		/// </summary>
+		protected override void Setup()
+		{
+			replacements = new Dictionary<BuildingInfo, Dictionary<PrefabInfo, BOBBuildingReplacement>>();
 		}
 	}
 }

@@ -1,27 +1,12 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 
 
 namespace BOB
 {
 	/// <summary>
-	/// Records original prop data.
-	/// </summary>
-	public class NetPropReference
-	{
-		public NetInfo network;
-		public int laneIndex;
-		public int propIndex;
-		public float angle;
-		public Vector3 position;
-		public int probability;
-	}
-
-
-	/// <summary>
 	/// Class to manage all-network prop and tree replacements.
 	/// </summary>
-	internal class AllNetworkReplacement
+	internal class AllNetworkReplacement : NetworkReplacementBase
 	{
 		// Instance reference.
 		internal static AllNetworkReplacement instance;
@@ -31,28 +16,18 @@ namespace BOB
 
 
 		/// <summary>
-		/// Constructor - initializes instance reference and calls initial setup.
+		/// Constructor - initializes instance reference.
 		/// </summary>
 		internal AllNetworkReplacement()
 		{
 			instance = this;
-			Setup();
-		}
-
-
-		/// <summary>
-		/// Performs setup and initialises the master dictionary.  Must be called prior to use.
-		/// </summary>
-		internal void Setup()
-		{
-			replacements = new Dictionary<PrefabInfo, BOBNetReplacement>();
 		}
 
 		
 		/// <summary>
 		/// Reverts all active all-network replacements and re-initialises the master dictionary.
 		/// </summary>
-		internal void RevertAll()
+		internal override void RevertAll()
 		{
 			// Iterate through each entry in the master prop dictionary.
 			foreach (PrefabInfo prop in replacements.Keys)
@@ -94,7 +69,7 @@ namespace BOB
 				NetData.DirtyList.Add(propReference.network);
 
 				// Restore any pack replacement.
-				PackReplacement.instance.Restore(propReference.network, target, propReference.laneIndex, propReference.propIndex);
+				NetworkPackReplacement.instance.Restore(propReference.network, target, propReference.laneIndex, propReference.propIndex);
 			}
 
 			// Remove entry from dictionary, if we're doing so.
@@ -223,7 +198,7 @@ namespace BOB
 						}
 
 						// Check for any existing pack replacement.
-						PrefabInfo thisProp = PackReplacement.instance.GetOriginal(network, laneIndex, propIndex);
+						PrefabInfo thisProp = NetworkPackReplacement.instance.GetOriginal(network, laneIndex, propIndex);
 						if (thisProp == null)
 						{
 							// No active replacement; use current PropInfo.
@@ -259,9 +234,9 @@ namespace BOB
 			foreach (NetPropReference propReference in replacements[target].references)
 			{
 				// Reset any pack replacements first.
-				PackReplacement.instance.RemoveEntry(propReference.network, target, propReference.laneIndex, propReference.propIndex);
+				NetworkPackReplacement.instance.RemoveEntry(propReference.network, target, propReference.laneIndex, propReference.propIndex);
 
-				NetworkReplacement.instance.ReplaceProp(replacements[target], propReference);
+				ReplaceProp(replacements[target], propReference);
 			}
 		}
 
@@ -303,7 +278,7 @@ namespace BOB
 		/// <param name="laneIndex">Lane index to check</param>
 		/// <param name="propIndex">Prop index to check</param>
 		/// <returns>Replacement record if a all-network replacement is currently applied, null if no all-network replacement is currently applied</returns>
-		internal BOBNetReplacement ActiveReplacement(NetInfo netPrefab, int laneIndex, int propIndex)
+		internal override BOBNetReplacement ActiveReplacement(NetInfo netPrefab, int laneIndex, int propIndex)
 		{
 			// Iterate through each entry in master dictionary.
 			foreach (PrefabInfo target in replacements.Keys)
@@ -353,12 +328,21 @@ namespace BOB
 				replacements[target].references.Add(newReference);
 
 				// Apply replacement and return true to indicate restoration.
-				NetworkReplacement.instance.ReplaceProp(replacements[target], newReference);
+				ReplaceProp(replacements[target], newReference);
 				return true;
 			}
 
 			// If we got here, no restoration was made.
 			return false;
+		}
+
+
+		/// <summary>
+		/// Performs setup and initialises the master dictionary.  Must be called prior to use.
+		/// </summary>
+		protected override void Setup()
+		{
+			replacements = new Dictionary<PrefabInfo, BOBNetReplacement>();
 		}
 	}
 }

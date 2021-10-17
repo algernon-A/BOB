@@ -94,7 +94,7 @@ namespace BOB
 						}
 
 						// Deserialise active replacement packs.
-						PackReplacement.instance.DeserializeActivePacks(configFile.activePacks);
+						NetworkPackReplacement.instance.DeserializeActivePacks(configFile.activePacks);
 					}
 				}
 				else
@@ -207,7 +207,7 @@ namespace BOB
 						}
 
 						// Serialise active replacement packs.
-						configFile.activePacks = PackReplacement.instance.SerializeActivePacks();
+						configFile.activePacks = NetworkPackReplacement.instance.SerializeActivePacks();
 					}
 
 					// Write to file.

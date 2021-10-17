@@ -7,10 +7,10 @@ namespace BOB
 	/// <summary>
 	/// Class to manage replacement packs.
 	/// </summary>
-	internal class PackReplacement
+	internal class NetworkPackReplacement : NetworkReplacementBase
 	{
 		// Instance reference.
-		internal static PackReplacement instance;
+		internal static NetworkPackReplacement instance;
 
 		// Master dictionary of prop pack replacements.
 		private Dictionary<string, Dictionary<PrefabInfo, PropReplacement>> packRecords;
@@ -24,12 +24,11 @@ namespace BOB
 
 
 		/// <summary>
-		/// Constructor - initializes instance reference and calls initial setup.
+		/// Constructor - initializes instance reference.
 		/// </summary>
-		internal PackReplacement()
+		internal NetworkPackReplacement()
 		{
 			instance = this;
-			Setup();
 		}
 
 
@@ -231,90 +230,9 @@ namespace BOB
 
 
 		/// <summary>
-		/// Performs setup, loads pack files, and initialises the dictionaries.  Must be called prior to use.
-		/// </summary>
-		internal void Setup()
-		{
-			// Initialise dictionaries.
-			packRecords = new Dictionary<string, Dictionary<PrefabInfo, PropReplacement>>();
-			replacements = new Dictionary<PrefabInfo, BOBNetReplacement>();
-			packEnabled = new Dictionary<string, bool>();
-			packNotAllLoaded = new Dictionary<string, bool>();
-
-			// Read config files.
-			List<BOBPackFile> packFiles = PackUtils.LoadPackFiles();
-
-			foreach (BOBPackFile packFile in packFiles)
-			{
-				// Iterate through each prop pack loaded from the settings file.
-				foreach (PropPack propPack in packFile.propPacks)
-				{
-					// Check to see if we already have a record for this pack.
-					if (packRecords.ContainsKey(propPack.name))
-					{
-						// Yes - log the message and carry on.
-						Logging.Message("duplicate record for replacement pack with name", propPack.name);
-					}
-					else
-					{
-						// No - add pack to our records.
-						packRecords.Add(propPack.name, new Dictionary<PrefabInfo, PropReplacement>());
-						packEnabled.Add(propPack.name, false);
-					}
-
-					// Iterate through each replacement in the pack.
-					for (int i = 0; i < propPack.propReplacements.Count; ++i)
-					{
-						// Get reference.
-						PropReplacement propReplacement = propPack.propReplacements[i];
-
-						// Can we find both target and replacment?
-						PrefabInfo targetInfo = propReplacement.isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(propReplacement.targetName) : PrefabCollection<PropInfo>.FindLoaded(propReplacement.targetName);
-						propReplacement.replacementInfo = propReplacement.isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(propReplacement.replacementName) : PrefabCollection<PropInfo>.FindLoaded(propReplacement.replacementName);
-						if (targetInfo == null)
-						{
-							// Target prop not found - log and continue.
-							Logging.Message("couldn't find pack target prop");
-						}
-						else if (propReplacement.replacementInfo == null)
-						{
-							// Replacement prop not found - flag that pack wasn't all loaded.
-							if (!packNotAllLoaded.ContainsKey(propPack.name))
-                            {
-								packNotAllLoaded.Add(propPack.name, true);
-                            }
-						}
-						else
-						{
-							// Target and replacment both found - add this replacmeent to our pack dictionary entry.
-							if (packRecords[propPack.name].ContainsKey(targetInfo))
-							{
-								// Skip any duplicates.
-								Logging.Error("duplicate replacement ", targetInfo.name, " in replacement pack ", propPack.name);
-							}
-							else
-							{
-								packRecords[propPack.name].Add(targetInfo, propReplacement);
-							}
-						}
-					}
-
-					// Check to make sure we have at least one replacement; if not, remove the pack from our records.
-					if (packRecords[propPack.name].Count == 0)
-					{
-						Logging.Message("replacement pack ", propPack.name, " has no valid replacements; removing from list");
-						packRecords.Remove(propPack.name);
-						packEnabled.Remove(propPack.name);
-					}
-				}
-			}
-		}
-
-
-		/// <summary>
 		/// Reverts all active pack replacements and re-initialises the master dictionaries.
 		/// </summary>
-		internal void RevertAll()
+		internal override void RevertAll()
 		{
 			// Iterate through each entry in the master pack dictionary.
 			foreach (string packName in packEnabled.Keys)
@@ -402,6 +320,87 @@ namespace BOB
 						// Remove this reference and return.
 						replacements[target].references.Remove(replacements[target].references[i]);
 						return;
+					}
+				}
+			}
+		}
+
+
+		/// <summary>
+		/// Performs setup, loads pack files, and initialises the dictionaries.  Must be called prior to use.
+		/// </summary>
+		protected override void Setup()
+		{
+			// Initialise dictionaries.
+			packRecords = new Dictionary<string, Dictionary<PrefabInfo, PropReplacement>>();
+			replacements = new Dictionary<PrefabInfo, BOBNetReplacement>();
+			packEnabled = new Dictionary<string, bool>();
+			packNotAllLoaded = new Dictionary<string, bool>();
+
+			// Read config files.
+			List<BOBPackFile> packFiles = PackUtils.LoadPackFiles();
+
+			foreach (BOBPackFile packFile in packFiles)
+			{
+				// Iterate through each prop pack loaded from the settings file.
+				foreach (PropPack propPack in packFile.propPacks)
+				{
+					// Check to see if we already have a record for this pack.
+					if (packRecords.ContainsKey(propPack.name))
+					{
+						// Yes - log the message and carry on.
+						Logging.Message("duplicate record for replacement pack with name", propPack.name);
+					}
+					else
+					{
+						// No - add pack to our records.
+						packRecords.Add(propPack.name, new Dictionary<PrefabInfo, PropReplacement>());
+						packEnabled.Add(propPack.name, false);
+					}
+
+					// Iterate through each replacement in the pack.
+					for (int i = 0; i < propPack.propReplacements.Count; ++i)
+					{
+						// Get reference.
+						PropReplacement propReplacement = propPack.propReplacements[i];
+
+						// Can we find both target and replacment?
+						PrefabInfo targetInfo = propReplacement.isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(propReplacement.targetName) : PrefabCollection<PropInfo>.FindLoaded(propReplacement.targetName);
+						propReplacement.replacementInfo = propReplacement.isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(propReplacement.replacementName) : PrefabCollection<PropInfo>.FindLoaded(propReplacement.replacementName);
+						if (targetInfo == null)
+						{
+							// Target prop not found - log and continue.
+							Logging.Message("couldn't find pack target prop");
+						}
+						else if (propReplacement.replacementInfo == null)
+						{
+							// Replacement prop not found - flag that pack wasn't all loaded.
+							if (!packNotAllLoaded.ContainsKey(propPack.name))
+							{
+								packNotAllLoaded.Add(propPack.name, true);
+							}
+						}
+						else
+						{
+							// Target and replacment both found - add this replacmeent to our pack dictionary entry.
+							if (packRecords[propPack.name].ContainsKey(targetInfo))
+							{
+								// Skip any duplicates.
+								Logging.Error("duplicate replacement ", targetInfo.name, " in replacement pack ", propPack.name);
+							}
+							else
+							{
+								packRecords[propPack.name].Add(targetInfo, propReplacement);
+							}
+						}
+					}
+
+					// Check to make sure we have at least one replacement; if not, remove the pack from our records.
+					if (packRecords[propPack.name].Count == 0)
+					{
+						Logging.Message("replacement pack ", propPack.name, " has no valid replacements; removing from list");
+						packRecords.Remove(propPack.name);
+						packEnabled.Remove(propPack.name);
 					}
 				}
 			}
@@ -525,7 +524,7 @@ namespace BOB
 			// Now, iterate through each entry found and apply the replacement to each one.
 			foreach (NetPropReference propReference in replacements[target].references)
 			{
-				NetworkReplacement.instance.ReplaceProp(replacements[target], propReference);
+				ReplaceProp(replacements[target], propReference);
 			}
 		}
 
@@ -567,7 +566,7 @@ namespace BOB
 		/// <param name="laneIndex">Lane index to check</param>
 		/// <param name="propIndex">Prop index to check</param>
 		/// <returns>Replacement record if a all-network replacement is currently applied, null if no all-network replacement is currently applied</returns>
-		internal BOBNetReplacement ActiveReplacement(NetInfo netPrefab, int laneIndex, int propIndex)
+		internal override BOBNetReplacement ActiveReplacement(NetInfo netPrefab, int laneIndex, int propIndex)
 		{
 			// Iterate through each entry in master dictionary.
 			foreach (PrefabInfo target in replacements.Keys)
@@ -616,7 +615,7 @@ namespace BOB
 				replacements[target].references.Add(newReference);
 
 				// Apply replacement and return true to indicate restoration.
-				NetworkReplacement.instance.ReplaceProp(replacements[target], newReference);
+				ReplaceProp(replacements[target], newReference);
 				return true;
 			}
 

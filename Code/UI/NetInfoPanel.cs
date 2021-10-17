@@ -223,7 +223,7 @@ namespace BOB
 				}
 
 				// Replacement pack replacement and original probability (if any).
-				BOBNetReplacement packReplacement = PackReplacement.instance.ActiveReplacement(currentNet, lane, propIndex);
+				BOBNetReplacement packReplacement = NetworkPackReplacement.instance.ActiveReplacement(currentNet, lane, propIndex);
 				if (packReplacement != null)
 				{
 					propListItem.packagePrefab = packReplacement.replacementInfo;
@@ -294,7 +294,7 @@ namespace BOB
 					propListItem.lanes.Add(lane);
 
 					// Get original (pre-replacement) tree/prop prefab and current probability (as default original probability).
-					propListItem.originalPrefab = NetworkReplacement.instance.GetOriginal(currentNet, lane, propIndex) ?? AllNetworkReplacement.instance.GetOriginal(currentNet, lane, propIndex) ?? PackReplacement.instance.GetOriginal(currentNet, lane, propIndex) ?? finalInfo;
+					propListItem.originalPrefab = NetworkReplacement.instance.GetOriginal(currentNet, lane, propIndex) ?? AllNetworkReplacement.instance.GetOriginal(currentNet, lane, propIndex) ?? NetworkPackReplacement.instance.GetOriginal(currentNet, lane, propIndex) ?? finalInfo;
 					propListItem.originalProb = laneProps[propIndex].m_probability;
 					propListItem.originalAngle = laneProps[propIndex].m_angle;
 
@@ -315,7 +315,7 @@ namespace BOB
 					}
 
 					// Replacement pack replacement and original probability (if any).
-					BOBNetReplacement packReplacement = PackReplacement.instance.ActiveReplacement(currentNet, lane, propIndex);
+					BOBNetReplacement packReplacement = NetworkPackReplacement.instance.ActiveReplacement(currentNet, lane, propIndex);
 					if (packReplacement != null)
 					{
 						propListItem.packagePrefab = packReplacement.replacementInfo;

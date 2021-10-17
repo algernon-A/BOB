@@ -109,7 +109,7 @@ namespace BOB
             PrefabLists.BuildLists();
 
             // Load prop packs.
-            new PackReplacement();
+            new NetworkPackReplacement();
 
             // Load configuration file.
             ConfigurationUtils.LoadConfig();

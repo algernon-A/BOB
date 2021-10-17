@@ -17,7 +17,7 @@ namespace BOB
 			AllBuildingReplacement.instance?.RevertAll();
 			BuildingReplacement.instance?.RevertAll();
 			IndividualBuildingReplacement.instance?.RevertAll();
-			PackReplacement.instance?.RevertAll();
+			NetworkPackReplacement.instance?.RevertAll();
 			AllNetworkReplacement.instance?.RevertAll();
 			NetworkReplacement.instance?.RevertAll();
 			Scaling.instance?.RevertAll();

@@ -21,13 +21,6 @@ namespace BOB
 	/// </summary>
 	internal abstract class BuildingReplacementBase
 	{
-
-		/// <summary>
-		/// Performs setup and initialises the master dictionary.  Must be called prior to use.
-		/// </summary>
-		protected abstract void Setup();
-
-
 		/// <summary>
 		/// Reverts all active replacements and re-initialises the master dictionary.
 		/// </summary>
@@ -41,6 +34,12 @@ namespace BOB
 		/// <param name="propIndex">Prop index to check</param>
 		/// <returns>Replacement record if a replacement is currently applied, null if no replacement is currently applied</returns>
 		internal abstract BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingPrefab, int propIndex);
+
+
+		/// <summary>
+		/// Performs setup and initialises the master dictionary.  Must be called prior to use.
+		/// </summary>
+		protected abstract void Setup();
 
 
 		/// <summary>
