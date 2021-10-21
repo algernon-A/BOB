@@ -70,6 +70,12 @@ namespace BOB
 
 
 		/// <summary>
+		/// Returns the current individual index number of the current selection.  This could be either the direct index or in the index array, depending on situation.
+		/// </summary>
+		protected int IndividualIndex => CurrentTargetItem.index < 0 ? CurrentTargetItem.indexes[0] : CurrentTargetItem.index;
+
+
+		/// <summary>
 		/// Sets the current target item and updates button states accordingly.
 		/// </summary>
 		internal virtual PropListItem CurrentTargetItem
@@ -104,6 +110,7 @@ namespace BOB
 				}
 				else
 				{
+					// No valid current selection - clear highlighting.
 					targetList.selectedIndex = -1;
 					loadedList.selectedIndex = -1;
 					RenderOverlays.CurrentIndex = -1;

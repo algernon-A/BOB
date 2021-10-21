@@ -14,8 +14,9 @@ namespace BOB
 		private const float PackButtonX = RandomButtonX + ToggleSize;
 
 
-		// Current selection reference.
+		// Current selection references.
 		private NetInfo currentNet;
+		private NetPropListItem currentNetItem;
 
 
 		// Button tooltips.
@@ -28,36 +29,35 @@ namespace BOB
 		protected override UITextureAtlas ReplaceAllAtlas => TextureUtils.LoadSpriteAtlas("bob_all_roads");
 
 
+
+		/// <summary>
+		/// Returns the current individual lane number of the current selection.  This could be either the direct lane or in the lane array, depending on situation.
+		/// </summary>
+		private int IndividualLane => currentNetItem.lane < 0 ? currentNetItem.lanes[0] : currentNetItem.lane;
+
+
 		/// <summary>
 		/// Handles changes to the currently selected target prefab.
 		/// </summary>
 		internal override PropListItem CurrentTargetItem
         {
-            set
-            {
+			set
+			{
 				// Call base.
 				base.CurrentTargetItem = value;
 
-				if (value is NetPropListItem netItem)
+				// Set net item reference.
+				currentNetItem = value as NetPropListItem;
+
+				// Ensure valid selections before proceeding.
+				if (currentNetItem != null && currentNet != null)
 				{
 					// TODO: use properties instead of direct access.  Also for Building Info Panel.
 					// If we've got an individual replacement, update the offset fields with the replacement values.
 					if (CurrentTargetItem.individualPrefab != null)
 					{
-						// Handle case of switching from individual to grouped props (lane and index will be -1, actual lane and index in relevant lists).
-						int thisLane = netItem.lane;
-						int thisIndex = netItem.index;
-						if (thisIndex < 0)
-                        {
-							thisIndex = netItem.indexes[0];
-						}
-						if (thisLane < 0)
-						{
-							thisLane = netItem.lanes[0];
-						}
-
-						// Get replacement and update control values.
-						BOBNetReplacement individualReplacement = IndividualNetworkReplacement.instance.Replacement(currentNet, thisLane, thisIndex);
+						// Use IndividualIndex and IndividualLane to handle case of switching from individual to grouped props (values will be -1, actual values in relevant lists).
+						BOBNetReplacement individualReplacement = IndividualNetworkReplacement.instance.Replacement(currentNet, IndividualLane, IndividualIndex);
 						if (individualReplacement != null)
 						{
 							angleSlider.TrueValue = individualReplacement.angle;
@@ -65,6 +65,13 @@ namespace BOB
 							ySlider.TrueValue = individualReplacement.offsetY;
 							zSlider.TrueValue = individualReplacement.offsetZ;
 							probabilitySlider.TrueValue = individualReplacement.probability;
+
+
+							// Set lane highlighting selection for individual items.
+							RenderOverlays.CurrentLane = currentNet.m_lanes[IndividualLane];
+
+							// All done here.
+							return;
 						}
 					}
 					// Ditto for any network replacement
@@ -79,6 +86,9 @@ namespace BOB
 							ySlider.TrueValue = networkReplacement.offsetY;
 							zSlider.TrueValue = networkReplacement.offsetZ;
 							probabilitySlider.TrueValue = networkReplacement.probability;
+
+							// All done here.
+							return;
 						}
 					}
 					// Ditto for any all-network replacement.
@@ -93,25 +103,20 @@ namespace BOB
 							ySlider.TrueValue = allNetReplacement.offsetY;
 							zSlider.TrueValue = allNetReplacement.offsetZ;
 							probabilitySlider.TrueValue = allNetReplacement.probability;
+
+							// All done here.
+							return;
 						}
 					}
-					else
-					{
-						// No current replacement; set all offset fields to original prop.
-						angleSlider.TrueValue = 0f;
-						xSlider.TrueValue = 0;
-						ySlider.TrueValue = 0;
-						zSlider.TrueValue = 0;
-						probabilitySlider.TrueValue = value.originalProb;
-					}
-
-					// Set lane highlighting selection for individual items.
-					if (netItem.lane > -1)
-					{
-						RenderOverlays.CurrentLane = currentNet.m_lanes[netItem.lane];
-					}
 				}
-            }
+
+				// If we got here, there's no valid current selection; set all offset fields to defaults.
+				angleSlider.TrueValue = 0f;
+				xSlider.TrueValue = 0;
+				ySlider.TrueValue = 0;
+				zSlider.TrueValue = 0;
+				probabilitySlider.TrueValue = value != null ? value.originalProb : 0;
+			}
 		}
 
 
@@ -201,48 +206,42 @@ namespace BOB
 		/// </summary>
 		protected override void Revert(UIComponent control, UIMouseEventParameter mouseEvent)
 		{
-			// Individual prop reversion?
-			if (CurrentTargetItem.individualPrefab != null)
+			// Make sure we've got a valid selection.
+			if (currentNetItem == null)
 			{
-				// Individual prop reversion - ensuire that we've got a current selection before doing anything.
-				if (CurrentTargetItem is NetPropListItem currentNetTargetItem)
-				{
-					// Individual reversion.
-					IndividualNetworkReplacement.instance.Revert(currentNet, currentNetTargetItem.lane, currentNetTargetItem.index, true);
+				return;
+			}
 
-					// Clear current target replacement prefab.
-					CurrentTargetItem.individualPrefab = null;
-				}
+			// Individual prop reversion?
+			if (currentNetItem.individualPrefab != null)
+			{
+				// Individual reversion - use IndividualLane and IndividualIndex to ensure valid values for current context are used.
+				IndividualNetworkReplacement.instance.Revert(currentNet, IndividualLane, IndividualIndex, true);
+
+				// Clear current target replacement prefab.
+				CurrentTargetItem.individualPrefab = null;
 
 				// Perform post-replacment updates.
 				FinishUpdate();
 			}
-			else if (CurrentTargetItem.replacementPrefab != null)
+			else if (currentNetItem.replacementPrefab != null)
 			{
-				// Network reversion - ensuire that we've got a current selection before doing anything.
-				if (CurrentTargetItem is NetPropListItem currentNetTargetItem)
-				{
-					// Network reversion.
-					NetworkReplacement.instance.Revert(currentNet, currentNetTargetItem.originalPrefab, true);
+				// Network reversion.
+				NetworkReplacement.instance.Revert(currentNet, currentNetItem.originalPrefab, true);
 
-					// Perform post-reversion updates.
-					FinishUpdate();
-				}
+				// Perform post-reversion updates.
+				FinishUpdate();
 			}
-			else if (CurrentTargetItem.allPrefab != null)
+			else if (currentNetItem.allPrefab != null)
 			{
-				// All-network reversion - make sure we've got a currently active replacement before doing anything.
-				if (CurrentTargetItem.originalPrefab)
-				{
-					// Apply all-network reversion.
-					AllNetworkReplacement.instance.Revert(CurrentTargetItem.originalPrefab, true);
+				// All-network reversion.
+				AllNetworkReplacement.instance.Revert(currentNetItem.originalPrefab, true);
 
-					// Save configuration file and refresh target list (to reflect our changes).
-					ConfigurationUtils.SaveConfig();
+				// Save configuration file and refresh target list (to reflect our changes).
+				ConfigurationUtils.SaveConfig();
 
-					// Perform post-reversion updates.
-					FinishUpdate();
-				}
+				// Perform post-reversion updates.
+				FinishUpdate();
 			}
 		}
 

@@ -54,8 +54,6 @@ namespace BOB
 
 			// Add group checkbox.
 			indCheck = UIControls.LabelledCheckBox(this, 155f, TitleHeight + Margin, Translations.Translate("BOB_PNL_IND"), 12f, 0.7f);
-
-			// Event handler for group checkbox.
 			indCheck.eventCheckChanged += IndividualCheckChanged;
 
 			// Probability.
@@ -212,6 +210,7 @@ namespace BOB
 			// Clear selection.
 			targetList.selectedIndex = -1;
 			CurrentTargetItem = null;
+			ReplacementPrefab = null;
 
 			// Store current group state as most recent state.
 			ModSettings.lastInd = isChecked;

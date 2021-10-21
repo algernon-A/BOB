@@ -122,37 +122,24 @@ namespace BOB
 				// Call base.
 				base.CurrentTargetItem = value;
 
-				// Check for null.
-				if (value == null || currentBuilding == null)
+				// Ensure valid selections before proceeding.
+				if (CurrentTargetItem != null && currentBuilding != null)
 				{
-					// Set all slider fields to zero and exit.
-					angleSlider.TrueValue = 0f;
-					xSlider.TrueValue = 0f;
-					ySlider.TrueValue = 0f;
-					zSlider.TrueValue = 0f;
-					probabilitySlider.TrueValue = 0f;
-					return;
-				}
 
-				try
-				{
 					// If we've got an individuial building prop replacement, update the offset fields with the replacement values.
 					if (CurrentTargetItem.individualPrefab != null)
 					{
-						// Handle case of switching from individual to grouped props (index will be -1, actual index in relevant list).
-						int thisIndex = CurrentTargetItem.index;
-						if (thisIndex < 0)
-						{
-							thisIndex = CurrentTargetItem.indexes[0];
-						}
-
-						BOBBuildingReplacement thisReplacement = IndividualBuildingReplacement.instance.Replacement(currentBuilding, thisIndex);
+						// Use IndividualIndex to handle case of switching from individual to grouped props (index will be -1, actual index in relevant list).
+						BOBBuildingReplacement thisReplacement = IndividualBuildingReplacement.instance.Replacement(currentBuilding, IndividualIndex);
 
 						angleSlider.TrueValue = thisReplacement.angle;
 						xSlider.TrueValue = thisReplacement.offsetX;
-						ySlider.TrueValue = thisReplacement.offsetY;	
+						ySlider.TrueValue = thisReplacement.offsetY;
 						zSlider.TrueValue = thisReplacement.offsetZ;
 						probabilitySlider.TrueValue = thisReplacement.probability;
+
+						// All done here.
+						return;
 					}
 					// Ditto for any building replacement.
 					else if (CurrentTargetItem.replacementPrefab != null)
@@ -164,6 +151,9 @@ namespace BOB
 						ySlider.TrueValue = thisReplacement.offsetY;
 						zSlider.TrueValue = thisReplacement.offsetZ;
 						probabilitySlider.TrueValue = thisReplacement.probability;
+
+						// All done here.
+						return;
 					}
 					// Ditto for any all-building replacement.
 					else if (CurrentTargetItem.allPrefab != null)
@@ -175,21 +165,18 @@ namespace BOB
 						ySlider.TrueValue = thisReplacement.offsetY;
 						zSlider.TrueValue = thisReplacement.offsetZ;
 						probabilitySlider.TrueValue = thisReplacement.probability;
-					}
-					else
-					{
-						// No current replacement; set all relative fields to zero, and absolute fields to final prop.
-						angleSlider.TrueValue = 0f;
-						xSlider.TrueValue = 0f;
-						ySlider.TrueValue = 0f;
-						zSlider.TrueValue = 0f;
-						probabilitySlider.TrueValue = value.originalProb;
+
+						// All done here.
+						return;
 					}
 				}
-				catch (Exception e)
-                {
-					Logging.LogException(e, "exception accessing current target item ");
-                }
+
+				// If we got here, there's no valid current selection; set all offset fields to defaults.
+				angleSlider.TrueValue = 0f;
+				xSlider.TrueValue = 0;
+				ySlider.TrueValue = 0;
+				zSlider.TrueValue = 0;
+				probabilitySlider.TrueValue = value != null ? value.originalProb : 0;
 			}
 		}
 
@@ -364,33 +351,31 @@ namespace BOB
 		/// </summary>
 		protected override void Revert(UIComponent control, UIMouseEventParameter mouseEvent)
 		{
+			// Make sure we've got a valid selection.
+			if (CurrentTargetItem == null)
+			{
+				return;
+			}
+
 			// Individual building prop reversion?
 			if (CurrentTargetItem.individualPrefab != null)
 			{
-				// Individual building prop reversion - ensuire that we've got a current selection before doing anything.
-				if (CurrentTargetItem != null && CurrentTargetItem is PropListItem)
-				{
-					// Individual reversion.
-					IndividualBuildingReplacement.instance.Revert(currentBuilding, CurrentTargetItem.index, true);
+				// Individual reversion - use IndividualIndex to ensure valid value for current context is used.
+				IndividualBuildingReplacement.instance.Revert(currentBuilding, IndividualIndex, true);
 
-					// Clear current target replacement prefab.
-					CurrentTargetItem.individualPrefab = null;
-				}
+				// Clear current target replacement prefab.
+				CurrentTargetItem.individualPrefab = null;
 
 				// Perform post-replacment updates.
 				FinishUpdate();
 			}
 			else if (CurrentTargetItem.replacementPrefab != null)
 			{
-				// Building reversion - ensuire that we've got a current selection before doing anything.
-				if (CurrentTargetItem != null && CurrentTargetItem is PropListItem)
-				{
-					// Grouped reversion.
-					BuildingReplacement.instance.Revert(currentBuilding, CurrentTargetItem.originalPrefab, true);
+				// Grouped reversion.
+				BuildingReplacement.instance.Revert(currentBuilding, CurrentTargetItem.originalPrefab, true);
 
-					// Clear current target replacement prefab.
-					CurrentTargetItem.replacementPrefab = null;
-				}
+				// Clear current target replacement prefab.
+				CurrentTargetItem.replacementPrefab = null;
 
 				// Perform post-replacment updates.
 				FinishUpdate();
