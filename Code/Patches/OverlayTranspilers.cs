@@ -108,11 +108,14 @@ namespace BOB
         {
             // ILCode local variable indexes.
             const int SurfaceMapping2Index = 9;
+            const int propLoopIndex = 11;
             const int PropVarIndex = 16;
             const int PropPositionVarIndex = 23;
             const int TreeVarIndex = 31;
             const int TreePositionVarIndex = 38;
 
+            // ILCode argument indexes.
+            const int LaneInfoArg = 4;
 
             // Instruction parsing.
             IEnumerator<CodeInstruction> instructionsEnumerator = instructions.GetEnumerator();
@@ -166,7 +169,7 @@ namespace BOB
                                 candidateName = "Prop";
                                 prefabIndex = PropVarIndex;
                                 positionIndex = PropPositionVarIndex;
-                                methodName = nameof(RenderOverlays.HighlightProp);
+                                methodName = nameof(RenderOverlays.HighlightNetworkProp);
                             }
                             else
                             {
@@ -174,13 +177,16 @@ namespace BOB
                                 candidateName = "Tree";
                                 prefabIndex = TreeVarIndex;
                                 positionIndex = TreePositionVarIndex;
-                                methodName = nameof(RenderOverlays.HighlightTree);
+                                methodName = nameof(RenderOverlays.HighlightNetworkTree);
                             }
 
                             // Insert call to PropOverlays.Highlight method after original call.
                             Logging.KeyMessage("adding network Highlight", candidateName, " call after RenderInstance");
                             yield return new CodeInstruction(OpCodes.Ldloc_S, prefabIndex);
                             yield return new CodeInstruction(OpCodes.Ldloc_S, positionIndex);
+                            yield return new CodeInstruction(OpCodes.Ldarg_2); // segment ID
+                            yield return new CodeInstruction(OpCodes.Ldarg_S, LaneInfoArg); // NetInfo.Lane
+                            yield return new CodeInstruction(OpCodes.Ldloc_S, propLoopIndex); // index
                             yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(RenderOverlays), methodName));
                         }
                     }

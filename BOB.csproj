@@ -71,6 +71,7 @@
     <Compile Include="Code\PreviewRenderer\PreviewRenderer.cs" />
     <Compile Include="Code\Replacement\BuildingReplacementBase.cs" />
     <Compile Include="Code\Replacement\EMapPropReplacement.cs" />
+    <Compile Include="Code\Replacement\IndividualNetworkReplacement.cs" />
     <Compile Include="Code\Replacement\MapPropReplacement.cs" />
     <Compile Include="Code\Replacement\NetworkReplacementBase.cs" />
     <Compile Include="Code\Replacement\Scaling.cs" />

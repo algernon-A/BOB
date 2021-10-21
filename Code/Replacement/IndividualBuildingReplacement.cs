@@ -109,6 +109,7 @@ namespace BOB
 		/// </summary>
 		/// <param name="building">Targeted building</param>
 		/// <param name="target">Targeted (original) prop prefab</param>
+		/// <param name="targetIndex">Prop index to apply replacement to</param>
 		/// <param name="replacement">Replacment prop prefab</param>
 		/// <param name="angle">Replacment prop angle adjustment</param>
 		/// <param name="offsetX">Replacment X position offset</param>

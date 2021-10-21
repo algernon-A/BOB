@@ -1,4 +1,5 @@
-﻿- Add proper escape key handling
+﻿- Add individual network prop replacement
+- Add proper escape key handling
 - Fix text in configuration panel 'Load and apply' button
 - Rework replacement class inheritance structure
 

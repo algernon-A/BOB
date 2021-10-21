@@ -154,17 +154,25 @@ namespace BOB
                 // See if this is a network prop.
                 NetPropListItem thisNetItem = data as NetPropListItem;
 
+                // Clear label text.
+                indexLabel.text = "";
+
                 // Display index number if this is an individual reference.
                 if (thisItem.index >= 0)
                 {
-                    indexLabel.text = thisItem.index.ToString();
+                    // Display lane marker if this is a network prop.
+                    if (thisNetItem != null)
+                    {
+                        indexLabel.text += thisNetItem.lane.ToString() + " ";
 
-                    // Adjust name label position to accomodate.
+                        // Adjust name label position to accomodate lane number.
+                        labelX += IndexWidth;
+                    }
+
+                    indexLabel.text += thisItem.index.ToString();
+
+                    // Adjust name label position to accomodate index number.
                     labelX += IndexWidth;
-                }
-                else
-                {
-                    indexLabel.text = "";
                 }
 
                 bool hasReplacement = false;

@@ -76,7 +76,6 @@ namespace BOB
 		internal string[] SubBuildingNames { get; private set; }
 
 		// Panel components.
-		private readonly UICheckBox indCheck;
 		private UIPanel subBuildingPanel;
 		private UIFastList subBuildingList;
 
@@ -140,8 +139,14 @@ namespace BOB
 					// If we've got an individuial building prop replacement, update the offset fields with the replacement values.
 					if (CurrentTargetItem.individualPrefab != null)
 					{
-						Logging.Message("target changed: individual replacement for ", currentBuilding.name, " at index ", CurrentTargetItem.index.ToString());
-						BOBBuildingReplacement thisReplacement = IndividualBuildingReplacement.instance.replacements[currentBuilding][CurrentTargetItem.index];
+						// Handle case of switching from individual to grouped props (index will be -1, actual index in relevant list).
+						int thisIndex = CurrentTargetItem.index;
+						if (thisIndex < 0)
+						{
+							thisIndex = CurrentTargetItem.indexes[0];
+						}
+
+						BOBBuildingReplacement thisReplacement = IndividualBuildingReplacement.instance.replacements[currentBuilding][thisIndex];
 
 						angleSlider.TrueValue = thisReplacement.angle;
 						xSlider.TrueValue = thisReplacement.offsetX;
@@ -152,7 +157,6 @@ namespace BOB
 					// Ditto for any building replacement.
 					else if (CurrentTargetItem.replacementPrefab != null)
 					{
-						Logging.Message("target changed: getting building replacement for ", currentBuilding.name, " with original prefab ", CurrentTargetItem.originalPrefab.name);
 						BOBBuildingReplacement thisReplacement = BuildingReplacement.instance.replacements[currentBuilding][CurrentTargetItem.originalPrefab];
 
 						angleSlider.TrueValue = thisReplacement.angle;
@@ -164,7 +168,6 @@ namespace BOB
 					// Ditto for any all-building replacement.
 					else if (CurrentTargetItem.allPrefab != null)
 					{
-						Logging.Message("target changed: getting all-building replacement for ", currentBuilding.name, " with original prefab ", CurrentTargetItem.originalPrefab.name);
 						BOBBuildingReplacement thisReplacement = AllBuildingReplacement.replacements[CurrentTargetItem.originalPrefab];
 
 						angleSlider.TrueValue = thisReplacement.angle;
@@ -196,33 +199,6 @@ namespace BOB
 		/// </summary>
 		internal BOBBuildingInfoPanel()
 		{
-			// Add group checkbox.
-			indCheck = UIControls.LabelledCheckBox(this, 155f, TitleHeight + Margin, Translations.Translate("BOB_PNL_IND"), 12f, 0.7f);
-
-			// Event handler for group checkbox.
-			indCheck.eventCheckChanged += (control, isChecked) =>
-			{
-				// Rebuild target list.
-				TargetList();
-
-				// Clear selection.
-				targetList.selectedIndex = -1;
-				CurrentTargetItem = null;
-
-				// Store current group state as most recent state.
-				ModSettings.lastInd = isChecked;
-
-				// Toggle replace all button visibility.
-				if (isChecked)
-				{
-					replaceAllButton.Hide();
-				}
-				else
-				{
-					replaceAllButton.Show();
-				}
-			};
-
 			// Populate loaded list.
 			LoadedList();
 		}
@@ -468,7 +444,7 @@ namespace BOB
 		/// <param name="propListItem">Target item</param>
 		protected override void UpdateTargetItem(PropListItem propListItem)
 		{
-			// Determine index to test - if no individaul index, just grab first one from list.
+			// Determine index to test - if no individual index, just grab first one from list.
 			int propIndex = propListItem.index;
 			if (propIndex < 0)
             {
@@ -602,7 +578,7 @@ namespace BOB
 					// Iterate through each item in our existing list of props.
 					foreach (PropListItem item in propList)
 					{
-						// Check to see if we already have this in the list - matching original prefab, building replacement prefab, all-building replacement prefab, and probability.
+						// Check to see if we already have this in the list - matching original prefab, individual replacement prefab, building replacement prefab, all-building replacement prefab, and probability.
 						if (item.originalPrefab == propListItem.originalPrefab && item.individualPrefab == propListItem.individualPrefab && item.replacementPrefab == propListItem.replacementPrefab && propListItem.allPrefab == item.allPrefab)
 						{
 							// We've already got an identical grouped instance of this item - add this index and lane to the lists of indexes and lanes under that item and set the flag to indicate that we've done so.

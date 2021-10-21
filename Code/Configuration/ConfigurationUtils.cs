@@ -93,6 +93,12 @@ namespace BOB
 							DeserializeNetwork(network);
 						}
 
+						// Deserialise network replacements, per network.
+						foreach (BOBNetworkElement network in configFile.indNetworks)
+						{
+							DeserializeIndividualNetwork(network);
+						}
+
 						// Deserialise active replacement packs.
 						NetworkPackReplacement.instance.DeserializeActivePacks(configFile.activePacks);
 					}
@@ -192,19 +198,13 @@ namespace BOB
 						}
 
 						// Serialise all-network replacements.
-						configFile.allNetworkProps = AllNetworkReplacement.instance.replacements.Values.ToList();
+						configFile.allNetworkProps = AllNetworkReplacement.instance.Serialize();
 
-						// Serialise network replacements, per network.
-						configFile.networks = new List<BOBNetworkElement>();
-						foreach (NetInfo network in NetworkReplacement.instance.replacements.Keys)
-						{
-							// Create new element.
-							configFile.networks.Add(new BOBNetworkElement
-							{
-								network = network.name,
-								replacements = NetworkReplacement.instance.replacements[network].Values.ToList()
-							});
-						}
+						// Serialise network replacements.
+						configFile.networks = NetworkReplacement.instance.Serialize();
+
+						// Serialise individual network replacements.
+						configFile.indNetworks = IndividualNetworkReplacement.instance.Serialize();
 
 						// Serialise active replacement packs.
 						configFile.activePacks = NetworkPackReplacement.instance.SerializeActivePacks();
@@ -401,6 +401,45 @@ namespace BOB
 
 				// If we got here, it's all good; apply the network replacement.
 				NetworkReplacement.instance.Apply(networkInfo, targetPrefab, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
+			}
+		}
+
+
+		/// <summary>
+		/// Deserialises an individual network prop replacement list.
+		/// </summary>
+		/// <param name="elementList">Network element list to deserialise</param>
+		private static void DeserializeIndividualNetwork(BOBNetworkElement networkElement)
+		{
+			// Try to find target network.
+			NetInfo networkInfo = (NetInfo)PrefabCollection<NetInfo>.FindLoaded(networkElement.network);
+			if (networkInfo == null)
+			{
+				Logging.Message("Couldn't find target network ", networkElement.network);
+				return;
+			}
+
+			// Iterate through each element in the provided list.
+			foreach (BOBNetReplacement replacement in networkElement.replacements)
+			{
+				// Try to find target prefab.
+				PrefabInfo targetPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);
+				if (targetPrefab == null)
+				{
+					Logging.Message("Couldn't find target prefab ", replacement.target);
+					continue;
+				}
+
+				// Try to find replacement prefab.
+				PrefabInfo replacementPrefab = FindReplacementPrefab(replacement.Replacement, replacement.tree);
+				if (replacementPrefab == null)
+				{
+					Logging.Message("Couldn't find replacement prefab ", replacement.Replacement);
+					continue;
+				}
+
+				// If we got here, it's all good; apply the building replacement.
+				IndividualNetworkReplacement.instance.Apply(networkInfo, targetPrefab, replacement.lane, replacement.index, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
 			}
 		}
 

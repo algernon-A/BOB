@@ -49,6 +49,10 @@ namespace BOB
 		[XmlArrayItem("network")]
 		public List<BOBNetworkElement> networks;
 
+		[XmlArray("netind")]
+		[XmlArrayItem("netind")]
+		public List<BOBNetworkElement> indNetworks;
+
 		[XmlArray("activePacks")]
 		[XmlArrayItem("activePacks")]
 		public List<string> activePacks;
@@ -106,6 +110,7 @@ namespace BOB
 		public List<BOBNetReplacement> replacements;
 	}
 
+
 	public class BOBBuildingElement
 	{
 		[XmlElement("building")]
@@ -119,20 +124,11 @@ namespace BOB
 		public List<BOBBuildingReplacement> replacements;
 	}
 
-	public class BOBBuildingReplacement : BOBNetReplacement
-    {
-		[XmlAttribute("index")]
-		public int index = -1;
-
-		[XmlIgnore]
-		new public List<BuildingPropReference> references;
-    }
-
 
 	/// <summary>
-	/// All-building network record XML format.
+	/// Base replacement record XML format.
 	/// </summary>
-	public class BOBNetReplacement
+	public class BOBReplacementBase
 	{
 		[XmlAttribute("tree")]
 		public bool tree = false;
@@ -146,6 +142,9 @@ namespace BOB
 			get => replacementInfo?.name ?? replacementName ?? string.Empty;
 			set => replacementName = value;
 		}
+
+		[XmlAttribute("index")]
+		public int index = -1;
 
 		[XmlAttribute("angle")]
 		public float angle = 0f;
@@ -170,6 +169,26 @@ namespace BOB
 
 		[XmlIgnore]
 		public PrefabInfo targetInfo;
+	}
+
+
+	/// <summary>
+	/// Building replacement record XML format.
+	/// </summary>
+	public class BOBBuildingReplacement : BOBReplacementBase
+	{
+		[XmlIgnore]
+		public List<BuildingPropReference> references;
+    }
+
+
+	/// <summary>
+	/// Network replacement record XML format.
+	/// </summary>
+	public class BOBNetReplacement : BOBReplacementBase
+	{
+		[XmlAttribute("lane")]
+		public int lane = -1;
 
 		[XmlIgnore]
 		public List<NetPropReference> references;

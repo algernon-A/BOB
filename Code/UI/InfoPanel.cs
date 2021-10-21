@@ -30,6 +30,7 @@ namespace BOB
 		// Panel components.
 		protected UIButton replaceAllButton;
 		protected BOBSlider probabilitySlider, angleSlider, xSlider, ySlider, zSlider;
+		protected readonly UICheckBox indCheck;
 		private readonly UICheckBox randomCheck;
 
 		// Button tooltips.
@@ -50,6 +51,12 @@ namespace BOB
 			// Replace all button.
 			replaceAllButton = AddIconButton(this, MidControlX + replaceButton.width, ReplaceY, BigIconSize, ReplaceAllTooltipKey, ReplaceAllAtlas);
 			replaceAllButton.eventClicked += ReplaceAll;
+
+			// Add group checkbox.
+			indCheck = UIControls.LabelledCheckBox(this, 155f, TitleHeight + Margin, Translations.Translate("BOB_PNL_IND"), 12f, 0.7f);
+
+			// Event handler for group checkbox.
+			indCheck.eventCheckChanged += IndividualCheckChanged;
 
 			// Probability.
 			UIPanel probabilityPanel = Sliderpanel(this, MidControlX, ProbabilityY, SliderHeight);
@@ -188,6 +195,35 @@ namespace BOB
 			{
 				// No - show normal loaded prefab list.
 				base.LoadedList();
+			}
+		}
+
+
+		/// <summary>
+		/// Individual prop check event handler.
+		/// </summary>
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="isChecked">New checked state</param>
+		private void IndividualCheckChanged(UIComponent control, bool isChecked)
+		{
+			// Rebuild target list.
+			TargetList();
+
+			// Clear selection.
+			targetList.selectedIndex = -1;
+			CurrentTargetItem = null;
+
+			// Store current group state as most recent state.
+			ModSettings.lastInd = isChecked;
+
+			// Toggle replace all button visibility.
+			if (isChecked)
+			{
+				replaceAllButton.Hide();
+			}
+			else
+			{
+				replaceAllButton.Show();
 			}
 		}
 

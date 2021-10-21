@@ -67,28 +67,34 @@ namespace BOB
 				z = netElement.offsetZ
 			};
 
+			NetInfo.Lane thisLane = propReference.network.m_lanes[propReference.laneIndex];
+
 			// Apply replacement.
 			if (netElement.replacementInfo is PropInfo propInfo)
 			{
-				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = propInfo;
+				thisLane.m_laneProps.m_props[propReference.propIndex].m_finalProp = propInfo;
+			}
+			else if (netElement.replacementInfo is TreeInfo treeInfo)
+			{
+				thisLane.m_laneProps.m_props[propReference.propIndex].m_finalTree = treeInfo;
 			}
 			else
 			{
-				propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = (TreeInfo)netElement.replacementInfo;
+				Logging.Error("invalid replacement ", netElement.replacementInfo?.name ?? "null", " passed to NetworkReplacement.ReplaceProp");
 			}
 
 			// Invert x offset to match original prop x position.
-			if (propReference.network.m_lanes[propReference.laneIndex].m_position + propReference.position.x < 0)
+			if (thisLane.m_position + propReference.position.x < 0)
 			{
 				offset.x = 0 - offset.x;
 			}
 
 			// Angle and offset.
-			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle + netElement.angle;
-			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.position + offset;
+			thisLane.m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle + netElement.angle;
+			thisLane.m_laneProps.m_props[propReference.propIndex].m_position = propReference.position + offset;
 
 			// Probability.
-			propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_probability = netElement.probability;
+			thisLane.m_laneProps.m_props[propReference.propIndex].m_probability = netElement.probability;
 
 			// Add network to dirty list.
 			NetData.DirtyList.Add(propReference.network);

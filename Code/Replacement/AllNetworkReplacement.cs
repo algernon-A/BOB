@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 
 namespace BOB
@@ -12,7 +13,7 @@ namespace BOB
 		internal static AllNetworkReplacement instance;
 
 		// Master dictionary of replaced prop references.
-		internal Dictionary<PrefabInfo, BOBNetReplacement> replacements;
+		private Dictionary<PrefabInfo, BOBNetReplacement> replacements;
 
 
 		/// <summary>
@@ -23,7 +24,25 @@ namespace BOB
 			instance = this;
 		}
 
-		
+
+		/// <summary>
+		/// Retrieves a currently-applied network replacement entry for the given network, lane and prop index.
+		/// </summary>
+		/// <param name="target">Target prop/tree prefab</param>
+		/// <returns>Currently-applied network replacement (null if none)</returns>
+		internal BOBNetReplacement Replacement(PrefabInfo target)
+		{
+			if (replacements.TryGetValue(target, out BOBNetReplacement replacementEntry))
+			{
+				return replacementEntry;
+			}
+
+			// If we got here, something went wrong.
+			Logging.Error("no all-network replacement entry for target ", target?.name ?? "null");
+			return null;
+		}
+
+
 		/// <summary>
 		/// Reverts all active all-network replacements and re-initialises the master dictionary.
 		/// </summary>
@@ -335,6 +354,13 @@ namespace BOB
 			// If we got here, no restoration was made.
 			return false;
 		}
+
+
+		/// <summary>
+		/// Serializes network replacement dictionary to XML format.
+		/// </summary>
+		/// <returns>List of network replacement entries in XML Format</returns>
+		internal List<BOBNetReplacement> Serialize() => replacements.Values.ToList();
 
 
 		/// <summary>

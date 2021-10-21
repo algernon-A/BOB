@@ -106,35 +106,32 @@ namespace BOB
 		/// <param name="propIndex">Prop index</param>
 		internal void RemoveEntry(BuildingInfo buildingPrefab, PrefabInfo target, int propIndex)
 		{
-			// Check to see if we have an entry for this prefab.
-			if (replacements.ContainsKey(buildingPrefab))
+			// Check to see if we have an entry for this prefab and target.
+			if (replacements.ContainsKey(buildingPrefab) && replacements[buildingPrefab].ContainsKey(target))
 			{
-				if (replacements[buildingPrefab].ContainsKey(target))
+				// Yes - iterate through each recorded prop reference.
+				for (int i = 0; i < replacements[buildingPrefab][target].references.Count; ++i)
 				{
-					// Yes - iterate through each recorded prop reference.
-					for (int i = 0; i < replacements[buildingPrefab][target].references.Count; ++i)
+					// Look for a building and index match.
+					BuildingPropReference propReference = replacements[buildingPrefab][target].references[i];
+					if (propReference.building == buildingPrefab && propReference.propIndex == propIndex)
 					{
-						// Look for a building and index match.
-						BuildingPropReference propReference = replacements[buildingPrefab][target].references[i];
-						if (propReference.building == buildingPrefab && propReference.propIndex == propIndex)
+						// Got a match!  Revert instance.
+						if (target is PropInfo propTarget)
 						{
-							// Got a match!  Revert instance.
-							if (target is PropInfo propTarget)
-							{
-								propReference.building.m_props[propReference.propIndex].m_finalProp = propTarget;
-							}
-							else
-							{
-								propReference.building.m_props[propReference.propIndex].m_finalTree = (TreeInfo)target;
-							}
-							buildingPrefab.m_props[propIndex].m_radAngle = propReference.radAngle;
-							buildingPrefab.m_props[propIndex].m_position = propReference.postion;
-							buildingPrefab.m_props[propIndex].m_probability = propReference.probability;
-
-							// Remove this reference and return.
-							replacements[buildingPrefab][target].references.Remove(replacements[buildingPrefab][target].references[i]);
-							return;
+							propReference.building.m_props[propReference.propIndex].m_finalProp = propTarget;
 						}
+						else
+						{
+							propReference.building.m_props[propReference.propIndex].m_finalTree = (TreeInfo)target;
+						}
+						buildingPrefab.m_props[propIndex].m_radAngle = propReference.radAngle;
+						buildingPrefab.m_props[propIndex].m_position = propReference.postion;
+						buildingPrefab.m_props[propIndex].m_probability = propReference.probability;
+
+						// Remove this reference and return.
+						replacements[buildingPrefab][target].references.Remove(replacements[buildingPrefab][target].references[i]);
+						return;
 					}
 				}
 			}
@@ -266,7 +263,7 @@ namespace BOB
 						// Check for a building and prop index match.
 						if (propRef.building == buildingPrefab && propRef.propIndex == propIndex)
 						{
-							// Match!  Return the original prefab.
+							// Match!  Return the replacement record.
 							return replacements[buildingPrefab][target];
 						}
 					}
