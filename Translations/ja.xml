@@ -63,11 +63,12 @@
     <Translation ID="BOB_CFG_SSC" String="選択した構成をコピー"/>
     <Translation ID="BOB_CFG_SEC" String="新しい空の構成"/>
     <Translation ID="BOB_CFG_DEL" String="選択した構成を削除"/>
+    <Translation ID="BOB_CFG_LAA" String="選択した構成をロード＆適用"/>
     <Translation ID="BOB_OPT_GEN" String="一般設定"/>
     <Translation ID="BOB_OPT_CFG" String="構成の設定"/>
     <Translation ID="BOB_OPT_RUI" String="荒れ地"/>
     <Translation ID="BOB_OPT_KEY" String="ホットキー"/>
-    <Translation ID="BOB_OPT_PRS" String="Press any key"/>
+    <Translation ID="BOB_OPT_PRS" String="何かキーを押してください"/>
     <Translation ID="BOB_OPT_RGL" String="変更はゲームの再起動時に反映"/>
     <Translation ID="BOB_OPT_RRT" String="ツリーの地面に出来る荒れ地を防止"/>
     <Translation ID="BOB_OPT_RRP" String="Propの地面に出来る荒れ地を防止"/>
