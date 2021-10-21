@@ -210,7 +210,6 @@ namespace BOB
 			// Clear selection.
 			targetList.selectedIndex = -1;
 			CurrentTargetItem = null;
-			ReplacementPrefab = null;
 
 			// Store current group state as most recent state.
 			ModSettings.lastInd = isChecked;

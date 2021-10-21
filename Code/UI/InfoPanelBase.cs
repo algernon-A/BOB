@@ -86,12 +86,6 @@ namespace BOB
 			{
 				currentTargetItem = value;
 
-				// Refresh loaded list if needed.
-				if (value != null && (loadedList.rowsData?.m_buffer == null || loadedList.rowsData.m_size == 0))
-                {
-					LoadedList();
-				}
-
 				// Check if actual item has been set.
 				if (currentTargetItem != null)
 				{
@@ -110,10 +104,12 @@ namespace BOB
 				}
 				else
 				{
-					// No valid current selection - clear highlighting.
+					// No valid current selection - clear selection.
 					targetList.selectedIndex = -1;
-					loadedList.selectedIndex = -1;
+
+					// Clear highlighting.
 					RenderOverlays.CurrentIndex = -1;
+					RenderOverlays.CurrentLane = null;
 					RenderOverlays.CurrentProp = null;
 					RenderOverlays.CurrentTree = null;
 				}
