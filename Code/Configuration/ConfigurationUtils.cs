@@ -72,32 +72,20 @@ namespace BOB
 						// Deserialize all-building replacements.
 						DeserializeAllBuilding(configFile.allBuildingProps);
 
-						// Deserialise building replacements, per building.
-						foreach (BOBBuildingElement building in configFile.buildings)
-						{
-							DeserializeBuilding(building);
-						}
+						// Deserialise building replacements.
+						BuildingReplacement.instance.Deserialize(configFile.buildings);
 
-						// Deserialise individual building prop replacements, per building.
-						foreach (BOBBuildingElement building in configFile.indBuildings)
-						{
-							DeserializeIndividual(building);
-						}
+						// Deserialise individual building prop replacements.
+						IndividualBuildingReplacement.instance.Deserialize(configFile.indBuildings);
 
 						// Deserialise all-network replacements.
-						DeserializeAllNetwork(configFile.allNetworkProps);
+						AllNetworkReplacement.instance.Deserialize(configFile.allNetworkProps);
 
-						// Deserialise network replacements, per network.
-						foreach (BOBNetworkElement network in configFile.networks)
-                        {
-							DeserializeNetwork(network);
-						}
+						// Deserialise network replacements.
+						NetworkReplacement.instance.Deserialize(configFile.networks);
 
-						// Deserialise network replacements, per network.
-						foreach (BOBNetworkElement network in configFile.indNetworks)
-						{
-							DeserializeIndividualNetwork(network);
-						}
+						// Deserialise individual network replacements.
+						IndividualNetworkReplacement.instance.Deserialize(configFile.indNetworks);
 
 						// Deserialise active replacement packs.
 						NetworkPackReplacement.instance.DeserializeActivePacks(configFile.activePacks);
@@ -171,31 +159,13 @@ namespace BOB
 						configFile.treeScales = Scaling.instance.treeScales.Values.ToList();
 
 						// Serialise all-building replacements.
-						configFile.allBuildingProps = AllBuildingReplacement.replacements.Values.ToList();
+						configFile.allBuildingProps = AllBuildingReplacement.instance.Serialize();
 
 						// Serialise building replacements, per building.
-						configFile.buildings = new List<BOBBuildingElement>();
-						foreach (BuildingInfo building in BuildingReplacement.instance.replacements.Keys)
-						{
-							// Create new element.
-							configFile.buildings.Add(new BOBBuildingElement
-							{
-								building = building.name,
-								replacements = BuildingReplacement.instance.replacements[building].Values.ToList()
-							});
-						}
+						configFile.buildings = BuildingReplacement.instance.Serialize();
 
 						// Serialise individual building prop replacements, per building.
-						configFile.indBuildings = new List<BOBBuildingElement>();
-						foreach (BuildingInfo building in IndividualBuildingReplacement.instance.replacements.Keys)
-						{
-							// Create new element.
-							configFile.indBuildings.Add(new BOBBuildingElement
-							{
-								building = building.name,
-								replacements = IndividualBuildingReplacement.instance.replacements[building].Values.ToList()
-							});
-						}
+						configFile.indBuildings = IndividualBuildingReplacement.instance.Serialize();
 
 						// Serialise all-network replacements.
 						configFile.allNetworkProps = AllNetworkReplacement.instance.Serialize();
@@ -327,121 +297,40 @@ namespace BOB
 
 
 		/// <summary>
+		/// Attempts to find the replacement prefab with the specified name.
+		/// </summary>
+		/// <param name="replacementName">Prefab name to find</param>
+		/// <param name="isTree">True if the desired prefab is a tree, false if it's a prop</param>
+		/// <returns>Requested prefab, or null if not found</returns>
+		internal static PrefabInfo FindReplacementPrefab(string replacementName, bool isTree)
+		{
+			// Null check.
+			if (replacementName.IsNullOrWhiteSpace())
+			{
+				Logging.Error("invalid replacement prop name");
+				return null;
+			}
+
+			// Attempt to load from prefab collection.
+			PrefabInfo replacementPrefab = isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacementName) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacementName);
+
+			if (replacementPrefab == null)
+			{
+				// If we couldn't load from prefab collection, attempt to find in our list of replacement prefabs.
+				replacementPrefab = isTree ? (PrefabInfo)PrefabLists.randomTrees.Find(x => x.name.Equals(replacementName)).tree : (PrefabInfo)PrefabLists.randomProps.Find(x => x.name.Equals(replacementName)).prop;
+			}
+
+			// Return what we have.
+			return replacementPrefab;
+		}
+
+
+		/// <summary>
 		/// Returns the absolute filepath of the config file for the given config name.
 		/// </summary>
 		/// <param name="configName">Config filepath</param>
 		/// <returns></returns>
 		private static string FullConfigPath(string configName) => Path.Combine(ConfigDirectory, configName + ".xml");
-
-
-		/// <summary>
-		/// Deserialises an all-network element list.
-		/// </summary>
-		/// <param name="elementList">All-network element list to deserialise</param>
-		private static void DeserializeAllNetwork(List<BOBNetReplacement> elementList)
-		{
-			// Iterate through each element in the provided list.
-			foreach (BOBNetReplacement replacement in elementList)
-			{
-				// Try to find target prefab.
-				PrefabInfo targetPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);
-				if (targetPrefab == null)
-				{
-					Logging.Message("Couldn't find target prefab ", replacement.target);
-					continue;
-				}
-
-				// Try to find replacement prefab.
-				PrefabInfo replacementPrefab = FindReplacementPrefab(replacement.Replacement, replacement.tree);
-				if (replacementPrefab == null)
-				{
-					Logging.Message("Couldn't find replacement prefab ", replacement.Replacement);
-					continue;
-				}
-
-				// If we got here, it's all good; apply the all-network replacement.
-				AllNetworkReplacement.instance.Apply(targetPrefab, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
-			}
-		}
-
-
-		/// <summary>
-		/// Deserialises a network replacement list.
-		/// </summary>
-		/// <param name="elementList">Network element list to deserialise</param>
-		private static void DeserializeNetwork(BOBNetworkElement networkElement)
-		{
-			// Try to find target network.
-			NetInfo networkInfo = (NetInfo)PrefabCollection<NetInfo>.FindLoaded(networkElement.network);
-			if (networkInfo == null)
-			{
-				Logging.Message("Couldn't find target network ", networkElement.network);
-				return;
-			}
-
-
-			// Iterate through each element in the provided list.
-			foreach (BOBNetReplacement replacement in networkElement.replacements)
-			{
-				// Try to find target prefab.
-				PrefabInfo targetPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);
-				if (targetPrefab == null)
-				{
-					Logging.Message("Couldn't find target prefab ", replacement.target);
-					continue;
-				}
-
-				// Try to find replacement prefab.
-				PrefabInfo replacementPrefab = FindReplacementPrefab(replacement.Replacement, replacement.tree);
-				if (replacementPrefab == null)
-				{
-					Logging.Message("Couldn't find replacement prefab ", replacement.Replacement);
-					continue;
-				}
-
-				// If we got here, it's all good; apply the network replacement.
-				NetworkReplacement.instance.Apply(networkInfo, targetPrefab, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
-			}
-		}
-
-
-		/// <summary>
-		/// Deserialises an individual network prop replacement list.
-		/// </summary>
-		/// <param name="elementList">Network element list to deserialise</param>
-		private static void DeserializeIndividualNetwork(BOBNetworkElement networkElement)
-		{
-			// Try to find target network.
-			NetInfo networkInfo = (NetInfo)PrefabCollection<NetInfo>.FindLoaded(networkElement.network);
-			if (networkInfo == null)
-			{
-				Logging.Message("Couldn't find target network ", networkElement.network);
-				return;
-			}
-
-			// Iterate through each element in the provided list.
-			foreach (BOBNetReplacement replacement in networkElement.replacements)
-			{
-				// Try to find target prefab.
-				PrefabInfo targetPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);
-				if (targetPrefab == null)
-				{
-					Logging.Message("Couldn't find target prefab ", replacement.target);
-					continue;
-				}
-
-				// Try to find replacement prefab.
-				PrefabInfo replacementPrefab = FindReplacementPrefab(replacement.Replacement, replacement.tree);
-				if (replacementPrefab == null)
-				{
-					Logging.Message("Couldn't find replacement prefab ", replacement.Replacement);
-					continue;
-				}
-
-				// If we got here, it's all good; apply the building replacement.
-				IndividualNetworkReplacement.instance.Apply(networkInfo, targetPrefab, replacement.lane, replacement.index, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
-			}
-		}
 
 
 		/// <summary>
@@ -471,117 +360,8 @@ namespace BOB
 
 				// If we got here, it's all good; apply the all-network replacement.
 				Logging.Message("applying all-building replacement ", targetPrefab.name, " to ", replacementPrefab.name);
-				AllBuildingReplacement.instance.Apply(targetPrefab, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
+				AllBuildingReplacement.instance.Apply(null, targetPrefab, replacementPrefab, -1, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
 			}
-		}
-
-
-		/// <summary>
-		/// Deserialises a building replacement list.
-		/// </summary>
-		/// <param name="elementList">Building element list to deserialise</param>
-		private static void DeserializeBuilding(BOBBuildingElement buildingElement)
-		{
-			// Try to find target network.
-			BuildingInfo buildingInfo = (BuildingInfo)PrefabCollection<BuildingInfo>.FindLoaded(buildingElement.building);
-			if (buildingInfo == null)
-			{
-				Logging.Message("Couldn't find target building ", buildingElement.building);
-				return;
-			}
-
-
-			// Iterate through each element in the provided list.
-			foreach (BOBBuildingReplacement replacement in buildingElement.replacements)
-			{
-				// Try to find target prefab.
-				PrefabInfo targetPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);
-				if (targetPrefab == null)
-				{
-					Logging.Message("Couldn't find target prefab ", replacement.target);
-					continue;
-				}
-
-				// Try to find replacement prefab.
-				PrefabInfo replacementPrefab = FindReplacementPrefab(replacement.Replacement, replacement.tree);
-				if (replacementPrefab == null)
-				{
-					Logging.Message("Couldn't find replacement prefab ", replacement.Replacement);
-					continue;
-				}
-
-				// If we got here, it's all good; apply the building replacement.
-				Logging.Message("applying building replacement ", targetPrefab.name, " to ", replacementPrefab.name, " in ", buildingInfo.name);
-				BuildingReplacement.instance.Apply(buildingInfo, targetPrefab, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
-			}
-		}
-
-
-		/// <summary>
-		/// Deserialises an individual building prop replacement list.
-		/// </summary>
-		/// <param name="elementList">Building element list to deserialise</param>
-		private static void DeserializeIndividual(BOBBuildingElement buildingElement)
-		{
-			// Try to find target network.
-			BuildingInfo buildingInfo = (BuildingInfo)PrefabCollection<BuildingInfo>.FindLoaded(buildingElement.building);
-			if (buildingInfo == null)
-			{
-				Logging.Message("Couldn't find target building ", buildingElement.building);
-				return;
-			}
-
-			// Iterate through each element in the provided list.
-			foreach (BOBBuildingReplacement replacement in buildingElement.replacements)
-			{
-				// Try to find target prefab.
-				PrefabInfo targetPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);
-				if (targetPrefab == null)
-				{
-					Logging.Message("Couldn't find target prefab ", replacement.target);
-					continue;
-				}
-
-				// Try to find replacement prefab.
-				PrefabInfo replacementPrefab = FindReplacementPrefab(replacement.Replacement, replacement.tree);
-				if (replacementPrefab == null)
-				{
-					Logging.Message("Couldn't find replacement prefab ", replacement.Replacement);
-					continue;
-				}
-
-				// If we got here, it's all good; apply the building replacement.
-				IndividualBuildingReplacement.instance.Apply(buildingInfo, targetPrefab, replacement.index, replacementPrefab, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
-			}
-		}
-
-
-		/// <summary>
-		/// Attempts to find the replacement prefab with the specified name.
-		/// </summary>
-		/// <param name="replacementName">Prefab name to find</param>
-		/// <param name="isTree">True if the desired prefab is a tree, false if it's a prop</param>
-		/// <returns>Requested prefab, or null if not found</returns>
-		private static PrefabInfo FindReplacementPrefab(string replacementName, bool isTree)
-        {
-			// Null check.
-			if (replacementName.IsNullOrWhiteSpace())
-            {
-				Logging.Error("invalid replacement prop name");
-				return null;
-            }
-
-			// Attempt to load from prefab collection.
-			PrefabInfo replacementPrefab = isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacementName) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacementName);
-
-			if (replacementPrefab == null)
-			{
-				// If we couldn't load from prefab collection, attempt to find in our list of replacement prefabs.
-				replacementPrefab = isTree ? (PrefabInfo)PrefabLists.randomTrees.Find(x => x.name.Equals(replacementName)).tree : (PrefabInfo)PrefabLists.randomProps.Find(x => x.name.Equals(replacementName)).prop;
-			}
-
-			// Return what we have.
-			return replacementPrefab;
 		}
 	}
 }

@@ -26,7 +26,7 @@ namespace BOB
 
 
 		/// <summary>
-		/// Retrieves a currently-applied network replacement entry for the given network, lane and prop index.
+		/// Retrieves a currently-applied network replacement entry for the given network and target prefab.
 		/// </summary>
 		/// <param name="network">Network prefab</param>
 		/// <param name="target">Target prop/tree prefab</param>
@@ -44,6 +44,123 @@ namespace BOB
 			// If we got here, something went wrong.
 			Logging.Error("no network replacement entry for network ", network?.name ?? "null", " with target ", target?.name ?? "null");
 			return null;
+		}
+
+
+		/// <summary>
+		/// Applies a new (or updated) network replacement.
+		/// </summary>
+		/// <param name="network">Targeted network</param>
+		/// <param name="target">Targeted (original) prop prefab</param>
+		/// <param name="replacement">Replacment prop prefab</param>
+		/// <param name="targetLane">Targeted lane index (in parent network)</param>
+		/// <param name="targetIndex">Prop index to apply replacement to</param>
+		/// <param name="angle">Replacment prop angle adjustment</param>
+		/// <param name="offsetX">Replacment X position offset</param>
+		/// <param name="offsetY">Replacment Y position offset</param>
+		/// <param name="offsetZ">Replacment Z position offset</param>
+		/// <param name="probability">Replacement probability</param>
+		internal override void Apply(NetInfo network, PrefabInfo target, PrefabInfo replacement, int lane, int targetIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability)
+		{
+			// Safety check.
+			if (network?.m_lanes == null)
+			{
+				return;
+			}
+
+			// Make sure that target and replacement are the same type before doing anything.
+			if (target == null || replacement == null || (target is TreeInfo && !(replacement is TreeInfo)) || (target is PropInfo) && !(replacement is PropInfo))
+			{
+				return;
+			}
+
+			// Check to see if we already have a replacement entry for this prop - if so, revert the replacement first.
+			if (replacements.ContainsKey(network) && replacements[network].ContainsKey(target))
+			{
+				Revert(network, target, true);
+			}
+
+			// Create new dictionary entry for network if none already exists.
+			if (!replacements.ContainsKey(network))
+			{
+				replacements.Add(network, new Dictionary<PrefabInfo, BOBNetReplacement>());
+			}
+
+			// Create new dictionary entry for prop if none already exists.
+			if (!replacements[network].ContainsKey(target))
+			{
+				replacements[network].Add(target, new BOBNetReplacement());
+			}
+
+			// Add/replace dictionary replacement data.
+			replacements[network][target].references = new List<NetPropReference>();
+			replacements[network][target].tree = target is TreeInfo;
+			replacements[network][target].targetInfo = target;
+			replacements[network][target].target = target.name;
+			replacements[network][target].angle = angle;
+			replacements[network][target].offsetX = offsetX;
+			replacements[network][target].offsetY = offsetY;
+			replacements[network][target].offsetZ = offsetZ;
+			replacements[network][target].probability = probability;
+
+			// Record replacement prop.
+			replacements[network][target].replacementInfo = replacement;
+			replacements[network][target].Replacement = replacement.name;
+
+			// Iterate through each lane.
+			for (int laneIndex = 0; laneIndex < network.m_lanes.Length; ++laneIndex)
+			{
+				// If no props in this lane, skip it and go to the next one.
+				if (network.m_lanes[laneIndex].m_laneProps?.m_props == null)
+				{
+					continue;
+				}
+
+				// Iterate through each prop in lane.
+				for (int propIndex = 0; propIndex < network.m_lanes[laneIndex].m_laneProps.m_props.Length; ++propIndex)
+				{
+					// Check for any existing pack or all-network replacement.
+					PrefabInfo thisProp = NetworkPackReplacement.instance.GetOriginal(network, laneIndex, propIndex) ?? AllNetworkReplacement.instance.GetOriginal(network, laneIndex, propIndex);
+					if (thisProp == null)
+					{
+						// No active replacement; use current PropInfo.
+						if (target is PropInfo)
+						{
+							thisProp = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_finalProp;
+						}
+						else
+						{
+							thisProp = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_finalTree;
+						}
+					}
+
+					// See if this prop matches our replacement.
+					if (thisProp != null && thisProp == target)
+					{
+						// Match!  Add reference data to the list.
+						replacements[network][target].references.Add(new NetPropReference
+						{
+							network = network,
+							laneIndex = laneIndex,
+							propIndex = propIndex,
+							angle = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_angle,
+							position = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position,
+							probability = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_probability
+						});
+					}
+				}
+			}
+
+			// Now, iterate through each entry found.
+			foreach (NetPropReference propReference in replacements[network][target].references)
+			{
+				// Reset any pack or all-network replacements first.
+				NetworkPackReplacement.instance.RemoveEntry(network, target, propReference.laneIndex, propReference.propIndex);
+				AllNetworkReplacement.instance.RemoveEntry(network, target, propReference.laneIndex, propReference.propIndex);
+
+				// Apply the replacement.
+				ReplaceProp(replacements[network][target], propReference);
+			}
 		}
 
 
@@ -160,121 +277,6 @@ namespace BOB
 						return;
 					}
 				}
-			}
-		}
-
-
-		/// <summary>
-		/// Applies a new (or updated) network replacement.
-		/// </summary>
-		/// <param name="network">Targeted network</param>
-		/// <param name="target">Targeted (original) prop prefab</param>
-		/// <param name="replacement">Replacment prop prefab</param>
-		/// <param name="angle">Replacment prop angle adjustment</param>
-		/// <param name="offsetX">Replacment X position offset</param>
-		/// <param name="offsetY">Replacment Y position offset</param>
-		/// <param name="offsetZ">Replacment Z position offset</param>
-		/// <param name="probability">Replacement probability</param>
-		internal void Apply(NetInfo network, PrefabInfo target, PrefabInfo replacement, float angle, float offsetX, float offsetY, float offsetZ, int probability)
-		{
-			// Safety check.
-			if (network?.m_lanes == null)
-			{
-				return;
-			}
-
-			// Make sure that target and replacement are the same type before doing anything.
-			if (target == null || replacement == null || (target is TreeInfo && !(replacement is TreeInfo)) || (target is PropInfo) && !(replacement is PropInfo))
-			{
-				return;
-			}
-
-			// Check to see if we already have a replacement entry for this prop - if so, revert the replacement first.
-			if (replacements.ContainsKey(network) && replacements[network].ContainsKey(target))
-			{
-				Revert(network, target, true);
-			}
-
-			// Create new dictionary entry for network if none already exists.
-			if (!replacements.ContainsKey(network))
-			{
-				replacements.Add(network, new Dictionary<PrefabInfo, BOBNetReplacement>());
-			}
-
-			// Create new dictionary entry for prop if none already exists.
-			if (!replacements[network].ContainsKey(target))
-			{
-				replacements[network].Add(target, new BOBNetReplacement());
-			}
-
-			// Add/replace dictionary replacement data.
-			replacements[network][target].references = new List<NetPropReference>();
-			replacements[network][target].tree = target is TreeInfo;
-			replacements[network][target].targetInfo = target;
-			replacements[network][target].target = target.name;
-			replacements[network][target].angle = angle;
-			replacements[network][target].offsetX = offsetX;
-			replacements[network][target].offsetY = offsetY;
-			replacements[network][target].offsetZ = offsetZ;
-			replacements[network][target].probability = probability;
-
-			// Record replacement prop.
-			replacements[network][target].replacementInfo = replacement;
-			replacements[network][target].Replacement = replacement.name;
-
-			// Iterate through each lane.
-			for (int laneIndex = 0; laneIndex < network.m_lanes.Length; ++laneIndex)
-			{
-				// If no props in this lane, skip it and go to the next one.
-				if (network.m_lanes[laneIndex].m_laneProps?.m_props == null)
-				{
-					continue;
-				}
-
-				// Iterate through each prop in lane.
-				for (int propIndex = 0; propIndex < network.m_lanes[laneIndex].m_laneProps.m_props.Length; ++propIndex)
-				{
-					// Check for any existing pack or all-network replacement.
-					PrefabInfo thisProp = NetworkPackReplacement.instance.GetOriginal(network, laneIndex, propIndex) ?? AllNetworkReplacement.instance.GetOriginal(network, laneIndex, propIndex);
-					if (thisProp == null)
-                    {
-						// No active replacement; use current PropInfo.
-						if (target is PropInfo)
-						{
-							thisProp = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_finalProp;
-						}
-						else
-						{
-							thisProp = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_finalTree;
-						}
-					}
-
-					// See if this prop matches our replacement.
-					if (thisProp != null && thisProp == target)
-					{
-						// Match!  Add reference data to the list.
-						replacements[network][target].references.Add(new NetPropReference
-						{
-							network = network,
-							laneIndex = laneIndex,
-							propIndex = propIndex,
-							angle = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_angle,
-							position = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position,
-							probability = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_probability
-						});
-					}
-				}
-			}
-
-			// Now, iterate through each entry found.
-			foreach (NetPropReference propReference in replacements[network][target].references)
-			{
-				// Reset any pack or all-network replacements first.
-				NetworkPackReplacement.instance.RemoveEntry(network, target, propReference.laneIndex, propReference.propIndex);
-				AllNetworkReplacement.instance.RemoveEntry(network, target, propReference.laneIndex, propReference.propIndex);
-
-				// Apply the replacement.
-				ReplaceProp(replacements[network][target], propReference);
 			}
 		}
 

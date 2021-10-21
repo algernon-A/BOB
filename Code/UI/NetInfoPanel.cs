@@ -170,7 +170,7 @@ namespace BOB
 				if (CurrentTargetItem.index < 0)
 				{
 					// Grouped replacement.
-					NetworkReplacement.instance.Apply(currentNet, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+					NetworkReplacement.instance.Apply(currentNet, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, -1, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
 
 					// Update current target.
 					CurrentTargetItem.replacementPrefab = ReplacementPrefab;
@@ -181,7 +181,7 @@ namespace BOB
 					// Individual replacement.
 					NetPropListItem netItem = CurrentTargetItem as NetPropListItem;
 
-					IndividualNetworkReplacement.instance.Apply(currentNet, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, netItem.lane, CurrentTargetItem.index, ReplacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+					IndividualNetworkReplacement.instance.Apply(currentNet, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, netItem.lane, CurrentTargetItem.index, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
 
 					// Update current target.
 					CurrentTargetItem.individualPrefab = ReplacementPrefab;
@@ -255,7 +255,7 @@ namespace BOB
 		protected override void ReplaceAll(UIComponent control, UIMouseEventParameter mouseEvent)
 		{
 			// Apply replacement.
-			AllNetworkReplacement.instance.Apply(CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+			AllNetworkReplacement.instance.Apply(null, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, -1, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
 
 			// Perform post-replacment updates.
 			FinishUpdate();

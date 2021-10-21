@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 
 namespace BOB
@@ -12,7 +13,7 @@ namespace BOB
 		internal static IndividualBuildingReplacement instance;
 
 		// Master dictionary of replaced prop references.
-		internal Dictionary<BuildingInfo, Dictionary<int, BOBBuildingReplacement>> replacements;
+		private Dictionary<BuildingInfo, Dictionary<int, BOBBuildingReplacement>> replacements;
 
 
 		/// <summary>
@@ -21,6 +22,108 @@ namespace BOB
 		internal IndividualBuildingReplacement()
 		{
 			instance = this;
+		}
+
+
+		/// <summary>
+		/// Retrieves a currently-applied individual building replacement entry for the given building and prop index.
+		/// </summary>
+		/// <param name="building">Building prefab</param>
+		/// <param name="index">Prop index number</param>
+		/// <returns>Currently-applied individual building replacement (null if none)</returns>
+		internal BOBBuildingReplacement Replacement(BuildingInfo building,int index)
+		{
+			if (replacements.TryGetValue(building, out Dictionary<int, BOBBuildingReplacement> buildingEntry))
+			{
+				if (buildingEntry.TryGetValue(index, out BOBBuildingReplacement replacementEntry))
+				{
+					return replacementEntry;
+				}
+			}
+
+			// If we got here, something went wrong.
+			Logging.Error("no individual building replacement entry for building ", building?.name ?? "null", " with index ", index.ToString());
+			return null;
+		}
+
+
+		/// <summary>
+		/// Applies a new (or updated) individual building prop replacement.
+		/// </summary>
+		/// <param name="building">Targeted building</param>
+		/// <param name="target">Targeted (original) prop prefab</param>
+		/// <param name="replacement">Replacment prop prefab</param>
+		/// <param name="targetIndex">Prop index to apply replacement to</param>
+		/// <param name="angle">Replacment prop angle adjustment</param>
+		/// <param name="offsetX">Replacment X position offset</param>
+		/// <param name="offsetY">Replacment Y position offset</param>
+		/// <param name="offsetZ">Replacment Z position offset</param>
+		/// <param name="probability">Replacement probability</param>
+		internal override void Apply(BuildingInfo building, PrefabInfo target, PrefabInfo replacement, int targetIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability)
+		{
+			// Local reference.
+			BuildingInfo.Prop targetProp = building?.m_props?[targetIndex];
+
+			// Bail out if no building prop.
+			if (targetProp == null)
+			{
+				Logging.Error("no target prop reference found when applying individual replacement");
+				return;
+			}
+
+			// Check to see if we already have a replacement entry for this prop - if so, revert the replacement first.
+			if (replacements.ContainsKey(building) && replacements[building].ContainsKey(targetIndex))
+			{
+				Revert(building, targetIndex, true);
+			}
+
+			// Create new dictionary entry for building if none already exists.
+			if (!replacements.ContainsKey(building))
+			{
+				replacements.Add(building, new Dictionary<int, BOBBuildingReplacement>());
+			}
+
+			// Create new dictionary entry for prop if none already exists.
+			if (!replacements[building].ContainsKey(targetIndex))
+			{
+				replacements[building].Add(targetIndex, new BOBBuildingReplacement());
+			}
+
+			// Add/replace dictionary replacement data.
+			replacements[building][targetIndex].index = targetIndex;
+			replacements[building][targetIndex].references = new List<BuildingPropReference>();
+			replacements[building][targetIndex].tree = target is TreeInfo;
+			replacements[building][targetIndex].targetInfo = target;
+			replacements[building][targetIndex].target = target.name;
+			replacements[building][targetIndex].angle = angle;
+			replacements[building][targetIndex].offsetX = offsetX;
+			replacements[building][targetIndex].offsetY = offsetY;
+			replacements[building][targetIndex].offsetZ = offsetZ;
+			replacements[building][targetIndex].probability = probability;
+
+			// Record replacement prop.
+			replacements[building][targetIndex].replacementInfo = replacement;
+			replacements[building][targetIndex].Replacement = replacement.name;
+
+			// Create replacement record.
+			BuildingPropReference propReference = new BuildingPropReference
+			{
+				building = building,
+				propIndex = targetIndex,
+				radAngle = building.m_props[targetIndex].m_radAngle,
+				postion = building.m_props[targetIndex].m_position,
+				probability = building.m_props[targetIndex].m_probability
+			};
+
+			// Add reference data to the list (only entry....)
+			replacements[building][targetIndex].references.Add(propReference);
+
+			// Reset any building or all-building replacements first.
+			BuildingReplacement.instance.RemoveEntry(building, target, targetIndex);
+			AllBuildingReplacement.instance.RemoveEntry(building, target, targetIndex);
+
+			// Apply the replacement.
+			ReplaceProp(replacements[building][targetIndex], propReference);
 		}
 
 
@@ -105,86 +208,6 @@ namespace BOB
 
 
 		/// <summary>
-		/// Applies a new (or updated) individual building prop replacement.
-		/// </summary>
-		/// <param name="building">Targeted building</param>
-		/// <param name="target">Targeted (original) prop prefab</param>
-		/// <param name="targetIndex">Prop index to apply replacement to</param>
-		/// <param name="replacement">Replacment prop prefab</param>
-		/// <param name="angle">Replacment prop angle adjustment</param>
-		/// <param name="offsetX">Replacment X position offset</param>
-		/// <param name="offsetY">Replacment Y position offset</param>
-		/// <param name="offsetZ">Replacment Z position offset</param>
-		/// <param name="probability">Replacement probability</param>
-		internal void Apply(BuildingInfo building, PrefabInfo target, int targetIndex, PrefabInfo replacement, float angle, float offsetX, float offsetY, float offsetZ, int probability)
-		{
-			// Local reference.
-			BuildingInfo.Prop targetProp = building?.m_props?[targetIndex];
-
-			// Bail out if no building prop.
-			if (targetProp == null)
-			{
-				Logging.Error("no target prop reference found when applying individual replacement");
-				return;
-			}
-
-			// Check to see if we already have a replacement entry for this prop - if so, revert the replacement first.
-			if (replacements.ContainsKey(building) && replacements[building].ContainsKey(targetIndex))
-			{
-				Revert(building, targetIndex, true);
-			}
-
-			// Create new dictionary entry for building if none already exists.
-			if (!replacements.ContainsKey(building))
-			{
-				replacements.Add(building, new Dictionary<int, BOBBuildingReplacement>());
-			}
-
-			// Create new dictionary entry for prop if none already exists.
-			if (!replacements[building].ContainsKey(targetIndex))
-			{
-				replacements[building].Add(targetIndex, new BOBBuildingReplacement());
-			}
-
-			// Add/replace dictionary replacement data.
-			replacements[building][targetIndex].index = targetIndex;
-			replacements[building][targetIndex].references = new List<BuildingPropReference>();
-			replacements[building][targetIndex].tree = target is TreeInfo;
-			replacements[building][targetIndex].targetInfo = target;
-			replacements[building][targetIndex].target = target.name;
-			replacements[building][targetIndex].angle = angle;
-			replacements[building][targetIndex].offsetX = offsetX;
-			replacements[building][targetIndex].offsetY = offsetY;
-			replacements[building][targetIndex].offsetZ = offsetZ;
-			replacements[building][targetIndex].probability = probability;
-
-			// Record replacement prop.
-			replacements[building][targetIndex].replacementInfo = replacement;
-			replacements[building][targetIndex].Replacement = replacement.name;
-
-			// Create replacement record.
-			BuildingPropReference propReference = new BuildingPropReference
-			{
-				building = building,
-				propIndex = targetIndex,
-				radAngle = building.m_props[targetIndex].m_radAngle,
-				postion = building.m_props[targetIndex].m_position,
-				probability = building.m_props[targetIndex].m_probability
-			};
-
-			// Add reference data to the list (only entry....)
-			replacements[building][targetIndex].references.Add(propReference);
-
-			// Reset any building or all-building replacements first.
-			BuildingReplacement.instance.RemoveEntry(building, target, targetIndex);
-			AllBuildingReplacement.instance.RemoveEntry(building, target, targetIndex);
-
-			// Apply the replacement.
-			ReplaceProp(replacements[building][targetIndex], propReference);
-		}
-
-
-		/// <summary>
 		/// Checks if there's a currently active individual building prop applied to the given building prop index, and if so, returns the replacement record.
 		/// </summary>
 		/// <param name="buildingPrefab">Building prefab to check</param>
@@ -205,6 +228,29 @@ namespace BOB
 			// If we got here, no entry was found - return null to indicate no active replacement.
 			return null;
 		}
+
+
+		/// <summary>
+		/// Serializes building replacement dictionary to XML format.
+		/// </summary>
+		/// <returns>List of building replacement entries in XML Format</returns>
+		internal List<BOBBuildingElement> Serialize()
+		{
+			// Serialise network replacements, per network.
+			List<BOBBuildingElement> elementList = new List<BOBBuildingElement>();
+			foreach (BuildingInfo building in replacements.Keys)
+			{
+				// Create new element.
+				elementList.Add(new BOBBuildingElement
+				{
+					building = building.name,
+					replacements = replacements[building].Values.ToList()
+				});
+			}
+
+			return elementList;
+		}
+
 
 
 		/// <summary>

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 
 namespace BOB
@@ -22,6 +23,22 @@ namespace BOB
 	/// </summary>
 	internal abstract class NetworkReplacementBase
 	{
+		/// <summary>
+		/// Applies a new (or updated) network replacement.
+		/// </summary>
+		/// <param name="network">Targeted network</param>
+		/// <param name="target">Targeted (original) prop prefab</param>
+		/// <param name="replacement">Replacment prop prefab</param>
+		/// <param name="targetLane">Targeted lane index (in parent network)</param>
+		/// <param name="targetIndex">Prop index to apply replacement to</param>
+		/// <param name="angle">Replacment prop angle adjustment</param>
+		/// <param name="offsetX">Replacment X position offset</param>
+		/// <param name="offsetY">Replacment Y position offset</param>
+		/// <param name="offsetZ">Replacment Z position offset</param>
+		/// <param name="probability">Replacement probability</param>
+		internal abstract void Apply(NetInfo network, PrefabInfo target, PrefabInfo replacement, int lane, int targetIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability);
+
+
 		/// <summary>
 		/// Reverts all active replacements and re-initialises the master dictionary.
 		/// </summary>
@@ -49,6 +66,50 @@ namespace BOB
 		internal NetworkReplacementBase()
 		{
 			Setup();
+		}
+
+
+		/// <summary>
+		/// Deserialises a network replacement list.
+		/// </summary>
+		/// <param name="elementList">List of elements to deserialise</param>
+		internal virtual void Deserialize(List<BOBNetworkElement> elementList)
+		{
+			// Iterate through each element in list.
+			foreach (BOBNetworkElement networkElement in elementList)
+			{
+				// Try to find target network.
+				NetInfo networkInfo = (NetInfo)PrefabCollection<NetInfo>.FindLoaded(networkElement.network);
+				if (networkInfo == null)
+				{
+					Logging.Message("Couldn't find target network ", networkElement.network);
+					return;
+				}
+
+
+				// Iterate through each element in the provided list.
+				foreach (BOBNetReplacement replacement in networkElement.replacements)
+				{
+					// Try to find target prefab.
+					PrefabInfo targetPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);
+					if (targetPrefab == null)
+					{
+						Logging.Message("Couldn't find target prefab ", replacement.target);
+						continue;
+					}
+
+					// Try to find replacement prefab.
+					PrefabInfo replacementPrefab = ConfigurationUtils.FindReplacementPrefab(replacement.Replacement, replacement.tree);
+					if (replacementPrefab == null)
+					{
+						Logging.Message("Couldn't find replacement prefab ", replacement.Replacement);
+						continue;
+					}
+
+					// If we got here, it's all good; apply the network replacement.
+					Apply(networkInfo, targetPrefab, replacementPrefab, replacement.lane, replacement.index, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
+				}
+			}
 		}
 
 

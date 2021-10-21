@@ -33,11 +33,30 @@ namespace BOB
 
 
 		/// <summary>
-		/// Returns the current status of the named replacement pack.
+		/// Dummy entry - DO NOT USE.
 		/// </summary>
-		/// <param name="packName">Replacement pack name</param>
-		/// <returns>True if enabled, false otherwise</returns>
-		internal bool GetPackStatus(string packName)
+		/// <param name="network"></param>
+		/// <param name="target"></param>
+		/// <param name="replacement"></param>
+		/// <param name="lane"></param>
+		/// <param name="targetIndex"></param>
+		/// <param name="angle"></param>
+		/// <param name="offsetX"></param>
+		/// <param name="offsetY"></param>
+		/// <param name="offsetZ"></param>
+		/// <param name="probability"></param>
+        internal override void Apply(NetInfo network, PrefabInfo target, PrefabInfo replacement, int lane, int targetIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability)
+        {
+            throw new System.NotImplementedException();
+        }
+
+
+        /// <summary>
+        /// Returns the current status of the named replacement pack.
+        /// </summary>
+        /// <param name="packName">Replacement pack name</param>
+        /// <returns>True if enabled, false otherwise</returns>
+        internal bool GetPackStatus(string packName)
         {
 			if (packEnabled.ContainsKey(packName))
             {

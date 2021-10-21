@@ -146,7 +146,7 @@ namespace BOB
 							thisIndex = CurrentTargetItem.indexes[0];
 						}
 
-						BOBBuildingReplacement thisReplacement = IndividualBuildingReplacement.instance.replacements[currentBuilding][thisIndex];
+						BOBBuildingReplacement thisReplacement = IndividualBuildingReplacement.instance.Replacement(currentBuilding, thisIndex);
 
 						angleSlider.TrueValue = thisReplacement.angle;
 						xSlider.TrueValue = thisReplacement.offsetX;
@@ -157,7 +157,7 @@ namespace BOB
 					// Ditto for any building replacement.
 					else if (CurrentTargetItem.replacementPrefab != null)
 					{
-						BOBBuildingReplacement thisReplacement = BuildingReplacement.instance.replacements[currentBuilding][CurrentTargetItem.originalPrefab];
+						BOBBuildingReplacement thisReplacement = BuildingReplacement.instance.Replacement(currentBuilding, CurrentTargetItem.originalPrefab);
 
 						angleSlider.TrueValue = thisReplacement.angle;
 						xSlider.TrueValue = thisReplacement.offsetX;
@@ -168,7 +168,7 @@ namespace BOB
 					// Ditto for any all-building replacement.
 					else if (CurrentTargetItem.allPrefab != null)
 					{
-						BOBBuildingReplacement thisReplacement = AllBuildingReplacement.replacements[CurrentTargetItem.originalPrefab];
+						BOBBuildingReplacement thisReplacement = AllBuildingReplacement.instance.Replacement(CurrentTargetItem.originalPrefab);
 
 						angleSlider.TrueValue = thisReplacement.angle;
 						xSlider.TrueValue = thisReplacement.offsetX;
@@ -335,7 +335,7 @@ namespace BOB
 				if (CurrentTargetItem.index < 0)
 				{
 					// Grouped replacement.
-					BuildingReplacement.instance.Apply(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+					BuildingReplacement.instance.Apply(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
 
 					// Update current target.
 					CurrentTargetItem.replacementPrefab = ReplacementPrefab;
@@ -344,7 +344,7 @@ namespace BOB
 				else
 				{
 					// Individual replacement.
-					IndividualBuildingReplacement.instance.Apply(currentBuilding, CurrentTargetItem.originalPrefab, CurrentTargetItem.index, ReplacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+					IndividualBuildingReplacement.instance.Apply(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, CurrentTargetItem.index, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
 
 					// Update current target.
 					CurrentTargetItem.individualPrefab = ReplacementPrefab;
@@ -427,7 +427,7 @@ namespace BOB
 			}
 
 			// Apply replacement.
-			AllBuildingReplacement.instance.Apply(CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+			AllBuildingReplacement.instance.Apply(null, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
 
 			// Update current target.
 			CurrentTargetItem.allPrefab = ReplacementPrefab;

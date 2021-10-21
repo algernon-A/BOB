@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 
 namespace BOB
@@ -46,6 +47,140 @@ namespace BOB
 		internal IndividualNetworkReplacement()
 		{
 			instance = this;
+		}
+
+
+		/// <summary>
+		/// Applies a new (or updated) individual network replacement.
+		/// </summary>
+		/// <param name="network">Targeted network</param>
+		/// <param name="target">Targeted (original) prop prefab</param>
+		/// <param name="replacement">Replacment prop prefab</param>
+		/// <param name="targetLane">Targeted lane index (in parent network)</param>
+		/// <param name="targetIndex">Prop index to apply replacement to</param>
+		/// <param name="angle">Replacment prop angle adjustment</param>
+		/// <param name="offsetX">Replacment X position offset</param>
+		/// <param name="offsetY">Replacment Y position offset</param>
+		/// <param name="offsetZ">Replacment Z position offset</param>
+		/// <param name="probability">Replacement probability</param>
+		internal override void Apply(NetInfo network, PrefabInfo target, PrefabInfo replacement, int lane, int targetIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability)
+		{
+			Logging.Message("applying individual network replacement");
+
+			// Safety check.
+			if (network?.m_lanes == null)
+			{
+				return;
+			}
+
+			// Make sure that target and replacement are the same type before doing anything.
+			if (target == null || replacement == null || (target is TreeInfo && !(replacement is TreeInfo)) || (target is PropInfo) && !(replacement is PropInfo))
+			{
+				return;
+			}
+
+
+			Logging.Message("individual network replacement of ", target.name, " with ", replacement.name, " for lane ", lane.ToString(), " and index ", targetIndex.ToString());
+
+			// Create key.
+			KeyValuePair<int, int> indexKey = new KeyValuePair<int, int>(lane, targetIndex);
+
+			// Check to see if we already have a replacement entry for this prop - if so, revert the replacement first.
+			if (replacements.ContainsKey(network) && replacements[network].ContainsKey(indexKey))
+			{
+				Revert(network, lane, targetIndex, true);
+			}
+
+			// Create new dictionary entry for network if none already exists.
+			if (!replacements.ContainsKey(network))
+			{
+				replacements.Add(network, new Dictionary<KeyValuePair<int, int>, BOBNetReplacement>());
+			}
+
+			// Create new dictionary entry for prop if none already exists.
+			if (!replacements[network].ContainsKey(indexKey))
+			{
+				replacements[network].Add(indexKey, new BOBNetReplacement());
+			}
+
+			// Add/replace dictionary replacement data.
+			replacements[network][indexKey].references = new List<NetPropReference>();
+			replacements[network][indexKey].tree = target is TreeInfo;
+			replacements[network][indexKey].targetInfo = target;
+			replacements[network][indexKey].replacementInfo = replacement;
+			replacements[network][indexKey].target = target.name;
+			replacements[network][indexKey].lane = lane;
+			replacements[network][indexKey].index = targetIndex;
+			replacements[network][indexKey].angle = angle;
+			replacements[network][indexKey].offsetX = offsetX;
+			replacements[network][indexKey].offsetY = offsetY;
+			replacements[network][indexKey].offsetZ = offsetZ;
+			replacements[network][indexKey].probability = probability;
+
+			// Create replacement record.
+			NetPropReference propReference = new NetPropReference
+			{
+				network = network,
+				laneIndex = lane,
+				propIndex = targetIndex,
+				angle = network.m_lanes[lane].m_laneProps.m_props[targetIndex].m_angle,
+				position = network.m_lanes[lane].m_laneProps.m_props[targetIndex].m_position,
+				probability = network.m_lanes[lane].m_laneProps.m_props[targetIndex].m_probability
+			};
+
+			// Add reference data to the list (only entry....)
+			replacements[network][indexKey].references.Add(propReference);
+
+			// Reset any pack, network, or all-network replacements first.
+			NetworkPackReplacement.instance.RemoveEntry(network, target, propReference.laneIndex, propReference.propIndex);
+			AllNetworkReplacement.instance.RemoveEntry(network, target, propReference.laneIndex, propReference.propIndex);
+			NetworkReplacement.instance.RemoveEntry(network, target, propReference.laneIndex, propReference.propIndex);
+
+
+			// If this is a vanilla network, then we've probably got shared NetLaneProp references, so need to copy to a new instance.
+			// If the name doesn't contain a period (c.f. 12345.MyNetwok_Data), then assume it's vanilla - may be a mod or not shared, but better safe than sorry.
+			if (!network.name.Contains("."))
+			{
+				Logging.Message("creating new m_laneProps instance for network ", network.name);
+
+				// Create new m_laneProps instance with new props list.
+				NetLaneProps newLaneProps = ScriptableObject.CreateInstance<NetLaneProps>();
+				newLaneProps.m_props = new NetLaneProps.Prop[network.m_lanes[lane].m_laneProps.m_props.Length];
+
+				// Iterate through each  in the existing instance
+				for (int i = 0; i < newLaneProps.m_props.Length; ++i)
+				{
+					NetLaneProps.Prop existingNetLaneProp = network.m_lanes[lane].m_laneProps.m_props[i];
+
+					newLaneProps.m_props[i] = new NetLaneProps.Prop
+					{
+						m_flagsRequired = existingNetLaneProp.m_flagsRequired,
+						m_flagsForbidden = existingNetLaneProp.m_flagsForbidden,
+						m_startFlagsRequired = existingNetLaneProp.m_startFlagsRequired,
+						m_startFlagsForbidden = existingNetLaneProp.m_startFlagsForbidden,
+						m_endFlagsRequired = existingNetLaneProp.m_endFlagsRequired,
+						m_endFlagsForbidden = existingNetLaneProp.m_endFlagsForbidden,
+						m_colorMode = existingNetLaneProp.m_colorMode,
+						m_prop = existingNetLaneProp.m_prop,
+						m_tree = existingNetLaneProp.m_tree,
+						m_position = existingNetLaneProp.m_position,
+						m_angle = existingNetLaneProp.m_angle,
+						m_segmentOffset = existingNetLaneProp.m_segmentOffset,
+						m_repeatDistance = existingNetLaneProp.m_repeatDistance,
+						m_minLength = existingNetLaneProp.m_minLength,
+						m_cornerAngle = existingNetLaneProp.m_cornerAngle,
+						m_probability = existingNetLaneProp.m_probability,
+						m_finalProp = existingNetLaneProp.m_finalProp,
+						m_finalTree = existingNetLaneProp.m_finalTree
+					};
+				}
+
+				// Replace network laneProps with our new instance.
+				network.m_lanes[lane].m_laneProps = newLaneProps;
+			}
+
+			// Apply the replacement.
+			ReplaceProp(replacements[network][indexKey], propReference);
 		}
 
 
@@ -134,142 +269,6 @@ namespace BOB
 					replacements.Remove(network);
 				}
 			}
-		}
-
-
-		/// <summary>
-		/// Applies a new (or updated) individual network replacement.
-		/// </summary>
-		/// <param name="network">Targeted network</param>
-		/// <param name="target">Targeted (original) prop prefab</param>
-		/// <param name="targetLane">Targeted lane index (in parent network)</param>
-		/// <param name="targetIndex">Prop index to apply replacement to</param>
-		/// <param name="replacement">Replacment prop prefab</param>
-		/// <param name="angle">Replacment prop angle adjustment</param>
-		/// <param name="offsetX">Replacment X position offset</param>
-		/// <param name="offsetY">Replacment Y position offset</param>
-		/// <param name="offsetZ">Replacment Z position offset</param>
-		/// <param name="probability">Replacement probability</param>
-		internal void Apply(NetInfo network, PrefabInfo target, int lane, int targetIndex, PrefabInfo replacement, float angle, float offsetX, float offsetY, float offsetZ, int probability)
-		{
-			Logging.Message("applying individual network replacement");
-
-			// Safety check.
-			if (network?.m_lanes == null)
-			{
-				return;
-			}
-
-			// Make sure that target and replacement are the same type before doing anything.
-			if (target == null || replacement == null || (target is TreeInfo && !(replacement is TreeInfo)) || (target is PropInfo) && !(replacement is PropInfo))
-			{
-				return;
-			}
-
-
-			Logging.Message("individual network replacement of ", target.name, " with ", replacement.name, " for lane ", lane.ToString(), " and index ", targetIndex.ToString());
-
-			// Create key.
-			KeyValuePair<int, int> indexKey = new KeyValuePair<int, int>(lane, targetIndex);
-
-			// Check to see if we already have a replacement entry for this prop - if so, revert the replacement first.
-			if (replacements.ContainsKey(network) && replacements[network].ContainsKey(indexKey))
-			{
-				Revert(network, lane, targetIndex, true);
-			}
-
-			// Create new dictionary entry for network if none already exists.
-			if (!replacements.ContainsKey(network))
-			{
-				replacements.Add(network, new Dictionary<KeyValuePair<int, int>, BOBNetReplacement>());
-			}
-
-			// Create new dictionary entry for prop if none already exists.
-			if (!replacements[network].ContainsKey(indexKey))
-			{
-				replacements[network].Add(indexKey, new BOBNetReplacement());
-			}
-
-			// Add/replace dictionary replacement data.
-			replacements[network][indexKey].references = new List<NetPropReference>();
-			replacements[network][indexKey].tree = target is TreeInfo;
-			replacements[network][indexKey].targetInfo = target;
-			replacements[network][indexKey].replacementInfo = replacement;
-			replacements[network][indexKey].target = target.name;
-			replacements[network][indexKey].lane = lane;
-			replacements[network][indexKey].index = targetIndex;
-			replacements[network][indexKey].angle = angle;
-			replacements[network][indexKey].offsetX = offsetX;
-			replacements[network][indexKey].offsetY = offsetY;
-			replacements[network][indexKey].offsetZ = offsetZ;
-			replacements[network][indexKey].probability = probability;
-
-			// Create replacement record.
-			NetPropReference propReference = new NetPropReference
-			{
-				network = network,
-				laneIndex = lane,
-				propIndex = targetIndex,
-				angle = network.m_lanes[lane].m_laneProps.m_props[targetIndex].m_angle,
-				position = network.m_lanes[lane].m_laneProps.m_props[targetIndex].m_position,
-				probability = network.m_lanes[lane].m_laneProps.m_props[targetIndex].m_probability
-			};
-
-			// Add reference data to the list (only entry....)
-			replacements[network][indexKey].references.Add(propReference);
-
-			// Reset any pack, network, or all-network replacements first.
-			NetworkPackReplacement.instance.RemoveEntry(network, target, propReference.laneIndex, propReference.propIndex);
-			AllNetworkReplacement.instance.RemoveEntry(network, target, propReference.laneIndex, propReference.propIndex);
-			NetworkReplacement.instance.RemoveEntry(network, target, propReference.laneIndex, propReference.propIndex);
-
-
-			// If this is a vanilla network, then we've probably got shared NetLaneProp references, so need to copy to a new instance.
-			// If the name doesn't contain a period (c.f. 12345.MyNetwok_Data), then assume it's vanilla - may be a mod or not shared, but better safe than sorry.
-			if (!network.name.Contains("."))
-			{
-				Logging.Message("creating new m_laneProps instance for network ", network.name);
-
-				// Create new m_laneProps instance with new props list.
-				NetLaneProps newLaneProps = new NetLaneProps
-				{
-					m_props = new NetLaneProps.Prop[network.m_lanes[lane].m_laneProps.m_props.Length]
-				};
-
-				// Iterate through each  in the existing instance
-				for (int i = 0; i < newLaneProps.m_props.Length; ++i)
-				{
-					NetLaneProps.Prop existingNetLaneProp = network.m_lanes[lane].m_laneProps.m_props[i];
-
-					newLaneProps.m_props[i] = new NetLaneProps.Prop
-					{
-						m_flagsRequired = existingNetLaneProp.m_flagsRequired,
-						m_flagsForbidden = existingNetLaneProp.m_flagsForbidden,
-						m_startFlagsRequired = existingNetLaneProp.m_startFlagsRequired,
-						m_startFlagsForbidden = existingNetLaneProp.m_startFlagsForbidden,
-						m_endFlagsRequired = existingNetLaneProp.m_endFlagsRequired,
-						m_endFlagsForbidden = existingNetLaneProp.m_endFlagsForbidden,
-						m_colorMode = existingNetLaneProp.m_colorMode,
-						m_prop = existingNetLaneProp.m_prop,
-						m_tree = existingNetLaneProp.m_tree,
-						m_position = existingNetLaneProp.m_position,
-						m_angle = existingNetLaneProp.m_angle,
-						m_segmentOffset = existingNetLaneProp.m_segmentOffset,
-						m_repeatDistance = existingNetLaneProp.m_repeatDistance,
-						m_minLength = existingNetLaneProp.m_minLength,
-						m_cornerAngle = existingNetLaneProp.m_cornerAngle,
-						m_probability = existingNetLaneProp.m_probability,
-						m_finalProp = existingNetLaneProp.m_finalProp,
-						m_finalTree = existingNetLaneProp.m_finalTree
-					};
-				}
-
-				// Replace network laneProps with our new instance.
-				network.m_lanes[lane].m_laneProps = newLaneProps;
-			}
-
-			// Apply the replacement.
-			ReplaceProp(replacements[network][indexKey], propReference);
 		}
 
 
