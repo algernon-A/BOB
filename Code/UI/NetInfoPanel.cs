@@ -52,7 +52,12 @@ namespace BOB
 				// Ensure valid selections before proceeding.
 				if (currentNetItem != null && currentNet != null)
 				{
-					// TODO: use properties instead of direct access.  Also for Building Info Panel.
+					// Set lane highlighting selection for individual items.
+					if (currentNetItem.lane > -1)
+					{
+						RenderOverlays.CurrentLane = currentNet.m_lanes[currentNetItem.lane];
+					}
+
 					// If we've got an individual replacement, update the offset fields with the replacement values.
 					if (CurrentTargetItem.individualPrefab != null)
 					{
@@ -65,10 +70,6 @@ namespace BOB
 							ySlider.TrueValue = individualReplacement.offsetY;
 							zSlider.TrueValue = individualReplacement.offsetZ;
 							probabilitySlider.TrueValue = individualReplacement.probability;
-
-
-							// Set lane highlighting selection for individual items.
-							RenderOverlays.CurrentLane = currentNet.m_lanes[IndividualLane];
 
 							// All done here.
 							return;
