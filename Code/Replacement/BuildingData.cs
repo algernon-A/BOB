@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using ColossalFramework;
+
 
 namespace BOB
 {
@@ -30,7 +32,7 @@ namespace BOB
 
 
         /// <summary>
-        /// Refreshes network prefab renders for all 'dirty' buildings.
+        /// Refreshes building prefab renders for all 'dirty' buildings.
         /// </summary>
         internal static void Update()
         {
@@ -44,8 +46,9 @@ namespace BOB
                 // Check that this is a valid building in the dirty list.
                 if (building.m_flags != Building.Flags.None && DirtyList.Contains(building.Info))
                 {
-                    // Match - update building render.
-                    BuildingManager.instance.UpdateBuildingRenderer(i, true);
+                    // Match - update building render via simulation thread, creating local buildingID reference to avoid race condition.
+                    ushort buildingID = i;
+                    Singleton<SimulationManager>.instance.AddAction(delegate { Singleton<BuildingManager>.instance.UpdateBuildingRenderer(buildingID, true); });
                 }
             }
 

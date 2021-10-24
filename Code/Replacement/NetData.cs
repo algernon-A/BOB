@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using ColossalFramework;
+
 
 namespace BOB
 {
@@ -44,8 +46,9 @@ namespace BOB
                 // Check that this is a valid network in the dirty list.
                 if (segment.m_flags != NetSegment.Flags.None && DirtyList.Contains(segment.Info))
                 {
-                    // Match - update segment render.
-                    NetManager.instance.UpdateSegmentRenderer(i, true);
+                    // Match - update segment render via simulation thread, creating local buildingID reference to avoid race condition.
+                    ushort segmentID = i;
+                    Singleton<SimulationManager>.instance.AddAction(delegate { Singleton<NetManager>.instance.UpdateSegmentRenderer(segmentID, true); });
                 }
             }
 
