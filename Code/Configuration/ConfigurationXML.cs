@@ -84,19 +84,6 @@ namespace BOB
 	}
 
 
-	/// <summary>
-	/// All-building replacment record XML format.
-	/// </summary>
-	public class BOBAllBuildingElement
-	{
-		[XmlAttribute("target")]
-		public string target = string.Empty;
-
-		[XmlAttribute("replacement")]
-		public string replacement = string.Empty;
-	}
-
-
 	public class BOBNetworkElement
     {
 		[XmlElement("network")]
@@ -169,6 +156,18 @@ namespace BOB
 
 		[XmlIgnore]
 		public PrefabInfo targetInfo;
+
+		[XmlIgnore]
+		public TreeInfo TargetTree => targetInfo as TreeInfo;
+
+		[XmlIgnore]
+		public PropInfo TargetProp => targetInfo as PropInfo;
+
+		[XmlIgnore]
+		public TreeInfo ReplacementTree => replacementInfo as TreeInfo;
+
+		[XmlIgnore]
+		public PropInfo ReplacementProp => replacementInfo as PropInfo;
 	}
 
 
@@ -177,6 +176,9 @@ namespace BOB
 	/// </summary>
 	public class BOBBuildingReplacement : BOBReplacementBase
 	{
+		[XmlIgnore]
+		public BuildingInfo buildingPrefab;
+
 		[XmlIgnore]
 		public List<BuildingPropReference> references;
     }
@@ -187,6 +189,9 @@ namespace BOB
 	/// </summary>
 	public class BOBNetReplacement : BOBReplacementBase
 	{
+		[XmlIgnore]
+		public NetInfo netPrefab;
+
 		[XmlAttribute("lane")]
 		public int lane = -1;
 

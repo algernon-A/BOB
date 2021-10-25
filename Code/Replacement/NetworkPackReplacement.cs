@@ -45,7 +45,7 @@ namespace BOB
 		/// <param name="offsetY"></param>
 		/// <param name="offsetZ"></param>
 		/// <param name="probability"></param>
-        internal override void Apply(NetInfo network, PrefabInfo target, PrefabInfo replacement, int lane, int targetIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability)
+        internal override void Replace(NetInfo network, PrefabInfo target, PrefabInfo replacement, int lane, int targetIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability)
         {
             throw new System.NotImplementedException();
         }

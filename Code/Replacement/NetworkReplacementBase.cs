@@ -36,7 +36,7 @@ namespace BOB
 		/// <param name="offsetY">Replacment Y position offset</param>
 		/// <param name="offsetZ">Replacment Z position offset</param>
 		/// <param name="probability">Replacement probability</param>
-		internal abstract void Apply(NetInfo network, PrefabInfo target, PrefabInfo replacement, int lane, int targetIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability);
+		internal abstract void Replace(NetInfo network, PrefabInfo target, PrefabInfo replacement, int lane, int targetIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability);
 
 
 		/// <summary>
@@ -57,7 +57,7 @@ namespace BOB
 		/// <summary>
 		/// Performs setup and initialises the master dictionary.  Must be called prior to use.
 		/// </summary>
-		protected abstract void Setup();
+		protected virtual void Setup() { }
 
 
 		/// <summary>
@@ -107,7 +107,7 @@ namespace BOB
 					}
 
 					// If we got here, it's all good; apply the network replacement.
-					Apply(networkInfo, targetPrefab, replacementPrefab, replacement.lane, replacement.index, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
+					Replace(networkInfo, targetPrefab, replacementPrefab, replacement.lane, replacement.index, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
 				}
 			}
 		}

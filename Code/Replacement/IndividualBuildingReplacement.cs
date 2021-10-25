@@ -59,7 +59,7 @@ namespace BOB
 		/// <param name="offsetY">Replacment Y position offset</param>
 		/// <param name="offsetZ">Replacment Z position offset</param>
 		/// <param name="probability">Replacement probability</param>
-		internal override void Apply(BuildingInfo building, PrefabInfo target, PrefabInfo replacement, int targetIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability)
+		internal override void Replace(BuildingInfo building, PrefabInfo target, PrefabInfo replacement, int targetIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability)
 		{
 			// Local reference.
 			BuildingInfo.Prop targetProp = building?.m_props?[targetIndex];

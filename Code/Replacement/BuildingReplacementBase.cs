@@ -34,7 +34,7 @@ namespace BOB
 		/// <param name="offsetY">Replacment Y position offset</param>
 		/// <param name="offsetZ">Replacment Z position offset</param>
 		/// <param name="probability">Replacement probability</param>
-		internal abstract void Apply(BuildingInfo building, PrefabInfo target, PrefabInfo replacement, int targetIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability);
+		internal abstract void Replace(BuildingInfo building, PrefabInfo target, PrefabInfo replacement, int targetIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability);
 
 
 		/// <summary>
@@ -55,7 +55,7 @@ namespace BOB
 		/// <summary>
 		/// Performs setup and initialises the master dictionary.  Must be called prior to use.
 		/// </summary>
-		protected abstract void Setup();
+		protected virtual void Setup() { }
 
 
 		/// <summary>
@@ -104,7 +104,7 @@ namespace BOB
 					}
 
 					// If we got here, it's all good; apply the building replacement.
-					Apply(buildingInfo, targetPrefab, replacementPrefab, replacement.index, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
+					Replace(buildingInfo, targetPrefab, replacementPrefab, replacement.index, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
 				}
 			}
 		}

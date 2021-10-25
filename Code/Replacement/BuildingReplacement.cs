@@ -59,7 +59,7 @@ namespace BOB
 		/// <param name="offsetY">Replacment Y position offset</param>
 		/// <param name="offsetZ">Replacment Z position offset</param>
 		/// <param name="probability">Replacement probability</param>
-		internal override void Apply(BuildingInfo building, PrefabInfo target, PrefabInfo replacement, int _, float angle, float offsetX, float offsetY, float offsetZ, int probability)
+		internal override void Replace(BuildingInfo building, PrefabInfo target, PrefabInfo replacement, int _, float angle, float offsetX, float offsetY, float offsetZ, int probability)
 		{
 			// Make sure that target and replacement are the same type before doing anything.
 			if (target == null || replacement == null || (target is TreeInfo && !(replacement is TreeInfo)) || (target is PropInfo) && !(replacement is PropInfo))

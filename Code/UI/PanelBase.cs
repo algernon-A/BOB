@@ -153,15 +153,14 @@ namespace BOB
 		protected abstract void TreeCheckChanged(UIComponent control, bool isChecked);
 
 
-
 		/// <summary>
 		/// Loaded list sort button event handler.
 		/// <param name="control">Calling component (unused)</param>
 		/// <param name="mouseEvent">Mouse event (unused)</param>
 		/// </summary>
-		protected void SortLoaded(UIComponent control, UIMouseEventParameter mouseEvent)
+		protected virtual void SortLoaded(UIComponent control, UIMouseEventParameter mouseEvent)
 		{
-			// Toggle status (set to descending if we're currently ascending, otherwise set to ascending).
+			// To`ggle status (set to descending if we're currently ascending, otherwise set to ascending).
 			if (loadedSearchStatus == (int)OrderBy.NameAscending)
 			{
 				// Order by name descending.

@@ -109,7 +109,7 @@ namespace BOB
             {
                 // Use custom check box.
                 customCheck = UIControls.LabelledCheckBox(panel, Margin, ToolBarY, Translations.Translate("BOB_CFG_UCS"));
-                customCheck.isChecked = !string.IsNullOrEmpty(ConfigurationUtils.currentConfig);
+                customCheck.isChecked = !string.IsNullOrEmpty(ConfigurationUtils.CurrentConfigName);
 
                 // Apply button.
                 UIButton applyButton = UIControls.AddButton(panel, Margin, FooterY, Translations.Translate("BOB_CFG_LAA"), 300f, scale: 0.8f);
@@ -123,7 +123,7 @@ namespace BOB
                     ReplacementUtils.NukeSettings();
 
                     // Save clean configuration.
-                    ConfigurationUtils.SaveConfig(ConfigurationUtils.currentConfig, true);
+                    ConfigurationUtils.SaveConfig(ConfigurationUtils.CurrentConfigName, true);
                 };
             }
 
@@ -134,7 +134,7 @@ namespace BOB
             if (customCheck != null && customCheck.isChecked)
             {
                 // Try to select current config name.
-                selectedConfig = configList.FindItem(ConfigurationUtils.currentConfig);
+                selectedConfig = configList.FindItem(ConfigurationUtils.CurrentConfigName);
 
                 // Did we find it?
                 if (selectedConfig == null)
@@ -254,7 +254,7 @@ namespace BOB
             if (customCheck.isChecked && !string.IsNullOrEmpty(selectedConfig))
             {
                 // Yes - set current configuration file.
-                ConfigurationUtils.currentConfig = selectedConfig;
+                ConfigurationUtils.CurrentConfigName = selectedConfig;
 
                 // Clear current replacements.
                 ReplacementUtils.NukeSettings();
@@ -262,15 +262,15 @@ namespace BOB
                 // Load config file.
                 ConfigurationUtils.LoadConfig();
 
-                Logging.KeyMessage("current configuration set to ", ConfigurationUtils.currentConfig);
+                Logging.KeyMessage("current configuration set to ", ConfigurationUtils.CurrentConfigName);
             }
             else
             {
                 // No custom settings - did we have any previously?
-                if (ConfigurationUtils.currentConfig != null)
+                if (ConfigurationUtils.CurrentConfigName != null)
                 {
                     // We had previous settings - reset.
-                    ConfigurationUtils.currentConfig = null;
+                    ConfigurationUtils.CurrentConfigName = null;
 
                     // Clear current replacements.
                     ReplacementUtils.NukeSettings();

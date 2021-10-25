@@ -115,8 +115,8 @@ namespace BOB
             Logging.Message("wrote props length ", propNames.Count.ToString());
 
             // Write current configuration name.
-            serializer.WriteSharedString(ConfigurationUtils.currentConfig);
-            Logging.Message("wrote current configuration name ", ConfigurationUtils.currentConfig ?? "null");
+            serializer.WriteSharedString(ConfigurationUtils.CurrentConfigName);
+            Logging.Message("wrote current configuration name ", ConfigurationUtils.CurrentConfigName ?? "null");
         }
 
 
@@ -151,8 +151,8 @@ namespace BOB
                 // Read custom config name if we're using version 1 or greater.
                 if (dataVersion > 0)
                 {
-                    ConfigurationUtils.currentConfig = serializer.ReadSharedString();
-                    Logging.Message("read current configuration name ", (ConfigurationUtils.currentConfig ?? "null"));
+                    ConfigurationUtils.CurrentConfigName = serializer.ReadSharedString();
+                    Logging.Message("read current configuration name ", (ConfigurationUtils.CurrentConfigName ?? "null"));
                 }
             }
             catch

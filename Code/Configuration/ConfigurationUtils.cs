@@ -17,13 +17,15 @@ namespace BOB
 		internal static readonly string GeneralSettingsFile = "BOB-config.xml";
 		internal static readonly string ConfigDirectory = ColossalFramework.IO.DataLocation.localApplicationData + Path.DirectorySeparatorChar + ConfigDirectory + "BOBconfigs";
 
-		internal static string currentConfig;
+		// Instance references.
+		internal static string CurrentConfigName { get; set; }
+		internal static BOBConfigurationFile CurrentConfig { get; private set; }
 
 
 		/// <summary>
 		/// Loads configuration from the current configuration file.
 		/// </summary>
-		internal static void LoadConfig() => LoadConfig(currentConfig);
+		internal static void LoadConfig() => LoadConfig(CurrentConfigName);
 
 
 		/// <summary>
@@ -53,42 +55,44 @@ namespace BOB
 					// Read it.
 					using (StreamReader reader = new StreamReader(fileName))
 					{
-						BOBConfigurationFile configFile = (BOBConfigurationFile)new XmlSerializer(typeof(BOBConfigurationFile)).Deserialize(reader);
+						CurrentConfig = (BOBConfigurationFile)new XmlSerializer(typeof(BOBConfigurationFile)).Deserialize(reader);
 
-						if (configFile == null)
+						// If we couldn't read it, log error and create new empty config.
+						if (CurrentConfig == null)
 						{
 							Logging.Error("couldn't deserialize settings file");
+							CurrentConfig = new BOBConfigurationFile();
 							return;
 						}
 
 						// Deserialise random prefabs.
-						PrefabLists.DeserializeRandomProps(configFile.randomProps);
-						PrefabLists.DeserializeRandomTrees(configFile.randomTrees);
+						PrefabLists.DeserializeRandomProps(CurrentConfig.randomProps);
+						PrefabLists.DeserializeRandomTrees(CurrentConfig.randomTrees);
 
 						// Deserialize scaling.
-						Scaling.instance.DeserializeProps(configFile.propScales);
-						Scaling.instance.DeserializeTrees(configFile.treeScales);
+						Scaling.instance.DeserializeProps(CurrentConfig.propScales);
+						Scaling.instance.DeserializeTrees(CurrentConfig.treeScales);
 
 						// Deserialize all-building replacements.
-						DeserializeAllBuilding(configFile.allBuildingProps);
+						AllBuildingReplacement.instance.Deserialize(CurrentConfig.allBuildingProps);
 
 						// Deserialise building replacements.
-						BuildingReplacement.instance.Deserialize(configFile.buildings);
+						BuildingReplacement.instance.Deserialize(CurrentConfig.buildings);
 
 						// Deserialise individual building prop replacements.
-						IndividualBuildingReplacement.instance.Deserialize(configFile.indBuildings);
+						IndividualBuildingReplacement.instance.Deserialize(CurrentConfig.indBuildings);
 
 						// Deserialise all-network replacements.
-						AllNetworkReplacement.instance.Deserialize(configFile.allNetworkProps);
+						AllNetworkReplacement.instance.Deserialize(CurrentConfig.allNetworkProps);
 
 						// Deserialise network replacements.
-						NetworkReplacement.instance.Deserialize(configFile.networks);
+						NetworkReplacement.instance.Deserialize(CurrentConfig.networks);
 
 						// Deserialise individual network replacements.
-						IndividualNetworkReplacement.instance.Deserialize(configFile.indNetworks);
+						IndividualNetworkReplacement.instance.Deserialize(CurrentConfig.indNetworks);
 
 						// Deserialise active replacement packs.
-						NetworkPackReplacement.instance.DeserializeActivePacks(configFile.activePacks);
+						NetworkPackReplacement.instance.DeserializeActivePacks(CurrentConfig.activePacks);
 					}
 				}
 				else
@@ -108,7 +112,7 @@ namespace BOB
 		/// Saves current configuration to the current configuration file.
 		/// <param name="clean">Set to true to generate a blank file (default false)</param>
 		/// </summary>
-		internal static void SaveConfig() => SaveConfig(currentConfig);
+		internal static void SaveConfig() => SaveConfig(CurrentConfigName);
 
 
 		/// <summary>
@@ -141,47 +145,46 @@ namespace BOB
 				using (StreamWriter textWriter = new StreamWriter(fileName, append: false))
 				{
 					XmlSerializer xmlSerializer = new XmlSerializer(typeof(BOBConfigurationFile));
-					BOBConfigurationFile configFile = new BOBConfigurationFile
+
+					// Create new config if there isn't one.
+					if (CurrentConfig == null)
 					{
-						// Version 1.
-						version = 1
-					};
+						CurrentConfig = new BOBConfigurationFile
+						{
+							// Version 1.
+							version = 1
+						};
+					}
 
 					// Don't populate file if we're doing a clean save.
 					if (!clean)
 					{
 						// Serialise random prefabs.
-						configFile.randomProps = PrefabLists.SerializeRandomProps();
-						configFile.randomTrees = PrefabLists.SerializeRandomTrees();
+						CurrentConfig.randomProps = PrefabLists.SerializeRandomProps();
+						CurrentConfig.randomTrees = PrefabLists.SerializeRandomTrees();
 
 						// Serialise scales.
-						configFile.propScales = Scaling.instance.propScales.Values.ToList();
-						configFile.treeScales = Scaling.instance.treeScales.Values.ToList();
-
-						// Serialise all-building replacements.
-						configFile.allBuildingProps = AllBuildingReplacement.instance.Serialize();
+						CurrentConfig.propScales = Scaling.instance.propScales.Values.ToList();
+						CurrentConfig.treeScales = Scaling.instance.treeScales.Values.ToList();
 
 						// Serialise building replacements, per building.
-						configFile.buildings = BuildingReplacement.instance.Serialize();
+						CurrentConfig.buildings = BuildingReplacement.instance.Serialize();
 
 						// Serialise individual building prop replacements, per building.
-						configFile.indBuildings = IndividualBuildingReplacement.instance.Serialize();
-
-						// Serialise all-network replacements.
-						configFile.allNetworkProps = AllNetworkReplacement.instance.Serialize();
+						CurrentConfig.indBuildings = IndividualBuildingReplacement.instance.Serialize();
 
 						// Serialise network replacements.
-						configFile.networks = NetworkReplacement.instance.Serialize();
+						CurrentConfig.networks = NetworkReplacement.instance.Serialize();
 
 						// Serialise individual network replacements.
-						configFile.indNetworks = IndividualNetworkReplacement.instance.Serialize();
+						CurrentConfig.indNetworks = IndividualNetworkReplacement.instance.Serialize();
 
 						// Serialise active replacement packs.
-						configFile.activePacks = NetworkPackReplacement.instance.SerializeActivePacks();
+						CurrentConfig.activePacks = NetworkPackReplacement.instance.SerializeActivePacks();
 					}
 
 					// Write to file.
-					xmlSerializer.Serialize(textWriter, configFile);
+					xmlSerializer.Serialize(textWriter, CurrentConfig);
 				}
 			}
 			catch (Exception e)
@@ -331,37 +334,5 @@ namespace BOB
 		/// <param name="configName">Config filepath</param>
 		/// <returns></returns>
 		private static string FullConfigPath(string configName) => Path.Combine(ConfigDirectory, configName + ".xml");
-
-
-		/// <summary>
-		/// Deserialises an all-building element list.
-		/// </summary>
-		/// <param name="elementList">All-building element list to deserialise</param>
-		private static void DeserializeAllBuilding(List<BOBBuildingReplacement> elementList)
-		{
-			// Iterate through each element in the provided list.
-			foreach (BOBBuildingReplacement replacement in elementList)
-			{
-				// Try to find target prefab.
-				PrefabInfo targetPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);
-				if (targetPrefab == null)
-				{
-					Logging.Message("Couldn't find target prefab ", replacement.target);
-					continue;
-				}
-
-				// Try to find replacement prefab.
-				PrefabInfo replacementPrefab = FindReplacementPrefab(replacement.Replacement, replacement.tree);
-				if (replacementPrefab == null)
-				{
-					Logging.Message("Couldn't find replacement prefab ", replacement.Replacement);
-					continue;
-				}
-
-				// If we got here, it's all good; apply the all-network replacement.
-				Logging.Message("applying all-building replacement ", targetPrefab.name, " to ", replacementPrefab.name);
-				AllBuildingReplacement.instance.Apply(null, targetPrefab, replacementPrefab, -1, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
-			}
-		}
 	}
 }
