@@ -47,6 +47,10 @@ namespace BOB
 		}
 
 
+
+		internal override BOBBuildingReplacement Replacement(BuildingInfo buildingInfo, PrefabInfo targetInfo) => null;
+
+
 		/// <summary>
 		/// Applies a new (or updated) individual building prop replacement.
 		/// </summary>

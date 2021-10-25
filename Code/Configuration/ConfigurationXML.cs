@@ -177,7 +177,7 @@ namespace BOB
 	public class BOBBuildingReplacement : BOBReplacementBase
 	{
 		[XmlIgnore]
-		public BuildingInfo buildingPrefab;
+		public BuildingInfo buildingInfo;
 
 		[XmlIgnore]
 		public List<BuildingPropReference> references;

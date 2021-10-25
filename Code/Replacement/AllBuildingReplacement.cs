@@ -22,52 +22,53 @@ namespace BOB
 
 
 		/// <summary>
-		/// Retrieves a currently-applied all-building replacement entry for the given target prefab.
+		/// Retrieves any currently-applied replacement entry for the given building and target prefab.
 		/// </summary>
-		/// <param name="target">Target prop/tree prefab</param>
-		/// <returns>Currently-applied building replacement (null if none)</returns>
-		internal BOBBuildingReplacement Replacement(PrefabInfo target) => ConfigurationUtils.CurrentConfig.allBuildingProps.Find(x => x.target.Equals(target.name));
+		/// <param name="buildingInfo">Building prefab</param>
+		/// <param name="targetInfo">Target prop/tree prefab</param>
+		/// <returns>Currently-applied replacement (null if none)</returns>
+		internal override BOBBuildingReplacement Replacement(BuildingInfo _, PrefabInfo targetInfo) => ConfigurationUtils.CurrentConfig.allBuildingProps.Find(x => x.target.Equals(targetInfo.name));
 
 
 		/// <summary>
 		/// Applies a new (or updated) all-building replacement.
 		/// </summary>
-		/// <param name="building">Targeted building (ignored)</param>
-		/// <param name="target">Targeted (original) prop prefab</param>
-		/// <param name="replacement">Replacment prop prefab</param>
+		/// <param name="buildingInfo">Targeted building prefab (ignored)</param>
+		/// <param name="targetInfo">Targeted (original) prop prefab</param>
+		/// <param name="replacementInfo">Replacment prop prefab</param>
 		/// <param name="targetIndex">Prop index to apply replacement to (ignored)</param>
 		/// <param name="angle">Replacment prop angle adjustment</param>
 		/// <param name="offsetX">Replacment X position offset</param>
 		/// <param name="offsetY">Replacment Y position offset</param>
 		/// <param name="offsetZ">Replacment Z position offset</param>
 		/// <param name="probability">Replacement probability</param>
-		internal override void Replace(BuildingInfo building, PrefabInfo target, PrefabInfo replacement, int targetIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability)
+		internal override void Replace(BuildingInfo buildingInfo, PrefabInfo targetInfo, PrefabInfo replacementInfo, int targetIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability)
 		{
 			// Make sure that target and replacement are valid and the same type before doing anything.
-			if (target?.name == null || replacement?.name == null || (target is TreeInfo && !(replacement is TreeInfo)) || (target is PropInfo) && !(replacement is PropInfo))
+			if (targetInfo?.name == null || replacementInfo?.name == null || (targetInfo is TreeInfo && !(replacementInfo is TreeInfo)) || (targetInfo is PropInfo) && !(replacementInfo is PropInfo))
 			{
 				return;
 			}
 
 			// Revert any current replacement entry for this prop.
-			Revert(target.name, true);
+			Revert(targetInfo.name, true);
 
 			// Get current replacement after reversion above.
-			BOBBuildingReplacement thisReplacement = CurrentReplacement(target.name);
+			BOBBuildingReplacement thisReplacement = CurrentReplacement(targetInfo.name);
 
 			// Create new replacement list entry if none already exists.
 			if (thisReplacement == null)
 			{
 				thisReplacement = new BOBBuildingReplacement
 				{
-					target = target.name,
-					targetInfo = target
+					target = targetInfo.name,
+					targetInfo = targetInfo
 				};
 				ConfigurationUtils.CurrentConfig.allBuildingProps.Add(thisReplacement);
 			}
 
 			// Add/replace list replacement data.
-			thisReplacement.tree = target is TreeInfo;
+			thisReplacement.tree = targetInfo is TreeInfo;
 			thisReplacement.angle = angle;
 			thisReplacement.offsetX = offsetX;
 			thisReplacement.offsetY = offsetY;
@@ -75,8 +76,8 @@ namespace BOB
 			thisReplacement.probability = probability;
 
 			// Record replacement prop.
-			thisReplacement.replacementInfo = replacement;
-			thisReplacement.Replacement = replacement.name;
+			thisReplacement.replacementInfo = replacementInfo;
+			thisReplacement.Replacement = replacementInfo.name;
 
 			// Apply replacement.
 			ApplyReplacement(thisReplacement);
@@ -109,16 +110,16 @@ namespace BOB
 
 
 		/// <summary>
-		/// Removes an entry from the list of all-building replacements currently applied to building.
+		/// Removes an entry from the list of all-building replacements currently applied.
 		/// </summary>
-		/// <param name="buildingPrefab">Building prefab</param>
-		/// <param name="target">Target prop info</param>
+		/// <param name="buildingInfo">Building prefab</param>
+		/// <param name="targetInfo">Target prop info</param>
 		/// <param name="laneIndex">Lane index</param>
 		/// <param name="propIndex">Prop index</param>
-		internal void RemoveEntry(BuildingInfo buildingPrefab, PrefabInfo target, int propIndex)
+		internal void RemoveEntry(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex)
 		{
 			// Check to see if we have an entry for this prefab.
-			BOBBuildingReplacement thisReplacement = CurrentReplacement(target.name);
+			BOBBuildingReplacement thisReplacement = CurrentReplacement(targetInfo.name);
 			if (thisReplacement != null)
 			{
 				BuildingPropReference thisPropReference = null;
@@ -127,20 +128,20 @@ namespace BOB
 				foreach (BuildingPropReference propReference in thisReplacement.references)
 				{
 					// Look for a building and index match.
-					if (propReference.building == buildingPrefab && propReference.propIndex == propIndex)
+					if (propReference.building == buildingInfo && propReference.propIndex == propIndex)
 					{
 						// Got a match!  Revert instance.
-						if (target is PropInfo propTarget)
+						if (targetInfo is PropInfo propTarget)
 						{
 							propReference.building.m_props[propReference.propIndex].m_finalProp = propTarget;
 						}
 						else
 						{
-							propReference.building.m_props[propReference.propIndex].m_finalTree = (TreeInfo)target;
+							propReference.building.m_props[propReference.propIndex].m_finalTree = (TreeInfo)targetInfo;
 						}
-						buildingPrefab.m_props[propIndex].m_radAngle = propReference.radAngle;
-						buildingPrefab.m_props[propIndex].m_position = propReference.postion;
-						buildingPrefab.m_props[propIndex].m_probability = propReference.probability;
+						buildingInfo.m_props[propIndex].m_radAngle = propReference.radAngle;
+						buildingInfo.m_props[propIndex].m_position = propReference.postion;
+						buildingInfo.m_props[propIndex].m_probability = propReference.probability;
 
 						// Record the matching reference and stop iterating - we're done here.
 						thisPropReference = propReference;
@@ -164,7 +165,7 @@ namespace BOB
 		/// <param name="buildingPrefab">Building prefab to check</param>
 		/// <param name="propIndex">Prop index to check</param>
 		/// <returns>Replacement record if an all-building replacement is currently applied, null if no all-building replacement is currently applied</returns>
-		internal override BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingPrefab, int propIndex)
+		internal override BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingInfo, int propIndex)
 		{
 			// Iterate through each building replacment record in the current config.
 			foreach (BOBBuildingReplacement buildingReplacement in ConfigurationUtils.CurrentConfig.allBuildingProps)
@@ -175,7 +176,7 @@ namespace BOB
 					foreach (BuildingPropReference propRef in buildingReplacement.references)
 					{
 						// Check for a building and prop index match.
-						if (propRef.building == buildingPrefab && propRef.propIndex == propIndex)
+						if (propRef.building == buildingInfo && propRef.propIndex == propIndex)
 						{
 							// Match!  Return the replacement record.
 							return buildingReplacement;
@@ -186,35 +187,6 @@ namespace BOB
 
 			// If we got here, no entry was found - return null to indicate no active replacement.
 			return null;
-		}
-
-
-		/// <summary>
-		/// Restores an all-building replacement, if any (e.g. after a building replacement has been reverted).
-		/// </summary>
-		/// <param name="buildingPrefab">Building prefab</param>
-		/// <param name="target">Target prop info</param>
-		/// <param name="propIndex">Prop index</param>
-		internal void Restore(BuildingInfo buildingPrefab, PrefabInfo target, int propIndex)
-		{
-			// Check to see if we have an entry for this prefab.
-			BOBBuildingReplacement thisReplacement = CurrentReplacement(target.name);
-			if (thisReplacement != null)
-			{
-				// Yes - add reference data to the list.
-				BuildingPropReference newReference = new BuildingPropReference
-				{
-					building = buildingPrefab,
-					propIndex = propIndex,
-					radAngle = buildingPrefab.m_props[propIndex].m_radAngle,
-					postion = buildingPrefab.m_props[propIndex].m_position,
-					probability = buildingPrefab.m_props[propIndex].m_probability
-				};
-				thisReplacement.references.Add(newReference);
-
-				// Apply replacement.
-				ReplaceProp(thisReplacement, newReference);
-			}
 		}
 
 
@@ -326,7 +298,6 @@ namespace BOB
 
 			if (replacement.references != null)
 			{
-
 				// Iterate through each entry in our list.
 				foreach (BuildingPropReference propReference in replacement.references)
 				{

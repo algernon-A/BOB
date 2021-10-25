@@ -25,16 +25,16 @@ namespace BOB
 		/// <summary>
 		/// Applies a new (or updated) building prop replacement.
 		/// </summary>
-		/// <param name="building">Targeted building</param>
-		/// <param name="target">Targeted (original) prop prefab</param>
-		/// <param name="replacement">Replacment prop prefab</param>
+		/// <param name="buildingInfo">Targeted building prefab</param>
+		/// <param name="targetInfo">Targeted (original) prop prefab</param>
+		/// <param name="replacementInfo">Replacment prop prefab</param>
 		/// <param name="targetIndex">Prop index to apply replacement to</param>
 		/// <param name="angle">Replacment prop angle adjustment</param>
 		/// <param name="offsetX">Replacment X position offset</param>
 		/// <param name="offsetY">Replacment Y position offset</param>
 		/// <param name="offsetZ">Replacment Z position offset</param>
 		/// <param name="probability">Replacement probability</param>
-		internal abstract void Replace(BuildingInfo building, PrefabInfo target, PrefabInfo replacement, int targetIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability);
+		internal abstract void Replace(BuildingInfo buildingInfo, PrefabInfo targetInfo, PrefabInfo replacementInfo, int targetIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability);
 
 
 		/// <summary>
@@ -44,12 +44,55 @@ namespace BOB
 
 
 		/// <summary>
+		/// Retrieves any currently-applied replacement entry for the given building and target prefab.
+		/// </summary>
+		/// <param name="buildingInfo">Building prefab</param>
+		/// <param name="targetInfo">Target prop/tree prefab</param>
+		/// <returns>Currently-applied replacement (null if none)</returns>
+		internal abstract BOBBuildingReplacement Replacement(BuildingInfo buildingInfo, PrefabInfo targetInfo);
+
+
+		/// <summary>
 		/// Checks if there's a currently active replacement applied to the given building prop index, and if so, returns the *replacement* record.
 		/// </summary>
-		/// <param name="buildingPrefab">Building prefab to check</param>
+		/// <param name="buildingInfo">Building prefab to check</param>
 		/// <param name="propIndex">Prop index to check</param>
 		/// <returns>Replacement record if a replacement is currently applied, null if no replacement is currently applied</returns>
-		internal abstract BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingPrefab, int propIndex);
+		internal abstract BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingInfo, int propIndex);
+
+
+		/// <summary>
+		/// Restores a building replacement, if any (e.g. after a individual building prop replacement has been reverted).
+		/// </summary>
+		/// <param name="buildingInfo">Building prefab</param>
+		/// <param name="targetInfo">Target prop info</param>
+		/// <param name="propIndex">Prop index</param>
+		/// <returns>True if a restoration was made, false otherwise</returns>
+		internal virtual bool Restore(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex)
+		{
+			// See if we have a relevant building replacement record.
+			BOBBuildingReplacement thisReplacement = Replacement(buildingInfo, targetInfo);
+			if (thisReplacement != null)
+			{
+				// Yes - add reference data to the list.
+				BuildingPropReference newReference = new BuildingPropReference
+				{
+					building = buildingInfo,
+					propIndex = propIndex,
+					radAngle = buildingInfo.m_props[propIndex].m_radAngle,
+					postion = buildingInfo.m_props[propIndex].m_position
+				};
+				thisReplacement.references.Add(newReference);
+
+				// Apply replacement and return true to indicate restoration.
+				ReplaceProp(thisReplacement, newReference);
+
+				return true;
+			}
+
+			// If we got here, no restoration was made.
+			return false;
+		}
 
 
 		/// <summary>

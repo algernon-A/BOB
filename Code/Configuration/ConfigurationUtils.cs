@@ -167,9 +167,6 @@ namespace BOB
 						CurrentConfig.propScales = Scaling.instance.propScales.Values.ToList();
 						CurrentConfig.treeScales = Scaling.instance.treeScales.Values.ToList();
 
-						// Serialise building replacements, per building.
-						CurrentConfig.buildings = BuildingReplacement.instance.Serialize();
-
 						// Serialise individual building prop replacements, per building.
 						CurrentConfig.indBuildings = IndividualBuildingReplacement.instance.Serialize();
 

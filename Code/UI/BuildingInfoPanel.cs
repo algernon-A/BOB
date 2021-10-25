@@ -158,7 +158,7 @@ namespace BOB
 					// Ditto for any all-building replacement.
 					else if (CurrentTargetItem.allPrefab != null)
 					{
-						BOBBuildingReplacement thisReplacement = AllBuildingReplacement.instance.Replacement(CurrentTargetItem.originalPrefab);
+						BOBBuildingReplacement thisReplacement = AllBuildingReplacement.instance.Replacement(null, CurrentTargetItem.originalPrefab);
 
 						angleSlider.TrueValue = thisReplacement.angle;
 						xSlider.TrueValue = thisReplacement.offsetX;
