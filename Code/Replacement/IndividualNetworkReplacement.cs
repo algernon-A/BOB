@@ -136,47 +136,11 @@ namespace BOB
 			AllNetworkReplacement.instance.RemoveEntry(network, target, propReference.laneIndex, propReference.propIndex);
 			NetworkReplacement.instance.RemoveEntry(network, target, propReference.laneIndex, propReference.propIndex);
 
-
 			// If this is a vanilla network, then we've probably got shared NetLaneProp references, so need to copy to a new instance.
 			// If the name doesn't contain a period (c.f. 12345.MyNetwok_Data), then assume it's vanilla - may be a mod or not shared, but better safe than sorry.
 			if (!network.name.Contains("."))
 			{
-				Logging.Message("creating new m_laneProps instance for network ", network.name);
-
-				// Create new m_laneProps instance with new props list.
-				NetLaneProps newLaneProps = ScriptableObject.CreateInstance<NetLaneProps>();
-				newLaneProps.m_props = new NetLaneProps.Prop[network.m_lanes[lane].m_laneProps.m_props.Length];
-
-				// Iterate through each  in the existing instance
-				for (int i = 0; i < newLaneProps.m_props.Length; ++i)
-				{
-					NetLaneProps.Prop existingNetLaneProp = network.m_lanes[lane].m_laneProps.m_props[i];
-
-					newLaneProps.m_props[i] = new NetLaneProps.Prop
-					{
-						m_flagsRequired = existingNetLaneProp.m_flagsRequired,
-						m_flagsForbidden = existingNetLaneProp.m_flagsForbidden,
-						m_startFlagsRequired = existingNetLaneProp.m_startFlagsRequired,
-						m_startFlagsForbidden = existingNetLaneProp.m_startFlagsForbidden,
-						m_endFlagsRequired = existingNetLaneProp.m_endFlagsRequired,
-						m_endFlagsForbidden = existingNetLaneProp.m_endFlagsForbidden,
-						m_colorMode = existingNetLaneProp.m_colorMode,
-						m_prop = existingNetLaneProp.m_prop,
-						m_tree = existingNetLaneProp.m_tree,
-						m_position = existingNetLaneProp.m_position,
-						m_angle = existingNetLaneProp.m_angle,
-						m_segmentOffset = existingNetLaneProp.m_segmentOffset,
-						m_repeatDistance = existingNetLaneProp.m_repeatDistance,
-						m_minLength = existingNetLaneProp.m_minLength,
-						m_cornerAngle = existingNetLaneProp.m_cornerAngle,
-						m_probability = existingNetLaneProp.m_probability,
-						m_finalProp = existingNetLaneProp.m_finalProp,
-						m_finalTree = existingNetLaneProp.m_finalTree
-					};
-				}
-
-				// Replace network laneProps with our new instance.
-				network.m_lanes[lane].m_laneProps = newLaneProps;
+				NewLanePropInstance(network, lane);
 			}
 
 			// Apply the replacement.

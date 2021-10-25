@@ -60,7 +60,7 @@ namespace BOB
 		/// <param name="offsetY">Replacment Y position offset</param>
 		/// <param name="offsetZ">Replacment Z position offset</param>
 		/// <param name="probability">Replacement probability</param>
-		internal override void Replace(NetInfo network, PrefabInfo target, PrefabInfo replacement, int lane, int targetIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability)
+		internal override void Replace(NetInfo network, PrefabInfo target, PrefabInfo replacement, int targetLane, int targetIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability)
 		{
 			// Safety check.
 			if (network?.m_lanes == null)
@@ -157,6 +157,13 @@ namespace BOB
 				// Reset any pack or all-network replacements first.
 				NetworkPackReplacement.instance.RemoveEntry(network, target, propReference.laneIndex, propReference.propIndex);
 				AllNetworkReplacement.instance.RemoveEntry(network, target, propReference.laneIndex, propReference.propIndex);
+
+				// If this is a vanilla network, then we've probably got shared NetLaneProp references, so need to copy to a new instance.
+				// If the name doesn't contain a period (c.f. 12345.MyNetwok_Data), then assume it's vanilla - may be a mod or not shared, but better safe than sorry.
+				if (!network.name.Contains("."))
+				{
+					NewLanePropInstance(network, propReference.laneIndex);
+				}
 
 				// Apply the replacement.
 				ReplaceProp(replacements[network][target], propReference);
