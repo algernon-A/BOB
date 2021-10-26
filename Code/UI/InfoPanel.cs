@@ -198,6 +198,36 @@ namespace BOB
 
 
 		/// <summary>
+		/// Sets the sliders to the values specified in the given replacement record.
+		/// </summary>
+		/// <param name="replacement">Replacement record to use</param>
+		protected void SetSliders(BOBReplacementBase replacement)
+        {
+			// Null check first.
+			if (replacement == null)
+            {
+				Logging.Error("null replacement passed to SetSliders");
+
+				// In the absense of valid data, set all offset fields to defaults.
+				angleSlider.TrueValue = 0f;
+				xSlider.TrueValue = 0;
+				ySlider.TrueValue = 0;
+				zSlider.TrueValue = 0;
+				probabilitySlider.TrueValue = CurrentTargetItem != null ? CurrentTargetItem.originalProb : 0;
+
+				return;
+            }
+
+			// Set slider values.
+			angleSlider.TrueValue = replacement.angle;
+			xSlider.TrueValue = replacement.offsetX;
+			ySlider.TrueValue = replacement.offsetY;
+			zSlider.TrueValue = replacement.offsetZ;
+			probabilitySlider.TrueValue = replacement.probability;
+		}
+
+
+		/// <summary>
 		/// Individual prop check event handler.
 		/// </summary>
 		/// <param name="control">Calling component (unused)</param>

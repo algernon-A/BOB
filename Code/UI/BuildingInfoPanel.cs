@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using ColossalFramework.UI;
@@ -130,13 +129,7 @@ namespace BOB
 					if (CurrentTargetItem.individualPrefab != null)
 					{
 						// Use IndividualIndex to handle case of switching from individual to grouped props (index will be -1, actual index in relevant list).
-						BOBBuildingReplacement thisReplacement = IndividualBuildingReplacement.instance.Replacement(currentBuilding, IndividualIndex);
-
-						angleSlider.TrueValue = thisReplacement.angle;
-						xSlider.TrueValue = thisReplacement.offsetX;
-						ySlider.TrueValue = thisReplacement.offsetY;
-						zSlider.TrueValue = thisReplacement.offsetZ;
-						probabilitySlider.TrueValue = thisReplacement.probability;
+						SetSliders(IndividualBuildingReplacement.instance.Replacement(currentBuilding, CurrentTargetItem.originalPrefab, IndividualIndex));
 
 						// All done here.
 						return;
@@ -144,13 +137,7 @@ namespace BOB
 					// Ditto for any building replacement.
 					else if (CurrentTargetItem.replacementPrefab != null)
 					{
-						BOBBuildingReplacement thisReplacement = BuildingReplacement.instance.Replacement(currentBuilding, CurrentTargetItem.originalPrefab);
-
-						angleSlider.TrueValue = thisReplacement.angle;
-						xSlider.TrueValue = thisReplacement.offsetX;
-						ySlider.TrueValue = thisReplacement.offsetY;
-						zSlider.TrueValue = thisReplacement.offsetZ;
-						probabilitySlider.TrueValue = thisReplacement.probability;
+						SetSliders(BuildingReplacement.instance.Replacement(currentBuilding, CurrentTargetItem.originalPrefab, -1));
 
 						// All done here.
 						return;
@@ -158,13 +145,7 @@ namespace BOB
 					// Ditto for any all-building replacement.
 					else if (CurrentTargetItem.allPrefab != null)
 					{
-						BOBBuildingReplacement thisReplacement = AllBuildingReplacement.instance.Replacement(null, CurrentTargetItem.originalPrefab);
-
-						angleSlider.TrueValue = thisReplacement.angle;
-						xSlider.TrueValue = thisReplacement.offsetX;
-						ySlider.TrueValue = thisReplacement.offsetY;
-						zSlider.TrueValue = thisReplacement.offsetZ;
-						probabilitySlider.TrueValue = thisReplacement.probability;
+						SetSliders(AllBuildingReplacement.instance.Replacement(null, CurrentTargetItem.originalPrefab, -1));
 
 						// All done here.
 						return;
@@ -361,7 +342,7 @@ namespace BOB
 			if (CurrentTargetItem.individualPrefab != null)
 			{
 				// Individual reversion - use IndividualIndex to ensure valid value for current context is used.
-				IndividualBuildingReplacement.instance.Revert(currentBuilding, IndividualIndex, true);
+				IndividualBuildingReplacement.instance.Revert(currentBuilding, CurrentTargetItem.originalPrefab, IndividualIndex, true);
 
 				// Clear current target replacement prefab.
 				CurrentTargetItem.individualPrefab = null;
@@ -372,7 +353,7 @@ namespace BOB
 			else if (CurrentTargetItem.replacementPrefab != null)
 			{
 				// Grouped reversion.
-				BuildingReplacement.instance.Revert(currentBuilding, CurrentTargetItem.originalPrefab, true);
+				BuildingReplacement.instance.Revert(currentBuilding, CurrentTargetItem.originalPrefab, -1, true);
 
 				// Clear current target replacement prefab.
 				CurrentTargetItem.replacementPrefab = null;
@@ -386,7 +367,7 @@ namespace BOB
 				if (CurrentTargetItem.originalPrefab)
 				{
 					// Apply all-building reversion.
-					AllBuildingReplacement.instance.Revert(CurrentTargetItem.originalPrefab.name, true);
+					AllBuildingReplacement.instance.Revert(currentBuilding, CurrentTargetItem.originalPrefab, CurrentTargetItem.index, true);
 
 					// Clear current target 'all' prefab.
 					CurrentTargetItem.allPrefab = null;
@@ -526,7 +507,7 @@ namespace BOB
 				}
 
 				// Get original (pre-replacement) tree/prop prefab and current probability (as default original probability).
-				propListItem.originalPrefab = BuildingReplacement.instance.ActiveReplacement(currentBuilding, propIndex)?.targetInfo ?? AllBuildingReplacement.instance.ActiveReplacement(currentBuilding, propIndex)?.targetInfo ?? finalInfo;
+				propListItem.originalPrefab = finalInfo;
 				propListItem.originalProb = currentBuilding.m_props[propIndex].m_probability;
 				propListItem.originalAngle = (currentBuilding.m_props[propIndex].m_radAngle * 180f) / Mathf.PI;
 
@@ -536,6 +517,9 @@ namespace BOB
 				{
 					propListItem.allPrefab = allBuildingReplacement.replacementInfo;
 					propListItem.allProb = allBuildingReplacement.probability;
+
+					// Update original prop reference.
+					propListItem.originalPrefab = allBuildingReplacement.targetInfo;
 				}
 
 				// Building replacement and original probability (if any).
@@ -544,6 +528,9 @@ namespace BOB
 				{
 					propListItem.replacementPrefab = buildingReplacement.replacementInfo;
 					propListItem.replacementProb = buildingReplacement.probability;
+
+					// Update original prop reference.
+					propListItem.originalPrefab = buildingReplacement.targetInfo;
 				}
 
 				// Individual replacement and original probability (if any).
@@ -552,6 +539,9 @@ namespace BOB
 				{
 					propListItem.individualPrefab = individualReplacement.replacementInfo;
 					propListItem.individualProb = individualReplacement.probability;
+
+					// Update original prop reference.
+					propListItem.originalPrefab = individualReplacement.targetInfo;
 				}
 
 				// Are we grouping?

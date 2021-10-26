@@ -62,52 +62,27 @@ namespace BOB
 					if (CurrentTargetItem.individualPrefab != null)
 					{
 						// Use IndividualIndex and IndividualLane to handle case of switching from individual to grouped props (values will be -1, actual values in relevant lists).
-						BOBNetReplacement individualReplacement = IndividualNetworkReplacement.instance.Replacement(currentNet, IndividualLane, IndividualIndex);
-						if (individualReplacement != null)
-						{
-							angleSlider.TrueValue = individualReplacement.angle;
-							xSlider.TrueValue = individualReplacement.offsetX;
-							ySlider.TrueValue = individualReplacement.offsetY;
-							zSlider.TrueValue = individualReplacement.offsetZ;
-							probabilitySlider.TrueValue = individualReplacement.probability;
-
-							// All done here.
-							return;
-						}
+						SetSliders(IndividualNetworkReplacement.instance.Replacement(currentNet, IndividualLane, IndividualIndex));
+						// All done here.
+						return;
 					}
 					// Ditto for any network replacement
 					else if (CurrentTargetItem.replacementPrefab != null)
 					{
 						// Get replacement and update control values.
-						BOBNetReplacement networkReplacement = NetworkReplacement.instance.Replacement(currentNet, CurrentTargetItem.originalPrefab);
-						if (networkReplacement != null)
-						{
-							angleSlider.TrueValue = networkReplacement.angle;
-							xSlider.TrueValue = networkReplacement.offsetX;
-							ySlider.TrueValue = networkReplacement.offsetY;
-							zSlider.TrueValue = networkReplacement.offsetZ;
-							probabilitySlider.TrueValue = networkReplacement.probability;
+						SetSliders(NetworkReplacement.instance.Replacement(currentNet, CurrentTargetItem.originalPrefab));
 
-							// All done here.
-							return;
-						}
+						// All done here.
+						return;
 					}
 					// Ditto for any all-network replacement.
 					else if (CurrentTargetItem.allPrefab != null)
 					{
 						// Get replacement and update control values.
-						BOBNetReplacement allNetReplacement = AllNetworkReplacement.instance.Replacement(CurrentTargetItem.originalPrefab);
-						if (allNetReplacement != null)
-						{
-							angleSlider.TrueValue = allNetReplacement.angle;
-							xSlider.TrueValue = allNetReplacement.offsetX;
-							ySlider.TrueValue = allNetReplacement.offsetY;
-							zSlider.TrueValue = allNetReplacement.offsetZ;
-							probabilitySlider.TrueValue = allNetReplacement.probability;
+						SetSliders(AllNetworkReplacement.instance.Replacement(CurrentTargetItem.originalPrefab));
 
-							// All done here.
-							return;
-						}
+						// All done here.
+						return;
 					}
 				}
 
@@ -388,6 +363,11 @@ namespace BOB
 						continue;
 					}
 
+					// Get original (pre-replacement) tree/prop prefab and current probability (as default original probability).
+					propListItem.originalPrefab = finalInfo;
+					propListItem.originalProb = laneProps[propIndex].m_probability;
+					propListItem.originalAngle = laneProps[propIndex].m_angle;
+
 					// Grouped or individual?
 					if (indCheck.isChecked)
 					{
@@ -404,17 +384,15 @@ namespace BOB
 						propListItem.lanes.Add(lane);
 					}
 
-					// Get original (pre-replacement) tree/prop prefab and current probability (as default original probability).
-					propListItem.originalPrefab = NetworkReplacement.instance.GetOriginal(currentNet, lane, propIndex) ?? AllNetworkReplacement.instance.GetOriginal(currentNet, lane, propIndex) ?? NetworkPackReplacement.instance.GetOriginal(currentNet, lane, propIndex) ?? finalInfo;
-					propListItem.originalProb = laneProps[propIndex].m_probability;
-					propListItem.originalAngle = laneProps[propIndex].m_angle;
-
 					// All-network replacement and original probability (if any).
 					BOBNetReplacement allNetReplacement = AllNetworkReplacement.instance.ActiveReplacement(currentNet, lane, propIndex);
 					if (allNetReplacement != null)
 					{
 						propListItem.allPrefab = allNetReplacement.replacementInfo;
 						propListItem.allProb = allNetReplacement.probability;
+
+						// Update original prop reference.
+						propListItem.originalPrefab = allNetReplacement.targetInfo;
 					}
 
 					// Network replacement and original probability (if any).
@@ -423,6 +401,9 @@ namespace BOB
 					{
 						propListItem.replacementPrefab = netReplacement.replacementInfo;
 						propListItem.replacementProb = netReplacement.probability;
+
+						// Update original prop reference.
+						propListItem.originalPrefab = netReplacement.targetInfo;
 					}
 
 					// Individual replacement and original probability (if any).
@@ -431,6 +412,9 @@ namespace BOB
 					{
 						propListItem.individualPrefab = individualReplacement.replacementInfo;
 						propListItem.individualProb = individualReplacement.probability;
+
+						// Update original prop reference.
+						propListItem.originalPrefab = individualReplacement.targetInfo;
 					}
 
 					// Replacement pack replacement and original probability (if any).
@@ -438,6 +422,9 @@ namespace BOB
 					if (packReplacement != null)
 					{
 						propListItem.packagePrefab = packReplacement.replacementInfo;
+
+						// Update original prop reference.
+						propListItem.originalPrefab = packReplacement.targetInfo;
 					}
 
 					// Are we grouping?
