@@ -65,7 +65,7 @@ namespace BOB
             instance = this;
 
             // Determine if we're in-game or not; use status of replacer managers to determine.
-            inGame = BuildingReplacement.instance != null && NetworkReplacement.instance != null;
+            inGame = BuildingReplacement.Instance != null && NetworkReplacement.Instance != null;
 
             // Add tab and helper.
             UIPanel panel = PanelUtils.AddTab(tabStrip, Translations.Translate("BOB_OPT_CFG"), tabIndex);

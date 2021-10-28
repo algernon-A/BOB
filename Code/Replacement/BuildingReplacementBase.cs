@@ -9,10 +9,10 @@ namespace BOB
 	/// </summary>
 	public class BuildingPropReference
 	{
-		public BuildingInfo building;
+		public BuildingInfo buildingInfo;
 		public int propIndex;
 		public float radAngle;
-		public Vector3 postion;
+		public Vector3 position;
 		public int probability;
 	}
 
@@ -22,8 +22,6 @@ namespace BOB
 	/// </summary>
 	internal abstract class BuildingReplacementBase
 	{
-
-
 		/// <summary>
 		/// Returns the config file list of building elements relevant to the current replacement type.
 		/// </summary>
@@ -31,68 +29,45 @@ namespace BOB
 
 
 		/// <summary>
-		/// Retrieves any currently-applied replacement entry for the given building and target prefab.
+		/// Retrieves any currently-applied replacement entry that affects the given building and target prefab and prop index.
 		/// </summary>
 		/// <param name="buildingInfo">Building prefab</param>
 		/// <param name="targetInfo">Target prop/tree prefab</param>
-		/// <param name="targetIndex">Target prop/tree index</param>
+		/// <param name="propIndex">Target prop/tree index</param>
 		/// <returns>Currently-applied replacement (null if none)</returns>
-		internal abstract BOBBuildingReplacement Replacement(BuildingInfo buildingInfo, PrefabInfo targetInfo, int targetIndex);
+		internal abstract BOBBuildingReplacement EligibileReplacement(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex);
 
 
 		/// <summary>
-		/// Checks if there's a currently active replacement applied to the given building and prop index, and if so, returns the replacement record.
+		/// Reverts all active replacements.
 		/// </summary>
-		/// <param name="buildingPrefab">Building prefab to check</param>
-		/// <param name="propIndex">Prop index to check</param>
-		/// <returns>Replacement record if a building replacement is currently applied, null if no building replacement is currently applied</returns>
-		internal virtual BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingInfo, int propIndex)
+		internal virtual void RevertAll()
 		{
-			// Get the relevant building element record.
-			BOBBuildingElement buildingElement = BuildingElement(buildingInfo);
-			if (buildingElement?.replacements != null)
+			// Iterate through each entry in the replacement list.
+			foreach (BOBBuildingElement buildingElement in BuildingElementList)
 			{
-				// Iterate through each replacement record for this building.
-				foreach (BOBBuildingReplacement buildingReplacement in buildingElement.replacements)
+				foreach (BOBBuildingReplacement replacement in buildingElement.replacements)
 				{
-					// Iterate through each prop reference in this record. 
-					foreach (BuildingPropReference propRef in buildingReplacement.references)
-					{
-						// Check for an index match.
-						if (propRef.propIndex == propIndex)
-						{
-							// Match!  Return the replacement record.
-							return buildingReplacement;
-						}
-					}
+					// Revert this replacement (but don't remove the entry, as the list is currently immutable while we're iterating through it).
+					Revert(replacement, false);
 				}
 			}
-
-			// If we got here, no entry was found - return null to indicate no active replacement.
-			return null;
 		}
 
 
 		/// <summary>
-		/// Applies an individual building prop replacement.
-		/// </summary>
-		/// <param name="replacement">Replacement record to apply</param>
-		protected abstract void ApplyReplacement(BOBBuildingReplacement replacement);
-
-
-		/// <summary>
-		/// Applies a new (or updated) individual building prop replacement.
+		/// Applies a new (or updated) replacement.
 		/// </summary>
 		/// <param name="buildingInfo">Targeted building prefab</param>
 		/// <param name="targetInfo">Targeted (original) prop prefab</param>
 		/// <param name="replacementInfo">Replacment prop prefab</param>
-		/// <param name="targetIndex">Prop index to apply replacement to (ignored)</param>
+		/// <param name="propIndex">Prop index to apply replacement to (ignored)</param>
 		/// <param name="angle">Replacment prop angle adjustment</param>
 		/// <param name="offsetX">Replacment X position offset</param>
 		/// <param name="offsetY">Replacment Y position offset</param>
 		/// <param name="offsetZ">Replacment Z position offset</param>
 		/// <param name="probability">Replacement probability</param>
-		internal void Replace(BuildingInfo buildingInfo, PrefabInfo targetInfo, PrefabInfo replacementInfo, int targetIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability)
+		internal void Replace(BuildingInfo buildingInfo, PrefabInfo targetInfo, PrefabInfo replacementInfo, int propIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability)
 		{
 			// Make sure that target and replacement are the same type before doing anything.
 			if (targetInfo?.name == null || replacementInfo?.name == null || (targetInfo is TreeInfo && !(replacementInfo is TreeInfo)) || (targetInfo is PropInfo) && !(replacementInfo is PropInfo))
@@ -101,13 +76,13 @@ namespace BOB
 			}
 
 			// Revert any current replacement entry for this prop.
-			Revert(buildingInfo, targetInfo, targetIndex, true);
+			Revert(buildingInfo, targetInfo, propIndex, true);
 
 			// Get configuration file building list entry.
-			List<BOBBuildingReplacement> replacementsList = ReplacementsList(buildingInfo);
+			List<BOBBuildingReplacement> replacementsList = ReplacementEntry(buildingInfo);
 
 			// Get current replacement after reversion above.
-			BOBBuildingReplacement thisReplacement = Replacement(buildingInfo, targetInfo, targetIndex);
+			BOBBuildingReplacement thisReplacement = EligibileReplacement(buildingInfo, targetInfo, propIndex);
 
 			// Create new replacement list entry if none already exists.
 			if (thisReplacement == null)
@@ -117,12 +92,12 @@ namespace BOB
 					buildingInfo = buildingInfo,
 					target = targetInfo.name,
 					targetInfo = targetInfo,
-					index = targetIndex
+					propIndex = propIndex
 				};
 				replacementsList.Add(thisReplacement);
 			}
 
-			// Add/replace dictionary replacement data.
+			// Add/replace replacement data.
 			thisReplacement.tree = targetInfo is TreeInfo;
 			thisReplacement.angle = angle;
 			thisReplacement.offsetX = offsetX;
@@ -140,11 +115,185 @@ namespace BOB
 
 
 		/// <summary>
+		/// Reverts a replacement.
+		/// </summary>
+		/// <param name="buildingInfo">Targeted building</param>
+		/// <param name="targetInfo">Targeted (original) tree/prop prefab</param>
+		/// <param name="propIndex">Targeted (original) tree/prop index</param>
+		/// <param name="removeEntries">True (default) to remove the reverted entries from the list of replacements, false to leave the list unchanged</param>
+		internal void Revert(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex, bool removeEntries) => Revert(EligibileReplacement(buildingInfo, targetInfo, propIndex), removeEntries);
+
+
+		/// <summary>
+		/// Restores a replacement, if any (e.g. after a higher-priority replacement has been reverted).
+		/// </summary>
+		/// <param name="buildingInfo">Building prefab</param>
+		/// <param name="targetInfo">Target prop info</param>
+		/// <param name="propIndex">Prop index</param>
+		/// <returns>True if a restoration was made, false otherwise</returns>
+		internal bool Restore(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex)
+		{
+			// See if we have a relevant replacement record.
+			BOBBuildingReplacement thisReplacement = EligibileReplacement(buildingInfo, targetInfo, propIndex);
+			if (thisReplacement != null)
+			{
+				// Yes - add reference data to the list.
+				BuildingPropReference newReference = new BuildingPropReference
+				{
+					buildingInfo = buildingInfo,
+					propIndex = propIndex,
+					radAngle = buildingInfo.m_props[propIndex].m_radAngle,
+					position = buildingInfo.m_props[propIndex].m_position,
+					probability = buildingInfo.m_props[propIndex].m_probability
+				};
+				thisReplacement.references.Add(newReference);
+
+				// Apply replacement and return true to indicate restoration.
+				ReplaceProp(thisReplacement, newReference);
+
+				return true;
+			}
+
+			// If we got here, no restoration was made.
+			return false;
+		}
+
+
+		/// <summary>
+		/// Unapplies a particular replacement instance to defer to a higher-priority replacement.
+		/// </summary>
+		/// <param name="buildingInfo">Building prefab</param>
+		/// <param name="targetInfo">Target prop info</param>
+		/// <param name="propIndex">Prop index</param>
+		internal void RemoveEntry(BuildingInfo buildingInfo, PrefabInfo targetInfo,int propIndex)
+		{
+			// Check to see if we have an entry for this prefab and target.
+			BOBBuildingReplacement thisReplacement = EligibileReplacement(buildingInfo, targetInfo, propIndex);
+			if (thisReplacement != null)
+			{
+				BuildingPropReference thisPropReference = null;
+
+				// Iterate through each recorded prop reference.
+				foreach (BuildingPropReference propReference in thisReplacement.references)
+				{
+					// Look for a building and index match.
+					if (propReference.buildingInfo == buildingInfo && propReference.propIndex == propIndex)
+					{
+						// Got a match!  Revert instance.
+						if (targetInfo is PropInfo propTarget)
+						{
+							propReference.buildingInfo.m_props[propReference.propIndex].m_finalProp = propTarget;
+						}
+						else
+						{
+							propReference.buildingInfo.m_props[propReference.propIndex].m_finalTree = (TreeInfo)targetInfo;
+						}
+						buildingInfo.m_props[propIndex].m_radAngle = propReference.radAngle;
+						buildingInfo.m_props[propIndex].m_position = propReference.position;
+						buildingInfo.m_props[propIndex].m_probability = propReference.probability;
+
+						// Record the matching reference and stop iterating - we're done here.
+						thisPropReference = propReference;
+						break;
+					}
+				}
+
+				// Remove replacement if one was found.
+				if (thisPropReference != null)
+				{
+					thisReplacement.references.Remove(thisPropReference);
+				};
+			}
+		}
+
+
+		/// <summary>
+		/// Checks if there's a currently active replacement applied to the given building and prop index, and if so, returns the replacement record.
+		/// </summary>
+		/// <param name="buildingInfo">Building prefab to check</param>
+		/// <param name="propIndex">Prop index to check</param>
+		/// <returns>Replacement record if a replacement is currently applied, null if no replacement is currently applied</returns>
+		internal BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingInfo, int propIndex)
+		{
+			// See if we've got a replacement entry for this building.
+			List<BOBBuildingReplacement> replacementList = ReplacementList(buildingInfo);
+			if (replacementList == null)
+            {
+				// No entry - return null.
+				return null;
+			}
+
+			// Iterate through each replacement record for this building.
+			foreach (BOBBuildingReplacement buildingReplacement in replacementList)
+			{
+				// Iterate through each prop reference in this record. 
+				foreach (BuildingPropReference propRef in buildingReplacement.references)
+				{
+					// Check for building (due to all- replacement) and index match.
+					if (propRef.buildingInfo == buildingInfo && propRef.propIndex == propIndex)
+					{
+						// Match!  Return the replacement record.
+						return buildingReplacement;
+					}
+				}
+			}
+
+			// If we got here, no entry was found - return null to indicate no active replacement.
+			return null;
+		}
+
+
+		/// <summary>
+		/// Deserialises a building element list.
+		/// </summary>
+		/// <param name="elementList">Element list to deserialise</param>
+		internal void Deserialize(List<BOBBuildingElement> elementList)
+		{
+			// Iterate through each element in the provided list.
+			foreach (BOBBuildingElement element in elementList)
+			{
+				// Try to find building prefab.
+				element.buildingInfo = PrefabCollection<BuildingInfo>.FindLoaded(element.building);
+
+				// Don't bother deserializing further if the building info wasn't found.
+				if (element.buildingInfo != null)
+				{
+					Deserialize(element.buildingInfo, element.replacements);
+				}
+			}
+		}
+
+
+		/// <summary>
+		/// Applies a replacement.
+		/// </summary>
+		/// <param name="replacement">Replacement record to apply</param>
+		protected abstract void ApplyReplacement(BOBBuildingReplacement replacement);
+
+
+		/// <summary>
+		/// Restores any replacements from lower-priority replacements after a reversion.
+		/// </summary>
+		/// <param name="buildingInfo">Building prefab</param>
+		/// <param name="targetInfo">Target prop info</param>
+		/// <param name="propIndex">Prop index</param>
+		protected abstract void RestoreLower(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex);
+
+
+		/// <summary>
+		/// Gets the relevant replacement list entry from the active configuration file, if any.
+		/// </summary>
+		/// <param name="buildingInfo">Building prefab</param>
+		/// <returns>Replacement list for the specified building prefab (null if none)</returns>
+		protected virtual List<BOBBuildingReplacement> ReplacementList(BuildingInfo buildingInfo) => BuildingElement(buildingInfo)?.replacements;
+
+
+		/// <summary>
 		/// Gets the relevant building replacement list entry from the active configuration file, creating a new building entry if none already exists.
 		/// </summary>
-		/// <param name="buildingInfo"></param>
-		/// <returns></returns>
-		internal virtual List<BOBBuildingReplacement> ReplacementsList(BuildingInfo buildingInfo)
+		/// <param name="buildingInfo">Building prefab</param>
+		/// <returns>Replacement list for the specified building prefab</returns>
+		protected virtual List<BOBBuildingReplacement> ReplacementEntry(BuildingInfo buildingInfo)
 		{
 			// Get existing entry for this building.
 			BOBBuildingElement thisBuilding = BuildingElement(buildingInfo);
@@ -167,132 +316,7 @@ namespace BOB
 
 
 		/// <summary>
-		/// Restores a building replacement, if any (e.g. after a individual building prop replacement has been reverted).
-		/// </summary>
-		/// <param name="buildingInfo">Building prefab</param>
-		/// <param name="targetInfo">Target prop info</param>
-		/// <param name="propIndex">Prop index</param>
-		/// <returns>True if a restoration was made, false otherwise</returns>
-		internal virtual bool Restore(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex)
-		{
-			// See if we have a relevant building replacement record.
-			BOBBuildingReplacement thisReplacement = Replacement(buildingInfo, targetInfo, propIndex);
-			if (thisReplacement != null)
-			{
-				// Yes - add reference data to the list.
-				BuildingPropReference newReference = new BuildingPropReference
-				{
-					building = buildingInfo,
-					propIndex = propIndex,
-					radAngle = buildingInfo.m_props[propIndex].m_radAngle,
-					postion = buildingInfo.m_props[propIndex].m_position
-				};
-				thisReplacement.references.Add(newReference);
-
-				// Apply replacement and return true to indicate restoration.
-				ReplaceProp(thisReplacement, newReference);
-
-				return true;
-			}
-
-			// If we got here, no restoration was made.
-			return false;
-		}
-
-
-		/// <summary>
-		/// Reverts an individual building replacement.
-		/// </summary>
-		/// <param name="buildingInfo">Targeted building</param>
-		/// <param name="targetInfo">Targeted (original) tree/prop prefab</param>
-		/// <param name="targetIndex">Targeted (original) tree/prop prefab index</param>
-		/// <param name="removeEntries">True (default) to remove the reverted entries from the list of replacements, false to leave the list unchanged</param>
-		internal void Revert(BuildingInfo buildingInfo, PrefabInfo targetInfo, int targetIndex, bool removeEntries) => Revert(Replacement(buildingInfo, targetInfo, targetIndex), removeEntries);
-
-
-		/// <summary>
-		/// Reverts all active building replacements and re-initialises the master dictionary.
-		/// </summary>
-		internal virtual void RevertAll()
-		{
-			// Iterate through each entry in the replacement list.
-			foreach (BOBBuildingElement buildingElement in BuildingElementList)
-			{
-				foreach (BOBBuildingReplacement replacement in buildingElement.replacements)
-				{
-					// Revert this replacement (but don't remove the entry, as the dictionary is currently immutable while we're iterating through it).
-					Revert(replacement, false);
-				}
-			}
-
-			// Re-initialise the dictionaries.
-			Setup();
-		}
-
-
-		/// <summary>
-		/// Performs setup and initialises the master dictionary.  Must be called prior to use.
-		/// </summary>
-		protected virtual void Setup() { }
-
-
-		/// <summary>
-		/// Constructor - initializes instance reference and calls initial setup.
-		/// </summary>
-		internal BuildingReplacementBase()
-		{
-			Setup();
-		}
-
-
-		/// <summary>
-		/// Deserialises a building element list.
-		/// </summary>
-		/// <param name="elementList">All-building element list to deserialise</param>
-		internal void Deserialize(List<BOBBuildingElement> elementList)
-		{
-			// Iterate through each element in the provided list.
-			foreach (BOBBuildingElement element in elementList)
-			{
-				// Try to find building prefab.
-				element.buildingInfo = PrefabCollection<BuildingInfo>.FindLoaded(element.building);
-
-				// Don't bother deserializing further if the building info wasn't found.
-				if (element.buildingInfo != null)
-				{
-					Deserialize(element.buildingInfo, element.replacements);
-				}
-			}
-		}
-
-
-		/// <summary>
-		/// Deserialises an building replacement list.
-		/// </summary>
-		/// <param name="buildingInfo">Building prefab</param>
-		/// <param name="elementList">All-building element list to deserialise</param>
-		internal void Deserialize(BuildingInfo buildingInfo, List<BOBBuildingReplacement> elementList)
-		{
-			// Iterate through each element in the provided list.
-			foreach (BOBBuildingReplacement replacement in elementList)
-			{
-				// Assign building info.
-				replacement.buildingInfo = buildingInfo;
-
-				// Try to find target prefab.
-				replacement.targetInfo = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);
-
-				// Try to find replacement prefab.
-				replacement.replacementInfo = ConfigurationUtils.FindReplacementPrefab(replacement.Replacement, replacement.tree);
-
-				// Try to apply the replacement.
-				ApplyReplacement(replacement);
-			}
-		}
-
-
-		/// <summary>
-		/// Reverts a building replacement.
+		/// Reverts a replacement.
 		/// </summary>
 		/// <param name="replacement">Replacement record to revert</param>
 		/// <param name="removeEntries">True to remove the reverted entries from the list of replacements, false to leave the list unchanged</param>
@@ -313,28 +337,28 @@ namespace BOB
 					// Revert entry.
 					if (replacement.tree)
 					{
-						propReference.building.m_props[propReference.propIndex].m_finalTree = replacement.TargetTree;
+						propReference.buildingInfo.m_props[propReference.propIndex].m_finalTree = replacement.TargetTree;
 					}
 					else
 					{
-						propReference.building.m_props[propReference.propIndex].m_finalProp = replacement.TargetProp;
+						propReference.buildingInfo.m_props[propReference.propIndex].m_finalProp = replacement.TargetProp;
 					}
-					propReference.building.m_props[propReference.propIndex].m_radAngle = propReference.radAngle;
-					propReference.building.m_props[propReference.propIndex].m_position = propReference.postion;
-					propReference.building.m_props[propReference.propIndex].m_probability = propReference.probability;
+					propReference.buildingInfo.m_props[propReference.propIndex].m_radAngle = propReference.radAngle;
+					propReference.buildingInfo.m_props[propReference.propIndex].m_position = propReference.position;
+					propReference.buildingInfo.m_props[propReference.propIndex].m_probability = propReference.probability;
 
 					// Restore any lower-priority replacements.
-					ReplaceLower(propReference.building, replacement.targetInfo, propReference.propIndex);
+					RestoreLower(propReference.buildingInfo, replacement.targetInfo, propReference.propIndex);
 
 					// Add building to dirty list.
-					BuildingData.DirtyList.Add(propReference.building);
+					BuildingData.DirtyList.Add(propReference.buildingInfo);
 				}
 
 				// Remove entry from list, if we're doing so.
 				if (removeEntries)
 				{
 					// Remove from replacement list.
-					ReplacementsList(replacement.buildingInfo).Remove(replacement);
+					ReplacementList(replacement.buildingInfo).Remove(replacement);
 
 					// See if we've got a parent building element record, and if so, if it has any remaining replacement entries.
 					BOBBuildingElement thisElement = BuildingElement(replacement.buildingInfo);
@@ -353,49 +377,39 @@ namespace BOB
 
 
 		/// <summary>
-		/// Restores any replacements from lower-priority replacements after a reversion.
+		/// Replaces a prop, using a building replacement.
 		/// </summary>
-		/// <param name="buildingInfo">Building prefab</param>
-		/// <param name="targetInfo">Target prop info</param>
-		/// <param name="propIndex">Prop index</param>
-		/// <returns>True if a restoration was made, false otherwise</returns>
-		protected virtual void ReplaceLower(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex) { }
-
-
-		/// <summary>
-		/// Replaces a prop using a building replacement.
-		/// </summary>
-		/// <param name="buildingElement">Building replacement element to apply</param>
+		/// <param name="replacement">Building replacement element to apply</param>
 		/// <param name="propReference">Individual prop reference to apply to</param>
-		protected void ReplaceProp(BOBBuildingReplacement buildingElement, BuildingPropReference propReference)
+		protected void ReplaceProp(BOBBuildingReplacement replacement, BuildingPropReference propReference)
 		{
 			// Convert offset to Vector3.
 			Vector3 offset = new Vector3
 			{
-				x = buildingElement.offsetX,
-				y = buildingElement.offsetY,
-				z = buildingElement.offsetZ
+				x = replacement.offsetX,
+				y = replacement.offsetY,
+				z = replacement.offsetZ
 			};
 
 			// Apply replacement.
-			if (buildingElement.replacementInfo is PropInfo propInfo)
+			if (replacement.replacementInfo is PropInfo propInfo)
 			{
-				propReference.building.m_props[propReference.propIndex].m_finalProp = propInfo;
+				propReference.buildingInfo.m_props[propReference.propIndex].m_finalProp = propInfo;
 			}
 			else
 			{
-				propReference.building.m_props[propReference.propIndex].m_finalTree = (TreeInfo)buildingElement.replacementInfo;
+				propReference.buildingInfo.m_props[propReference.propIndex].m_finalTree = (TreeInfo)replacement.replacementInfo;
 			}
 
 			// Angle and offset.
-			propReference.building.m_props[propReference.propIndex].m_radAngle = propReference.radAngle + ((buildingElement.angle * Mathf.PI) / 180f);
-			propReference.building.m_props[propReference.propIndex].m_position = propReference.postion + offset;
+			propReference.buildingInfo.m_props[propReference.propIndex].m_radAngle = propReference.radAngle + ((replacement.angle * Mathf.PI) / 180f);
+			propReference.buildingInfo.m_props[propReference.propIndex].m_position = propReference.position + offset;
 
 			// Probability.
-			propReference.building.m_props[propReference.propIndex].m_probability = buildingElement.probability;
+			propReference.buildingInfo.m_props[propReference.propIndex].m_probability = replacement.probability;
 
 			// Add building to dirty list.
-			BuildingData.DirtyList.Add(propReference.building);
+			BuildingData.DirtyList.Add(propReference.buildingInfo);
 		}
 
 
@@ -404,6 +418,31 @@ namespace BOB
 		/// </summary>
 		/// <param name="buildingInfo">Building prefab</param>
 		/// <returns>Replacement record for the specified building prefab (null if none)</returns>
-		protected BOBBuildingElement BuildingElement(BuildingInfo buildingInfo) => BuildingElementList?.Find(x => x.buildingInfo == buildingInfo);
+		protected BOBBuildingElement BuildingElement(BuildingInfo buildingInfo) => buildingInfo == null ? null : BuildingElementList?.Find(x => x.buildingInfo == buildingInfo);
+
+
+		/// <summary>
+		/// Deserialises a replacement list.
+		/// </summary>
+		/// <param name="buildingInfo">Building prefab</param>
+		/// <param name="elementList">Replacement list to deserialise</param>
+		protected void Deserialize(BuildingInfo buildingInfo, List<BOBBuildingReplacement> replacementList)
+		{
+			// Iterate through each element in the provided list.
+			foreach (BOBBuildingReplacement replacement in replacementList)
+			{
+				// Assign building info.
+				replacement.buildingInfo = buildingInfo;
+
+				// Try to find target prefab.
+				replacement.targetInfo = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);
+
+				// Try to find replacement prefab.
+				replacement.replacementInfo = ConfigurationUtils.FindReplacementPrefab(replacement.Replacement, replacement.tree);
+
+				// Try to apply the replacement.
+				ApplyReplacement(replacement);
+			}
+		}
 	}
 }

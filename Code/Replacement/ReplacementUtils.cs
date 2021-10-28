@@ -14,12 +14,12 @@ namespace BOB
 		internal static void NukeSettings()
         {
 			// Revert all-building and building settings (assuming instances exist).
-			AllBuildingReplacement.instance?.RevertAll();
-			BuildingReplacement.instance?.RevertAll();
-			IndividualBuildingReplacement.instance?.RevertAll();
-			NetworkPackReplacement.instance?.RevertAll();
-			AllNetworkReplacement.instance?.RevertAll();
-			NetworkReplacement.instance?.RevertAll();
+			AllBuildingReplacement.Instance?.RevertAll();
+			BuildingReplacement.Instance?.RevertAll();
+			IndividualBuildingReplacement.Instance?.RevertAll();
+			NetworkPackReplacement.Instance?.RevertAll();
+			AllNetworkReplacement.Instance?.RevertAll();
+			NetworkReplacement.Instance?.RevertAll();
 			Scaling.instance?.RevertAll();
 		}
 	}

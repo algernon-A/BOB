@@ -74,25 +74,25 @@ namespace BOB
 						Scaling.instance.DeserializeTrees(CurrentConfig.treeScales);
 
 						// Deserialize all-building replacements.
-						AllBuildingReplacement.instance.Deserialize(CurrentConfig.allBuildingProps);
+						AllBuildingReplacement.Instance.Deserialize(CurrentConfig.allBuildingProps);
 
 						// Deserialise building replacements.
-						BuildingReplacement.instance.Deserialize(CurrentConfig.buildings);
+						BuildingReplacement.Instance.Deserialize(CurrentConfig.buildings);
 
 						// Deserialise individual building prop replacements.
-						IndividualBuildingReplacement.instance.Deserialize(CurrentConfig.indBuildings);
+						IndividualBuildingReplacement.Instance.Deserialize(CurrentConfig.indBuildings);
 
 						// Deserialise all-network replacements.
-						AllNetworkReplacement.instance.Deserialize(CurrentConfig.allNetworkProps);
+						AllNetworkReplacement.Instance.Deserialize(CurrentConfig.allNetworkProps);
 
 						// Deserialise network replacements.
-						NetworkReplacement.instance.Deserialize(CurrentConfig.networks);
+						NetworkReplacement.Instance.Deserialize(CurrentConfig.networks);
 
 						// Deserialise individual network replacements.
-						IndividualNetworkReplacement.instance.Deserialize(CurrentConfig.indNetworks);
+						IndividualNetworkReplacement.Instance.Deserialize(CurrentConfig.indNetworks);
 
 						// Deserialise active replacement packs.
-						NetworkPackReplacement.instance.DeserializeActivePacks(CurrentConfig.activePacks);
+						NetworkPackReplacement.Instance.DeserializeActivePacks(CurrentConfig.activePacks);
 					}
 				}
 				else
@@ -167,14 +167,8 @@ namespace BOB
 						CurrentConfig.propScales = Scaling.instance.propScales.Values.ToList();
 						CurrentConfig.treeScales = Scaling.instance.treeScales.Values.ToList();
 
-						// Serialise network replacements.
-						CurrentConfig.networks = NetworkReplacement.instance.Serialize();
-
-						// Serialise individual network replacements.
-						CurrentConfig.indNetworks = IndividualNetworkReplacement.instance.Serialize();
-
 						// Serialise active replacement packs.
-						CurrentConfig.activePacks = NetworkPackReplacement.instance.SerializeActivePacks();
+						CurrentConfig.activePacks = NetworkPackReplacement.Instance.SerializeActivePacks();
 					}
 
 					// Write to file.

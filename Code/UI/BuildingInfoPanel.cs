@@ -129,7 +129,7 @@ namespace BOB
 					if (CurrentTargetItem.individualPrefab != null)
 					{
 						// Use IndividualIndex to handle case of switching from individual to grouped props (index will be -1, actual index in relevant list).
-						SetSliders(IndividualBuildingReplacement.instance.Replacement(currentBuilding, CurrentTargetItem.originalPrefab, IndividualIndex));
+						SetSliders(IndividualBuildingReplacement.Instance.EligibileReplacement(currentBuilding, CurrentTargetItem.originalPrefab, IndividualIndex));
 
 						// All done here.
 						return;
@@ -137,7 +137,7 @@ namespace BOB
 					// Ditto for any building replacement.
 					else if (CurrentTargetItem.replacementPrefab != null)
 					{
-						SetSliders(BuildingReplacement.instance.Replacement(currentBuilding, CurrentTargetItem.originalPrefab, -1));
+						SetSliders(BuildingReplacement.Instance.EligibileReplacement(currentBuilding, CurrentTargetItem.originalPrefab, -1));
 
 						// All done here.
 						return;
@@ -145,7 +145,7 @@ namespace BOB
 					// Ditto for any all-building replacement.
 					else if (CurrentTargetItem.allPrefab != null)
 					{
-						SetSliders(AllBuildingReplacement.instance.Replacement(null, CurrentTargetItem.originalPrefab, -1));
+						SetSliders(AllBuildingReplacement.Instance.EligibileReplacement(null, CurrentTargetItem.originalPrefab, -1));
 
 						// All done here.
 						return;
@@ -303,7 +303,7 @@ namespace BOB
 				if (CurrentTargetItem.index < 0)
 				{
 					// Grouped replacement.
-					BuildingReplacement.instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+					BuildingReplacement.Instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
 
 					// Update current target.
 					CurrentTargetItem.replacementPrefab = ReplacementPrefab;
@@ -312,7 +312,7 @@ namespace BOB
 				else
 				{
 					// Individual replacement.
-					IndividualBuildingReplacement.instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, CurrentTargetItem.index, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+					IndividualBuildingReplacement.Instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, CurrentTargetItem.index, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
 
 					// Update current target.
 					CurrentTargetItem.individualPrefab = ReplacementPrefab;
@@ -342,7 +342,7 @@ namespace BOB
 			if (CurrentTargetItem.individualPrefab != null)
 			{
 				// Individual reversion - use IndividualIndex to ensure valid value for current context is used.
-				IndividualBuildingReplacement.instance.Revert(currentBuilding, CurrentTargetItem.originalPrefab, IndividualIndex, true);
+				IndividualBuildingReplacement.Instance.Revert(currentBuilding, CurrentTargetItem.originalPrefab, IndividualIndex, true);
 
 				// Clear current target replacement prefab.
 				CurrentTargetItem.individualPrefab = null;
@@ -353,7 +353,7 @@ namespace BOB
 			else if (CurrentTargetItem.replacementPrefab != null)
 			{
 				// Grouped reversion.
-				BuildingReplacement.instance.Revert(currentBuilding, CurrentTargetItem.originalPrefab, -1, true);
+				BuildingReplacement.Instance.Revert(currentBuilding, CurrentTargetItem.originalPrefab, -1, true);
 
 				// Clear current target replacement prefab.
 				CurrentTargetItem.replacementPrefab = null;
@@ -367,7 +367,7 @@ namespace BOB
 				if (CurrentTargetItem.originalPrefab)
 				{
 					// Apply all-building reversion.
-					AllBuildingReplacement.instance.Revert(currentBuilding, CurrentTargetItem.originalPrefab, CurrentTargetItem.index, true);
+					AllBuildingReplacement.Instance.Revert(currentBuilding, CurrentTargetItem.originalPrefab, CurrentTargetItem.index, true);
 
 					// Clear current target 'all' prefab.
 					CurrentTargetItem.allPrefab = null;
@@ -393,7 +393,7 @@ namespace BOB
 			}
 
 			// Apply replacement.
-			AllBuildingReplacement.instance.Replace(null, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+			AllBuildingReplacement.Instance.Replace(null, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
 
 			// Update current target.
 			CurrentTargetItem.allPrefab = ReplacementPrefab;
@@ -418,7 +418,7 @@ namespace BOB
             }
 
 			// All-building replacement and original probability (if any).
-			BOBBuildingReplacement allBuildingReplacement = AllBuildingReplacement.instance.ActiveReplacement(currentBuilding, propIndex);
+			BOBBuildingReplacement allBuildingReplacement = AllBuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex);
 			if (allBuildingReplacement != null)
 			{
 				propListItem.allPrefab = allBuildingReplacement.replacementInfo;
@@ -431,7 +431,7 @@ namespace BOB
 			}
 
 			// Building replacement and original probability (if any).
-			BOBBuildingReplacement buildingReplacement = BuildingReplacement.instance.ActiveReplacement(currentBuilding, propIndex);
+			BOBBuildingReplacement buildingReplacement = BuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex);
 			if (buildingReplacement != null)
 			{
 				propListItem.replacementPrefab = buildingReplacement.replacementInfo;
@@ -444,7 +444,7 @@ namespace BOB
 			}
 
 			// Individual replacement and original probability (if any).
-			BOBBuildingReplacement individualReplacement = IndividualBuildingReplacement.instance.ActiveReplacement(currentBuilding, propIndex);
+			BOBBuildingReplacement individualReplacement = IndividualBuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex);
 			if (individualReplacement != null)
 			{
 				propListItem.individualPrefab = individualReplacement.replacementInfo;
@@ -512,7 +512,7 @@ namespace BOB
 				propListItem.originalAngle = (currentBuilding.m_props[propIndex].m_radAngle * 180f) / Mathf.PI;
 
 				// All-building replacement and original probability (if any).
-				BOBBuildingReplacement allBuildingReplacement = AllBuildingReplacement.instance.ActiveReplacement(currentBuilding, propIndex);
+				BOBBuildingReplacement allBuildingReplacement = AllBuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex);
 				if (allBuildingReplacement != null)
 				{
 					propListItem.allPrefab = allBuildingReplacement.replacementInfo;
@@ -523,7 +523,7 @@ namespace BOB
 				}
 
 				// Building replacement and original probability (if any).
-				BOBBuildingReplacement buildingReplacement = BuildingReplacement.instance.ActiveReplacement(currentBuilding, propIndex);
+				BOBBuildingReplacement buildingReplacement = BuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex);
 				if (buildingReplacement != null)
 				{
 					propListItem.replacementPrefab = buildingReplacement.replacementInfo;
@@ -534,7 +534,7 @@ namespace BOB
 				}
 
 				// Individual replacement and original probability (if any).
-				BOBBuildingReplacement individualReplacement = IndividualBuildingReplacement.instance.ActiveReplacement(currentBuilding, propIndex);
+				BOBBuildingReplacement individualReplacement = IndividualBuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex);
 				if (individualReplacement != null)
 				{
 					propListItem.individualPrefab = individualReplacement.replacementInfo;

@@ -9,9 +9,6 @@ namespace BOB
 	/// </summary>
 	internal class NetworkPackReplacement : NetworkReplacementBase
 	{
-		// Instance reference.
-		internal static NetworkPackReplacement instance;
-
 		// Master dictionary of prop pack replacements.
 		private Dictionary<string, Dictionary<PrefabInfo, PropReplacement>> packRecords;
 
@@ -28,35 +25,40 @@ namespace BOB
 		/// </summary>
 		internal NetworkPackReplacement()
 		{
-			instance = this;
+			Instance = this;
+			Setup();
 		}
 
 
 		/// <summary>
-		/// Dummy entry - DO NOT USE.
+		/// Instance reference.
 		/// </summary>
-		/// <param name="network"></param>
-		/// <param name="target"></param>
-		/// <param name="replacement"></param>
-		/// <param name="lane"></param>
-		/// <param name="targetIndex"></param>
-		/// <param name="angle"></param>
-		/// <param name="offsetX"></param>
-		/// <param name="offsetY"></param>
-		/// <param name="offsetZ"></param>
-		/// <param name="probability"></param>
-        internal override void Replace(NetInfo network, PrefabInfo target, PrefabInfo replacement, int lane, int targetIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability)
-        {
-            throw new System.NotImplementedException();
-        }
+		internal static NetworkPackReplacement Instance { get; private set; }
 
 
-        /// <summary>
-        /// Returns the current status of the named replacement pack.
-        /// </summary>
-        /// <param name="packName">Replacement pack name</param>
-        /// <returns>True if enabled, false otherwise</returns>
-        internal bool GetPackStatus(string packName)
+		/// <summary>
+		/// Returns the config file list of elements relevant to the current replacement type.
+		/// </summary>
+		protected override List<BOBNetworkElement> NetworkElementList => null;
+
+
+		/// <summary>
+		/// Retrieves a currently-applied replacement entry for the given network, lane and prop index.
+		/// </summary>
+		/// <param name="networkInfo">Network prefab</param>
+		/// <param name="targetInfo">Target prop/tree prefab</param>
+		/// <param name="laneIndex">Lane number</param>
+		/// <param name="propIndex">Prop index number</param>
+		/// <returns>Currently-applied individual network replacement (null if none)</returns>
+		internal override BOBNetReplacement EligibileReplacement(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex) => ActiveReplacement(netInfo, laneIndex, propIndex);
+
+
+		/// <summary>
+		/// Returns the current status of the named replacement pack.
+		/// </summary>
+		/// <param name="packName">Replacement pack name</param>
+		/// <returns>True if enabled, false otherwise</returns>
+		internal bool GetPackStatus(string packName)
         {
 			if (packEnabled.ContainsKey(packName))
             {
@@ -149,6 +151,13 @@ namespace BOB
 			// If we got here, then no conflict was detected.
 			return false;
 		}
+
+
+		/// <summary>
+		/// Dummy entry - DO NOT USE
+		/// </summary>
+		/// <param name="replacement">Replacement record to apply</param>
+		protected override void ApplyReplacement(BOBNetReplacement replacement) { }
 
 
 		/// <summary>
@@ -284,18 +293,18 @@ namespace BOB
 					// Revert entry.
 					if (target is PropInfo propTarget)
 					{
-						propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = propTarget;
+						propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = propTarget;
 					}
 					else
 					{
-						propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = (TreeInfo)target;
+						propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = (TreeInfo)target;
 					}
-					propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle;
-					propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.position;
-					propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_probability = propReference.probability;
+					propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle;
+					propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.position;
+					propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_probability = propReference.probability;
 
 					// Add network to dirty list.
-					NetData.DirtyList.Add(propReference.network);
+					NetData.DirtyList.Add(propReference.netInfo);
 				}
 
 				// Remove entry from dictionary.
@@ -311,7 +320,7 @@ namespace BOB
 		/// <param name="target">Target prop info</param>
 		/// <param name="laneIndex">Lane index</param>
 		/// <param name="propIndex">Prop index</param>
-		internal void RemoveEntry(NetInfo netPrefab, PrefabInfo target, int laneIndex, int propIndex)
+		internal new void RemoveEntry(NetInfo netPrefab, PrefabInfo target, int laneIndex, int propIndex)
 		{
 			// Check to see if we have an entry for this prefab.
 			if (replacements.ContainsKey(target))
@@ -321,16 +330,16 @@ namespace BOB
 				{
 					// Look for a network, lane and index match.
 					NetPropReference propReference = replacements[target].references[i];
-					if (propReference.network == netPrefab && propReference.laneIndex == laneIndex && propReference.propIndex == propIndex)
+					if (propReference.netInfo == netPrefab && propReference.laneIndex == laneIndex && propReference.propIndex == propIndex)
 					{
 						// Got a match!  Revert instance.
 						if (target is PropInfo propTarget)
 						{
-							propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = propTarget;
+							propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = propTarget;
 						}
 						else
 						{
-							propReference.network.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = (TreeInfo)target;
+							propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = (TreeInfo)target;
 						}
 						netPrefab.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_angle = propReference.angle;
 						netPrefab.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position = propReference.position;
@@ -348,7 +357,7 @@ namespace BOB
 		/// <summary>
 		/// Performs setup, loads pack files, and initialises the dictionaries.  Must be called prior to use.
 		/// </summary>
-		protected override void Setup()
+		private void Setup()
 		{
 			// Initialise dictionaries.
 			packRecords = new Dictionary<string, Dictionary<PrefabInfo, PropReplacement>>();
@@ -417,7 +426,6 @@ namespace BOB
 					// Check to make sure we have at least one replacement; if not, remove the pack from our records.
 					if (packRecords[propPack.name].Count == 0)
 					{
-						Logging.Message("replacement pack ", propPack.name, " has no valid replacements; removing from list");
 						packRecords.Remove(propPack.name);
 						packEnabled.Remove(propPack.name);
 					}
@@ -498,12 +506,12 @@ namespace BOB
 					for (int propIndex = 0; propIndex < network.m_lanes[laneIndex].m_laneProps.m_props.Length; ++propIndex)
 					{
 						// Check for any currently active conflicting replacements.
-						if (NetworkReplacement.instance.GetOriginal(network, laneIndex, propIndex) != null)
+						if (NetworkReplacement.Instance.ActiveReplacement(network, laneIndex, propIndex) != null)
 						{
 							// Active network replacement; skip this one.
 							continue;
 						}
-						else if (AllNetworkReplacement.instance.GetOriginal(network, laneIndex, propIndex) != null)
+						else if (AllNetworkReplacement.Instance.ActiveReplacement(network, laneIndex, propIndex) != null)
 						{
 							// Active all-network replacement; skip this one.
 							continue;
@@ -528,7 +536,7 @@ namespace BOB
 							// Match!  Add reference data to the list.
 							replacements[target].references.Add(new NetPropReference
 							{
-								network = network,
+								netInfo = network,
 								laneIndex = laneIndex,
 								propIndex = propIndex,
 								angle = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_angle,
@@ -565,7 +573,7 @@ namespace BOB
 				foreach (NetPropReference propRef in reference.references)
 				{
 					// Check for a network, lane, and prop index match.
-					if (propRef.network == netPrefab && propRef.laneIndex == laneIndex && propRef.propIndex == propIndex)
+					if (propRef.netInfo == netPrefab && propRef.laneIndex == laneIndex && propRef.propIndex == propIndex)
 					{
 						// Match!  Return the original prefab.
 						return target;
@@ -585,7 +593,7 @@ namespace BOB
 		/// <param name="laneIndex">Lane index to check</param>
 		/// <param name="propIndex">Prop index to check</param>
 		/// <returns>Replacement record if a all-network replacement is currently applied, null if no all-network replacement is currently applied</returns>
-		internal override BOBNetReplacement ActiveReplacement(NetInfo netPrefab, int laneIndex, int propIndex)
+		internal new BOBNetReplacement ActiveReplacement(NetInfo netPrefab, int laneIndex, int propIndex)
 		{
 			// Iterate through each entry in master dictionary.
 			foreach (PrefabInfo target in replacements.Keys)
@@ -595,7 +603,7 @@ namespace BOB
 				foreach (NetPropReference propRef in reference.references)
 				{
 					// Check for a network, lane, and prop index match.
-					if (propRef.network == netPrefab && propRef.laneIndex == laneIndex && propRef.propIndex == propIndex)
+					if (propRef.netInfo == netPrefab && propRef.laneIndex == laneIndex && propRef.propIndex == propIndex)
 					{
 						// Match!  Return the replacement record.
 						return replacements[target];
@@ -616,7 +624,7 @@ namespace BOB
 		/// <param name="laneIndex">Lane index</param>
 		/// <param name="propIndex">Prop index</param>
 		/// <returns>True if a restoration was made, false otherwise</returns>
-		internal bool Restore(NetInfo netPrefab, PrefabInfo target, int laneIndex, int propIndex)
+		internal new bool Restore(NetInfo netPrefab, PrefabInfo target, int laneIndex, int propIndex)
 		{
 			// Check to see if we have an entry for this prefab.
 			if (replacements.ContainsKey(target))
@@ -624,7 +632,7 @@ namespace BOB
 				// Yes - add reference data to the list.
 				NetPropReference newReference = new NetPropReference
 				{
-					network = netPrefab,
+					netInfo = netPrefab,
 					laneIndex = laneIndex,
 					propIndex = propIndex,
 					angle = netPrefab.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_angle,
@@ -641,5 +649,15 @@ namespace BOB
 			// If we got here, no restoration was made.
 			return false;
 		}
+
+
+		/// <summary>
+		/// Restores any replacements from lower-priority replacements after a reversion.
+		/// </summary>
+		/// <param name="netInfo">Network prefab</param>
+		/// <param name="targetInfo">Target prop info</param>
+		/// <param name="laneIndex">Lane index</param>
+		/// <param name="propIndex">Prop index</param>
+		protected override void RestoreLower(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex) { }
 	}
 }

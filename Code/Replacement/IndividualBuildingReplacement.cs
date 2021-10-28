@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 
 namespace BOB
@@ -9,27 +8,19 @@ namespace BOB
 	/// </summary>
 	internal class IndividualBuildingReplacement : BuildingReplacementBase
 	{
-		// Instance reference.
-		internal static IndividualBuildingReplacement instance;
-
-
 		/// <summary>
 		/// Constructor - initializes instance reference.
 		/// </summary>
 		internal IndividualBuildingReplacement()
 		{
-			instance = this;
+			Instance = this;
 		}
 
 
 		/// <summary>
-		/// Retrieves any currently-applied replacement entry for the given building prefab, target prefab and prop index.
+		/// Instance reference.
 		/// </summary>
-		/// <param name="buildingInfo">Building prefab</param>
-		/// <param name="targetInfo">Target prop/tree prefab</param>
-		/// <param name="targetIndex">Target prop/tree index</param>
-		/// <returns>Currently-applied replacement (null if none)</returns>
-		internal override BOBBuildingReplacement Replacement(BuildingInfo buildingInfo, PrefabInfo targetInfo, int targetIndex) => BuildingElementList.Find(x => x.buildingInfo == buildingInfo)?.replacements?.Find(x => x.index == targetIndex);
+		internal static IndividualBuildingReplacement Instance { get; private set; }
 
 
 		/// <summary>
@@ -39,7 +30,17 @@ namespace BOB
 
 
 		/// <summary>
-		/// Applies an individual building prop replacement.
+		/// Retrieves any currently-applied replacement entry for the given building prefab, target prefab and prop index.
+		/// </summary>
+		/// <param name="buildingInfo">Building prefab</param>
+		/// <param name="targetInfo">Target prop/tree prefab</param>
+		/// <param name="propIndex">Target prop/tree index</param>
+		/// <returns>Currently-applied replacement (null if none)</returns>
+		internal override BOBBuildingReplacement EligibileReplacement(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex) => ReplacementList(buildingInfo)?.Find(x => x.propIndex == propIndex);
+
+
+		/// <summary>
+		/// Applies a replacement.
 		/// </summary>
 		/// <param name="replacement">Replacement record to apply</param>
 		protected override void ApplyReplacement(BOBBuildingReplacement replacement)
@@ -51,23 +52,23 @@ namespace BOB
 			}
 
 			// Check prop index.
-			BuildingInfo.Prop thisProp = replacement.buildingInfo.m_props[replacement.index];
+			BuildingInfo.Prop thisProp = replacement.buildingInfo.m_props[replacement.propIndex];
 			if (thisProp == null)
             {
 				return;
 			}
 
 			// Reset any building or all-building replacements first.
-			BuildingReplacement.instance.RemoveEntry(replacement.buildingInfo, replacement.targetInfo, replacement.index);
-			AllBuildingReplacement.instance.RemoveEntry(replacement.buildingInfo, replacement.targetInfo, replacement.index);
+			BuildingReplacement.Instance.RemoveEntry(replacement.buildingInfo, replacement.targetInfo, replacement.propIndex); ;
+			AllBuildingReplacement.Instance.RemoveEntry(replacement.buildingInfo, replacement.targetInfo, replacement.propIndex);
 
 			// Create replacment entry.
 			BuildingPropReference newPropReference = new BuildingPropReference
 			{
-				building = replacement.buildingInfo,
-				propIndex = replacement.index,
+				buildingInfo = replacement.buildingInfo,
+				propIndex = replacement.propIndex,
 				radAngle = thisProp.m_radAngle,
-				postion = thisProp.m_position,
+				position = thisProp.m_position,
 				probability = thisProp.m_probability
 			};
 
@@ -85,14 +86,13 @@ namespace BOB
 		/// <param name="buildingInfo">Building prefab</param>
 		/// <param name="targetInfo">Target prop info</param>
 		/// <param name="propIndex">Prop index</param>
-		/// <returns>True if a restoration was made, false otherwise</returns>
-		protected override void ReplaceLower(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex)
+		protected override void RestoreLower(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex)
 		{
 			// Restore any building replacement.
-			if (!BuildingReplacement.instance.Restore(buildingInfo, targetInfo, propIndex))
+			if (!BuildingReplacement.Instance.Restore(buildingInfo, targetInfo, propIndex))
 			{
 				// No building restoration occured - restore any all-building replacement.
-				AllBuildingReplacement.instance.Restore(buildingInfo, targetInfo, propIndex);
+				AllBuildingReplacement.Instance.Restore(buildingInfo, targetInfo, propIndex);
 			}
 		}
 	}

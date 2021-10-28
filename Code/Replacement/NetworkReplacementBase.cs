@@ -9,7 +9,7 @@ namespace BOB
 	/// </summary>
 	public class NetPropReference
 	{
-		public NetInfo network;
+		public NetInfo netInfo;
 		public int laneIndex;
 		public int propIndex;
 		public float angle;
@@ -19,129 +19,409 @@ namespace BOB
 
 
 	/// <summary>
-	/// Base class for building replacement.
+	/// Base class for network replacement.
 	/// </summary>
 	internal abstract class NetworkReplacementBase
 	{
 		/// <summary>
-		/// Applies a new (or updated) network replacement.
+		/// Returns the config file list of network elements relevant to the current replacement type.
 		/// </summary>
-		/// <param name="network">Targeted network</param>
-		/// <param name="target">Targeted (original) prop prefab</param>
-		/// <param name="replacement">Replacment prop prefab</param>
-		/// <param name="targetLane">Targeted lane index (in parent network)</param>
-		/// <param name="targetIndex">Prop index to apply replacement to</param>
+		protected abstract List<BOBNetworkElement> NetworkElementList { get; }
+
+
+		/// <summary>
+		/// Retrieves a currently-applied replacement entry for the given network, lane and prop index.
+		/// </summary>
+		/// <param name="networkInfo">Network prefab</param>
+		/// <param name="targetInfo">Target prop/tree prefab</param>
+		/// <param name="laneIndex">Lane number</param>
+		/// <param name="propIndex">Prop index number</param>
+		/// <returns>Currently-applied feplacement (null if none)</returns>
+		internal abstract BOBNetReplacement EligibileReplacement(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex);
+
+
+		/// <summary>
+		/// Reverts all active replacements.
+		/// </summary>
+		internal virtual void RevertAll()
+		{
+			// Iterate through each entry in the replacement list.
+			foreach (BOBNetworkElement netElement in NetworkElementList)
+			{
+				foreach (BOBNetReplacement replacement in netElement.replacements)
+				{
+					// Revert this replacement (but don't remove the entry, as the list is currently immutable while we're iterating through it).
+					Revert(replacement, false);
+				}
+			}
+		}
+
+
+		/// <summary>
+		/// Applies a new (or updated) replacement.
+		/// </summary>
+		/// <param name="netInfo">Targeted network prefab</param>
+		/// <param name="targetInfo">Targeted (original) prop prefab</param>
+		/// <param name="replacementInfo">Replacment prop prefab</param>
+		/// <param name="laneIndex">Targeted lane index (in parent network)</param>
+		/// <param name="propIndex">Prop index to apply replacement to</param>
 		/// <param name="angle">Replacment prop angle adjustment</param>
 		/// <param name="offsetX">Replacment X position offset</param>
 		/// <param name="offsetY">Replacment Y position offset</param>
 		/// <param name="offsetZ">Replacment Z position offset</param>
 		/// <param name="probability">Replacement probability</param>
-		internal abstract void Replace(NetInfo network, PrefabInfo target, PrefabInfo replacement, int lane, int targetIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability);
-
-
-		/// <summary>
-		/// Reverts all active replacements and re-initialises the master dictionary.
-		/// </summary>
-		internal abstract void RevertAll();
-
-
-		/// <summary>
-		/// Checks if there's a currently active replacement applied to the given building prop index, and if so, returns the *replacement* record.
-		/// </summary>
-		/// <param name="buildingPrefab">Building prefab to check</param>
-		/// <param name="propIndex">Prop index to check</param>
-		/// <returns>Replacement record if a replacement is currently applied, null if no replacement is currently applied</returns>
-		internal abstract BOBNetReplacement ActiveReplacement(NetInfo netPrefab, int laneIndex, int propIndex);
-
-
-		/// <summary>
-		/// Performs setup and initialises the master dictionary.  Must be called prior to use.
-		/// </summary>
-		protected virtual void Setup() { }
-
-
-		/// <summary>
-		/// Constructor - initializes instance reference and calls initial setup.
-		/// </summary>
-		internal NetworkReplacementBase()
+		internal void Replace(NetInfo netInfo, PrefabInfo targetInfo, PrefabInfo replacementInfo, int laneIndex, int propIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability)
 		{
-			Setup();
+			// Make sure that target and replacement are the same type before doing anything.
+			if (targetInfo?.name == null || replacementInfo?.name == null || (targetInfo is TreeInfo && !(replacementInfo is TreeInfo)) || (targetInfo is PropInfo) && !(replacementInfo is PropInfo))
+			{
+				return;
+			}
+
+			// Revert any current replacement entry for this prop.
+			Revert(netInfo, targetInfo, laneIndex, propIndex, true);
+
+			// Get configuration file network list entry.
+			List<BOBNetReplacement> replacementsList = ReplacementEntry(netInfo);
+
+			// Get current replacement after reversion above.
+			BOBNetReplacement thisReplacement = EligibileReplacement(netInfo, targetInfo, laneIndex, propIndex);
+
+			// Create new replacement list entry if none already exists.
+			if (thisReplacement == null)
+			{
+				thisReplacement = new BOBNetReplacement
+				{
+					netInfo = netInfo,
+					target = targetInfo.name,
+					targetInfo = targetInfo,
+					laneIndex = laneIndex,
+					propIndex = propIndex
+				};
+				replacementsList.Add(thisReplacement);
+			}
+
+			// Add/replace replacement data.
+			thisReplacement.tree = targetInfo is TreeInfo;
+			thisReplacement.angle = angle;
+			thisReplacement.offsetX = offsetX;
+			thisReplacement.offsetY = offsetY;
+			thisReplacement.offsetZ = offsetZ;
+			thisReplacement.probability = probability;
+
+			// Record replacement prop.
+			thisReplacement.replacementInfo = replacementInfo;
+			thisReplacement.Replacement = replacementInfo.name;
+
+			// Apply replacement.
+			ApplyReplacement(thisReplacement);
 		}
 
 
 		/// <summary>
-		/// Deserialises a network replacement list.
+		/// Reverts a replacement.
 		/// </summary>
-		/// <param name="elementList">List of elements to deserialise</param>
-		internal virtual void Deserialize(List<BOBNetworkElement> elementList)
+		/// <param name="netInfo">Targeted network prefab</param>
+		/// <param name="targetInfo">Targeted (original) tree/prop prefab</param>
+		/// <param name="laneIndex">Targeted (original) tree/prop lane index</param>
+		/// <param name="propIndex">Targeted (original) tree/prop prop index</param>
+		/// <param name="removeEntries">True (default) to remove the reverted entries from the list of replacements, false to leave the list unchanged</param>
+		internal void Revert(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex, bool removeEntries) => Revert(EligibileReplacement(netInfo, targetInfo, laneIndex, propIndex), removeEntries);
+
+
+		/// <summary>
+		/// Restores a replacement, if any (e.g. after a higher-priority replacement has been reverted).
+		/// </summary>
+		/// <param name="netInfo">Network prefab</param>
+		/// <param name="targetInfo">Target prop info</param>
+		/// <param name="laneIndex">Lane index</param>
+		/// <param name="propIndex">Prop index</param>
+		/// <returns>True if a restoration was made, false otherwise</returns>
+		internal bool Restore(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex)
 		{
-			// Iterate through each element in list.
-			foreach (BOBNetworkElement networkElement in elementList)
+			// See if we have a relevant replacement record.
+			BOBNetReplacement thisReplacement = EligibileReplacement(netInfo, targetInfo, laneIndex, propIndex);
+			if (thisReplacement != null)
 			{
-				// Try to find target network.
-				NetInfo networkInfo = (NetInfo)PrefabCollection<NetInfo>.FindLoaded(networkElement.network);
-				if (networkInfo == null)
+				// Yes - add reference data to the list.
+				NetPropReference newReference = new NetPropReference
 				{
-					Logging.Message("Couldn't find target network ", networkElement.network);
-					return;
+					netInfo = netInfo,
+					laneIndex = laneIndex,
+					propIndex = propIndex,
+					angle = netInfo.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_angle,
+					position = netInfo.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position,
+					probability = netInfo.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_probability
+				};
+				thisReplacement.references.Add(newReference);
+
+				// Apply replacement and return true to indicate restoration.
+				ReplaceProp(thisReplacement, newReference);
+
+				return true;
+			}
+
+			// If we got here, no restoration was made.
+			return false;
+		}
+
+
+		/// <summary>
+		/// Unapplies a particular replacement instance to defer to a higher-priority replacement.
+		/// </summary>
+		/// <param name="netInfo">Network prefab</param>
+		/// <param name="targetInfo">Target prefab</param>
+		/// <param name="laneIndex">Lane index</param>
+		/// <param name="propIndex">Prop index</param>
+		internal void RemoveEntry(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex)
+		{
+			// Check to see if we have an entry for this prefab and target.
+			BOBNetReplacement thisReplacement = EligibileReplacement(netInfo, targetInfo, laneIndex, propIndex);
+			if (thisReplacement != null)
+			{
+				NetPropReference thisPropReference = null;
+
+				// Iterate through each recorded prop reference.
+				foreach (NetPropReference propReference in thisReplacement.references)
+				{
+					// Look for a network, lane and index match.
+					if (propReference.netInfo == netInfo && propReference.laneIndex == laneIndex && propReference.propIndex == propIndex)
+					{
+						// Got a match!  Revert instance.
+						if (targetInfo is PropInfo propTarget)
+						{
+							propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = propTarget;
+						}
+						else
+						{
+							propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = (TreeInfo)targetInfo;
+						}
+						netInfo.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_angle = propReference.angle;
+						netInfo.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position = propReference.position;
+						netInfo.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_probability = propReference.probability;
+
+						// Record the matching reference and stop iterating - we're done here.
+						thisPropReference = propReference;
+						break;
+					}
 				}
 
-
-				// Iterate through each element in the provided list.
-				foreach (BOBNetReplacement replacement in networkElement.replacements)
+				// Remove replacement if one was found.
+				if (thisPropReference != null)
 				{
-					// Try to find target prefab.
-					PrefabInfo targetPrefab = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);
-					if (targetPrefab == null)
-					{
-						Logging.Message("Couldn't find target prefab ", replacement.target);
-						continue;
-					}
-
-					// Try to find replacement prefab.
-					PrefabInfo replacementPrefab = ConfigurationUtils.FindReplacementPrefab(replacement.Replacement, replacement.tree);
-					if (replacementPrefab == null)
-					{
-						Logging.Message("Couldn't find replacement prefab ", replacement.Replacement);
-						continue;
-					}
-
-					// If we got here, it's all good; apply the network replacement.
-					Replace(networkInfo, targetPrefab, replacementPrefab, replacement.lane, replacement.index, replacement.angle, replacement.offsetX, replacement.offsetY, replacement.offsetZ, replacement.probability);
+					thisReplacement.references.Remove(thisPropReference);
 				}
 			}
 		}
 
 
 		/// <summary>
-		/// Replaces a prop using a network replacement.
+		/// Checks if there's a currently active replacement applied to the given network, lane and prop index, and if so, returns the replacement record.
 		/// </summary>
-		/// <param name="netElement">Network replacement element to apply</param>
-		/// <param name="propReference">Individual prop reference to apply to</param>
-		protected void ReplaceProp(BOBNetReplacement netElement, NetPropReference propReference)
+		/// <param name="netInfo">Net prefab to check</param>
+		/// <param name="laneIndex">Lane index to check</param>
+		/// <param name="propIndex">Prop index to check</param>
+		/// <returns>Replacement record if a replacement is currently applied, null if no replacement is currently applied</returns>
+		internal BOBNetReplacement ActiveReplacement(NetInfo netInfo, int laneIndex, int propIndex)
 		{
+			// See if we've got a replacement entry for this building.
+			List<BOBNetReplacement> replacementList = ReplacementList(netInfo);
+			if (replacementList == null)
+			{
+				// No entry - return null.
+				return null;
+			}
+
+			// Iterate through each replacement record for this network.
+			foreach (BOBNetReplacement netReplacement in replacementList)
+			{
+				// Iterate through each prop reference in this record. 
+				foreach (NetPropReference propRef in netReplacement.references)
+				{
+					// Check for a a network(due to all- replacement), lane and prop index match.
+					if (propRef.netInfo == netInfo && propRef.laneIndex == laneIndex && propRef.propIndex == propIndex)
+					{
+						// Match!  Return the replacement record.
+						return netReplacement;
+					}
+				}
+			}
+
+			// If we got here, no entry was found - return null to indicate no active replacement.
+			return null;
+		}
+
+
+		/// <summary>
+		/// Deserialises a network element list.
+		/// </summary>
+		/// <param name="elementList">Element list to deserialise</param>
+		internal void Deserialize(List<BOBNetworkElement> elementList)
+		{
+			// Iterate through each element in the provided list.
+			foreach (BOBNetworkElement element in elementList)
+			{
+				// Try to find network prefab.
+				element.netInfo = PrefabCollection<NetInfo>.FindLoaded(element.network);
+
+				// Don't bother deserializing further if the network info wasn't found.
+				if (element.netInfo != null)
+				{
+					Deserialize(element.netInfo, element.replacements);
+				}
+			}
+		}
+
+
+		/// <summary>
+		/// Applies a replacement.
+		/// </summary>
+		/// <param name="replacement">Replacement record to apply</param>
+		protected abstract void ApplyReplacement(BOBNetReplacement replacement);
+
+
+		/// <summary>
+		/// Restores any replacements from lower-priority replacements after a reversion.
+		/// </summary>
+		/// <param name="netInfo">Network prefab</param>
+		/// <param name="targetInfo">Target prop info</param>
+		/// <param name="laneIndex">Lane index</param>
+		/// <param name="propIndex">Prop index</param>
+		protected abstract void RestoreLower(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex);
+
+
+		/// <summary>
+		/// Gets the relevant replacement list entry from the active configuration file, if any.
+		/// </summary>
+		/// <param name="netInfo">Network prefab</param>
+		/// <returns>Replacement list for the specified network prefab (null if none)</returns>
+		protected virtual List<BOBNetReplacement> ReplacementList(NetInfo netInfo) => NetworkElement(netInfo)?.replacements;
+
+
+		/// <summary>
+		/// Gets the relevant network replacement list entry from the active configuration file, creating a new network entry if none already exists.
+		/// </summary>
+		/// <param name="netInfo">Network prefab</param>
+		/// <returns>Replacement list for the specified network prefab</returns>
+		protected virtual List<BOBNetReplacement> ReplacementEntry(NetInfo netInfo)
+		{
+			// Get existing entry for this network.
+			BOBNetworkElement thisNetwork = NetworkElement(netInfo);
+
+			// If no existing entry, create a new one.
+			if (thisNetwork == null)
+			{
+				thisNetwork = new BOBNetworkElement
+				{
+					network = netInfo.name,
+					netInfo = netInfo,
+					replacements = new List<BOBNetReplacement>()
+				};
+				NetworkElementList.Add(thisNetwork);
+			}
+
+			// Return replacement list from this entry.
+			return thisNetwork.replacements;
+		}
+
+
+		/// <summary>
+		/// Reverts a replacement.
+		/// </summary>
+		/// <param name="replacement">Replacement record to revert</param>
+		/// <param name="removeEntries">True to remove the reverted entries from the list of replacements, false to leave the list unchanged</param>
+		/// <returns>True if the entire network record was removed from the list (due to no remaining replacements for that prefab), false if the prefab remains in the list (has other active replacements)</returns>
+		protected bool Revert(BOBNetReplacement replacement, bool removeEntries)
+		{
+			// Safety check for calls without any current replacement.
+			if (replacement == null)
+			{
+				return false;
+			}
+
+			if (replacement.references != null)
+			{
+				// Iterate through each entry in our list.
+				foreach (NetPropReference propReference in replacement.references)
+				{
+					// Revert entry.
+					if (replacement.tree)
+					{
+						propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = replacement.TargetTree;
+					}
+					else
+					{
+						propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = replacement.TargetProp;
+					}
+					propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle;
+					propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.position;
+					propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_probability = propReference.probability;
+
+					// Restore any lower-priority replacements.
+					RestoreLower(propReference.netInfo, replacement.targetInfo, propReference.laneIndex, propReference.propIndex);
+
+					// Add network to dirty list.
+					NetData.DirtyList.Add(propReference.netInfo);
+				}
+
+				// Remove entry from list, if we're doing so.
+				if (removeEntries)
+				{
+					// Remove from replacement list.
+					ReplacementList(replacement.netInfo).Remove(replacement);
+
+					// See if we've got a parent network element record, and if so, if it has any remaining replacement entries.
+					BOBNetworkElement thisElement = NetworkElement(replacement.netInfo);
+					if (thisElement != null && (thisElement.replacements == null || thisElement.replacements.Count == 0))
+					{
+						// No replacement entries left - delete entire network entry and return true to indicate that we've done so.
+						NetworkElementList.Remove(thisElement);
+						return true;
+					}
+				}
+			}
+
+			// If we got here, we didn't remove any network entries from the list; return false.
+			return false;
+		}
+
+
+		/// <summary>
+		/// Replaces a prop, using a network replacement.
+		/// </summary>
+		/// <param name="replacement">Network replacement to apply</param>
+		/// <param name="propReference">Individual prop reference to apply to</param>
+		protected void ReplaceProp(BOBNetReplacement replacement, NetPropReference propReference)
+		{
+			// If this is a vanilla network, then we've probably got shared NetLaneProp references, so need to copy to a new instance.
+			// If the name doesn't contain a period (c.f. 12345.MyNetwok_Data), then assume it's vanilla - may be a mod or not shared, but better safe than sorry.
+			if (!propReference.netInfo.name.Contains("."))
+			{
+				CloneLanePropInstance(propReference.netInfo, propReference.laneIndex);
+			}
+
 			// Convert offset to Vector3.
 			Vector3 offset = new Vector3
 			{
-				x = netElement.offsetX,
-				y = netElement.offsetY,
-				z = netElement.offsetZ
+				x = replacement.offsetX,
+				y = replacement.offsetY,
+				z = replacement.offsetZ
 			};
 
-			NetInfo.Lane thisLane = propReference.network.m_lanes[propReference.laneIndex];
+			NetInfo.Lane thisLane = propReference.netInfo.m_lanes[propReference.laneIndex];
 
 			// Apply replacement.
-			if (netElement.replacementInfo is PropInfo propInfo)
+			if (replacement.replacementInfo is PropInfo propInfo)
 			{
 				thisLane.m_laneProps.m_props[propReference.propIndex].m_finalProp = propInfo;
 			}
-			else if (netElement.replacementInfo is TreeInfo treeInfo)
+			else if (replacement.replacementInfo is TreeInfo treeInfo)
 			{
 				thisLane.m_laneProps.m_props[propReference.propIndex].m_finalTree = treeInfo;
 			}
 			else
 			{
-				Logging.Error("invalid replacement ", netElement.replacementInfo?.name ?? "null", " passed to NetworkReplacement.ReplaceProp");
+				Logging.Error("invalid replacement ", replacement.replacementInfo?.name ?? "null", " passed to NetworkReplacement.ReplaceProp");
 			}
 
 			// Invert x offset to match original prop x position.
@@ -151,14 +431,48 @@ namespace BOB
 			}
 
 			// Angle and offset.
-			thisLane.m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle + netElement.angle;
+			thisLane.m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle + replacement.angle;
 			thisLane.m_laneProps.m_props[propReference.propIndex].m_position = propReference.position + offset;
 
 			// Probability.
-			thisLane.m_laneProps.m_props[propReference.propIndex].m_probability = netElement.probability;
+			thisLane.m_laneProps.m_props[propReference.propIndex].m_probability = replacement.probability;
 
 			// Add network to dirty list.
-			NetData.DirtyList.Add(propReference.network);
+			NetData.DirtyList.Add(propReference.netInfo);
+		}
+
+
+		/// <summary>
+		/// Returns the configuration file record for the specified network prefab.
+		/// </summary>
+		/// <param name="netInfo">Network prefab</param>
+		/// <returns>Replacement record for the specified network prefab (null if none)</returns>
+		protected BOBNetworkElement NetworkElement(NetInfo netInfo) => netInfo == null ? null : NetworkElementList?.Find(x => x.netInfo == netInfo);
+
+
+		/// <summary>
+		/// Deserialises a replacement list.
+		/// </summary>
+		/// <param name="netInfo">Network prefab</param>
+		/// <param name="elementList">Replacement list to deserialise</param>
+		protected void Deserialize(NetInfo NetInfo, List<BOBNetReplacement> replacementList)
+		{
+			// Iterate through each element in the provided list.
+			foreach (BOBNetReplacement replacement in replacementList)
+			{
+				// Assign network info.
+				replacement.netInfo = NetInfo;
+
+				// Try to find target prefab.
+				replacement.targetInfo = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);
+
+				// Try to find replacement prefab.
+				replacement.replacementInfo = ConfigurationUtils.FindReplacementPrefab(replacement.Replacement, replacement.tree);
+
+				// Try to apply the replacement.
+				ApplyReplacement(replacement);
+				Logging.Message("deserialized network replacement ", replacement.netInfo?.name ?? "null", " with target ", replacement.targetInfo?.name ?? "null", " and replacement ", replacement.replacementInfo?.name ?? "null");
+			}
 		}
 
 
@@ -168,7 +482,7 @@ namespace BOB
 		/// </summary>
 		/// <param name="network">Network prefab</param>
 		/// <param name="lane">Lane index</param>
-		protected void NewLanePropInstance(NetInfo network, int lane)
+		private void CloneLanePropInstance(NetInfo network, int lane)
 		{
 			// Don't do anything if we've previously converted this one.
 			if (network.m_lanes[lane].m_laneProps is NewNetLaneProps)

@@ -131,7 +131,7 @@ namespace BOB
 		}
 
 		[XmlAttribute("index")]
-		public int index = -1;
+		public int propIndex = -1;
 
 		[XmlAttribute("angle")]
 		public float angle = 0f;
@@ -190,10 +190,10 @@ namespace BOB
 	public class BOBNetReplacement : BOBReplacementBase
 	{
 		[XmlIgnore]
-		public NetInfo netPrefab;
+		public NetInfo netInfo;
 
 		[XmlAttribute("lane")]
-		public int lane = -1;
+		public int laneIndex = -1;
 
 		[XmlIgnore]
 		public List<NetPropReference> references;
