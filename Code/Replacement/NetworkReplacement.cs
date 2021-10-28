@@ -119,8 +119,8 @@ namespace BOB
 			foreach (NetPropReference propReference in replacement.references)
 			{
 				// Reset any pack or all-network replacements first.
-				AllNetworkReplacement.Instance.RemoveEntry(replacement.netInfo, replacement.targetInfo, replacement.laneIndex, replacement.propIndex);
-				NetworkPackReplacement.Instance.RemoveEntry(replacement.netInfo, replacement.targetInfo, replacement.laneIndex, replacement.propIndex);
+				AllNetworkReplacement.Instance.RemoveEntry(propReference.netInfo, replacement.targetInfo, propReference.laneIndex, propReference.propIndex);
+				NetworkPackReplacement.Instance.RemoveEntry(propReference.netInfo, replacement.targetInfo, propReference.laneIndex, propReference.propIndex);
 
 				// Apply the replacement.
 				ReplaceProp(replacement, propReference);

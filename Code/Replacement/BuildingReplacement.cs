@@ -94,7 +94,7 @@ namespace BOB
 			foreach (BuildingPropReference propReference in replacement.references)
 			{
 				// Reset any all-building replacements first.
-				AllBuildingReplacement.Instance.RemoveEntry(replacement.buildingInfo, replacement.targetInfo, propReference.propIndex);
+				AllBuildingReplacement.Instance.RemoveEntry(propReference.buildingInfo, replacement.targetInfo, propReference.propIndex);
 
 				// Apply the replacement.
 				ReplaceProp(replacement, propReference);
