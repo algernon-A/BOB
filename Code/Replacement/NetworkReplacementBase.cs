@@ -144,15 +144,7 @@ namespace BOB
 			if (thisReplacement != null)
 			{
 				// Yes - add reference data to the list.
-				NetPropReference newReference = new NetPropReference
-				{
-					netInfo = netInfo,
-					laneIndex = laneIndex,
-					propIndex = propIndex,
-					angle = netInfo.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_angle,
-					position = netInfo.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position,
-					probability = netInfo.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_probability
-				};
+				NetPropReference newReference = CreateReference(netInfo, laneIndex, propIndex);
 				thisReplacement.references.Add(newReference);
 
 				// Apply replacement and return true to indicate restoration.
@@ -383,6 +375,36 @@ namespace BOB
 
 			// If we got here, we didn't remove any network entries from the list; return false.
 			return false;
+		}
+
+
+		/// <summary>
+		/// Creates a new PropReference from the provided network prefab, lane and prop index.
+		/// </summary>
+		/// <param name="netInfo">Network prefab</param>
+		/// <param name="laneIndex">Lane index</param>
+		/// <param name="propIndex">Prop index</param>
+		/// <returns></returns>
+		protected NetPropReference CreateReference(NetInfo netInfo, int laneIndex, int propIndex)
+		{
+			// Safety checks.
+			if (netInfo != null || laneIndex < 0 || propIndex < 0)
+			{
+				// Create and return new reference.
+				return new NetPropReference
+				{
+					netInfo = netInfo,
+					laneIndex = laneIndex,
+					propIndex = propIndex,
+					angle = netInfo.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_angle,
+					position = netInfo.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position,
+					probability = netInfo.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_probability
+				};
+			}
+
+			// If we got here, something went wrong; return null.
+			Logging.Error("invalid argument passed to NetworkReplacementBase.CreateReference");
+			return null;
 		}
 
 

@@ -73,15 +73,7 @@ namespace BOB
 			NetworkPackReplacement.Instance.RemoveEntry(replacement.netInfo, replacement.targetInfo, replacement.laneIndex, replacement.propIndex);
 
 			// Create replacment entry.
-			NetPropReference newPropReference = new NetPropReference
-			{
-				netInfo = replacement.netInfo,
-				laneIndex = replacement.laneIndex,
-				propIndex = replacement.propIndex,
-				angle = thisLaneProp.m_angle,
-				position = thisLaneProp.m_position,
-				probability = thisLaneProp.m_probability
-			};
+			NetPropReference newPropReference = CreateReference(replacement.netInfo, replacement.laneIndex, replacement.propIndex);
 
 			// Reset replacement list to be only our new replacement entry.
 			replacement.references = new List<NetPropReference> { newPropReference };

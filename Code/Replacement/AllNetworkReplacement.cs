@@ -138,15 +138,7 @@ namespace BOB
 						if (thisProp != null && thisProp == replacement.targetInfo)
 						{
 							// Match!  Add reference data to the list.
-							replacement.references.Add(new NetPropReference
-							{
-								netInfo = netInfo,
-								laneIndex = laneIndex,
-								propIndex = propIndex,
-								angle = thisLaneProp.m_angle,
-								position = thisLaneProp.m_position,
-								probability = thisLaneProp.m_probability
-							});
+							replacement.references.Add(CreateReference(netInfo, laneIndex, propIndex));
 						}
 					}
 				}

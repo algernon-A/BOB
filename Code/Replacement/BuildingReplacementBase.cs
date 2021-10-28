@@ -138,14 +138,7 @@ namespace BOB
 			if (thisReplacement != null)
 			{
 				// Yes - add reference data to the list.
-				BuildingPropReference newReference = new BuildingPropReference
-				{
-					buildingInfo = buildingInfo,
-					propIndex = propIndex,
-					radAngle = buildingInfo.m_props[propIndex].m_radAngle,
-					position = buildingInfo.m_props[propIndex].m_position,
-					probability = buildingInfo.m_props[propIndex].m_probability
-				};
+				BuildingPropReference newReference = CreateReference(buildingInfo, propIndex);
 				thisReplacement.references.Add(newReference);
 
 				// Apply replacement and return true to indicate restoration.
@@ -373,6 +366,34 @@ namespace BOB
 
 			// If we got here, we didn't remove any building entries from the list; return false.
 			return false;
+		}
+
+
+		/// <summary>
+		/// Creates a new PropReference from the provided building prefab and prop index.
+		/// </summary>
+		/// <param name="buildingInfo">Building prefab</param>
+		/// <param name="propIndex">Prop index</param>
+		/// <returns></returns>
+		protected BuildingPropReference CreateReference(BuildingInfo buildingInfo, int propIndex)
+		{
+			// Safety checks.
+			if (buildingInfo != null || propIndex < 0)
+			{
+				// Create and return new reference.
+				return new BuildingPropReference
+				{
+					buildingInfo = buildingInfo,
+					propIndex = propIndex,
+					radAngle = buildingInfo.m_props[propIndex].m_radAngle,
+					position = buildingInfo.m_props[propIndex].m_position,
+					probability = buildingInfo.m_props[propIndex].m_probability
+				};
+			}
+
+			// If we got here, something went wrong; return null.
+			Logging.Error("invalid argument passed to BuildingReplacementBase.CreateReference");
+			return null;
 		}
 
 

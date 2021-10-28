@@ -86,14 +86,7 @@ namespace BOB
 				if (thisProp != null && thisProp == replacement.targetInfo)
 				{
 					// Match!  Add reference data to the list.
-					replacement.references.Add(new BuildingPropReference
-					{
-						buildingInfo = replacement.buildingInfo,
-						propIndex = propIndex,
-						radAngle = thisBuildingProp.m_radAngle,
-						position = thisBuildingProp.m_position,
-						probability = thisBuildingProp.m_probability
-					});
+					replacement.references.Add(CreateReference(replacement.buildingInfo, propIndex));
 				}
 			}
 

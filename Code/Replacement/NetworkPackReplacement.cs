@@ -534,15 +534,7 @@ namespace BOB
 						if (thisProp != null && thisProp == target)
 						{
 							// Match!  Add reference data to the list.
-							replacements[target].references.Add(new NetPropReference
-							{
-								netInfo = network,
-								laneIndex = laneIndex,
-								propIndex = propIndex,
-								angle = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_angle,
-								position = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position,
-								probability = network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_probability
-							});
+							replacements[target].references.Add(CreateReference(network, laneIndex, propIndex));
 						}
 					}
 				}
@@ -630,14 +622,7 @@ namespace BOB
 			if (replacements.ContainsKey(target))
 			{
 				// Yes - add reference data to the list.
-				NetPropReference newReference = new NetPropReference
-				{
-					netInfo = netPrefab,
-					laneIndex = laneIndex,
-					propIndex = propIndex,
-					angle = netPrefab.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_angle,
-					position = netPrefab.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position
-				};
+				NetPropReference newReference = CreateReference(netPrefab, laneIndex, propIndex);
 
 				replacements[target].references.Add(newReference);
 
