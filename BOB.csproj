@@ -73,6 +73,7 @@
     <Compile Include="Code\Replacement\IndividualNetworkReplacement.cs" />
     <Compile Include="Code\Replacement\MapPropReplacement.cs" />
     <Compile Include="Code\Replacement\NetworkReplacementBase.cs" />
+    <Compile Include="Code\Replacement\ReplacementReferences.cs" />
     <Compile Include="Code\Replacement\Scaling.cs" />
     <Compile Include="Code\Settings\OptionsPanelTabs\RuiningOptions.cs" />
     <Compile Include="Code\UI\BOBSlider.cs" />

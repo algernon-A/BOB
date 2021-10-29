@@ -163,13 +163,13 @@ namespace BOB
 					}
 
 					// Get this prop from building.
-					PrefabInfo thisProp = replacement.tree ? (PrefabInfo)buildingInfo.m_props[propIndex].m_finalTree : (PrefabInfo)buildingInfo.m_props[propIndex].m_finalProp;
+					PrefabInfo thisProp = replacement.isTree ? (PrefabInfo)buildingInfo.m_props[propIndex].m_finalTree : (PrefabInfo)buildingInfo.m_props[propIndex].m_finalProp;
 
 					// See if this prop matches our replacement.
 					if (thisProp != null && thisProp == replacement.targetInfo)
 					{
 						// Match!  Add reference data to the list.
-						referenceList.Add(CreateReference(buildingInfo, propIndex));
+						referenceList.Add(CreateReference(buildingInfo, propIndex, replacement.isTree));
 					}
 				}
 			}

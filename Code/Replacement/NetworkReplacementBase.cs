@@ -5,20 +5,6 @@ using UnityEngine;
 namespace BOB
 {
 	/// <summary>
-	/// Records original prop data.
-	/// </summary>
-	public class NetPropReference
-	{
-		public NetInfo netInfo;
-		public int laneIndex;
-		public int propIndex;
-		public float angle;
-		public Vector3 position;
-		public int probability;
-	}
-
-
-	/// <summary>
 	/// Base class for network replacement.
 	/// </summary>
 	internal abstract class NetworkReplacementBase
@@ -150,7 +136,7 @@ namespace BOB
 			}
 
 			// Add/replace replacement data.
-			thisReplacement.tree = targetInfo is TreeInfo;
+			thisReplacement.isTree = targetInfo is TreeInfo;
 			thisReplacement.angle = angle;
 			thisReplacement.offsetX = offsetX;
 			thisReplacement.offsetY = offsetY;
@@ -192,7 +178,7 @@ namespace BOB
 			if (thisReplacement != null)
 			{
 				// Yes - add reference data to the list.
-				NetPropReference newReference = CreateReference(netInfo, laneIndex, propIndex);
+				NetPropReference newReference = CreateReference(netInfo, laneIndex, propIndex, thisReplacement.isTree);
 				AddReference(thisReplacement, newReference);
 
 				// Apply replacement and return true to indicate restoration.
@@ -229,17 +215,7 @@ namespace BOB
 					if (propReference.netInfo == netInfo && propReference.laneIndex == laneIndex && propReference.propIndex == propIndex)
 					{
 						// Got a match!  Revert instance.
-						if (targetInfo is PropInfo propTarget)
-						{
-							propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = propTarget;
-						}
-						else
-						{
-							propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = (TreeInfo)targetInfo;
-						}
-						netInfo.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_angle = propReference.angle;
-						netInfo.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position = propReference.position;
-						netInfo.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_probability = propReference.probability;
+						RevertReference(propReference);
 
 						// Record the matching reference and stop iterating - we're done here.
 						thisPropReference = propReference;
@@ -390,17 +366,7 @@ namespace BOB
 			foreach (NetPropReference propReference in references)
 			{
 				// Revert entry.
-				if (originalPrefab is PropInfo prop)
-				{
-					propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = prop;
-				}
-				else
-				{
-					propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = (TreeInfo)originalPrefab;
-				}
-				propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle;
-				propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.position;
-				propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_probability = propReference.probability;
+				RevertReference(propReference);
 
 				// Restore any lower-priority replacements.
 				RestoreLower(propReference.netInfo, originalPrefab, propReference.laneIndex, propReference.propIndex);
@@ -417,27 +383,53 @@ namespace BOB
 		/// <param name="netInfo">Network prefab</param>
 		/// <param name="laneIndex">Lane index</param>
 		/// <param name="propIndex">Prop index</param>
-		/// <returns></returns>
-		protected NetPropReference CreateReference(NetInfo netInfo, int laneIndex, int propIndex)
+		/// <param name="isTree">True if this is a tree reference, false if this is a prop reference</param>
+		/// <returns>Newly-created reference (null if creation failed)</returns>
+		protected NetPropReference CreateReference(NetInfo netInfo, int laneIndex, int propIndex, bool isTree)
 		{
 			// Safety checks.
-			if (netInfo != null || laneIndex < 0 || propIndex < 0)
+			if (netInfo != null && laneIndex >= 0 && propIndex >= 0)
 			{
+				// Local reference.
+				NetLaneProps.Prop thisProp = netInfo.m_lanes[laneIndex].m_laneProps.m_props[propIndex];
+
 				// Create and return new reference.
 				return new NetPropReference
 				{
 					netInfo = netInfo,
 					laneIndex = laneIndex,
 					propIndex = propIndex,
-					angle = netInfo.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_angle,
-					position = netInfo.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position,
-					probability = netInfo.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_probability
+					isTree = isTree,
+					originalProp = thisProp.m_finalProp,
+					originalTree = thisProp.m_finalTree,
+					angle = thisProp.m_angle,
+					position = thisProp.m_position,
+					probability = thisProp.m_probability
 				};
 			}
 
 			// If we got here, something went wrong; return null.
 			Logging.Error("invalid argument passed to NetworkReplacementBase.CreateReference");
 			return null;
+		}
+
+
+		/// <summary>
+		/// Creates a new PropReference from the provided building prefab and prop index.
+		/// </summary>
+		/// <param name="reference">Referene to revert</param>
+		protected void RevertReference(NetPropReference reference)
+		{
+			// Local reference.
+			NetLaneProps.Prop thisProp = reference.netInfo.m_lanes[reference.laneIndex].m_laneProps.m_props?[reference.propIndex];
+			if (thisProp != null)
+			{
+				thisProp.m_finalProp = reference.originalProp;
+				thisProp.m_finalTree = reference.originalTree;
+				thisProp.m_angle = reference.angle;
+				thisProp.m_position = reference.position;
+				thisProp.m_probability = reference.probability;
+			}
 		}
 
 
@@ -519,10 +511,10 @@ namespace BOB
 				replacement.netInfo = NetInfo;
 
 				// Try to find target prefab.
-				replacement.targetInfo = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);
+				replacement.targetInfo = replacement.isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);
 
 				// Try to find replacement prefab.
-				replacement.replacementInfo = ConfigurationUtils.FindReplacementPrefab(replacement.Replacement, replacement.tree);
+				replacement.replacementInfo = ConfigurationUtils.FindReplacementPrefab(replacement.Replacement, replacement.isTree);
 
 				// Try to apply the replacement.
 				ApplyReplacement(replacement);

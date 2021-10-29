@@ -90,7 +90,6 @@ namespace BOB
 					AllNetworkReplacement.Instance.RemoveEntry(replacement.netInfo, replacement.targetInfo, replacement.laneIndex, replacement.propIndex);
 					NetworkPackReplacement.Instance.RemoveEntry(replacement.netInfo, replacement.targetInfo, replacement.laneIndex, replacement.propIndex);
 
-
 					// Check for any existing all-network or pack replacement.
 					PrefabInfo thisProp = NetworkPackReplacement.Instance.ActiveReplacement(replacement.netInfo, laneIndex, propIndex)?.targetInfo ?? AllNetworkReplacement.Instance.ActiveReplacement(replacement.netInfo, laneIndex, propIndex)?.targetInfo;
 					if (thisProp == null)
@@ -110,7 +109,7 @@ namespace BOB
 					if (thisProp != null && thisProp == replacement.targetInfo)
 					{
 						// Match!  Add reference data to the list.
-						replacement.references.Add(CreateReference(replacement.netInfo, laneIndex, propIndex));
+						replacement.references.Add(CreateReference(replacement.netInfo, laneIndex, propIndex, replacement.isTree));
 					}
 				}
 			}

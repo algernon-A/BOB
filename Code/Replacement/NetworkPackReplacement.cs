@@ -468,7 +468,7 @@ namespace BOB
 
 			// Add/replace dictionary replacement data.
 			replacements[target].references = new List<NetPropReference>();
-			replacements[target].tree = target is TreeInfo;
+			replacements[target].isTree = target is TreeInfo;
 			replacements[target].targetInfo = target;
 			replacements[target].target = target.name;
 			replacements[target].angle = angle;
@@ -528,13 +528,13 @@ namespace BOB
 						}
 
 						// Get this prop from network.
-						PrefabInfo thisProp = target is PropInfo ? (PrefabInfo)network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_finalProp : (PrefabInfo)network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_finalTree;
+						PrefabInfo thisProp = replacements[target].isTree ? (PrefabInfo)network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_finalTree : (PrefabInfo)network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_finalProp;
 
 						// See if this prop matches our replacement.
 						if (thisProp != null && thisProp == target)
 						{
 							// Match!  Add reference data to the list.
-							replacements[target].references.Add(CreateReference(network, laneIndex, propIndex));
+							replacements[target].references.Add(CreateReference(network, laneIndex, propIndex, replacements[target].isTree));
 						}
 					}
 				}
@@ -622,7 +622,7 @@ namespace BOB
 			if (replacements.ContainsKey(target))
 			{
 				// Yes - add reference data to the list.
-				NetPropReference newReference = CreateReference(netPrefab, laneIndex, propIndex);
+				NetPropReference newReference = CreateReference(netPrefab, laneIndex, propIndex, target is TreeInfo);
 
 				replacements[target].references.Add(newReference);
 

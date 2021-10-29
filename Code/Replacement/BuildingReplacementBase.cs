@@ -5,19 +5,6 @@ using UnityEngine;
 namespace BOB
 {
 	/// <summary>
-	/// Records original prop data.
-	/// </summary>
-	public class BuildingPropReference
-	{
-		public BuildingInfo buildingInfo;
-		public int propIndex;
-		public float radAngle;
-		public Vector3 position;
-		public int probability;
-	}
-
-
-	/// <summary>
 	/// Base class for building replacement.
 	/// </summary>
 	internal abstract class BuildingReplacementBase
@@ -144,7 +131,7 @@ namespace BOB
 			}
 
 			// Add/replace replacement data.
-			thisReplacement.tree = targetInfo is TreeInfo;
+			thisReplacement.isTree = targetInfo is TreeInfo;
 			thisReplacement.angle = angle;
 			thisReplacement.offsetX = offsetX;
 			thisReplacement.offsetY = offsetY;
@@ -184,7 +171,7 @@ namespace BOB
 			if (thisReplacement != null)
 			{
 				// Yes - add reference data to the list.
-				BuildingPropReference newReference = CreateReference(buildingInfo, propIndex);
+				BuildingPropReference newReference = CreateReference(buildingInfo, propIndex, thisReplacement.isTree);
 				AddReference(thisReplacement, newReference);
 
 				// Apply replacement and return true to indicate restoration.
@@ -220,17 +207,7 @@ namespace BOB
 					if (propReference.buildingInfo == buildingInfo && propReference.propIndex == propIndex)
 					{
 						// Got a match!  Revert instance.
-						if (targetInfo is PropInfo propTarget)
-						{
-							propReference.buildingInfo.m_props[propReference.propIndex].m_finalProp = propTarget;
-						}
-						else
-						{
-							propReference.buildingInfo.m_props[propReference.propIndex].m_finalTree = (TreeInfo)targetInfo;
-						}
-						buildingInfo.m_props[propIndex].m_radAngle = propReference.radAngle;
-						buildingInfo.m_props[propIndex].m_position = propReference.position;
-						buildingInfo.m_props[propIndex].m_probability = propReference.probability;
+						RevertReference(propReference);
 
 						// Record the matching reference and stop iterating - we're done here.
 						thisPropReference = propReference;
@@ -379,17 +356,7 @@ namespace BOB
 			foreach (BuildingPropReference propReference in references)
 			{
 				// Revert entry.
-				if (originalPrefab is PropInfo prop)
-				{
-					propReference.buildingInfo.m_props[propReference.propIndex].m_finalProp = prop;
-				}
-				else
-				{
-					propReference.buildingInfo.m_props[propReference.propIndex].m_finalTree = (TreeInfo)originalPrefab;
-				}
-				propReference.buildingInfo.m_props[propReference.propIndex].m_radAngle = propReference.radAngle;
-				propReference.buildingInfo.m_props[propReference.propIndex].m_position = propReference.position;
-				propReference.buildingInfo.m_props[propReference.propIndex].m_probability = propReference.probability;
+				RevertReference(propReference);
 
 				// Restore any lower-priority replacements.
 				RestoreLower(propReference.buildingInfo, originalPrefab, propReference.propIndex);
@@ -405,26 +372,52 @@ namespace BOB
 		/// </summary>
 		/// <param name="buildingInfo">Building prefab</param>
 		/// <param name="propIndex">Prop index</param>
-		/// <returns></returns>
-		protected BuildingPropReference CreateReference(BuildingInfo buildingInfo, int propIndex)
+		/// <param name="isTree">True if this is a tree reference, false if this is a prop reference</param>
+		/// <returns>Newly-created reference (null if creation failed)</returns>
+		protected BuildingPropReference CreateReference(BuildingInfo buildingInfo, int propIndex, bool isTree)
 		{
 			// Safety checks.
-			if (buildingInfo != null || propIndex < 0)
+			if (buildingInfo?.m_props != null && propIndex >= 0)
 			{
+				// Local reference.
+				BuildingInfo.Prop thisProp = buildingInfo.m_props[propIndex];
+
 				// Create and return new reference.
 				return new BuildingPropReference
 				{
 					buildingInfo = buildingInfo,
 					propIndex = propIndex,
-					radAngle = buildingInfo.m_props[propIndex].m_radAngle,
-					position = buildingInfo.m_props[propIndex].m_position,
-					probability = buildingInfo.m_props[propIndex].m_probability
+					isTree = isTree,
+					originalProp = thisProp.m_finalProp,
+					originalTree = thisProp.m_finalTree,
+					radAngle = thisProp.m_radAngle,
+					position = thisProp.m_position,
+					probability = thisProp.m_probability
 				};
 			}
 
 			// If we got here, something went wrong; return null.
 			Logging.Error("invalid argument passed to BuildingReplacementBase.CreateReference");
 			return null;
+		}
+
+
+		/// <summary>
+		/// Creates a new PropReference from the provided building prefab and prop index.
+		/// </summary>
+		/// <param name="reference">Referene to revert</param>
+		protected void RevertReference(BuildingPropReference reference)
+		{
+			// Local reference.
+			BuildingInfo.Prop thisProp = reference.buildingInfo.m_props[reference.propIndex];
+			if (thisProp != null)
+			{
+				thisProp.m_finalProp = reference.originalProp;
+				thisProp.m_finalTree = reference.originalTree;
+				thisProp.m_radAngle = reference.radAngle;
+				thisProp.m_position = reference.position;
+				thisProp.m_probability = reference.probability;
+			}
 		}
 
 
@@ -487,10 +480,10 @@ namespace BOB
 				replacement.buildingInfo = buildingInfo;
 
 				// Try to find target prefab.
-				replacement.targetInfo = replacement.tree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);
+				replacement.targetInfo = replacement.isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);
 
 				// Try to find replacement prefab.
-				replacement.replacementInfo = ConfigurationUtils.FindReplacementPrefab(replacement.Replacement, replacement.tree);
+				replacement.replacementInfo = ConfigurationUtils.FindReplacementPrefab(replacement.Replacement, replacement.isTree);
 
 				// Try to apply the replacement.
 				ApplyReplacement(replacement);

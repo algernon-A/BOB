@@ -118,7 +118,7 @@ namespace BOB
 	public class BOBReplacementBase
 	{
 		[XmlAttribute("tree")]
-		public bool tree = false;
+		public bool isTree = false;
 
 		[XmlAttribute("target")]
 		public string target = string.Empty;

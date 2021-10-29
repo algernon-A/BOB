@@ -193,7 +193,7 @@ namespace BOB
 						if (thisProp == null)
 						{
 							// No active replacement; use current PropInfo.
-							if (replacement.tree)
+							if (replacement.isTree)
 							{
 								thisProp = thisLaneProp.m_finalTree;
 							}
@@ -207,7 +207,7 @@ namespace BOB
 						if (thisProp != null && thisProp == replacement.targetInfo)
 						{
 							// Match!  Add reference data to the list.
-							referenceList.Add(CreateReference(netInfo, laneIndex, propIndex));
+							referenceList.Add(CreateReference(netInfo, laneIndex, propIndex, replacement.isTree));
 						}
 					}
 				}
