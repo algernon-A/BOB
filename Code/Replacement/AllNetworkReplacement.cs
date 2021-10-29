@@ -8,12 +8,17 @@ namespace BOB
 	/// </summary>
 	internal class AllNetworkReplacement : NetworkReplacementBase
 	{
+		// Dictionary of active replacment entries.
+		private readonly Dictionary<NetInfo, Dictionary<PrefabInfo, List<NetPropReference>>> propReferences;
+
+
 		/// <summary>
-		/// Constructor - initializes instance reference.
+		/// Constructor - initializes instance reference and replacement dictionary.
 		/// </summary>
 		internal AllNetworkReplacement()
 		{
 			Instance = this;
+			propReferences = new Dictionary<NetInfo, Dictionary<PrefabInfo, List<NetPropReference>>>();
 		}
 
 
@@ -41,6 +46,32 @@ namespace BOB
 
 
 		/// <summary>
+		/// Retuns the list of active prop references for the given replacement value(s).
+		/// </summary>
+		/// <param name="netInfo">Targeted network prefab</param>
+		/// <param name="targetInfo">Targeted (original) prop prefab</param>
+		/// <param name="laneIndex">Targeted lane index (in parent network)</param>
+		/// <param name="propIndex">Targeted prop index (in lanme)</param>
+		/// <returns>List of active prop references for the given replacment values (null if none)</returns>
+		internal override List<NetPropReference> ReferenceList(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex)
+        {
+			// See if we've got any active references for this net prefab.
+			if (propReferences.TryGetValue(netInfo, out Dictionary<PrefabInfo, List<NetPropReference>> referenceDict))
+			{
+				// See if we've got any active references for this target prefab.
+				if (referenceDict.TryGetValue(targetInfo, out List<NetPropReference> referenceList))
+				{
+					// Got it - return the list.
+					return referenceList;
+				}
+			}
+
+			// If we got here, we didn't get anything; return null.
+			return null;
+		}
+
+
+		/// <summary>
 		/// Reverts all active replacements.
 		/// </summary>
 		internal override void RevertAll()
@@ -51,6 +82,44 @@ namespace BOB
 				// Revert this replacement (but don't remove the entry, as the list is currently immutable while we're iterating through it).
 				Revert(replacement, false);
 			}
+
+			// Clear the active replacements dictionary.
+			propReferences.Clear();
+		}
+
+
+		/// <summary>
+		/// Checks if there's a currently active replacement applied to the given network, lane and prop index, and if so, returns the replacement record.
+		/// </summary>
+		/// <param name="netInfo">Net prefab to check</param>
+		/// <param name="laneIndex">Lane index to check</param>
+		/// <param name="propIndex">Prop index to check</param>
+		/// <returns>Replacement record if a replacement is currently applied, null if no replacement is currently applied</returns>
+		internal override BOBNetReplacement ActiveReplacement(NetInfo netInfo, int laneIndex, int propIndex)
+		{
+			// See if we've got any active references for this net prefab.
+			if (!propReferences.TryGetValue(netInfo, out Dictionary<PrefabInfo, List<NetPropReference>> referenceDict))
+			{
+				return null;
+			}
+
+			// Iterate through entry for each prefab under this network.
+			foreach (KeyValuePair<PrefabInfo, List<NetPropReference>> key in referenceDict)
+			{
+				// Iterate through each entry in list.
+				foreach (NetPropReference propRef in key.Value)
+				{
+					// Check for a a network(due to all- replacement), lane and prop index match.
+					if (propRef.netInfo == netInfo && propRef.laneIndex == laneIndex && propRef.propIndex == propIndex)
+					{
+						// Match!  Find and return the replacement record.
+						return EligibileReplacement(netInfo, key.Key, propRef.laneIndex, propRef.propIndex);
+					}
+				}
+			}
+
+			// If we got here, no entry was found - return null to indicate no active replacement.
+			return null;
 		}
 
 
@@ -73,8 +142,8 @@ namespace BOB
 				return;
 			}
 
-			// (Re)set replacement list.
-			replacement.references = new List<NetPropReference>();
+			// Create new reference list.
+			List<NetPropReference> referenceList = new List<NetPropReference>();
 
 			// Iterate through each loaded network and record props to be replaced.
 			for (int i = 0; i < PrefabCollection<NetInfo>.LoadedCount(); ++i)
@@ -138,18 +207,22 @@ namespace BOB
 						if (thisProp != null && thisProp == replacement.targetInfo)
 						{
 							// Match!  Add reference data to the list.
-							replacement.references.Add(CreateReference(netInfo, laneIndex, propIndex));
+							referenceList.Add(CreateReference(netInfo, laneIndex, propIndex));
 						}
 					}
 				}
 			}
 
 			// Now, iterate through each entry found and apply the replacement to each one.
-			foreach (NetPropReference propReference in replacement.references)
+			foreach (NetPropReference propReference in referenceList)
 			{
-				// Reset any pack replacements first.
+				// Remove any pack replacements first.
 				NetworkPackReplacement.Instance.RemoveEntry(propReference.netInfo, replacement.targetInfo, propReference.laneIndex, propReference.propIndex);
 
+				// Add entry to dictionary.
+				AddReference(replacement, propReference);
+
+				// Apply the replacement.
 				ReplaceProp(replacement, propReference);
 			}
 		}
@@ -179,5 +252,90 @@ namespace BOB
 		/// <param name="netInfo">Network prefab</param>
 		/// <returns>Replacement list for the specified building prefab</returns>
 		protected override List<BOBNetReplacement> ReplacementEntry(NetInfo netInfo) => ReplacementList(netInfo);
+
+		/// <summary>
+		/// Reverts a replacement.
+		/// </summary>
+		/// <param name="replacement">Replacement record to revert</param>
+		/// <param name="removeEntries">True to remove the reverted entries from the list of replacements, false to leave the list unchanged</param>
+		/// <returns>Always false (all-network entries never remove parent network elements)</returns>
+		protected override bool Revert(BOBNetReplacement replacement, bool removeEntries)
+		{
+			// Safety check for calls without any current replacement.
+			if (replacement?.targetInfo == null)
+			{
+				return false;
+			}
+
+			// List of prefabs where references need to be removed.
+			List<NetInfo> removeList = new List<NetInfo>();
+
+			// Iterate through each entry in prop reference dictionary.
+			foreach (KeyValuePair<NetInfo, Dictionary<PrefabInfo, List<NetPropReference>>> keyPair in propReferences)
+			{
+				// Attempt to get a replacement list for this entry.
+				if (keyPair.Value.TryGetValue(replacement.targetInfo, out List<NetPropReference> referenceList))
+				{
+					// Got a list - revert all entries.
+					RevertReferences(replacement.targetInfo, referenceList);
+
+					// Add dictionary to list to be cleared.
+					removeList.Add(keyPair.Key);
+				}
+			}
+
+			// Remove references from dictionary.
+			foreach (NetInfo removeEntry in removeList)
+			{
+				if (propReferences.ContainsKey(removeEntry))
+				{
+					if (propReferences[removeEntry].ContainsKey(replacement.targetInfo))
+					{
+						// Remove target info entries from this network entry.
+						propReferences[removeEntry].Remove(replacement.targetInfo);
+					}
+
+					// If no entries left for this network, remove entire network entry.
+					if (propReferences[removeEntry].Count == 0)
+					{
+						propReferences.Remove(removeEntry);
+					}
+				}
+			}
+
+			// Remove replacement entry from list of replacements, if we're doing so.
+			if (removeEntries)
+			{
+				// Remove from replacement list.
+				ReplacementList(replacement.netInfo).Remove(replacement);
+			}
+
+			// If we got here, we didn't remove any network entries from the list; return false.
+			return false;
+		}
+
+
+		/// <summary>
+		/// Adds the given prop reference to the record for the given replacement.
+		/// </summary>
+		/// <param name="replacement">Replacement reference</param>
+		/// <param name="propReference">Pop reference to store</param>
+		protected override void AddReference(BOBNetReplacement replacement, NetPropReference propReference)
+		{
+			// Check to see if we've got an entry for this target prefab in our dictionary, and if not, create one.
+			if (!propReferences.ContainsKey(propReference.netInfo))
+			{
+				propReferences.Add(propReference.netInfo, new Dictionary<PrefabInfo, List<NetPropReference>>());
+			}
+
+			// Check to see if we've got an entry for this network prefab in our dictionary entry for this target prefab, and if not, create one.
+			if (!propReferences[propReference.netInfo].ContainsKey(replacement.targetInfo))
+			{
+				propReferences[propReference.netInfo].Add(replacement.targetInfo, new List<NetPropReference>());
+			}
+
+			// Add this prop reference to the dictioanry.
+			propReferences[propReference.netInfo][replacement.targetInfo].Add(propReference);
+		}
 	}
 }

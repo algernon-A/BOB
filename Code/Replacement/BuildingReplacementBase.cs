@@ -31,11 +31,21 @@ namespace BOB
 		/// <summary>
 		/// Retrieves any currently-applied replacement entry that affects the given building and target prefab and prop index.
 		/// </summary>
-		/// <param name="buildingInfo">Building prefab</param>
+		/// <param name="buildingInfo">Targeted building prefab</param>
 		/// <param name="targetInfo">Target prop/tree prefab</param>
 		/// <param name="propIndex">Target prop/tree index</param>
 		/// <returns>Currently-applied replacement (null if none)</returns>
 		internal abstract BOBBuildingReplacement EligibileReplacement(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex);
+
+
+		/// <summary>
+		/// Retuns the list of active prop references for the given replacement value(s).
+		/// </summary>
+		/// <param name="buildingInfo">Targeted building prefab</param>
+		/// <param name="targetInfo">Targeted (original) prop prefab</param>
+		/// <param name="propIndex">Targeted prop index (in lanme)</param>
+		/// <returns>List of active prop references for the given replacment values (null if none)</returns>
+		internal virtual List<BuildingPropReference> ReferenceList(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex) => EligibileReplacement(buildingInfo, targetInfo, propIndex)?.references;
 
 
 		/// <summary>
@@ -52,6 +62,42 @@ namespace BOB
 					Revert(replacement, false);
 				}
 			}
+		}
+
+
+		/// <summary>
+		/// Checks if there's a currently active replacement applied to the given building and prop index, and if so, returns the replacement record.
+		/// </summary>
+		/// <param name="buildingInfo">Building prefab to check</param>
+		/// <param name="propIndex">Prop index to check</param>
+		/// <returns>Replacement record if a replacement is currently applied, null if no replacement is currently applied</returns>
+		internal virtual BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingInfo, int propIndex)
+		{
+			// See if we've got a replacement entry for this building.
+			List<BOBBuildingReplacement> replacementList = ReplacementList(buildingInfo);
+			if (replacementList == null)
+			{
+				// No entry - return null.
+				return null;
+			}
+
+			// Iterate through each replacement record for this building.
+			foreach (BOBBuildingReplacement buildingReplacement in replacementList)
+			{
+				// Iterate through each prop reference in this record. 
+				foreach (BuildingPropReference propRef in buildingReplacement.references)
+				{
+					// Check for building (due to all- replacement) and index match.
+					if (propRef.buildingInfo == buildingInfo && propRef.propIndex == propIndex)
+					{
+						// Match!  Return the replacement record.
+						return buildingReplacement;
+					}
+				}
+			}
+
+			// If we got here, no entry was found - return null to indicate no active replacement.
+			return null;
 		}
 
 
@@ -139,7 +185,7 @@ namespace BOB
 			{
 				// Yes - add reference data to the list.
 				BuildingPropReference newReference = CreateReference(buildingInfo, propIndex);
-				thisReplacement.references.Add(newReference);
+				AddReference(thisReplacement, newReference);
 
 				// Apply replacement and return true to indicate restoration.
 				ReplaceProp(thisReplacement, newReference);
@@ -161,13 +207,14 @@ namespace BOB
 		internal void RemoveEntry(BuildingInfo buildingInfo, PrefabInfo targetInfo,int propIndex)
 		{
 			// Check to see if we have an entry for this prefab and target.
-			BOBBuildingReplacement thisReplacement = EligibileReplacement(buildingInfo, targetInfo, propIndex);
-			if (thisReplacement != null)
+			List<BuildingPropReference> referenceList = ReferenceList(buildingInfo, targetInfo, propIndex);
+			if (referenceList != null)
 			{
+				// Got an active reference list; create a variable to store any matching reference for later removal.
 				BuildingPropReference thisPropReference = null;
 
 				// Iterate through each recorded prop reference.
-				foreach (BuildingPropReference propReference in thisReplacement.references)
+				foreach (BuildingPropReference propReference in referenceList)
 				{
 					// Look for a building and index match.
 					if (propReference.buildingInfo == buildingInfo && propReference.propIndex == propIndex)
@@ -194,45 +241,9 @@ namespace BOB
 				// Remove replacement if one was found.
 				if (thisPropReference != null)
 				{
-					thisReplacement.references.Remove(thisPropReference);
+					referenceList.Remove(thisPropReference);
 				};
 			}
-		}
-
-
-		/// <summary>
-		/// Checks if there's a currently active replacement applied to the given building and prop index, and if so, returns the replacement record.
-		/// </summary>
-		/// <param name="buildingInfo">Building prefab to check</param>
-		/// <param name="propIndex">Prop index to check</param>
-		/// <returns>Replacement record if a replacement is currently applied, null if no replacement is currently applied</returns>
-		internal BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingInfo, int propIndex)
-		{
-			// See if we've got a replacement entry for this building.
-			List<BOBBuildingReplacement> replacementList = ReplacementList(buildingInfo);
-			if (replacementList == null)
-            {
-				// No entry - return null.
-				return null;
-			}
-
-			// Iterate through each replacement record for this building.
-			foreach (BOBBuildingReplacement buildingReplacement in replacementList)
-			{
-				// Iterate through each prop reference in this record. 
-				foreach (BuildingPropReference propRef in buildingReplacement.references)
-				{
-					// Check for building (due to all- replacement) and index match.
-					if (propRef.buildingInfo == buildingInfo && propRef.propIndex == propIndex)
-					{
-						// Match!  Return the replacement record.
-						return buildingReplacement;
-					}
-				}
-			}
-
-			// If we got here, no entry was found - return null to indicate no active replacement.
-			return null;
 		}
 
 
@@ -314,40 +325,20 @@ namespace BOB
 		/// <param name="replacement">Replacement record to revert</param>
 		/// <param name="removeEntries">True to remove the reverted entries from the list of replacements, false to leave the list unchanged</param>
 		/// <returns>True if the entire building record was removed from the list (due to no remaining replacements for that prefab), false if the prefab remains in the list (has other active replacements)</returns>
-		protected bool Revert(BOBBuildingReplacement replacement, bool removeEntries)
+		protected virtual bool Revert(BOBBuildingReplacement replacement, bool removeEntries)
 		{
 			// Safety check for calls without any current replacement.
-			if (replacement == null)
+			if (replacement?.targetInfo == null || replacement.references == null)
 			{
 				return false;
 			}
 
 			if (replacement.references != null)
 			{
-				// Iterate through each entry in our list.
-				foreach (BuildingPropReference propReference in replacement.references)
-				{
-					// Revert entry.
-					if (replacement.tree)
-					{
-						propReference.buildingInfo.m_props[propReference.propIndex].m_finalTree = replacement.TargetTree;
-					}
-					else
-					{
-						propReference.buildingInfo.m_props[propReference.propIndex].m_finalProp = replacement.TargetProp;
-					}
-					propReference.buildingInfo.m_props[propReference.propIndex].m_radAngle = propReference.radAngle;
-					propReference.buildingInfo.m_props[propReference.propIndex].m_position = propReference.position;
-					propReference.buildingInfo.m_props[propReference.propIndex].m_probability = propReference.probability;
+				// Revert all entries in list.
+				RevertReferences(replacement.targetInfo, replacement.references);
 
-					// Restore any lower-priority replacements.
-					RestoreLower(propReference.buildingInfo, replacement.targetInfo, propReference.propIndex);
-
-					// Add building to dirty list.
-					BuildingData.DirtyList.Add(propReference.buildingInfo);
-				}
-
-				// Remove entry from list, if we're doing so.
+				// Remove replacement entry from list of replacements, if we're doing so.
 				if (removeEntries)
 				{
 					// Remove from replacement list.
@@ -366,6 +357,46 @@ namespace BOB
 
 			// If we got here, we didn't remove any building entries from the list; return false.
 			return false;
+		}
+
+
+		/// <summary>
+		/// Adds the given prop reference to the record for the given replacement.
+		/// </summary>
+		/// <param name="replacement">Replacement reference</param>
+		/// <param name="propReference">Pop reference to store</param>
+		protected virtual void AddReference(BOBBuildingReplacement replacement, BuildingPropReference propReference) => replacement.references.Add(propReference);
+
+
+		/// <summary>
+		/// Reverts all prop references in the provided list using the given replacement list and original target prefab.
+		/// </summary>
+		/// <param name="originalPrefab">Original prop/tree prefab</param>
+		/// <param name="references">List of prop references to revert</param>
+		protected void RevertReferences(PrefabInfo originalPrefab, List<BuildingPropReference> references)
+		{
+			// Iterate through each entry in our list.
+			foreach (BuildingPropReference propReference in references)
+			{
+				// Revert entry.
+				if (originalPrefab is PropInfo prop)
+				{
+					propReference.buildingInfo.m_props[propReference.propIndex].m_finalProp = prop;
+				}
+				else
+				{
+					propReference.buildingInfo.m_props[propReference.propIndex].m_finalTree = (TreeInfo)originalPrefab;
+				}
+				propReference.buildingInfo.m_props[propReference.propIndex].m_radAngle = propReference.radAngle;
+				propReference.buildingInfo.m_props[propReference.propIndex].m_position = propReference.position;
+				propReference.buildingInfo.m_props[propReference.propIndex].m_probability = propReference.probability;
+
+				// Restore any lower-priority replacements.
+				RestoreLower(propReference.buildingInfo, originalPrefab, propReference.propIndex);
+
+				// Add building to dirty list.
+				BuildingData.DirtyList.Add(propReference.buildingInfo);
+			}
 		}
 
 
