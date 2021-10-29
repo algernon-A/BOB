@@ -10,17 +10,26 @@ namespace BOB
 	/// </summary>
 	internal static class PrefabLists
 	{
-		// Lists of loaded trees and props.
-		internal static PropInfo[] loadedProps;
-		internal static TreeInfo[] loadedTrees;
-
-		// Lists of random trees and props.
-		internal static List<BOBRandomPrefab> randomProps;
-		internal static List<BOBRandomPrefab> randomTrees;
-
 		// Random tree and prop templates.
 		private static PropInfo randomPropTemplate;
 		private static TreeInfo randomTreeTemplate;
+
+
+		// Lists of loaded trees and props.
+		internal static PropInfo[] LoadedProps { get; private set; }
+		internal static TreeInfo[] LoadedTrees { get; private set; }
+
+
+		/// <summary>
+		/// Current list of random props.
+		/// </summary>
+		internal static List<BOBRandomPrefab> RandomProps => ConfigurationUtils.CurrentConfig.randomProps;
+
+
+		/// <summary>
+		/// Current list of random trees.
+		/// </summary>
+		internal static List<BOBRandomPrefab> RandomTrees => ConfigurationUtils.CurrentConfig.randomTrees;
 
 
 		/// <summary>
@@ -72,13 +81,9 @@ namespace BOB
 				}
 			}
 
-			// Initialise random lists.
-			randomProps = new List<BOBRandomPrefab>();
-			randomTrees = new List<BOBRandomPrefab>();
-
 			// Order lists by name.
-			loadedProps = props.OrderBy(prop => GetDisplayName(prop)).ToList().ToArray();
-			loadedTrees = trees.OrderBy(tree => GetDisplayName(tree)).ToList().ToArray();
+			LoadedProps = props.OrderBy(prop => GetDisplayName(prop)).ToList().ToArray();
+			LoadedTrees = trees.OrderBy(tree => GetDisplayName(tree)).ToList().ToArray();
 		}
 
 
@@ -87,7 +92,7 @@ namespace BOB
 		/// </summary>
 		/// <param name="propName">Prop name to check</param>
 		/// <returns>True if name is already in use, false otherwise</returns>
-		internal static bool DuplicatePropName(string propName) => randomProps.Find(x => x.name.Equals(propName)) != null || System.Array.Find(loadedProps, x => x.name.Equals(propName)) != null;
+		internal static bool DuplicatePropName(string propName) => RandomProps.Find(x => x.name.Equals(propName)) != null || System.Array.Find(LoadedProps, x => x.name.Equals(propName)) != null;
 
 
 		/// <summary>
@@ -95,7 +100,7 @@ namespace BOB
 		/// </summary>
 		/// <param name="treeName">Tree name to check</param>
 		/// <returns>True if name is already in use, false otherwise</returns>
-		internal static bool DuplicateTreeName(string treeName) => randomTrees.Find(x => x.name.Equals(treeName)) != null || System.Array.Find(loadedTrees, x => x.name.Equals(treeName)) != null;
+		internal static bool DuplicateTreeName(string treeName) => RandomTrees.Find(x => x.name.Equals(treeName)) != null || System.Array.Find(LoadedTrees, x => x.name.Equals(treeName)) != null;
 
 
 		/// <summary>
@@ -124,7 +129,7 @@ namespace BOB
 				};
 
 				// Add new tree to list and return direct reference.
-				randomProps.Add(newPrefab);
+				RandomProps.Add(newPrefab);
 				return newPrefab;
 			}
 
@@ -159,7 +164,7 @@ namespace BOB
 				};
 
 				// Add new tree to list and return direct reference.
-				randomTrees.Add(newPrefab);
+				RandomTrees.Add(newPrefab);
 				return newPrefab;
 			}
 
@@ -207,59 +212,43 @@ namespace BOB
 			return name.Substring(index + 1).Replace("_Data", "");
 		}
 
-
 		/// <summary>
-		/// Serializes the list of random props into XML.
-		/// </summary>
-		/// <returns>XML serialized random props</returns>
-		internal static List<BOBRandomPrefab> SerializeRandomProps() => randomProps;
-
-
-		/// <summary>
-		/// Serializes the list of random trees into XML.
-		/// </summary>
-		/// <returns>XML serialized random trees</returns>
-		internal static List<BOBRandomPrefab> SerializeRandomTrees() => randomTrees;
-
-
-		/// <summary>
+		/// 
 		/// Deserializes the list of random props from XML.
 		/// </summary>
+		/// <param name="randomPrefabList">List of random props to deserialize</param>
 		internal static void DeserializeRandomProps(List<BOBRandomPrefab> randomPrefabList)
 		{
-			// Use read list.
-			randomProps = randomPrefabList;
-
 			// Iterate through each item and setup prefab.
-			for (int i = 0; i < randomProps.Count; ++i)
+			foreach (BOBRandomPrefab randomProp in randomPrefabList)
 			{
 				// Create new prop.
-				randomProps[i].prop = InstantiateProp(randomProps[i].name);
+				randomProp.prop = InstantiateProp(randomProp.name);
 
 				// Don't do anything more with this one if we had a creation error.
-				if (randomProps[i].prop == null)
+				if (randomProp.prop == null)
                 {
 					continue;
                 }
 
-				Logging.Message("created random prop ", randomProps[i].prop.name);
+				Logging.Message("created random prop ", randomProp.prop.name);
 
 				// Find and assign variation prefabs.
-				randomProps[i].prop.m_variations = new PropInfo.Variation[randomProps[i].variations.Count];
-				for (int j = 0; j < randomProps[i].variations.Count; ++j)
+				randomProp.prop.m_variations = new PropInfo.Variation[randomProp.variations.Count];
+				for (int j = 0; j < randomProp.variations.Count; ++j)
 				{
-					PropInfo thisProp = PrefabCollection<PropInfo>.FindLoaded(randomProps[i].variations[j].name);
-					randomProps[i].variations[j].prefab = thisProp;
-					randomProps[i].prop.m_variations[j] = new PropInfo.Variation
+					PropInfo thisProp = PrefabCollection<PropInfo>.FindLoaded(randomProp.variations[j].name);
+					randomProp.variations[j].prefab = thisProp;
+					randomProp.prop.m_variations[j] = new PropInfo.Variation
 					{
 						m_finalProp = thisProp,
-						m_probability = randomProps[i].variations[j].probability
+						m_probability = randomProp.variations[j].probability
 					};
 
 					// Set 'not all loaded' flag as appropriate.
 					if (thisProp == null)
                     {
-						randomProps[i].missingVariant = true;
+						randomProp.missingVariant = true;
 					}
 				}
 			}
@@ -269,39 +258,37 @@ namespace BOB
 		/// <summary>
 		/// Deserializes the list of random trees from XML.
 		/// </summary>
+		/// <param name="randomPrefabList">List of random trees to deserialize</param>
 		internal static void DeserializeRandomTrees(List<BOBRandomPrefab> randomPrefabList)
 		{
-			// Use read list.
-			randomTrees = randomPrefabList;
-
 			// Iterate through each item and setup prefab.
-			for (int i = 0; i < randomTrees.Count; ++i)
+			foreach (BOBRandomPrefab randomTree in randomPrefabList)
 			{
 				// Create new prop.
-				randomTrees[i].tree = InstantiateTree(randomTrees[i].name);
+				randomTree.tree = InstantiateTree(randomTree.name);
 
 				// Don't do anything more with this one if we had a creation error.
-				if (randomTrees[i].tree == null)
+				if (randomTree.tree == null)
 				{
 					continue;
 				}
 
 				// Find and assign variation prefabs.
-				randomTrees[i].tree.m_variations = new TreeInfo.Variation[randomTrees[i].variations.Count];
-				for (int j = 0; j < randomTrees[i].variations.Count; ++j)
+				randomTree.tree.m_variations = new TreeInfo.Variation[randomTree.variations.Count];
+				for (int j = 0; j < randomTree.variations.Count; ++j)
 				{
-					TreeInfo thisTree = PrefabCollection<TreeInfo>.FindLoaded(randomTrees[i].variations[j].name);
-					randomTrees[i].variations[j].prefab = thisTree;
-					randomTrees[i].tree.m_variations[j] = new TreeInfo.Variation
+					TreeInfo thisTree = PrefabCollection<TreeInfo>.FindLoaded(randomTree.variations[j].name);
+					randomTree.variations[j].prefab = thisTree;
+					randomTree.tree.m_variations[j] = new TreeInfo.Variation
 					{
 						m_finalTree = thisTree,
-						m_probability = randomTrees[i].variations[j].probability
+						m_probability = randomTree.variations[j].probability
 					};
 
 					// Set 'not all loaded' flag as appropriate.
 					if (thisTree == null)
 					{
-						randomTrees[i].missingVariant = true;
+						randomTree.missingVariant = true;
 					}
 				}
 			}
@@ -312,14 +299,14 @@ namespace BOB
 		/// Removes a random prop.
 		/// </summary>
 		/// <param name="prop">Prop prefab to remove</param>
-		internal static void RemoveRandomProp(PropInfo prop) => randomProps.Remove(randomProps.Find(x => x.name.Equals(prop.name)));
+		internal static void RemoveRandomProp(PropInfo prop) => RandomProps.Remove(RandomProps.Find(x => x.name.Equals(prop.name)));
 
 
 		/// <summary>
 		/// Removes a random tree.
 		/// </summary>
 		/// <param name="tree">Tree prefab to remove</param>
-		internal static void RemoveRandomTree(TreeInfo tree) => randomTrees.Remove(randomTrees.Find(x => x.name.Equals(tree.name)));
+		internal static void RemoveRandomTree(TreeInfo tree) => RandomTrees.Remove(RandomTrees.Find(x => x.name.Equals(tree.name)));
 
 
 		/// <summary>

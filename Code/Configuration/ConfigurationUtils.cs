@@ -159,10 +159,6 @@ namespace BOB
 					// Don't populate file if we're doing a clean save.
 					if (!clean)
 					{
-						// Serialise random prefabs.
-						CurrentConfig.randomProps = PrefabLists.SerializeRandomProps();
-						CurrentConfig.randomTrees = PrefabLists.SerializeRandomTrees();
-
 						// Serialise scales.
 						CurrentConfig.propScales = Scaling.instance.propScales.Values.ToList();
 						CurrentConfig.treeScales = Scaling.instance.treeScales.Values.ToList();
@@ -308,7 +304,7 @@ namespace BOB
 			if (replacementPrefab == null)
 			{
 				// If we couldn't load from prefab collection, attempt to find in our list of replacement prefabs.
-				replacementPrefab = isTree ? (PrefabInfo)PrefabLists.randomTrees.Find(x => x.name.Equals(replacementName)).tree : (PrefabInfo)PrefabLists.randomProps.Find(x => x.name.Equals(replacementName)).prop;
+				replacementPrefab = isTree ? (PrefabInfo)CurrentConfig.randomTrees.Find(x => x.name.Equals(replacementName)).tree : (PrefabInfo)CurrentConfig.randomProps.Find(x => x.name.Equals(replacementName)).prop;
 			}
 
 			// Return what we have.

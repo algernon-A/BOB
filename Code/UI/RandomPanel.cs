@@ -333,10 +333,8 @@ namespace BOB
 			if (IsTree)
 			{
 				// Tree - iterate through each prop in our list of loaded prefabs.
-				for (int i = 0; i < PrefabLists.loadedTrees.Length; ++i)
+				foreach(TreeInfo loadedTree in PrefabLists.LoadedTrees)
 				{
-					TreeInfo loadedTree = PrefabLists.loadedTrees[i];
-
 					// Set display name.
 					string displayName = PrefabLists.GetDisplayName(loadedTree);
 
@@ -355,9 +353,8 @@ namespace BOB
 			else
 			{
 				// Prop - iterate through each prop in our list of loaded prefabs.
-				for (int i = 0; i < PrefabLists.loadedProps.Length; ++i)
+				foreach (PropInfo loadedProp in PrefabLists.LoadedProps)
 				{
-					PropInfo loadedProp = PrefabLists.loadedProps[i];
 
 					// Skip any props that require height or water maps.
 					if (loadedProp.m_requireHeightMap || loadedProp.m_requireWaterMap)
@@ -493,7 +490,7 @@ namespace BOB
 				BOBRandomPrefab existingTree = null;
 				do
 				{
-					existingTree = PrefabLists.randomTrees.Find(x => x.name.Equals(treeName));
+					existingTree = PrefabLists.RandomTrees.Find(x => x.name.Equals(treeName));
 					if (existingTree != null)
 					{
 						treeName = treeNameBase + " " + (++existingCount).ToString();
@@ -518,7 +515,7 @@ namespace BOB
 				BOBRandomPrefab existingProp = null;
 				do
 				{
-					existingProp = PrefabLists.randomProps.Find(x => x.name.Equals(propName));
+					existingProp = PrefabLists.RandomProps.Find(x => x.name.Equals(propName));
 					if (existingProp != null)
 					{
 						propName = propNameBase + " " + (++existingCount).ToString();
@@ -836,8 +833,8 @@ namespace BOB
 				// Trees.
 				randomList.rowsData = new FastList<object>
 				{
-					m_buffer = PrefabLists.randomTrees.OrderBy(x => x.name.ToLower()).ToArray(),
-					m_size = PrefabLists.randomTrees.Count
+					m_buffer = PrefabLists.RandomTrees.OrderBy(x => x.name.ToLower()).ToArray(),
+					m_size = PrefabLists.RandomTrees.Count
 				};
 			}
 			else
@@ -845,8 +842,8 @@ namespace BOB
 				// Props.
 				randomList.rowsData = new FastList<object>
 				{
-					m_buffer = PrefabLists.randomProps.OrderBy(x => x.name.ToLower()).ToArray(),
-					m_size = PrefabLists.randomProps.Count
+					m_buffer = PrefabLists.RandomProps.OrderBy(x => x.name.ToLower()).ToArray(),
+					m_size = PrefabLists.RandomProps.Count
 				};
 			}
 		}

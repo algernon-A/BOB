@@ -413,9 +413,8 @@ namespace BOB
 			if (IsTree)
 			{
 				// Tree - iterate through each tree in our list of loaded prefabs.
-				for (int i = 0; i < PrefabLists.loadedTrees.Length; ++i)
+				foreach (TreeInfo loadedTree in PrefabLists.LoadedTrees)
 				{
-					TreeInfo loadedTree = PrefabLists.loadedTrees[i];
 					// Set display name.
 					string displayName = PrefabLists.GetDisplayName(loadedTree);
 
@@ -434,10 +433,8 @@ namespace BOB
 			else
 			{
 				// Prop - iterate through each prop in our list of loaded prefabs.
-				for (int i = 0; i < PrefabLists.loadedProps.Length; ++i)
+				foreach (PropInfo loadedProp in PrefabLists.LoadedProps)
 				{
-					PropInfo loadedProp = PrefabLists.loadedProps[i];
-
 					// Set display name.
 					string displayName = PrefabLists.GetDisplayName(loadedProp);
 

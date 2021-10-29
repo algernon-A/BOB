@@ -164,8 +164,8 @@ namespace BOB
 					// Trees.
 					loadedList.rowsData = new FastList<object>
 					{
-						m_buffer = PrefabLists.randomTrees.OrderBy(x => x.name.ToLower()).ToArray(),
-						m_size = PrefabLists.randomTrees.Count
+						m_buffer = PrefabLists.RandomTrees.OrderBy(x => x.name.ToLower()).ToArray(),
+						m_size = PrefabLists.RandomTrees.Count
 					};
 				}
 				else
@@ -173,8 +173,8 @@ namespace BOB
 					// Props.
 					loadedList.rowsData = new FastList<object>
 					{
-						m_buffer = PrefabLists.randomProps.OrderBy(x => x.name.ToLower()).ToArray(),
-						m_size = PrefabLists.randomProps.Count
+						m_buffer = PrefabLists.RandomProps.OrderBy(x => x.name.ToLower()).ToArray(),
+						m_size = PrefabLists.RandomProps.Count
 					};
 				}
 
