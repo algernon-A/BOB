@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -222,35 +223,43 @@ namespace BOB
 			// Iterate through each item and setup prefab.
 			foreach (BOBRandomPrefab randomProp in randomPrefabList)
 			{
-				// Create new prop.
-				randomProp.prop = InstantiateProp(randomProp.name);
-
-				// Don't do anything more with this one if we had a creation error.
-				if (randomProp.prop == null)
-                {
-					continue;
-                }
-
-				Logging.Message("created random prop ", randomProp.prop.name);
-
-				// Find and assign variation prefabs.
-				randomProp.prop.m_variations = new PropInfo.Variation[randomProp.variations.Count];
-				for (int j = 0; j < randomProp.variations.Count; ++j)
+				try
 				{
-					PropInfo thisProp = PrefabCollection<PropInfo>.FindLoaded(randomProp.variations[j].name);
-					randomProp.variations[j].prefab = thisProp;
-					randomProp.prop.m_variations[j] = new PropInfo.Variation
-					{
-						m_finalProp = thisProp,
-						m_probability = randomProp.variations[j].probability
-					};
+					// Create new prop.
+					randomProp.prop = InstantiateProp(randomProp.name);
 
-					// Set 'not all loaded' flag as appropriate.
-					if (thisProp == null)
-                    {
-						randomProp.missingVariant = true;
+					// Don't do anything more with this one if we had a creation error.
+					if (randomProp.prop == null)
+					{
+						continue;
+					}
+
+					Logging.Message("created random prop ", randomProp.prop.name);
+
+					// Find and assign variation prefabs.
+					randomProp.prop.m_variations = new PropInfo.Variation[randomProp.variations.Count];
+					for (int j = 0; j < randomProp.variations.Count; ++j)
+					{
+						PropInfo thisProp = PrefabCollection<PropInfo>.FindLoaded(randomProp.variations[j].name);
+						randomProp.variations[j].prefab = thisProp;
+						randomProp.prop.m_variations[j] = new PropInfo.Variation
+						{
+							m_finalProp = thisProp,
+							m_probability = randomProp.variations[j].probability
+						};
+
+						// Set 'not all loaded' flag as appropriate.
+						if (thisProp == null)
+						{
+							randomProp.missingVariant = true;
+						}
 					}
 				}
+				catch (Exception e)
+                {
+					// Don't let a single failure stop us.
+					Logging.LogException(e, "exception deserializing random prop");
+                }
 			}
 		}
 
@@ -264,32 +273,40 @@ namespace BOB
 			// Iterate through each item and setup prefab.
 			foreach (BOBRandomPrefab randomTree in randomPrefabList)
 			{
-				// Create new prop.
-				randomTree.tree = InstantiateTree(randomTree.name);
-
-				// Don't do anything more with this one if we had a creation error.
-				if (randomTree.tree == null)
+				try
 				{
-					continue;
-				}
+					// Create new prop.
+					randomTree.tree = InstantiateTree(randomTree.name);
 
-				// Find and assign variation prefabs.
-				randomTree.tree.m_variations = new TreeInfo.Variation[randomTree.variations.Count];
-				for (int j = 0; j < randomTree.variations.Count; ++j)
-				{
-					TreeInfo thisTree = PrefabCollection<TreeInfo>.FindLoaded(randomTree.variations[j].name);
-					randomTree.variations[j].prefab = thisTree;
-					randomTree.tree.m_variations[j] = new TreeInfo.Variation
+					// Don't do anything more with this one if we had a creation error.
+					if (randomTree.tree == null)
 					{
-						m_finalTree = thisTree,
-						m_probability = randomTree.variations[j].probability
-					};
-
-					// Set 'not all loaded' flag as appropriate.
-					if (thisTree == null)
-					{
-						randomTree.missingVariant = true;
+						continue;
 					}
+
+					// Find and assign variation prefabs.
+					randomTree.tree.m_variations = new TreeInfo.Variation[randomTree.variations.Count];
+					for (int j = 0; j < randomTree.variations.Count; ++j)
+					{
+						TreeInfo thisTree = PrefabCollection<TreeInfo>.FindLoaded(randomTree.variations[j].name);
+						randomTree.variations[j].prefab = thisTree;
+						randomTree.tree.m_variations[j] = new TreeInfo.Variation
+						{
+							m_finalTree = thisTree,
+							m_probability = randomTree.variations[j].probability
+						};
+
+						// Set 'not all loaded' flag as appropriate.
+						if (thisTree == null)
+						{
+							randomTree.missingVariant = true;
+						}
+					}
+				}
+				catch (Exception e)
+				{
+					// Don't let a single failure stop us.
+					Logging.LogException(e, "exception deserializing random tree");
 				}
 			}
 		}
@@ -326,7 +343,7 @@ namespace BOB
 			// Instantiate prop template and use as base for new prop.
 			if (randomPropTemplate != null)
 			{
-				GameObject objectInstance = Object.Instantiate(randomPropTemplate.gameObject);
+				GameObject objectInstance = UnityEngine.Object.Instantiate(randomPropTemplate.gameObject);
 				objectInstance.name = propName;
 				PropInfo randomProp = objectInstance.GetComponent<PropInfo>();
 				objectInstance.SetActive(false);
@@ -359,7 +376,7 @@ namespace BOB
 			// Instantiate tree template and use as base for new tree.
 			if (randomTreeTemplate != null)
 			{
-				GameObject treeInstance = Object.Instantiate(randomTreeTemplate.gameObject);
+				GameObject treeInstance = UnityEngine.Object.Instantiate(randomTreeTemplate.gameObject);
 				treeInstance.name = treeName;
 				TreeInfo randomTree = treeInstance.GetComponent<TreeInfo>();
 				treeInstance.SetActive(false);

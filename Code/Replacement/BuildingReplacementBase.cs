@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -476,17 +477,25 @@ namespace BOB
 			// Iterate through each element in the provided list.
 			foreach (BOBBuildingReplacement replacement in replacementList)
 			{
-				// Assign building info.
-				replacement.buildingInfo = buildingInfo;
+				try
+				{
+					// Assign building info.
+					replacement.buildingInfo = buildingInfo;
 
-				// Try to find target prefab.
-				replacement.targetInfo = replacement.isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);
+					// Try to find target prefab.
+					replacement.targetInfo = replacement.isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);
 
-				// Try to find replacement prefab.
-				replacement.replacementInfo = ConfigurationUtils.FindReplacementPrefab(replacement.Replacement, replacement.isTree);
+					// Try to find replacement prefab.
+					replacement.replacementInfo = ConfigurationUtils.FindReplacementPrefab(replacement.Replacement, replacement.isTree);
 
-				// Try to apply the replacement.
-				ApplyReplacement(replacement);
+					// Try to apply the replacement.
+					ApplyReplacement(replacement);
+				}
+				catch (Exception e)
+				{
+					// Don't let a single failure stop us.
+					Logging.LogException(e, "exception deserializing building replacement");
+				}
 			}
 		}
 	}

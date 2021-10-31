@@ -1,7 +1,8 @@
 ﻿- Add individual network prop replacement
 - Add proper escape key handling
 - Fix text in configuration panel 'Load and apply' button
-- Rework replacement class inheritance structure
+- Add per-element exception handling to deserialization process (one failure should no longer stop other replacements from working too)
+- Significant refactoring of replacement code
 
 
 Version 0.7.4 -

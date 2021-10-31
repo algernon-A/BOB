@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 
 namespace BOB
@@ -44,21 +45,29 @@ namespace BOB
 			// Iterate through each element.
 			foreach (BOBScalingElement element in elements)
 			{
-				// Add record to dictionary (to retain records of any prefabs not found).
-				propScales.Add(element.prefabName, element);
-
-				// Try to find prefab in loaded collection.
-				PropInfo thisProp = PrefabCollection<PropInfo>.FindLoaded(element.prefabName);
-				if (thisProp != null)
+				try
 				{
-					// Found it - record original values.
-					element.prefab = thisProp;
-					element.originalMin = thisProp.m_minScale;
-					element.originalMax = thisProp.m_maxScale;
+					// Add record to dictionary (to retain records of any prefabs not found).
+					propScales.Add(element.prefabName, element);
 
-					// Apply new values.
-					thisProp.m_minScale = element.minScale;
-					thisProp.m_maxScale = element.maxScale;
+					// Try to find prefab in loaded collection.
+					PropInfo thisProp = PrefabCollection<PropInfo>.FindLoaded(element.prefabName);
+					if (thisProp != null)
+					{
+						// Found it - record original values.
+						element.prefab = thisProp;
+						element.originalMin = thisProp.m_minScale;
+						element.originalMax = thisProp.m_maxScale;
+
+						// Apply new values.
+						thisProp.m_minScale = element.minScale;
+						thisProp.m_maxScale = element.maxScale;
+					}
+				}
+				catch (Exception e)
+				{
+					// Don't let a single failure stop us.
+					Logging.LogException(e, "exception deserializing prop scaling element");
 				}
 			}
 		}
@@ -72,21 +81,29 @@ namespace BOB
 		{
 			foreach (BOBScalingElement element in elements)
 			{
-				// Add record to dictionary (to retain records of any prefabs not found).
-				treeScales.Add(element.prefabName, element);
-
-				// Try to find prefab in loaded collection, and if so, apply the recorded scaling.
-				TreeInfo thisTree = PrefabCollection<TreeInfo>.FindLoaded(element.prefabName);
-				if (thisTree != null)
+				try
 				{
-					// Found it - record original values.
-					element.prefab = thisTree;
-					element.originalMin = thisTree.m_minScale;
-					element.originalMax = thisTree.m_maxScale;
+					// Add record to dictionary (to retain records of any prefabs not found).
+					treeScales.Add(element.prefabName, element);
 
-					// Apply new values.
-					thisTree.m_minScale = element.minScale;
-					thisTree.m_maxScale = element.maxScale;
+					// Try to find prefab in loaded collection, and if so, apply the recorded scaling.
+					TreeInfo thisTree = PrefabCollection<TreeInfo>.FindLoaded(element.prefabName);
+					if (thisTree != null)
+					{
+						// Found it - record original values.
+						element.prefab = thisTree;
+						element.originalMin = thisTree.m_minScale;
+						element.originalMax = thisTree.m_maxScale;
+
+						// Apply new values.
+						thisTree.m_minScale = element.minScale;
+						thisTree.m_maxScale = element.maxScale;
+					}
+				}
+				catch (Exception e)
+				{
+					// Don't let a single failure stop us.
+					Logging.LogException(e, "exception deserializing tree scaling element");
 				}
 			}
 		}
