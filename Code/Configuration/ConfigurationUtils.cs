@@ -191,6 +191,9 @@ namespace BOB
 			{
 				Logging.LogException(e, "exception saving XML configuration file");
 			}
+
+			// Display any exception message that occured during save.
+			InfoPanelManager.CheckException();
 		}
 
 

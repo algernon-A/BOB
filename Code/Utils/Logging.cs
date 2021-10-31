@@ -74,6 +74,14 @@ namespace BOB
                 message.AppendLine(exception.InnerException.StackTrace);
             }
 
+            // Check to see if we've already reported an exception (only want to report earliest exception and not clobber with any downstream exceptions).
+            if (!InfoPanelManager.wasException)
+            {
+                // Not previously reported - set flag to indicate that an exception has been logged, and record message.
+                InfoPanelManager.wasException = true;
+                InfoPanelManager.exceptionMessage = message.ToString();
+            }
+
             // Write to log.
             Debug.Log(message);
         }

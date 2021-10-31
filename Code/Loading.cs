@@ -141,6 +141,9 @@ namespace BOB
             // Set up options panel event handler.
             OptionsPanel.OptionsEventHook();
 
+            // Display any exception message that occured during load.
+            InfoPanelManager.CheckException();
+
             Logging.Message("loading complete");
         }
     }

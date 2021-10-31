@@ -1,6 +1,7 @@
 ﻿using System;
 using ColossalFramework.UI;
 using UnityEngine;
+using BOB.MessageBox;
 
 
 namespace BOB
@@ -17,6 +18,10 @@ namespace BOB
 
 		// Recent state.
 		internal static float lastX, lastY;
+
+		// Exception flag.
+		internal static bool wasException = false, displayingException = false;
+		internal static string exceptionMessage;
 
 
 		/// <summary>
@@ -111,6 +116,21 @@ namespace BOB
 				{
 					ToolsModifierControl.SetTool<DefaultTool>();
 				}
+			}
+		}
+
+
+		/// <summary>
+		/// Checks to see if an exception has occured and, and if so displays it (if we aren't already).
+		/// </summary>
+		internal static void CheckException()
+        {
+			// Display exception message if an exception occured and we're not already displaying one.
+			if (wasException && !displayingException)
+			{
+				// Set displaying flag and show message.
+				displayingException = true;
+				MessageBoxBase.ShowModal<ExceptionMessageBox>();
 			}
 		}
 

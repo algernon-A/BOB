@@ -10,7 +10,7 @@ namespace BOB.MessageBox
     public class ListMessageBox : MessageBoxBase
     {
         // Components.
-        private UIButton closeButton;
+        protected UIButton closeButton;
 
 
         // Number of buttons for this panel (for layout).

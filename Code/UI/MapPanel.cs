@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using ColossalFramework;
 using ColossalFramework.UI;
@@ -60,8 +61,16 @@ namespace BOB
 		/// </summary>
 		internal BOBMapInfoPanel()
         {
-			// Populate loaded list.
-			LoadedList();
+			try
+			{
+				// Populate loaded list.
+				LoadedList();
+			}
+			catch (Exception e)
+			{
+				// Log and report any exception.
+				Logging.LogException(e, "exception creating map panel");
+			}
 		}
 
 
@@ -72,21 +81,29 @@ namespace BOB
 		/// </summary>
 		protected override void Replace(UIComponent control, UIMouseEventParameter mouseEvent)
 		{
-			// Apply replacement.
-			if (ReplacementPrefab is TreeInfo replacementTree)
+			try
 			{
-				MapTreeReplacement.instance.Apply((CurrentTargetItem.replacementPrefab ?? CurrentTargetItem.originalPrefab) as TreeInfo, replacementTree);
+				// Apply replacement.
+				if (ReplacementPrefab is TreeInfo replacementTree)
+				{
+					MapTreeReplacement.instance.Apply((CurrentTargetItem.replacementPrefab ?? CurrentTargetItem.originalPrefab) as TreeInfo, replacementTree);
+				}
+				else if (ReplacementPrefab is PropInfo replacementProp)
+				{
+					MapPropReplacement.instance.Apply((CurrentTargetItem.replacementPrefab ?? CurrentTargetItem.originalPrefab) as PropInfo, replacementProp);
+				}
+
+				// Update current target.
+				CurrentTargetItem.replacementPrefab = ReplacementPrefab;
+
+				// Perform post-replacment updates.
+				FinishUpdate();
 			}
-			else if (ReplacementPrefab is PropInfo replacementProp)
+			catch (Exception e)
 			{
-				MapPropReplacement.instance.Apply((CurrentTargetItem.replacementPrefab ?? CurrentTargetItem.originalPrefab) as PropInfo, replacementProp);
+				// Log and report any exception.
+				Logging.LogException(e, "exception perforiming map replacement");
 			}
-
-			// Update current target.
-			CurrentTargetItem.replacementPrefab = ReplacementPrefab;
-
-			// Perform post-replacment updates.
-			FinishUpdate();
 		}
 
 
@@ -97,25 +114,33 @@ namespace BOB
 		/// </summary>
 		protected override void Revert(UIComponent control, UIMouseEventParameter mouseEvent)
 		{
-			// Individual building prop reversion - ensuire that we've got a current selection before doing anything.
-			if (CurrentTargetItem != null && CurrentTargetItem is PropListItem)
+			try
 			{
-				// Individual reversion.
-				if (CurrentTargetItem.replacementPrefab is TreeInfo tree)
+				// Individual building prop reversion - ensuire that we've got a current selection before doing anything.
+				if (CurrentTargetItem != null && CurrentTargetItem is PropListItem)
 				{
-					MapTreeReplacement.instance.Revert(tree);
-				}
-				else if (CurrentTargetItem.replacementPrefab is PropInfo prop)
-				{
-					MapPropReplacement.instance.Revert(prop);
+					// Individual reversion.
+					if (CurrentTargetItem.replacementPrefab is TreeInfo tree)
+					{
+						MapTreeReplacement.instance.Revert(tree);
+					}
+					else if (CurrentTargetItem.replacementPrefab is PropInfo prop)
+					{
+						MapPropReplacement.instance.Revert(prop);
+					}
+
+					// Clear current target replacement prefab.
+					CurrentTargetItem.replacementPrefab = null;
 				}
 
-				// Clear current target replacement prefab.
-				CurrentTargetItem.replacementPrefab = null;
+				// Perform post-replacment updates.
+				FinishUpdate();
 			}
-
-			// Perform post-replacment updates.
-			FinishUpdate();
+			catch (Exception e)
+			{
+				// Log and report any exception.
+				Logging.LogException(e, "exception perforiming map reversion");
+			}
 		}
 
 

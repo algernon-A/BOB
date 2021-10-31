@@ -2,6 +2,7 @@
 - Add proper escape key handling
 - Fix text in configuration panel 'Load and apply' button
 - Add per-element exception handling to deserialization process (one failure should no longer stop other replacements from working too)
+- Add user notification of exceptions
 - Significant refactoring of replacement code
 
 
