@@ -74,6 +74,7 @@
     <Compile Include="Code\Replacement\Network\IndividualNetworkReplacement.cs" />
     <Compile Include="Code\Replacement\Map\MapPropReplacement.cs" />
     <Compile Include="Code\Replacement\Network\NetworkReplacementBase.cs" />
+    <Compile Include="Code\Replacement\RandomProps.cs" />
     <Compile Include="Code\Replacement\ReplacementReferences.cs" />
     <Compile Include="Code\Replacement\Scaling.cs" />
     <Compile Include="Code\Settings\OptionsPanelTabs\RuiningOptions.cs" />

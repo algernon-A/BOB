@@ -500,7 +500,7 @@ namespace BOB
 
 				// Create new random tree prefab.
 				Logging.Message("creating new random tree");
-				newPrefab = PrefabLists.NewRandomTree(treeName);
+				newPrefab = RandomPrefabs.NewRandomTree(treeName);
 			}
 			else
 			{
@@ -525,7 +525,7 @@ namespace BOB
 
 				// Create new random prop prefab.
 				Logging.Message("creating new random prop");
-				newPrefab = PrefabLists.NewRandomProp(propName);
+				newPrefab = RandomPrefabs.NewRandomProp(propName);
 			}
 
 			// Did we succesfully create a new prefab?
@@ -557,11 +557,11 @@ namespace BOB
 			// Remove tree or prop from relevant list of random prefabs.
 			if (selectedRandomPrefab.tree != null)
 			{
-				PrefabLists.RemoveRandomTree(selectedRandomPrefab.tree);
+				RandomPrefabs.RemoveRandomTree(selectedRandomPrefab.tree);
 			}
 			else if (selectedRandomPrefab.prop != null)
 			{
-				PrefabLists.RemoveRandomProp(selectedRandomPrefab.prop);
+				RandomPrefabs.RemoveRandomProp(selectedRandomPrefab.prop);
 			}
 
 			// Reset selection and regenerate UI fastlist.
@@ -587,7 +587,7 @@ namespace BOB
 			string trimmedName = nameField.text.Trim();
 
 			// Need unique name.
-			if ((selectedRandomPrefab.prop != null & PrefabLists.DuplicatePropName(trimmedName)) || (selectedRandomPrefab.tree != null && PrefabLists.DuplicateTreeName(trimmedName)))
+			if ((selectedRandomPrefab.prop != null & RandomPrefabs.DuplicatePropName(trimmedName)) || (selectedRandomPrefab.tree != null && RandomPrefabs.DuplicateTreeName(trimmedName)))
 			{
 				Logging.Error("duplicate name");
 				return;

@@ -66,8 +66,8 @@ namespace BOB
 						}
 
 						// Deserialise random prefabs.
-						PrefabLists.DeserializeRandomProps(CurrentConfig.randomProps);
-						PrefabLists.DeserializeRandomTrees(CurrentConfig.randomTrees);
+						RandomPrefabs.DeserializeRandomProps(CurrentConfig.randomProps);
+						RandomPrefabs.DeserializeRandomTrees(CurrentConfig.randomTrees);
 
 						// Deserialize scaling.
 						Scaling.Instance.DeserializeProps(CurrentConfig.propScales);
