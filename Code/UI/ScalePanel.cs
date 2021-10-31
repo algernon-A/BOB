@@ -385,7 +385,7 @@ namespace BOB
 			if (selectedLoadedPrefab?.name != null)
 			{
 				// Revert current selection.
-				Scaling.instance.Revert(selectedLoadedPrefab);
+				Scaling.instance.Revert(selectedLoadedPrefab, true);
 
 				// Reset prefab record to reset slider valies.
 				SelectedLoadedPrefab = selectedLoadedPrefab;

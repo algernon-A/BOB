@@ -159,7 +159,7 @@ namespace BOB
 		/// <param name="targetInfo">Targeted (original) tree/prop prefab</param>
 		/// <param name="laneIndex">Targeted (original) tree/prop lane index</param>
 		/// <param name="propIndex">Targeted (original) tree/prop prop index</param>
-		/// <param name="removeEntries">True (default) to remove the reverted entries from the list of replacements, false to leave the list unchanged</param>
+		/// <param name="removeEntries">True to remove the reverted entries from the list of replacements, false to leave the list unchanged</param>
 		internal void Revert(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex, bool removeEntries) => Revert(EligibileReplacement(netInfo, targetInfo, laneIndex, propIndex), removeEntries);
 
 
