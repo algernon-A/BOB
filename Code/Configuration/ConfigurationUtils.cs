@@ -132,7 +132,7 @@ namespace BOB
 					fileName = GeneralSettingsFile;
 				}
 				else
-                {
+				{
 					// Filename provided - use this filename in the configuration settings directory (creating directory if it doesn't already exist).
 					if (!Directory.Exists(ConfigDirectory))
 					{
@@ -160,11 +160,27 @@ namespace BOB
 					if (!clean)
 					{
 						// Serialise scales.
-						CurrentConfig.propScales = Scaling.instance.propScales.Values.ToList();
-						CurrentConfig.treeScales = Scaling.instance.treeScales.Values.ToList();
+						try
+						{
+							CurrentConfig.propScales = Scaling.instance.propScales.Values.ToList();
+							CurrentConfig.treeScales = Scaling.instance.treeScales.Values.ToList();
+						}
+						catch (Exception e)
+						{
+							// Don't let a single failure stop us.
+							Logging.LogException(e, "exception serializing scaling elements");
+						}
 
 						// Serialise active replacement packs.
-						CurrentConfig.activePacks = NetworkPackReplacement.Instance.SerializeActivePacks();
+						try
+						{
+							CurrentConfig.activePacks = NetworkPackReplacement.Instance.SerializeActivePacks();
+						}
+						catch (Exception e)
+						{
+							// Don't let a single failure stop us.
+							Logging.LogException(e, "exception serializing active replacement packs");
+						}
 					}
 
 					// Write to file.
