@@ -180,7 +180,7 @@ namespace BOB
 		public BuildingInfo buildingInfo;
 
 		[XmlIgnore]
-		public List<BuildingPropReference> references;
+		public List<BuildingPropReference> references = new List<BuildingPropReference>();
     }
 
 
@@ -196,7 +196,7 @@ namespace BOB
 		public int laneIndex = -1;
 
 		[XmlIgnore]
-		public List<NetPropReference> references;
+		public List<NetPropReference> references = new List<NetPropReference>();
 	}
 
 
