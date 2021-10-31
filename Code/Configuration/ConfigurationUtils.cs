@@ -70,8 +70,8 @@ namespace BOB
 						PrefabLists.DeserializeRandomTrees(CurrentConfig.randomTrees);
 
 						// Deserialize scaling.
-						Scaling.instance.DeserializeProps(CurrentConfig.propScales);
-						Scaling.instance.DeserializeTrees(CurrentConfig.treeScales);
+						Scaling.Instance.DeserializeProps(CurrentConfig.propScales);
+						Scaling.Instance.DeserializeTrees(CurrentConfig.treeScales);
 
 						// Deserialize all-building replacements.
 						AllBuildingReplacement.Instance.Deserialize(CurrentConfig.allBuildingProps);
@@ -162,8 +162,8 @@ namespace BOB
 						// Serialise scales.
 						try
 						{
-							CurrentConfig.propScales = Scaling.instance.propScales.Values.ToList();
-							CurrentConfig.treeScales = Scaling.instance.treeScales.Values.ToList();
+							CurrentConfig.propScales = Scaling.Instance.propScales.Values.ToList();
+							CurrentConfig.treeScales = Scaling.Instance.treeScales.Values.ToList();
 						}
 						catch (Exception e)
 						{

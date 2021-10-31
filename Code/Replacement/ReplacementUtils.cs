@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿using System;
 
 
 namespace BOB
@@ -12,15 +12,94 @@ namespace BOB
 		/// Reverts all current settings and clears replacement dictionaries.
 		/// </summary>
 		internal static void NukeSettings()
-        {
-			// Revert all-building and building settings (assuming instances exist).
-			AllBuildingReplacement.Instance?.RevertAll();
-			BuildingReplacement.Instance?.RevertAll();
-			IndividualBuildingReplacement.Instance?.RevertAll();
-			NetworkPackReplacement.Instance?.RevertAll();
-			AllNetworkReplacement.Instance?.RevertAll();
-			NetworkReplacement.Instance?.RevertAll();
-			Scaling.instance?.RevertAll();
+		{
+			// Revert all-building replacements.
+			try
+			{
+				AllBuildingReplacement.Instance?.RevertAll();
+			}
+			catch (Exception e)
+			{
+				// Don't let a single failure stop us.
+				Logging.LogException(e, "exception reverting all-building replacements");
+			}
+
+			// Revert building replacements.
+			try
+			{
+				BuildingReplacement.Instance?.RevertAll();
+			}
+			catch (Exception e)
+			{
+				// Don't let a single failure stop us.
+				Logging.LogException(e, "exception reverting building replacements");
+			}
+
+			// Revert individual building replacements.
+			try
+			{
+				IndividualBuildingReplacement.Instance?.RevertAll();
+			}
+			catch (Exception e)
+			{
+				// Don't let a single failure stop us.
+				Logging.LogException(e, "exception reverting individual building replacements");
+			}
+
+			// Revert network pack replacements.
+			try
+			{
+				NetworkPackReplacement.Instance?.RevertAll();
+			}
+			catch (Exception e)
+			{
+				// Don't let a single failure stop us.
+				Logging.LogException(e, "exception reverting network pack replacements");
+			}
+
+			// Revert all-network replacements.
+			try
+			{
+				AllNetworkReplacement.Instance?.RevertAll();
+			}
+			catch (Exception e)
+			{
+				// Don't let a single failure stop us.
+				Logging.LogException(e, "exception reverting all-network replacements");
+			}
+
+			// Revert network replacements.
+			try
+			{
+				NetworkReplacement.Instance?.RevertAll();
+			}
+			catch (Exception e)
+			{
+				// Don't let a single failure stop us.
+				Logging.LogException(e, "exception reverting network replacements");
+			}
+
+			// Revert individual network replacements.
+			try
+			{
+				IndividualNetworkReplacement.Instance?.RevertAll();
+			}
+			catch (Exception e)
+			{
+				// Don't let a single failure stop us.
+				Logging.LogException(e, "exception reverting individual network replacements");
+			}
+
+			// Revert scaling.
+			try
+			{
+				Scaling.Instance?.RevertAll();
+			}
+			catch (Exception e)
+			{
+				// Don't let a single failure stop us.
+				Logging.LogException(e, "exception reverting scaling elemennts");
+			}
 		}
 	}
 }

@@ -9,9 +9,6 @@ namespace BOB
 	/// </summary>
 	internal class Scaling
 	{
-		// Instance reference.
-		internal static Scaling instance;
-
 		// Master dictionary of replaced prop references.
 		internal Dictionary<string, BOBScalingElement> treeScales, propScales;
 
@@ -21,9 +18,13 @@ namespace BOB
 		/// </summary>
 		internal Scaling()
 		{
-			instance = this;
+			Instance = this;
 			Setup();
 		}
+
+
+		// Instance reference.
+		internal static Scaling Instance { get; private set; }
 
 
 		/// <summary>
