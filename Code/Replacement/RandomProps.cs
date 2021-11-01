@@ -59,8 +59,7 @@ namespace BOB
 				BOBRandomPrefab newPrefab = new BOBRandomPrefab
 				{
 					name = propName,
-					prop = newProp,
-					variations = new List<BOBVariation>()
+					prop = newProp
 				};
 
 				// Add new tree to list and return direct reference.
@@ -94,8 +93,7 @@ namespace BOB
 				BOBRandomPrefab newPrefab = new BOBRandomPrefab
 				{
 					name = treeName,
-					tree = newTree,
-					variations = new List<BOBVariation>()
+					tree = newTree
 				};
 
 				// Add new tree to list and return direct reference.

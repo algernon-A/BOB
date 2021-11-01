@@ -15,47 +15,47 @@ namespace BOB
 
 		[XmlArray("randomprops")]
 		[XmlArrayItem("randomprop")]
-		public List<BOBRandomPrefab> randomProps;
+		public List<BOBRandomPrefab> randomProps = new List<BOBRandomPrefab>();
 
 		[XmlArray("randomtrees")]
 		[XmlArrayItem("randomtree")]
-		public List<BOBRandomPrefab> randomTrees;
+		public List<BOBRandomPrefab> randomTrees = new List<BOBRandomPrefab>();
 
 		[XmlArray("propscaling")]
 		[XmlArrayItem("propscale")]
-		public List<BOBScalingElement> propScales;
+		public List<BOBScalingElement> propScales = new List<BOBScalingElement>();
 
 		[XmlArray("treescaling")]
 		[XmlArrayItem("treescale")]
-		public List<BOBScalingElement> treeScales;
+		public List<BOBScalingElement> treeScales = new List<BOBScalingElement>();
 
 		[XmlArray("buildprops")]
 		[XmlArrayItem("buildprop")]
-		public List<BOBBuildingReplacement> allBuildingProps;
+		public List<BOBBuildingReplacement> allBuildingProps = new List<BOBBuildingReplacement>();
 
 		[XmlArray("buildings")]
 		[XmlArrayItem("building")]
-		public List<BOBBuildingElement> buildings;
+		public List<BOBBuildingElement> buildings = new List<BOBBuildingElement>();
 
 		[XmlArray("individuals")]
 		[XmlArrayItem("individual")]
-		public List<BOBBuildingElement> indBuildings;
+		public List<BOBBuildingElement> indBuildings = new List<BOBBuildingElement>();
 
 		[XmlArray("netprops")]
 		[XmlArrayItem("netprop")]
-		public List<BOBNetReplacement> allNetworkProps;
+		public List<BOBNetReplacement> allNetworkProps = new List<BOBNetReplacement>();
 
 		[XmlArray("networks")]
 		[XmlArrayItem("network")]
-		public List<BOBNetworkElement> networks;
+		public List<BOBNetworkElement> networks = new List<BOBNetworkElement>();
 
 		[XmlArray("netind")]
 		[XmlArrayItem("netind")]
-		public List<BOBNetworkElement> indNetworks;
+		public List<BOBNetworkElement> indNetworks = new List<BOBNetworkElement>();
 
 		[XmlArray("activePacks")]
 		[XmlArrayItem("activePacks")]
-		public List<string> activePacks;
+		public List<string> activePacks = new List<string>();
 	}
 
 
@@ -210,7 +210,7 @@ namespace BOB
 
 		[XmlArray("variations")]
 		[XmlArrayItem("variation")]
-		public List<BOBVariation> variations;
+		public List<BOBVariation> variations = new List<BOBVariation>();
 
 		[XmlIgnore]
 		public PropInfo prop;
