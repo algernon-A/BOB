@@ -104,9 +104,6 @@ namespace BOB
                 new GeneralOptionsPanel(tabStrip, 0);
                 new ConfigurationsPanel(tabStrip, 1);
                 new RuiningOptionsPanel(tabStrip, 2);
-
-                // Disable hotkey while options panel is open.
-                UIThreading.Operating = false;
             }
             catch (Exception e)
             {
@@ -129,9 +126,6 @@ namespace BOB
                 GameObject.Destroy(optionsGameObject);
                 optionsGameObject = null;
             }
-
-            // Re-enable hotkey.
-            UIThreading.Operating = true;
         }
     }
 }

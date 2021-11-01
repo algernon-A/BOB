@@ -34,8 +34,8 @@ namespace BOB
                     // Read it.
                     using (StreamReader reader = new StreamReader(fileName))
                     {
-                        XmlSerializer xmlSerializer = new XmlSerializer(typeof(BOBSettingsFile));
-                        if (!(xmlSerializer.Deserialize(reader) is BOBSettingsFile settingsFile))
+                        XmlSerializer xmlSerializer = new XmlSerializer(typeof(ModSettings));
+                        if (!(xmlSerializer.Deserialize(reader) is ModSettings settingsFile))
                         {
                             Logging.Error("couldn't deserialize settings file");
                         }
@@ -63,8 +63,8 @@ namespace BOB
                 // Pretty straightforward.  Serialisation is within GBRSettingsFile class.
                 using (StreamWriter writer = new StreamWriter(NewSettingsFileName))
                 {
-                    XmlSerializer xmlSerializer = new XmlSerializer(typeof(BOBSettingsFile));
-                    xmlSerializer.Serialize(writer, new BOBSettingsFile());
+                    XmlSerializer xmlSerializer = new XmlSerializer(typeof(ModSettings));
+                    xmlSerializer.Serialize(writer, new ModSettings());
                 }
             }
             catch (Exception e)

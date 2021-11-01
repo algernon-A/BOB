@@ -1,6 +1,7 @@
 ﻿using ColossalFramework;
 using ColossalFramework.UI;
 using UnityEngine;
+using UnifiedUI.Helpers;
 
 
 namespace BOB
@@ -43,9 +44,20 @@ namespace BOB
 		protected override void Awake()
 		{
 			base.Awake();
+
+			// Load cursors.
 			lightCursor = TextureUtils.LoadCursor("bob_cursor_light.png");
 			darkCursor = TextureUtils.LoadCursor("bob_cursor_dark.png");
 			m_cursor = darkCursor;
+
+			// Create new UUI button.
+			UIComponent uuiButton = UUIHelpers.RegisterToolButton(
+				name: nameof(BOBTool),
+				groupName: null, // default group
+				tooltip: Translations.Translate("BOB_NAM"),
+				tool: this,
+				icon: UUIHelpers.LoadTexture(UUIHelpers.GetFullPath<BOBMod>("Resources", "uui_bob_random.png")),
+				hotkeys: new UUIHotKeys { ActivationKey = ModSettings.PanelSavedKey });
 		}
 
 		// Ignore nodes, citizens, disasters, districts, transport lines, and vehicles.

@@ -16,24 +16,6 @@ namespace BOB
 
 
         /// <summary>
-        /// The current hotkey settings as ColossalFramework InputKey
-        /// </summary>
-        /// </summary>
-        private InputKey CurrentHotkey
-        {
-            get => SavedInputKey.Encode(UIThreading.HotKey, UIThreading.HotCtrl, UIThreading.HotShift, UIThreading.HotAlt);
-
-            set
-            {
-                UIThreading.HotKey = (KeyCode)(value & 0xFFFFFFF);
-                UIThreading.HotCtrl = (value & 0x40000000) != 0;
-                UIThreading.HotShift = (value & 0x20000000) != 0;
-                UIThreading.HotAlt = (value & 0x10000000) != 0;
-            }
-        }
-
-
-        /// <summary>
         /// Setup this control
         /// Called by Unity immediately before the first update.
         /// </summary>
@@ -52,7 +34,7 @@ namespace BOB
 
             // Set label and button text.
             label.text = Translations.Translate("BOB_OPT_KEY");
-            button.text = SavedInputKey.ToLocalizedString("KEYNAME", CurrentHotkey);
+            button.text = SavedInputKey.ToLocalizedString("KEYNAME", ModSettings.CurrentHotkey);
         }
 
 
@@ -76,7 +58,7 @@ namespace BOB
                 // If escape was entered, we don't change the code.
                 if (keyEvent.keycode == KeyCode.Escape)
                 {
-                    inputKey = CurrentHotkey;
+                    inputKey = ModSettings.CurrentHotkey;
                 }
                 else
                 {
@@ -106,7 +88,7 @@ namespace BOB
                 if (mouseEvent.buttons == UIMouseButton.Left || mouseEvent.buttons == UIMouseButton.Right)
                 {
                     // Not a bindable mouse button - set the button text and cancel priming.
-                    button.text = SavedInputKey.ToLocalizedString("KEYNAME", CurrentHotkey);
+                    button.text = SavedInputKey.ToLocalizedString("KEYNAME", ModSettings.CurrentHotkey);
                     UIView.PopModal();
                     isPrimed = false;
                 }
@@ -163,7 +145,7 @@ namespace BOB
         private void ApplyKey(InputKey key)
         {
             // Apply key to current settings and save.
-            CurrentHotkey = key;
+            ModSettings.CurrentHotkey = key;
             SettingsUtils.SaveSettings();
 
             // Set the label for the new hotkey.
