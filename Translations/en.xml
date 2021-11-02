@@ -107,5 +107,7 @@
     <Translation ID="BOB_UPD_062_0" String="Add ability to remove terrain ruining from all trees and/or props (in the options panel)" />
     <Translation ID="BOB_UPD_062_1" String="Ferry paths are now selectable (to change/hide those ferry path marker buoys)" />
     <Translation ID="BOB_UPD_062_2" String="Fix network prop angles sometimes being incorrectly displayed on selection" />
+    <Translation ID="BOB_UPD_080_0" String="Add individual network prop replacement" />
+    <Translation ID="BOB_UPD_080_1" String="Add Universal UI (UUI) button" />
   </Translations>
 </Language>
