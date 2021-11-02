@@ -105,5 +105,7 @@
     <Translation ID="BOB_UPD_062_0" String="Agregado la capacidad de eliminar las ruinas del terreno de todos los árboles y/o decoraciones (en el panel de opciones)" />
     <Translation ID="BOB_UPD_062_1" String="Ahora se puede seleccionar las rutas de los transbordadores (para cambiar/ocultar esas boyas marcadoras de ruta)" />
     <Translation ID="BOB_UPD_062_2" String="Se corrigieron los ángulos de decoraciones en redes que a veces se mostraban incorrectamente en la selección" />
+    <Translation ID="BOB_UPD_080_0" String="Añadir reemplazo de decoración individual de redes" />
+    <Translation ID="BOB_UPD_080_1" String="Añadir botón de Universal UI (UUI)" />
   </Translations>
 </Language>
