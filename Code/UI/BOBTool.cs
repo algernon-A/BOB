@@ -46,8 +46,8 @@ namespace BOB
 			base.Awake();
 
 			// Load cursors.
-			lightCursor = TextureUtils.LoadCursor("bob_cursor_light.png");
-			darkCursor = TextureUtils.LoadCursor("bob_cursor_dark.png");
+			lightCursor = TextureUtils.LoadCursor("BOB-CursorLight.png");
+			darkCursor = TextureUtils.LoadCursor("BOB-CursorDark.png");
 			m_cursor = darkCursor;
 
 			// Create new UUI button.
@@ -56,7 +56,7 @@ namespace BOB
 				groupName: null, // default group
 				tooltip: Translations.Translate("BOB_NAM"),
 				tool: this,
-				icon: UUIHelpers.LoadTexture(UUIHelpers.GetFullPath<BOBMod>("Resources", "uui_bob_random.png")),
+				icon: UUIHelpers.LoadTexture(UUIHelpers.GetFullPath<BOBMod>("Resources", "BOB-UUI.png")),
 				hotkeys: new UUIHotKeys { ActivationKey = ModSettings.PanelSavedKey });
 		}
 

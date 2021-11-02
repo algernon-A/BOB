@@ -199,7 +199,7 @@ namespace BOB
 
 				lockSprite.size = new Vector2(17f, 17f);
 				lockSprite.relativePosition = new Vector2(width - 20f, 3f);
-				lockSprite.atlas = TextureUtils.LoadSpriteAtlas("bob_padlock_small");
+				lockSprite.atlas = TextureUtils.LoadSpriteAtlas("BOB-Padlock");
 				SetLockSprite();
 
 				lockSprite.eventClicked += (control, clickEvent) =>

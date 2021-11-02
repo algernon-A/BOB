@@ -232,7 +232,7 @@ namespace BOB
 				revertButton.eventClicked += Revert;
 
 				// Scale button.
-				UIButton scaleButton = AddIconButton(this, MiddleX, TitleHeight + Margin, ToggleSize, "BOB_PNL_SCA", TextureUtils.LoadSpriteAtlas("bob_prop_tree_scale_small"));
+				UIButton scaleButton = AddIconButton(this, MiddleX, TitleHeight + Margin, ToggleSize, "BOB_PNL_SCA", TextureUtils.LoadSpriteAtlas("BOB-Scale"));
 				scaleButton.eventClicked += (control, clickEvent) => BOBScalePanel.Create(IsTree, replacementPrefab);
 
 				// Preview image.

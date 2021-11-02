@@ -107,14 +107,14 @@ namespace BOB
 
 
         /// <summary>
-        /// Panel hotkey in CO SavedInputKey format.
+        /// Panel hotkey as ColossalFramework SavedInputKey.
         /// </summary>
         [XmlIgnore]
-        public static SavedInputKey PanelSavedKey => uuiSavedKey;
+        internal static SavedInputKey PanelSavedKey => uuiSavedKey;
 
 
         /// <summary>
-        /// The current hotkey settings as ColossalFramework InputKey
+        /// The current hotkey settings as ColossalFramework InputKey.
         /// </summary>
         [XmlIgnore]
         internal static InputKey CurrentHotkey

@@ -195,7 +195,7 @@ namespace BOB
                     hasReplacement = true;
 
                     // Show building replacement sprite.
-                    lineSprite.atlas = TextureUtils.LoadSpriteAtlas(thisNetItem == null ? "bob_single_building_small" : "bob_road_small");
+                    lineSprite.atlas = TextureUtils.LoadSpriteAtlas(thisNetItem == null ? "BOB-BuildingSmall" : "BOB-RoadSmall");
                     lineSprite.spriteName = "normal";
                     lineSprite.tooltip = Translations.Translate(thisNetItem == null ? "BOB_SPR_SBL" : "BOB_SPR_SNT");
                     lineSprite.Show();
@@ -218,7 +218,7 @@ namespace BOB
                     hasReplacement = true;
 
                     // Show building replacement sprite.
-                    lineSprite.atlas = TextureUtils.LoadSpriteAtlas(thisNetItem == null ? "bob_single_building_small" : "bob_road_small");
+                    lineSprite.atlas = TextureUtils.LoadSpriteAtlas(thisNetItem == null ? "BOB-BuildingSmall" : "BOB-RoadSmall");
                     lineSprite.spriteName = "normal";
                     lineSprite.tooltip = Translations.Translate(thisNetItem == null ? "BOB_SPR_SBL" : "BOB_SPR_SNT");
                     lineSprite.Show();
@@ -241,7 +241,7 @@ namespace BOB
                     hasReplacement = true;
 
                     // Show all- replacement sprite.
-                    lineSprite.atlas = TextureUtils.LoadSpriteAtlas(thisNetItem == null ? "bob_buildings_small" : "bob_all_roads_small");
+                    lineSprite.atlas = TextureUtils.LoadSpriteAtlas(thisNetItem == null ? "BOB-BuildingsSmall" : "BOB-RoadsSmall");
                     lineSprite.spriteName = "normal";
                     lineSprite.tooltip = Translations.Translate(thisNetItem == null ? "BOB_SPR_ABL" : "BOB_SPR_ANT");
                     lineSprite.Show();
@@ -256,7 +256,7 @@ namespace BOB
                     hasReplacement = true;
 
                     // Show package replacement sprite.
-                    lineSprite.atlas = TextureUtils.LoadSpriteAtlas("bob_prop_pack_small");
+                    lineSprite.atlas = TextureUtils.LoadSpriteAtlas("BOB-PropPackSmall");
                     lineSprite.spriteName = "normal";
                     lineSprite.tooltip = Translations.Translate("BOB_SPR_PCK");
                     lineSprite.Show();

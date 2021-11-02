@@ -26,8 +26,8 @@ namespace BOB
 
 
 		// Replace button atlases.
-		protected override UITextureAtlas ReplaceAtlas => TextureUtils.LoadSpriteAtlas("bob_road");
-		protected override UITextureAtlas ReplaceAllAtlas => TextureUtils.LoadSpriteAtlas("bob_all_roads");
+		protected override UITextureAtlas ReplaceAtlas => TextureUtils.LoadSpriteAtlas("BOB-Road");
+		protected override UITextureAtlas ReplaceAllAtlas => TextureUtils.LoadSpriteAtlas("BOB-Roads");
 
 
 
@@ -105,7 +105,7 @@ namespace BOB
 			try
 			{
 				// Add pack button.
-				UIButton packButton = AddIconButton(this, PackButtonX, TitleHeight + Margin, ToggleSize, "BOB_PNL_PKB", TextureUtils.LoadSpriteAtlas("bob_prop_pack"));
+				UIButton packButton = AddIconButton(this, PackButtonX, TitleHeight + Margin, ToggleSize, "BOB_PNL_PKB", TextureUtils.LoadSpriteAtlas("BOB-PropPack"));
 				packButton.eventClicked += (component, clickEvent) => PackPanelManager.Create();
 
 				// Populate loaded list.

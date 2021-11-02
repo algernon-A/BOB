@@ -86,8 +86,8 @@ namespace BOB
 
 
 		// Replace button atlases.
-		protected override UITextureAtlas ReplaceAtlas => TextureUtils.LoadSpriteAtlas("bob_single_building");
-		protected override UITextureAtlas ReplaceAllAtlas => TextureUtils.LoadSpriteAtlas("bob_buildings");
+		protected override UITextureAtlas ReplaceAtlas => TextureUtils.LoadSpriteAtlas("BOB-Building");
+		protected override UITextureAtlas ReplaceAllAtlas => TextureUtils.LoadSpriteAtlas("BOB-Buildings");
 
 
 		/// <summary>

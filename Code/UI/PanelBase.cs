@@ -100,8 +100,8 @@ namespace BOB
 			hideVanilla.eventCheckChanged += VanillaCheckChanged;
 
 			// Tree/Prop checkboxes.
-			propCheck = IconToggleCheck(this, Margin, TitleHeight + Margin, "bob_props3", "BOB_PNL_PRP");
-			treeCheck = IconToggleCheck(this, Margin + ToggleSize, TitleHeight + Margin, "bob_trees_small", "BOB_PNL_TRE");
+			propCheck = IconToggleCheck(this, Margin, TitleHeight + Margin, "BOB-PropsSmall", "BOB_PNL_PRP");
+			treeCheck = IconToggleCheck(this, Margin + ToggleSize, TitleHeight + Margin, "BOB-TreesSmall", "BOB_PNL_TRE");
 			propCheck.isChecked = !InitialTreeCheckedState;
 			treeCheck.isChecked = InitialTreeCheckedState;
 			propCheck.eventCheckChanged += PropCheckChanged;

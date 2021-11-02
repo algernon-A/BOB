@@ -92,7 +92,7 @@ namespace BOB
 				randomCheck.eventCheckChanged += RandomCheckChanged;
 
 				// Random settings button.
-				UIButton randomButton = AddIconButton(this, RandomButtonX, TitleHeight + Margin, ToggleSize, "BOB_PNL_RST", TextureUtils.LoadSpriteAtlas("bob_random_small"));
+				UIButton randomButton = AddIconButton(this, RandomButtonX, TitleHeight + Margin, ToggleSize, "BOB_PNL_RST", TextureUtils.LoadSpriteAtlas("BOB-Random"));
 				randomButton.eventClicked += (control, clickEvent) => BOBRandomPanel.Create();
 			}
 			catch (Exception e)

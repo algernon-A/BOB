@@ -253,11 +253,11 @@ namespace BOB
 			nameField = UIControls.AddTextField(this, Margin, NameFieldY, RandomizerWidth);
 
 			// Add random prefab button.
-			UIButton addRandomButton = AddIconButton(this, Margin, RandomButtonY, ToggleSize, "BOB_RND_NEW", TextureUtils.LoadSpriteAtlas("bob_buttons_plus_round_small"));
+			UIButton addRandomButton = AddIconButton(this, Margin, RandomButtonY, ToggleSize, "BOB_RND_NEW", TextureUtils.LoadSpriteAtlas("BOB-RoundPlus"));
 			addRandomButton.eventClicked += NewRandomPrefab;
 
 			// Remove random prefab button.
-			removeRandomButton = AddIconButton(this, addRandomButton.relativePosition.x + ToggleSize, RandomButtonY, ToggleSize, "BOB_RND_DEL", TextureUtils.LoadSpriteAtlas("bob_buttons_minus_round_small"));
+			removeRandomButton = AddIconButton(this, addRandomButton.relativePosition.x + ToggleSize, RandomButtonY, ToggleSize, "BOB_RND_DEL", TextureUtils.LoadSpriteAtlas("BOB-RoundMinus"));
 			removeRandomButton.eventClicked += RemoveRandomPrefab;
 
 			// Rename button.
@@ -265,11 +265,11 @@ namespace BOB
 			renameButton.eventClicked += RenameRandomPrefab;
 
 			// Add variation button.
-			UIButton addVariationButton = AddIconButton(this, MidControlX, ListY, ToggleSize, "BOB_RND_ADD", TextureUtils.LoadSpriteAtlas("bob_plus"));
+			UIButton addVariationButton = AddIconButton(this, MidControlX, ListY, ToggleSize, "BOB_RND_ADD", TextureUtils.LoadSpriteAtlas("BOB-ArrowPlus"));
 			addVariationButton.eventClicked += AddVariation;
 
 			// Remove variation button.
-			UIButton removeVariationButton = AddIconButton(this, MidControlX, ListY + ToggleSize, ToggleSize, "BOB_RND_SUB", TextureUtils.LoadSpriteAtlas("bob_minus"));
+			UIButton removeVariationButton = AddIconButton(this, MidControlX, ListY + ToggleSize, ToggleSize, "BOB_RND_SUB", TextureUtils.LoadSpriteAtlas("BOB-ArrowMinus"));
 			removeVariationButton.eventClicked += RemoveVariation;
 
 			// Order button.

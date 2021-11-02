@@ -25,7 +25,7 @@ namespace BOB
 
 
 		// Replace button atlas.
-		protected override UITextureAtlas ReplaceAtlas => TextureUtils.LoadSpriteAtlas("bob_trees");
+		protected override UITextureAtlas ReplaceAtlas => TextureUtils.LoadSpriteAtlas("BOB-Trees");
 
 
 		/// <summary>
@@ -154,7 +154,7 @@ namespace BOB
 			base.PropCheckChanged(control, isChecked);
 
 			// Toggle replace button atlas.
-			replaceButton.atlas = isChecked ? TextureUtils.LoadSpriteAtlas("bob_props3_large") : TextureUtils.LoadSpriteAtlas("bob_trees");
+			replaceButton.atlas = isChecked ? TextureUtils.LoadSpriteAtlas("BOB-Props") : TextureUtils.LoadSpriteAtlas("BOB-Trees");
 			replaceButton.tooltip = Translations.Translate(ReplaceTooltipKey);
 		}
 
