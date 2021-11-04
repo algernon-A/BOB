@@ -1,4 +1,9 @@
-﻿Version 0.8.1 -
+﻿Version 0.8.2 -
+-
+Fix fallback to new empty configuration record where no configuration file currently exists
+
+
+Version 0.8.1 -
 
 - Improve configuration file management
 - Improve hotkey response
