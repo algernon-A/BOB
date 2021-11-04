@@ -1,4 +1,6 @@
-﻿- Improve configuration file management
+﻿Version 0.8.1 -
+
+- Improve configuration file management
 
 
 Version 0.8 -

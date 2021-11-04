@@ -11,7 +11,7 @@ namespace BOB
     public class BOBMod : IUserMod
     {
         public static string ModName => "BOB - the tree and prop replacer";
-        public static string Version => "0.8.0";
+        public static string Version => "0.8.1";
 
         public string Name => ModName + " " + Version;
         public string Description => Translations.Translate("BOB_DESC");
@@ -24,7 +24,7 @@ namespace BOB
         {
             // Apply Harmony patches via Cities Harmony.
             // Called here instead of OnCreated to allow the auto-downloader to do its work prior to launch.
-            HarmonyHelper.DoOnHarmonyReady(() => Patcher.PatchAll());
+            HarmonyHelper.DoOnHarmonyReady(() => Patcher.PatchAll())
 
             // Load the settings file.
             SettingsUtils.LoadSettings();
