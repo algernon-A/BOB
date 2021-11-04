@@ -107,6 +107,6 @@
     <Translation ID="BOB_UPD_062_1" String="Теперь можно выбрать паромные пути (чтобы изменить/скрыть их буи)" />
     <Translation ID="BOB_UPD_062_2" String="Исправлена ошибка, из-за которой углы реквизита дорог иногда неправильно отображались при выборе" />
     <Translation ID="BOB_UPD_080_0" String="Добавить замену индивидуальной декорации путей" />
-    <Translation ID="BOB_UPD_080_1" String="Добавить кнопку Universal UI (UUI)" />
+    <Translation ID="BOB_UPD_080_1" String="Добавить кнопку Unified UI (UUI)" />
   </Translations>
 </Language>
