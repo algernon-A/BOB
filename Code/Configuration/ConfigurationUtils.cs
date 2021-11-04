@@ -106,11 +106,20 @@ namespace BOB
 				else
 				{
 					Logging.Message("no configuration file found");
+
+					// Create a new empty configuration file record.
+					CurrentConfig = new BOBConfigurationFile();
 				}
 			}
 			catch (Exception e)
 			{
 				Logging.LogException(e, "exception reading XML configuration file");
+
+				// If we didn't even get as far as creating a configuration file instanece, create a new blank one now.
+				if (CurrentConfig == null)
+				{
+					CurrentConfig = new BOBConfigurationFile();
+				}
 			}
 
 		}
