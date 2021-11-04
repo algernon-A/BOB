@@ -106,6 +106,6 @@
     <Translation ID="BOB_UPD_062_1" String="Fährstraßen sind nun anwählbar (um die Makierungs-Bojen auszutauschen oder zu verstecken)" />
     <Translation ID="BOB_UPD_062_2" String="Fehler behoben, der manchmal die Winkel-Angaben von Netzwerk-Dekoration fehlerhaft anzeigte" />
     <Translation ID="BOB_UPD_080_0" String="Einzelne Dekorationen von Netzwerken ändern hinzugefügt" />
-    <Translation ID="BOB_UPD_080_1" String="Universal UI (UUI) Button hinzugefügt" />
+    <Translation ID="BOB_UPD_080_1" String="Unified UI (UUI) Button hinzugefügt" />
   </Translations>
 </Language>
