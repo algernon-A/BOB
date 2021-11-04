@@ -48,10 +48,13 @@ namespace BOB
 			{
 				foreach (BOBNetReplacement replacement in netElement.replacements)
 				{
-					// Revert this replacement (but don't remove the entry, as the list is currently immutable while we're iterating through it).
-					Revert(replacement, false);
+					// Revert all references for this replacement.
+					RevertReferences(replacement.netInfo, replacement.references);
 				}
 			}
+
+			// Clear configuration file entry.
+			NetworkElementList.Clear();
 		}
 
 

@@ -72,12 +72,17 @@ namespace BOB
 		/// </summary>
 		internal override void RevertAll()
 		{
-			// Iterate through each entry in the replacement list.
-			foreach (BOBBuildingReplacement replacement in ConfigurationUtils.CurrentConfig.allBuildingProps)
+			// Revert all active references in dictionary.
+			foreach (BuildingInfo buildingPrefab in propReferences.Keys)
 			{
-				// Revert this replacement (but don't remove the entry, as the list is currently immutable while we're iterating through it).
-				Revert(replacement, false);
+				foreach (PrefabInfo targetPrefab in propReferences[buildingPrefab].Keys)
+				{
+					RevertReferences(targetPrefab, propReferences[buildingPrefab][targetPrefab]);
+				}
 			}
+
+			// Clear configuration file.
+			ReplacementList(null).Clear();
 
 			// Clear the active replacements dictionary.
 			propReferences.Clear();

@@ -13,6 +13,8 @@ namespace BOB
 		/// </summary>
 		internal static void NukeSettings()
 		{
+			Logging.KeyMessage("reverting all replacements");
+
 			// Revert all-building replacements.
 			try
 			{
@@ -67,7 +69,7 @@ namespace BOB
 				// Don't let a single failure stop us.
 				Logging.LogException(e, "exception reverting all-network replacements");
 			}
-
+			
 			// Revert network replacements.
 			try
 			{
@@ -89,7 +91,7 @@ namespace BOB
 				// Don't let a single failure stop us.
 				Logging.LogException(e, "exception reverting individual network replacements");
 			}
-
+			
 			// Revert scaling.
 			try
 			{
@@ -100,6 +102,10 @@ namespace BOB
 				// Don't let a single failure stop us.
 				Logging.LogException(e, "exception reverting scaling elemennts");
 			}
+
+			// Regenerate dirty renders.
+			NetData.Update();
+			BuildingData.Update();
 		}
 	}
 }

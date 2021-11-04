@@ -14,18 +14,26 @@ namespace BOB
 	internal static class ConfigurationUtils
 	{
 		// Filenames and locations.
-		internal static readonly string GeneralSettingsFile = "BOB-config.xml";
+		internal static readonly string GeneralConfigFile = "BOB-config.xml";
 		internal static readonly string ConfigDirectory = ColossalFramework.IO.DataLocation.localApplicationData + Path.DirectorySeparatorChar + ConfigDirectory + "BOBconfigs";
 
-		// Instance references.
-		internal static string CurrentConfigName { get; set; }
+
+		/// <summary>
+		/// Currently active configuration file.
+		/// </summary>
 		internal static BOBConfigurationFile CurrentConfig { get; private set; }
 
 
 		/// <summary>
-		/// Loads configuration from the current configuration file.
+		/// Configuration file name to save as default for current save.
 		/// </summary>
-		internal static void LoadConfig() => LoadConfig(CurrentConfigName);
+		internal static string CurrentSavedConfigName { get; set; }
+
+
+		/// <summary>
+		/// Loads configuration from the current configuration file (will default to global config if CurrentSavedConfigName is null).
+		/// </summary>
+		internal static void LoadConfig() => LoadConfig(CurrentSavedConfigName);
 
 
 		/// <summary>
@@ -40,8 +48,8 @@ namespace BOB
 				string fileName;
 				if (config == null)
 				{
-					// No file name provided; use general settings file.
-					fileName = GeneralSettingsFile;
+					// No file name provided; use general configuration file.
+					fileName = GeneralConfigFile;
 				}
 				else
 				{
@@ -109,10 +117,9 @@ namespace BOB
 
 
 		/// <summary>
-		/// Saves current configuration to the current configuration file.
-		/// <param name="clean">Set to true to generate a blank file (default false)</param>
+		/// Saves current configuration to the current configuration file; will default to general configuration file if CurrentSavedConfigName is null.
 		/// </summary>
-		internal static void SaveConfig() => SaveConfig(CurrentConfigName);
+		internal static void SaveConfig() => SaveConfig(CurrentSavedConfigName);
 
 
 		/// <summary>
@@ -128,8 +135,8 @@ namespace BOB
 				string fileName;
 				if (config == null)
 				{
-					// No file name provided; use general settings file.
-					fileName = GeneralSettingsFile;
+					// No file name provided; use general configuration file.
+					fileName = GeneralConfigFile;
 				}
 				else
 				{

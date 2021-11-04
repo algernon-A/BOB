@@ -109,21 +109,32 @@ namespace BOB
             {
                 // Use custom check box.
                 customCheck = UIControls.LabelledCheckBox(panel, Margin, ToolBarY, Translations.Translate("BOB_CFG_UCS"));
-                customCheck.isChecked = !string.IsNullOrEmpty(ConfigurationUtils.CurrentConfigName);
+                customCheck.eventCheckChanged += (control, isChecked) =>
+                {
+                    // If we've got a valid selection, set the current config name to this.
+                    if (isChecked && !string.IsNullOrEmpty(selectedConfig))
+                    {
+                        ConfigurationUtils.CurrentSavedConfigName = selectedConfig;
+                    }
+                };
 
                 // Apply button.
-                UIButton applyButton = UIControls.AddButton(panel, Margin, FooterY, Translations.Translate("BOB_CFG_LAA"), 300f, scale: 0.8f);
+                UIButton applyButton = UIControls.AddButton(panel, Margin, FooterY, Translations.Translate("BOB_CFG_LAA"), 400f, scale: 0.8f);
                 applyButton.eventClicked += Apply;
 
+                // Use global configuration button.
+                UIButton globalButton = UIControls.AddButton(panel, Margin, FooterY + 50f, Translations.Translate("BOB_CFG_LGL"), 400f, scale: 0.8f);
+                globalButton.eventClicked += UseGlobal;
+
                 // Nuke all settings button.
-                UIButton nukeButton = UIControls.AddButton(panel, Margin, FooterY + 50f, Translations.Translate("BOB_NUKE"), 300f);
+                UIButton nukeButton = UIControls.AddButton(panel, Margin + 50f, FooterY + 150f, Translations.Translate("BOB_NUKE"), 300f);
                 nukeButton.eventClicked += (control, clickEvent) =>
                 {
                     // Revert all-building and building settings.
                     ReplacementUtils.NukeSettings();
 
                     // Save clean configuration.
-                    ConfigurationUtils.SaveConfig(ConfigurationUtils.CurrentConfigName, true);
+                    //ConfigurationUtils.SaveConfig(ConfigurationUtils.CurrentSavedConfigName, true);
                 };
             }
 
@@ -134,7 +145,7 @@ namespace BOB
             if (customCheck != null && customCheck.isChecked)
             {
                 // Try to select current config name.
-                selectedConfig = configList.FindItem(ConfigurationUtils.CurrentConfigName);
+                selectedConfig = configList.FindItem(ConfigurationUtils.CurrentSavedConfigName);
 
                 // Did we find it?
                 if (selectedConfig == null)
@@ -238,23 +249,17 @@ namespace BOB
 
 
         /// <summary>
-        /// 'Save and apply' button event handler.  Should onl be called ingame.
+        /// 'Save and apply' button event handler.  Should only be called ingame.
         /// </summary>
 		/// <param name="control">Calling component (unused)</param>
 		/// <param name="mouseEvent">Mouse event (unused)</param>
         private void Apply(UIComponent control, UIMouseEventParameter mouseEvent)
         {
-            // Safety check.
-            if (!inGame)
-            {
-                return;
-            }
-
-            // Are we using custom settings for this savegame, and have a valid current selection?
-            if (customCheck.isChecked && !string.IsNullOrEmpty(selectedConfig))
+            // Are we in-game, and do we have a valid current selection?
+            if (inGame && !string.IsNullOrEmpty(selectedConfig))
             {
                 // Yes - set current configuration file.
-                ConfigurationUtils.CurrentConfigName = selectedConfig;
+                ConfigurationUtils.CurrentSavedConfigName = selectedConfig;
 
                 // Clear current replacements.
                 ReplacementUtils.NukeSettings();
@@ -262,24 +267,37 @@ namespace BOB
                 // Load config file.
                 ConfigurationUtils.LoadConfig();
 
-                Logging.KeyMessage("current configuration set to ", ConfigurationUtils.CurrentConfigName);
+                Logging.KeyMessage("current configuration set to ", ConfigurationUtils.CurrentSavedConfigName);
+
+                // Update button states accordingly.
+                UpdateButtonStates();
             }
-            else
+        }
+
+
+        /// <summary>
+        /// 'Load global settings' button event handler.  Should only be called ingame.
+        /// </summary>
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="mouseEvent">Mouse event (unused)</param>
+        private void UseGlobal(UIComponent control, UIMouseEventParameter mouseEvent)
+        {
+            // Are we in-game, and do we have a valid current selection?
+            if (inGame)
             {
-                // No custom settings - did we have any previously?
-                if (ConfigurationUtils.CurrentConfigName != null)
-                {
-                    // We had previous settings - reset.
-                    ConfigurationUtils.CurrentConfigName = null;
+                // Yes - clear currently selected configuration file.
+                ConfigurationUtils.CurrentSavedConfigName = null;
 
-                    // Clear current replacements.
-                    ReplacementUtils.NukeSettings();
+                // Clear current replacements.
+                ReplacementUtils.NukeSettings();
 
-                    // Load config file.
-                    ConfigurationUtils.LoadConfig();
+                // Load config file.
+                ConfigurationUtils.LoadConfig();
 
-                    Logging.KeyMessage("current configuration set to default");
-                }
+                Logging.KeyMessage("reloaded global configuration");
+
+                // Update button states accordingly.
+                UpdateButtonStates();
             }
         }
 
@@ -302,6 +320,9 @@ namespace BOB
 
             // Delete button requires a valid current selection.
             deleteButton.isEnabled = validSelection;
+
+            // Set 'use selected config as default' check.
+            customCheck.isChecked = validSelection && selectedConfig == ConfigurationUtils.CurrentSavedConfigName;
         }
     }
 

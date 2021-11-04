@@ -76,12 +76,17 @@ namespace BOB
 		/// </summary>
 		internal override void RevertAll()
 		{
-			// Iterate through each entry in the replacement list.
-			foreach (BOBNetReplacement replacement in ConfigurationUtils.CurrentConfig.allNetworkProps)
-			{
-				// Revert this replacement (but don't remove the entry, as the list is currently immutable while we're iterating through it).
-				Revert(replacement, false);
-			}
+			// Revert all active references in dictionary.
+			foreach(NetInfo netPrefab in propReferences.Keys)
+            {
+				foreach (PrefabInfo targetPrefab in propReferences[netPrefab].Keys)
+				{
+					RevertReferences(targetPrefab, propReferences[netPrefab][targetPrefab]);
+				}
+            }
+
+			// Clear configuration file.
+			ReplacementList(null).Clear();
 
 			// Clear the active replacements dictionary.
 			propReferences.Clear();
