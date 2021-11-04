@@ -212,7 +212,7 @@ namespace BOB
 						if (thisProp != null && thisProp == replacement.targetInfo)
 						{
 							// Match!  Add reference data to the list.
-							referenceList.Add(CreateReference(netInfo, laneIndex, propIndex, replacement.isTree));
+							referenceList.Add(CreateReference(netInfo, thisProp, laneIndex, propIndex, replacement.isTree));
 						}
 					}
 				}

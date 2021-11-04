@@ -534,7 +534,7 @@ namespace BOB
 						if (thisProp != null && thisProp == target)
 						{
 							// Match!  Add reference data to the list.
-							replacements[target].references.Add(CreateReference(network, laneIndex, propIndex, replacements[target].isTree));
+							replacements[target].references.Add(CreateReference(network, thisProp, laneIndex, propIndex, replacements[target].isTree));
 						}
 					}
 				}
@@ -622,7 +622,7 @@ namespace BOB
 			if (replacements.ContainsKey(target))
 			{
 				// Yes - add reference data to the list.
-				NetPropReference newReference = CreateReference(netPrefab, laneIndex, propIndex, target is TreeInfo);
+				NetPropReference newReference = CreateReference(netPrefab, target, laneIndex, propIndex, target is TreeInfo);
 
 				replacements[target].references.Add(newReference);
 
