@@ -24,7 +24,7 @@ namespace BOB
         {
             // Apply Harmony patches via Cities Harmony.
             // Called here instead of OnCreated to allow the auto-downloader to do its work prior to launch.
-            HarmonyHelper.DoOnHarmonyReady(() => Patcher.PatchAll())
+            HarmonyHelper.DoOnHarmonyReady(() => Patcher.PatchAll());
 
             // Load the settings file.
             SettingsUtils.LoadSettings();
