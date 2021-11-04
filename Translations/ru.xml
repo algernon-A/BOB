@@ -63,6 +63,8 @@
     <Translation ID="BOB_CFG_SSC" String="Копировать выбранную конфигурацию" />
     <Translation ID="BOB_CFG_SEC" String="Новая пустая конфигурация" />
     <Translation ID="BOB_CFG_DEL" String="Удалить выбранную конфигурацию" />
+    <Translation ID="BOB_CFG_LAA" String="Загрузить и применить выбранную конфигурацию" />
+    <Translation ID="BOB_CFG_LGL" String="Загрузить и применить глобальную конфигурацию" />
     <Translation ID="BOB_OPT_GEN" String="Общие настройки" />
     <Translation ID="BOB_OPT_CFG" String="Конфигурации" />
     <Translation ID="BOB_OPT_RUI" String="Разрушенная текстура" />
@@ -101,8 +103,8 @@
     <Translation ID="BOB_UPD_060_1" String="Выделение выбранного реквизита или деревьев" />
     <Translation ID="BOB_UPD_060_2" String="Теперь можно выбирать пути в зданиях" />
     <Translation ID="BOB_UPD_060_3" String="Теперь можно выбирать декоративные сооружения." />
-    <Translation ID="BOB_UPD_060_4" String="Новая уменьшенная панель замены" />
-    <Translation ID="BOB_UPD_061_0" String="Добавлены фильтры сортировки имён " />
+    <Translation ID="BOB_UPD_060_4" String="Новая, уменьшенная панель замены" />
+    <Translation ID="BOB_UPD_061_0" String="В списки добавлены фильтры сортировки имён по возрастанию/убыванию" />
     <Translation ID="BOB_UPD_062_0" String="Добавлена возможность удаления разрушенной текстуры под всеми деревьями и/или декорациями (в опциях)" />
     <Translation ID="BOB_UPD_062_1" String="Теперь можно выбрать паромные пути (чтобы изменить/скрыть их буи)" />
     <Translation ID="BOB_UPD_062_2" String="Исправлена ошибка, из-за которой углы реквизита дорог иногда неправильно отображались при выборе" />
