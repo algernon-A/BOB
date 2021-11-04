@@ -42,10 +42,12 @@ namespace BOB
 		/// <param name="config">Configuration name; null for default file (default null)</param>
 		internal static void LoadConfig(string config = null)
 		{
+			string fileName = null;
+
+
 			try
 			{
 				// Set file location to save to.
-				string fileName;
 				if (config == null)
 				{
 					// No file name provided; use general configuration file.
@@ -105,7 +107,7 @@ namespace BOB
 				}
 				else
 				{
-					Logging.Message("no configuration file found");
+					Logging.Message("configuration file ", fileName ?? "null", " not found");
 
 					// Create a new empty configuration file record.
 					CurrentConfig = new BOBConfigurationFile();
@@ -113,7 +115,7 @@ namespace BOB
 			}
 			catch (Exception e)
 			{
-				Logging.LogException(e, "exception reading XML configuration file");
+				Logging.LogException(e, "exception reading XML configuration file ", fileName ?? "null");
 
 				// If we didn't even get as far as creating a configuration file instanece, create a new blank one now.
 				if (CurrentConfig == null)
@@ -139,10 +141,12 @@ namespace BOB
 		/// <param name="clean">Set to true to generate a blank file (default false)</param>
 		internal static void SaveConfig(string config = null, bool clean = false)
 		{
+			string fileName = null;
+
+
 			try
 			{
 				// Set file location to save to.
-				string fileName;
 				if (config == null)
 				{
 					// No file name provided; use general configuration file.
@@ -206,7 +210,7 @@ namespace BOB
 			}
 			catch (Exception e)
 			{
-				Logging.LogException(e, "exception saving XML configuration file");
+				Logging.LogException(e, "exception saving XML configuration file ", fileName ?? "null");
 			}
 
 			// Display any exception message that occured during save.
