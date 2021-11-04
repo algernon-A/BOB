@@ -1,4 +1,7 @@
-﻿Version 0.8 -
+﻿- Improve configuration file management
+
+
+Version 0.8 -
 
 - Add individual network prop replacement
 - Add Universal UI (UUI) button

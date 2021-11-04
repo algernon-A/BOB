@@ -86,7 +86,7 @@ namespace BOB
 				if (thisProp != null && thisProp == replacement.targetInfo)
 				{
 					// Match!  Add reference data to the list.
-					replacement.references.Add(CreateReference(replacement.buildingInfo, propIndex, replacement.isTree));
+					replacement.references.Add(CreateReference(replacement.buildingInfo, thisProp, propIndex, replacement.isTree));
 				}
 			}
 

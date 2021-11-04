@@ -385,7 +385,7 @@ namespace BOB
 		/// Creates a new PropReference from the provided network prefab, lane and prop index.
 		/// </summary>
 		/// <param name="netInfo">Network prefab</param>
-		/// <param name="originalPrefab">Original prefab to store</param>
+		/// <param name="originalPrefab">Original prop/tree prefab (for later restoration if needed)</param>
 		/// <param name="laneIndex">Lane index</param>
 		/// <param name="propIndex">Prop index</param>
 		/// <param name="isTree">True if this is a tree reference, false if this is a prop reference</param>

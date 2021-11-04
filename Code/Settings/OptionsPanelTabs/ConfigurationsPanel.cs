@@ -261,16 +261,10 @@ namespace BOB
                 // Yes - set current configuration file.
                 ConfigurationUtils.CurrentSavedConfigName = selectedConfig;
 
-                // Clear current replacements.
-                ReplacementUtils.NukeSettings();
-
-                // Load config file.
-                ConfigurationUtils.LoadConfig();
-
                 Logging.KeyMessage("current configuration set to ", ConfigurationUtils.CurrentSavedConfigName);
 
-                // Update button states accordingly.
-                UpdateButtonStates();
+                // Load config.
+                LoadConfig();
             }
         }
 
@@ -288,17 +282,33 @@ namespace BOB
                 // Yes - clear currently selected configuration file.
                 ConfigurationUtils.CurrentSavedConfigName = null;
 
-                // Clear current replacements.
-                ReplacementUtils.NukeSettings();
+                Logging.KeyMessage("reloading global configuration");
 
-                // Load config file.
-                ConfigurationUtils.LoadConfig();
-
-                Logging.KeyMessage("reloaded global configuration");
-
-                // Update button states accordingly.
-                UpdateButtonStates();
+                // Load config.
+                LoadConfig();
             }
+        }
+
+
+        /// <summary>
+        /// (Re-)loads the current config (per ConfigurationUtils.CurrentSavedConfigName).
+        /// </summary>
+        private void LoadConfig()
+        {
+            // Clear current replacements.
+            ReplacementUtils.NukeSettings();
+
+            // Load config file.
+            ConfigurationUtils.LoadConfig();
+
+            Logging.KeyMessage("reloaded global configuration");
+
+            // Update button states accordingly.
+            UpdateButtonStates();
+
+            // Update dirty renders.
+            BuildingData.Update();
+            NetData.Update();
         }
 
 
@@ -322,7 +332,10 @@ namespace BOB
             deleteButton.isEnabled = validSelection;
 
             // Set 'use selected config as default' check.
-            customCheck.isChecked = validSelection && selectedConfig == ConfigurationUtils.CurrentSavedConfigName;
+            if (customCheck != null)
+            {
+                customCheck.isChecked = validSelection && selectedConfig == ConfigurationUtils.CurrentSavedConfigName;
+            }
         }
     }
 

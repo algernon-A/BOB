@@ -175,7 +175,7 @@ namespace BOB
 			if (thisReplacement != null)
 			{
 				// Yes - add reference data to the list.
-				BuildingPropReference newReference = CreateReference(buildingInfo, propIndex, thisReplacement.isTree);
+				BuildingPropReference newReference = CreateReference(buildingInfo, targetInfo, propIndex, thisReplacement.isTree);
 				AddReference(thisReplacement, newReference);
 
 				// Apply replacement and return true to indicate restoration.
@@ -375,10 +375,11 @@ namespace BOB
 		/// Creates a new PropReference from the provided building prefab and prop index.
 		/// </summary>
 		/// <param name="buildingInfo">Building prefab</param>
+		/// <param name="originalPrefab">Original prop/tree prefab (for later restoration if needed)</param>
 		/// <param name="propIndex">Prop index</param>
 		/// <param name="isTree">True if this is a tree reference, false if this is a prop reference</param>
 		/// <returns>Newly-created reference (null if creation failed)</returns>
-		protected BuildingPropReference CreateReference(BuildingInfo buildingInfo, int propIndex, bool isTree)
+		protected BuildingPropReference CreateReference(BuildingInfo buildingInfo, PrefabInfo originalPrefab, int propIndex, bool isTree)
 		{
 			// Safety checks.
 			if (buildingInfo?.m_props != null && propIndex >= 0)
@@ -392,8 +393,8 @@ namespace BOB
 					buildingInfo = buildingInfo,
 					propIndex = propIndex,
 					isTree = isTree,
-					originalProp = thisProp.m_finalProp,
-					originalTree = thisProp.m_finalTree,
+					originalProp = isTree ? thisProp.m_finalProp : originalPrefab as PropInfo,
+					originalTree = isTree ? originalPrefab as TreeInfo : thisProp.m_finalTree,
 					radAngle = thisProp.m_radAngle,
 					position = thisProp.m_position,
 					probability = thisProp.m_probability

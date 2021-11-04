@@ -63,7 +63,7 @@ namespace BOB
 			AllBuildingReplacement.Instance.RemoveEntry(replacement.buildingInfo, replacement.targetInfo, replacement.propIndex);
 
 			// Create replacment entry.
-			BuildingPropReference newPropReference = CreateReference(replacement.buildingInfo, replacement.propIndex, replacement.isTree);
+			BuildingPropReference newPropReference = CreateReference(replacement.buildingInfo, replacement.targetInfo, replacement.propIndex, replacement.isTree);
 
 			// Reset replacement list to be only our new replacement entry.
 			replacement.references = new List<BuildingPropReference> { newPropReference };

@@ -112,6 +112,7 @@ namespace BOB
 			{
 				Logging.LogException(e, "exception reading XML configuration file");
 			}
+
 		}
 
 

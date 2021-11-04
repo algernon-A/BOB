@@ -174,7 +174,7 @@ namespace BOB
 					if (thisProp != null && thisProp == replacement.targetInfo)
 					{
 						// Match!  Add reference data to the list.
-						referenceList.Add(CreateReference(buildingInfo, propIndex, replacement.isTree));
+						referenceList.Add(CreateReference(buildingInfo, thisProp, propIndex, replacement.isTree));
 					}
 				}
 			}
