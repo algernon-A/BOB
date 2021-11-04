@@ -88,6 +88,7 @@
     <Compile Include="Code\UI\RandomPanel.cs" />
     <Compile Include="Code\UI\ScalePanel.cs" />
     <Compile Include="Code\UI\UIFastList\UIRandomPropRow.cs" />
+    <Compile Include="Code\UI\UIThreading.cs" />
     <Compile Include="Code\Utils\Logging.cs" />
     <Compile Include="Code\PackUtils\PackUtils.cs" />
     <Compile Include="Code\PackUtils\PackXML.cs" />

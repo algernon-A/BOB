@@ -144,6 +144,9 @@ namespace BOB
             // Display any exception message that occured during load.
             InfoPanelManager.CheckException();
 
+            // Activate tool hotkey.
+            UIThreading.Operating = true;
+
             Logging.Message("loading complete");
         }
     }

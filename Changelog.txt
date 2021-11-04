@@ -1,6 +1,7 @@
 ﻿Version 0.8.1 -
 
 - Improve configuration file management
+- Improve hotkey response
 
 
 Version 0.8 -
