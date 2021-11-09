@@ -36,7 +36,7 @@ namespace BOB
                 // Write to savegame.
                 serializableDataManager.SaveData(dataID, stream.ToArray());
 
-                Logging.Message("wrote ", stream.Length.ToString());
+                Logging.Message("wrote ", stream.Length);
             }
         }
 
@@ -62,7 +62,7 @@ namespace BOB
 
                     // Deserialise savegame settings.
                     DataSerializer.Deserialize<BOBSerializer>(stream, DataSerializer.Mode.Memory);
-                    Logging.Message("read ", stream.Length.ToString());
+                    Logging.Message("read ", stream.Length);
                 }
             }
             else
@@ -111,8 +111,8 @@ namespace BOB
             // Write tree replacement lists to savegame.
             serializer.WriteUniqueStringArray(treeNames.ToArray());
             serializer.WriteUniqueStringArray(propNames.ToArray());
-            Logging.Message("wrote trees length ", treeNames.Count.ToString());
-            Logging.Message("wrote props length ", propNames.Count.ToString());
+            Logging.Message("wrote trees length ", treeNames.Count);
+            Logging.Message("wrote props length ", propNames.Count);
 
             // Write current configuration name.
             serializer.WriteSharedString(ConfigurationUtils.CurrentSavedConfigName);
@@ -135,17 +135,17 @@ namespace BOB
             {
                 // Read data version.
                 int dataVersion = serializer.ReadInt32();
-                Logging.Message("read data version ", dataVersion.ToString());
+                Logging.Message("read data version ", dataVersion);
 
                 // Deserialize tree replacement dictionary keys and values.
                 treeNames = serializer.ReadUniqueStringArray();
-                Logging.Message("read trees length ", treeNames.Length.ToString());
+                Logging.Message("read trees length ", treeNames.Length);
 
                 // Deserialize prop replacement dictionary keys and values if we're using version 2 or greater.
                 if (dataVersion > 1)
                 {
                     propNames = serializer.ReadUniqueStringArray();
-                    Logging.Message("read props length ", propNames.Length.ToString());
+                    Logging.Message("read props length ", propNames.Length);
                 }
 
                 // Read custom config name if we're using version 1 or greater.

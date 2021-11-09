@@ -166,13 +166,13 @@ namespace BOB
 
             // Get list count.
             int count = (int)appliedSkinsFieldValue.GetType().GetProperty("Count").GetValue(appliedSkinsFieldValue, null);
-            Logging.Message(count.ToString(), " applied NS2 skins found");
+            Logging.Message(count, " applied NS2 skins found");
 
             // Iterate through each skin in list.
             for (int i = 0; i < count; ++i)
             {
                 object appliedSkin = appliedSkinsFieldValue.GetType().GetProperty("Item").GetValue(appliedSkinsFieldValue, new object[] { i });
-                Logging.Message("Recalculating NS2 applied skin", appliedSkin.ToString());
+                Logging.Message("Recalculating NS2 applied skin", appliedSkin);
 
                 // Invoke recalculate.
                 ns2Recalculate.Invoke(appliedSkin, null);

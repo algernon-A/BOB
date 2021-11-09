@@ -184,7 +184,7 @@ namespace BOB
 					}
 					else
 					{
-						Logging.Message("unsupported prefab type ", selectedPrefab.ToString());
+						Logging.Message("unsupported prefab type ", selectedPrefab);
 						return;
 					}
 

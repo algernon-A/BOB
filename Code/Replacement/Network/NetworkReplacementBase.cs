@@ -549,7 +549,7 @@ namespace BOB
 				return;
 			}
 
-			Logging.Message("creating new m_laneProps instance for network ", network.name, " at lane ", lane.ToString());
+			Logging.Message("creating new m_laneProps instance for network ", network.name, " at lane ", lane);
 
 			// Create new m_laneProps instance with new props list, using our custom class instead of NetLaneProps as a flag that we've already done this one.
 			NewNetLaneProps newLaneProps = ScriptableObject.CreateInstance<NewNetLaneProps>();

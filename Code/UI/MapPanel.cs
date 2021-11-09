@@ -348,7 +348,7 @@ namespace BOB
 
 			EPropInstance[] props = EPropManager.m_props.m_buffer;
 
-			Logging.Message("got prop buffer, length ", props.Length.ToString());
+			Logging.Message("got prop buffer, length ", props.Length);
 
 			// Iterate through each prop or tree instance on map.
 			for (int index = 0; index < (IsTree ? trees.Length : props.Length); ++index)
