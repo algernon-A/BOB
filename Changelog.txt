@@ -1,4 +1,9 @@
-﻿Version 0.8.2 -
+﻿Version 0.8.3 -
+
+- Fix inter-thread communication during map (standalone) prop and tree replacement
+
+
+Version 0.8.2 -
 
 - Fix fallback to new empty configuration record where no configuration file currently exists
 
