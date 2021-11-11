@@ -129,8 +129,9 @@ namespace BOB
 					{
 						trees[treeIndex].Info = replacement;
 
-						// Refresh tree render (to update LOD).
-						treeManager.UpdateTreeRenderer(treeIndex, true);
+						// Update tree render (to update LOD) via simulation thread, creating local treeID reference to avoid race condition.
+						uint treeID = treeIndex;
+						Singleton<SimulationManager>.instance.AddAction(delegate { Singleton<TreeManager>.instance.UpdateTreeRenderer(treeID, true); });
 					}
 				}
 			}

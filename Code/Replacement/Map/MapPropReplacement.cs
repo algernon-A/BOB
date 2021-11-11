@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using ColossalFramework;
+using EManagersLib.API;
 
 
 namespace BOB
@@ -129,8 +130,21 @@ namespace BOB
 					{
 						props[propIndex].Info = replacement;
 
-						// Refresh prop render (to update LOD).
-						propManager.UpdatePropRenderer((ushort)propIndex, true);
+						// Update prop render (to update LOD) via simulation thread, creating local propID reference to avoid race condition.
+
+						// Using EPropManager?
+						if (ModSettings.ePropManager)
+						{
+							// EPropManager.
+							uint propID = (ushort)propIndex;
+							Singleton<SimulationManager>.instance.AddAction(delegate { EPropManager.UpdatePropRenderer(Singleton<PropManager>.instance, propID, true); });
+						}
+						else
+						{
+							// Vanilla PropManager.
+							ushort propID = (ushort)propIndex;
+							Singleton<SimulationManager>.instance.AddAction(delegate { Singleton<PropManager>.instance.UpdatePropRenderer(propID, true); });
+						}
 					}
 				}
 			}
