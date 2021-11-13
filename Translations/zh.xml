@@ -2,7 +2,7 @@
 <Language UniqueName="zh" ReadableName="简体中文">
   <Translations>
     <Translation ID="BOB_NAM" String="BOB：树木与摆件替换器" />
-    <Translation ID="BOB_DESC" String="BOB：树木与摆件替换器" />
+    <Translation ID="BOB_DESC" String="BOB：树木与摆件替换器。" />
     <Translation ID="TRN_CHOICE" String="语言设定" />
     <Translation ID="TRN_SYS" String="使用游戏默认语言" />
     <Translation ID="MES_CLS" String="关闭" />
@@ -26,6 +26,7 @@
     <Translation ID="BOB_PNL_RST" String="随机设定" />
     <Translation ID="BOB_PNL_SCA" String="摆件与树木缩放" />
     <Translation ID="BOB_PNL_REV" String="恢复" />
+    <Translation ID="BOB_PNL_REV_UND" String="撤消选定的替换" />
     <Translation ID="BOB_PNL_REV_TIP" String="目标尚未使用替换器替换，因此无法使用恢复默认功能" />
     <Translation ID="BOB_PNL_PKB" String="替换包" />
     <Translation ID="BOB_PNL_PRB" String="可见度" />
@@ -49,19 +50,21 @@
     <Translation ID="BOB_SPR_SNT" String="替换配置文件应用于指定道路" />
     <Translation ID="BOB_SPR_ANT" String="替换配置文件应用于所有道路" />
     <Translation ID="BOB_SPR_PCK" String="替换配置文件已应用" />
-    <Translation ID="BOB_PCK_APP" String="配置文件替换包" />
+    <Translation ID="BOB_PCK_APP" String="应用文件替换包" />
     <Translation ID="BOB_PCK_APP_A" String="应用选定的替换包" />
     <Translation ID="BOB_PCK_APP_C" String="与现存替换包冲突导致无法应用" />
     <Translation ID="BOB_PCK_APP_I" String="替换包已应用" />
-    <Translation ID="BOB_PCK_RVT" String="恢复包" />
+    <Translation ID="BOB_PCK_RVT" String="恢复" />
     <Translation ID="BOB_PCK_RVT_A" String="取消应用选定的替换包" />
     <Translation ID="BOB_PCK_RVT_I" String="目前没有应用替换包" />
     <Translation ID="BOB_PCK_NAL" String="并非所有替换包都可用" />
     <Translation ID="BOB_CFG_UCS" String="该保存使用选定配置（而不是全局配置）" />
     <Translation ID="BOB_CFG_SAC" String="保存当前配置" />
     <Translation ID="BOB_CFG_SSC" String="复制选定配置" />
-    <Translation ID="BOB_CFG_SEC" String="新建配置" />
+    <Translation ID="BOB_CFG_SEC" String="新建配" />
     <Translation ID="BOB_CFG_DEL" String="删除当前配置" />
+    <Translation ID="BOB_CFG_LAA" String="加载并应用选定的配置" />
+    <Translation ID="BOB_CFG_LGL" String="加载并应用全局配置" />
     <Translation ID="BOB_OPT_GEN" String="常规选项" />
     <Translation ID="BOB_OPT_CFG" String="配置" />
     <Translation ID="BOB_OPT_RUI" String="毁坏" />
@@ -77,33 +80,35 @@
     <Translation ID="BOB_PER_LST" String="记住先前设定" />
     <Translation ID="BOB_OPT_POS" String="记住先前面板位置" />
     <Translation ID="BOB_FIL_NAME" String="搜索：" />
-    <Translation ID="MES_PAGE" String="请到创意工坊该模组的页面了解详细信息" />
-    <Translation ID="BOB_ERR_FAT" String="该信息表明这个模组无法使用，并且需要关闭" />
+    <Translation ID="MES_PAGE" String="请到创意工坊该模组的页面了解详细信息。" />
+    <Translation ID="BOB_ERR_FAT" String="该信息表明这个模组无法使用，并且需要关闭。" />
     <Translation ID="BOB_ERR_HAR" String="BOB，树木与摆件替换器无法完全调用Harmony补丁。" />
-    <Translation ID="ERR_HAR0" String="Harmony调用失败" />
+    <Translation ID="ERR_HAR0" String="前置模组Harmony调用失败" />
     <Translation ID="ERR_HAR1" String="出现该问题的原因可能是：" />
-    <Translation ID="ERR_HAR2" String="前置模组Harmony 2并未订阅" />
+    <Translation ID="ERR_HAR2" String="前置模组Harmony 2并未订阅或未启用" />
     <Translation ID="ERR_HAR3" String="存在一个旧版/损坏模组导致Harmony 2无法正常运行" />
-    <Translation ID="BOB_UPD_040_0" String="地图树木替换器！正常激活BOB工具并选中树木" />
+    <Translation ID="BOB_UPD_040_0" String="地图树木替换器！正常激活BOB工具并选中树木。" />
     <Translation ID="BOB_UPD_041_0" String="修正在改变目标时间歇性面板异常。" />
-    <Translation ID="BOB_UPD_042_0" String="启用子建筑选项" />
-    <Translation ID="BOB_UPD_042_1" String="修正加载游戏时存在的潜在问题" />
-    <Translation ID="BOB_UPD_043_0" String="修正恢复所有建筑或所有道路替换时的概率刷新" />
-    <Translation ID="BOB_UPD_043_1" String="修正恢复所有建筑或所有道路LOD替换时的概率刷新" />
-    <Translation ID="BOB_UPD_043_2" String="调整信息面板文本框标签以适应较长的字符" />
-    <Translation ID="BOB_UPD_050_0" String="道路替换包的初步实现" />
-    <Translation ID="BOB_UPD_050_1" String="现在与Network Skins 2完全兼容" />
-    <Translation ID="BOB_UPD_050_2" String="更快的替换过程" />
-    <Translation ID="BOB_UPD_051_0" String="新的树木/摆件列表布局，用图标指示哪种类型的替换是活动的" />
+    <Translation ID="BOB_UPD_042_0" String="启用子建筑选项。" />
+    <Translation ID="BOB_UPD_042_1" String="修正加载游戏时存在的潜在问题。" />
+    <Translation ID="BOB_UPD_043_0" String="修正了当恢复到全建筑或全网络替换时的概率刷新" />
+    <Translation ID="BOB_UPD_043_1" String="修复恢复全网络或全构建替换后lod不刷新的问题" />
+    <Translation ID="BOB_UPD_043_2" String="调整信息面板文本框标签以适应较长的翻译字符串" />
+    <Translation ID="BOB_UPD_050_0" String="网络替换包的初步实现" />
+    <Translation ID="BOB_UPD_050_1" String="现在适当地与网络皮肤2兼容" />
+    <Translation ID="BOB_UPD_050_2" String="快速更换处理" />
+    <Translation ID="BOB_UPD_051_0" String="新的树/道具列表布局，用图标指示哪种类型的替换是活动的" />
     <Translation ID="BOB_UPD_052_0" String="添加配置管理以处理多个不同的配置文件，可通过选项面板访问" />
-    <Translation ID="BOB_UPD_060_0" String="单独摆件替换" />
-    <Translation ID="BOB_UPD_060_1" String="突出选定的摆件和树木" />
-    <Translation ID="BOB_UPD_060_2" String="现在可以在建筑中选中道路" />
-    <Translation ID="BOB_UPD_060_3" String="现在可以选中建筑中的装饰物" />
-    <Translation ID="BOB_UPD_060_4" String="重新设计更小的替换器窗口" />
+    <Translation ID="BOB_UPD_060_0" String="独立支撑替换" />
+    <Translation ID="BOB_UPD_060_1" String="突出选定的道具或树木" />
+    <Translation ID="BOB_UPD_060_2" String="现在可以选择建筑中的道路" />
+    <Translation ID="BOB_UPD_060_3" String="现在可以选择装饰建筑了" />
+    <Translation ID="BOB_UPD_060_4" String="重新设计的更小的更换面板" />
     <Translation ID="BOB_UPD_061_0" String="为列表添加升序/降序名称排序过滤器" />
     <Translation ID="BOB_UPD_062_0" String="增加从所有树和/或道具中移除地形破坏的能力(在选项面板中)" />
     <Translation ID="BOB_UPD_062_1" String="渡轮路径现在可以选择(更改/隐藏渡轮路径标记浮标)" />
-    <Translation ID="BOB_UPD_062_2" String="修复网络支撑角有时被错误地显示在选择" />
+    <Translation ID="BOB_UPD_062_2" String="修复固定网络支柱角度有时不正确显示选择" />
+    <Translation ID="BOB_UPD_080_0" String="添加个人道路道具替换" />
+    <Translation ID="BOB_UPD_080_1" String="添加Unified UI (UUI) 按钮" />
   </Translations>
 </Language>
