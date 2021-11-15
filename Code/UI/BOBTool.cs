@@ -1,7 +1,8 @@
-﻿using ColossalFramework;
+﻿using UnityEngine;
+using ColossalFramework;
 using ColossalFramework.UI;
-using UnityEngine;
 using UnifiedUI.Helpers;
+using EManagersLib.API;
 
 
 namespace BOB
@@ -126,7 +127,7 @@ namespace BOB
 			input.m_netService.m_itemLayers |= ItemClass.Layer.FerryPaths;
 
 			ToolErrors errors = ToolErrors.None;
-			RaycastOutput output;
+			EToolBase.RaycastOutput output;
 
 			// Cursor is dark by default.
 			m_cursor = darkCursor;
@@ -135,98 +136,52 @@ namespace BOB
 			if (m_mouseRayValid)
 			{
 				// Yes - raycast.
-				if (RayCast(input, out output))
+				if (PropAPI.RayCast(input, out output))
 				{
+					// Create new hover instance.
+					EInstanceID hoverInstance = InstanceID.Empty;
+
 					// Set base tool accurate position.
 					m_accuratePosition = output.m_hitPos;
 
 					// Select parent building of any 'untouchable' (sub-)building.
 					if (output.m_building != 0 && (Singleton<BuildingManager>.instance.m_buildings.m_buffer[output.m_building].m_flags & Building.Flags.Untouchable) != 0)
 					{
-						output.m_building = Building.FindParentBuilding(output.m_building);
+						output.m_building = Building.FindParentBuilding((ushort)output.m_building);
 					}
 
 					// Check for valid hits by type - network, building, prop, tree, in that order (so e.g. embedded networks can be selected).
 					if (output.m_netSegment != 0)
 					{
-						// Networks.
-						if (CheckSegment(output.m_netSegment, ref errors))
-						{
-							// CheckSegment passed - record hit position and set cursor to light.
-							output.m_hitPos = Singleton<NetManager>.instance.m_segments.m_buffer[output.m_netSegment].GetClosestPosition(output.m_hitPos);
-							m_cursor = lightCursor;
+						// Network - record hit position, set hover, and set cursor to light.
+						output.m_hitPos = Singleton<NetManager>.instance.m_segments.m_buffer[output.m_netSegment].GetClosestPosition(output.m_hitPos);
+						hoverInstance.NetSegment = (ushort)output.m_netSegment;
+						m_cursor = lightCursor;
 
-						}
-						else
-						{
-							// CheckSegment failed - deselect segment.
-							output.m_netSegment = 0;
-						}
+						// Set hover.
 					}
 					else if (output.m_building != 0)
 					{
-						// Buildings.
-						if (CheckBuilding(output.m_building, ref errors))
-						{
-							// CheckBuilding passed - record hit position and set cursor to light.
-							output.m_hitPos = Singleton<BuildingManager>.instance.m_buildings.m_buffer[output.m_building].m_position;
-							m_cursor = lightCursor;
-						}
-						else
-						{
-							// CheckBuilding failed - deselect building.
-							output.m_building = 0;
-						}
+						// Building - record hit position, set hover, and set cursor to light.
+						output.m_hitPos = Singleton<BuildingManager>.instance.m_buildings.m_buffer[output.m_building].m_position;
+						hoverInstance.Building = (ushort)output.m_building;
+						m_cursor = lightCursor;
+
+						// Set hover.
 					}
 					else if (output.m_propInstance != 0)
 					{
-						// Map props.
-						if (CheckProp(output.m_propInstance, ref errors))
-						{
-							// CheckProp passed - record hit position and set cursor to light.
-							output.m_hitPos = Singleton<PropManager>.instance.m_props.m_buffer[output.m_propInstance].Position;
-							m_cursor = lightCursor;
-						}
-						else
-						{
-							// CheckProp failed - deselect prop.
-							output.m_propInstance = 0;
-						}
-					}
-					else if (output.m_treeInstance != 0)
-					{
-						// Map trees.
-						if (CheckTree(output.m_treeInstance, ref errors))
-						{
-							// CheckTree passed - record hit position and set cursor to light.
-							output.m_hitPos = Singleton<TreeManager>.instance.m_trees.m_buffer[output.m_treeInstance].Position;
-							m_cursor = lightCursor;
-						}
-						else
-						{
-							// CheckTree failed - deselect tree.
-							output.m_treeInstance = 0u;
-						}
-					}
-
-
-					// Create new hover instance and set hovered type (if applicable).
-					InstanceID hoverInstance = InstanceID.Empty;
-					if (output.m_netSegment != 0)
-					{
-						hoverInstance.NetSegment = output.m_netSegment;
-					}
-					else if (output.m_building != 0)
-					{
-						hoverInstance.Building = output.m_building;
-					}
-					else if (output.m_propInstance != 0)
-					{
+						// Prop - record hit position, set hover, and set cursor to light.
+						output.m_hitPos = PropAPI.Wrapper.GetPosition(output.m_propInstance);
 						hoverInstance.Prop = output.m_propInstance;
+						m_cursor = lightCursor;
 					}
 					else if (output.m_treeInstance != 0)
 					{
+						// Map tree - record hit position, set hover, and set cursor to light.
+						output.m_hitPos = Singleton<TreeManager>.instance.m_trees.m_buffer[output.m_treeInstance].Position;
 						hoverInstance.Tree = output.m_treeInstance;
+						m_cursor = lightCursor;
 					}
 
 					// Has the hovered instance changed since last time?
@@ -237,27 +192,32 @@ namespace BOB
 						if (m_hoverInstance.Prop != 0)
 						{
 							// Unhide previously hovered prop.
-							if (Singleton<PropManager>.instance.m_props.m_buffer[m_hoverInstance.Prop].Hidden)
-							{
-								Singleton<PropManager>.instance.m_props.m_buffer[m_hoverInstance.Prop].Hidden = false;
-							}
+							PropAPI.Wrapper.SetFlags(m_hoverInstance.Prop, (ushort)(PropAPI.Wrapper.GetFlags(m_hoverInstance.Prop) & ~(ushort)PropInstance.Flags.Hidden));
 						}
 						else if (m_hoverInstance.Tree != 0)
 						{
+							// Local references.
+							TreeManager treeManager = Singleton<TreeManager>.instance;
+							TreeInstance[] treeBuffer = treeManager.m_trees.m_buffer;
+
 							// Unhide previously hovered tree.
-							if (Singleton<TreeManager>.instance.m_trees.m_buffer[m_hoverInstance.Tree].Hidden)
+							if (treeBuffer[m_hoverInstance.Tree].Hidden)
 							{
-								Singleton<TreeManager>.instance.m_trees.m_buffer[m_hoverInstance.Tree].Hidden = false;
-								Singleton<TreeManager>.instance.UpdateTreeRenderer(m_hoverInstance.Tree, updateGroup: true);
+								treeBuffer[m_hoverInstance.Tree].Hidden = false;
+								treeManager.UpdateTreeRenderer(m_hoverInstance.Tree, updateGroup: true);
 							}
 						}
 						else if (m_hoverInstance.Building != 0)
 						{
+							// Local references.
+							BuildingManager buildingManager = Singleton<BuildingManager>.instance;
+							Building[] buildingBuffer = buildingManager.m_buildings.m_buffer;
+
 							// Unhide previously hovered building.
-							if ((Singleton<BuildingManager>.instance.m_buildings.m_buffer[m_hoverInstance.Building].m_flags & Building.Flags.Hidden) != 0)
+							if ((buildingBuffer[m_hoverInstance.Building].m_flags & Building.Flags.Hidden) != 0)
 							{
-								Singleton<BuildingManager>.instance.m_buildings.m_buffer[m_hoverInstance.Building].m_flags &= ~Building.Flags.Hidden;
-								Singleton<BuildingManager>.instance.UpdateBuildingRenderer(m_hoverInstance.Building, updateGroup: true);
+								buildingBuffer[m_hoverInstance.Building].m_flags &= ~Building.Flags.Hidden;
+								buildingManager.UpdateBuildingRenderer(m_hoverInstance.Building, updateGroup: true);
 							}
 						}
 
@@ -368,7 +328,6 @@ namespace BOB
 					UIInput.MouseUsed();
 
 					// Create the info panel with the hovered building prefab.
-					//ToolsModifierControl.SetTool<DefaultTool>();
 					InfoPanelManager.SetTarget(Singleton<BuildingManager>.instance.m_buildings.m_buffer[building].Info);
 				}
 			}
@@ -385,7 +344,6 @@ namespace BOB
 						UIInput.MouseUsed();
 
 						// Create the info panel with the hovered network prefab.
-						//ToolsModifierControl.SetTool<DefaultTool>();
 						InfoPanelManager.SetTarget(Singleton<NetManager>.instance.m_segments.m_buffer[segment].Info);
 					}
 				}
@@ -403,13 +361,12 @@ namespace BOB
 							UIInput.MouseUsed();
 
 							// Create the info panel with the hovered network prefab.
-							//ToolsModifierControl.SetTool<DefaultTool>();
 							InfoPanelManager.SetTarget(Singleton<TreeManager>.instance.m_trees.m_buffer[tree].Info);
 						}
 					}
 					else
 					{
-						ushort prop = m_hoverInstance.Prop;
+						uint prop = PropAPI.GetPropID(m_hoverInstance);
 						// Try to get a hovered prop instance.
 						if (prop != 0)
 						{
@@ -420,8 +377,7 @@ namespace BOB
 								UIInput.MouseUsed();
 
 								// Create the info panel with the hovered network prefab.
-								// ToolsModifierControl.SetTool<DefaultTool>();
-								InfoPanelManager.SetTarget(Singleton<PropManager>.instance.m_props.m_buffer[prop].Info);
+								InfoPanelManager.SetTarget(PropAPI.Wrapper.GetInfo(prop));
 							}
 						}
 					}

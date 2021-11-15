@@ -34,9 +34,6 @@ namespace BOB
             // All good to go at this point.
             isModEnabled = true;
 
-            // Check if we're using EML's EPropManager.
-            ModSettings.ePropManager = ModUtils.IsModInstalled("EManagersLib", true);
-
             // Initialise data sets prior to savegame load.
             new AllBuildingReplacement();
             new AllNetworkReplacement();
@@ -45,19 +42,7 @@ namespace BOB
             new IndividualBuildingReplacement();
             new IndividualNetworkReplacement();
             new MapTreeReplacement();
-
-            // Using EPropManager?
-            if (ModSettings.ePropManager)
-            {
-                // Yes - use EPropManager.
-                new EMapPropReplacement();
-            }
-            else
-            {
-                // No - use game prop manager.
-                new MapPropReplacement();
-            }
-            
+            new MapPropReplacement();
             new Scaling();
 
             base.OnCreated(loading);
@@ -115,17 +100,8 @@ namespace BOB
             // Load configuration file.
             ConfigurationUtils.LoadConfig();
 
-            // Using EPropManager?
-            if (ModSettings.ePropManager)
-            {
-                // Yes - use BOB tool with EPropManager.
-                ToolsModifierControl.toolController.gameObject.AddComponent<EBOBTool>();
-            }
-            else
-            {
-                // No - use BOB tool with base game prop manager.
-                ToolsModifierControl.toolController.gameObject.AddComponent<BOBTool>();
-            }
+            // Set up BOB tool.
+            ToolsModifierControl.toolController.gameObject.AddComponent<BOBTool>();
 
             // Display update notification.
             WhatsNew.ShowWhatsNew();

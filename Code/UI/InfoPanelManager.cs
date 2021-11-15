@@ -169,18 +169,7 @@ namespace BOB
 						// Give it a unique name for easy finding with ModTools.
 						uiGameObject = new GameObject("BOBMapPanel");
 						uiGameObject.transform.parent = UIView.GetAView().transform;
-
-						// Using EPropManager?
-						if (ModSettings.ePropManager)
-						{
-							// Yes - use panel with EPropManager.
-							panel = uiGameObject.AddComponent<EBOBMapInfoPanel>();
-						}
-						else
-						{
-							// No - use panel with game prop manager.
-							panel = uiGameObject.AddComponent<BOBMapInfoPanel>();
-						}
+						panel = uiGameObject.AddComponent<BOBMapInfoPanel>();
 					}
 					else
 					{

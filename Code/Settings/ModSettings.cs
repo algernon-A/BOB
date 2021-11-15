@@ -20,10 +20,6 @@ namespace BOB
         [XmlElement("StopPropRuining")]
         public bool NoPropRuining { get => StopPropRuining; set => StopPropRuining = value; }
 
-        // Whether or not we're running with Extended Manager Library's EPropManager.
-        [XmlIgnore]
-        internal static bool ePropManager = false;
-
         // Default behaviour of the show individual props setting.
         [XmlIgnore]
         internal static int indDefault;

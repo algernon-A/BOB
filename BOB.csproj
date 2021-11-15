@@ -43,8 +43,9 @@
     <Reference Include="ColossalManaged">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\ColossalManaged.dll</HintPath>
     </Reference>
-    <Reference Include="EManagersLib.API">
-      <HintPath>..\..\source\repos\EManagersLib\EManagersLib.API\bin\Debug\EManagersLib.API.dll</HintPath>
+    <Reference Include="EManagersLib.API, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\workshop\content\255710\2607980391\EManagersLib.API.dll</HintPath>
     </Reference>
     <Reference Include="ICities">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\ICities.dll</HintPath>
@@ -73,7 +74,6 @@
     <Compile Include="Code\PreviewRenderer\PreviewPanel.cs" />
     <Compile Include="Code\PreviewRenderer\PreviewRenderer.cs" />
     <Compile Include="Code\Replacement\Building\BuildingReplacementBase.cs" />
-    <Compile Include="Code\Replacement\Map\EMapPropReplacement.cs" />
     <Compile Include="Code\Replacement\Network\IndividualNetworkReplacement.cs" />
     <Compile Include="Code\Replacement\Map\MapPropReplacement.cs" />
     <Compile Include="Code\Replacement\Network\NetworkReplacementBase.cs" />
@@ -82,7 +82,6 @@
     <Compile Include="Code\Replacement\Scaling.cs" />
     <Compile Include="Code\Settings\OptionsPanelTabs\RuiningOptions.cs" />
     <Compile Include="Code\UI\BOBSlider.cs" />
-    <Compile Include="Code\UI\EBOBTool.cs" />
     <Compile Include="Code\UI\MapPanel.cs" />
     <Compile Include="Code\UI\PanelBase.cs" />
     <Compile Include="Code\UI\RandomPanel.cs" />
@@ -143,6 +142,7 @@
     <Content Include="Changelog.txt" />
     <Content Include="Images\PreviewImage-Beta.png" />
     <Content Include="Images\PreviewImage-Prod.png" />
+    <Content Include="Libraries\EManagersLib.API.dll" />
     <Content Include="Libraries\UnifiedUILib.dll" />
     <Content Include="ReplacementPacks\TestPacks.xml" />
     <Content Include="ReplacementPacks\RoadArrows.xml" />
@@ -191,7 +191,7 @@ del "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName
 xcopy /y "$(TargetPath)" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)"
 
 xcopy /y "$(SolutionDir)packages\CitiesHarmony.API.2.0.0\lib\net35\CitiesHarmony.API.dll" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)"
-xcopy /y "$(ProjectDir)\Libraries\UnifiedUILib.dll" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)"
+xcopy /y "$(ProjectDir)\Libraries\*.dll" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)"
 
 mkdir "$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\Translations"
 del "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\Translations\*"
