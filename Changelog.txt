@@ -1,4 +1,9 @@
-﻿Version 0.8.3 -
+﻿Version 0.8.4 -
+
+- Convert to new Extended Managers Library API (compatible with EML 0.8+)
+
+
+Version 0.8.3 -
 
 - Fix inter-thread communication during map (standalone) prop and tree replacement
 
