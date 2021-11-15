@@ -1,4 +1,9 @@
-﻿Version 0.8.4 -
+﻿Version 0.8.4.1 hotfix -
+
+- Fix PropAPI initialization not occuring for players without Move It (Beta version) and/or Prop Anarchy installed
+
+
+Version 0.8.4 -
 
 - Convert to new Extended Managers Library API (compatible with EML 0.8+)
 

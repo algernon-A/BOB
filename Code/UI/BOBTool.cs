@@ -46,6 +46,9 @@ namespace BOB
 		{
 			base.Awake();
 
+			// Initializae PropAPI.
+			PropAPI.Initialize();
+
 			// Load cursors.
 			lightCursor = TextureUtils.LoadCursor("BOB-CursorLight.png");
 			darkCursor = TextureUtils.LoadCursor("BOB-CursorDark.png");
