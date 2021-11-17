@@ -1,4 +1,10 @@
-﻿Version 0.8.4.1 hotfix -
+﻿Version 0.8.4.2 hotfix -
+
+- Fix sliders not responding to mouse dragging after scroll wheel is used
+- Fix scale slider values not properly resetting on selection change
+
+
+Version 0.8.4.1 hotfix -
 
 - Fix PropAPI initialization not occuring for players without Move It (Beta version) and/or Prop Anarchy installed
 
