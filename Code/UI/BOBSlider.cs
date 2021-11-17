@@ -154,6 +154,7 @@ namespace BOB
 			suppressEvents = true;
 			TrueValue = trueValue.RoundToNearest(multiplier) + (mouseEvent.wheelDelta * multiplier);
 			ValueField.text = TrueValue.RoundToNearest(multiplier).ToString();
+			suppressEvents = false;
 
 			// Use event and invoke any handlers.
 			mouseEvent.Use();
