@@ -175,5 +175,22 @@
         <replacement target="No Left Turn Sign" replacement="1779508928.R2 R3-2 No Left Turn Sign_Data" rotation="90" />
       </propReplacements>
     </replacementpack>
+    <replacementpack name="Japanese Traffic Speed Signs by Krakow131">
+      <propReplacements>
+        <replacement target="30 Speed Limit" replacement="2567402949.JPTS Speed limit 30km/h_Data" rotation="0" />
+        <replacement target="40 Speed Limit" replacement="2567402949.JPTS Speed limit 40km/h_Data" rotation="0" />
+        <replacement target="50 Speed Limit" replacement="2567402949.JPTS Speed limit 50km/h_Data" rotation="0" />
+        <replacement target="60 Speed Limit" replacement="2567402949.JPTS Speed limit 60km/h_Data" rotation="0" />
+        <replacement target="100 Speed Limit" replacement="2567402949.JPTS Minimum speed 50km/h_Data" rotation="0" />
+      </propReplacements>
+    </replacementpack>
+    <replacementpack name="Japanese Traffic Signs by Krakow131">
+      <propReplacements>
+        <replacement target="Stop Sign" replacement="2567402949.JPTS Stop (2017~)_Data" rotation="0" />
+        <replacement target="No Parking Sign" replacement="2567402949.JPJPTS No parking_Data" rotation="0" />
+        <replacement target="No Right Turn Sign" replacement="2567402949.JPTS Straight ahead or left turn_Data" rotation="0" />
+        <replacement target="No Left Turn Sign" replacement="2567402949.JPTS Straight or right turn_Data" rotation="0" />
+      </propReplacements>
+    </replacementpack>
   </propPacks>
 </BOBPackFile>
