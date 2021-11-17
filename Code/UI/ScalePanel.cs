@@ -82,8 +82,8 @@ namespace BOB
 				// Prop or tree?  Set slider values accordingly.
 				if (selectedLoadedPrefab is PropInfo prop)
 				{
-					minScaleSlider.value = prop.m_minScale;
-					maxScaleSlider.value = prop.m_maxScale;
+					minScaleSlider.TrueValue = prop.m_minScale;
+					maxScaleSlider.TrueValue = prop.m_maxScale;
 
 					// Enable revert button.
 					revertButton.Enable();
@@ -93,8 +93,8 @@ namespace BOB
 				}
 				else if (selectedLoadedPrefab is TreeInfo tree)
 				{
-					minScaleSlider.value = tree.m_minScale;
-					maxScaleSlider.value = tree.m_maxScale;
+					minScaleSlider.TrueValue = tree.m_minScale;
+					maxScaleSlider.TrueValue = tree.m_maxScale;
 
 					// Enable revert button.
 					revertButton.Enable();
@@ -105,8 +105,8 @@ namespace BOB
 				else
 				{
 					// Neither prop nor tree, presumably null - set sliders to default values.
-					minScaleSlider.value = 1f;
-					maxScaleSlider.value = 1f;
+					minScaleSlider.TrueValue = 1f;
+					maxScaleSlider.TrueValue = 1f;
 
 					// Disable revert button if no valid selection.
 					revertButton.Disable();
