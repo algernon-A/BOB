@@ -13,13 +13,19 @@ namespace BOB
 		internal enum OrderBy
 		{
 			NameAscending = 0,
-			NameDescending
+			NameDescending,
+			CreatorAscending,
+			CreatorDescending
 		}
 
 
 		// Layout constants - general.
 		protected const float Margin = 5f;
 		protected const float ToggleSize = 32f;
+
+		// Layout constants - components.
+		protected const float ArrowButtonWidth = 32f;
+		protected const float ArrowButtonHeight = 20f;
 
 		// Layout constants - Y.
 		protected const float TitleHeight = 40f;
@@ -160,7 +166,7 @@ namespace BOB
 		/// </summary>
 		protected virtual void SortLoaded(UIComponent control, UIMouseEventParameter mouseEvent)
 		{
-			// To`ggle status (set to descending if we're currently ascending, otherwise set to ascending).
+			// Toggle status (set to descending if we're currently ascending, otherwise set to ascending).
 			if (loadedSearchStatus == (int)OrderBy.NameAscending)
 			{
 				// Order by name descending.
@@ -181,10 +187,9 @@ namespace BOB
 
 
 		/// <summary>
-		/// Sets the states of the two given sort buttons to match the given search status.
+		/// Sets the states of the given sort button to match the given search status.
 		/// </summary>
 		/// <param name="activeButton">Currently active sort button</param>
-		/// <param name="inactiveButton">Inactive button (other sort button for same list)</param>
 		/// <param name="searchStatus">Search status to apply</param>
 		protected void SetSortButton(UIButton activeButton, int searchStatus)
 		{
@@ -269,15 +274,13 @@ namespace BOB
 		/// <param name="parent">Parent component</param>
 		/// <param name="posX">Relative X postion</param>
 		/// <param name="posY">Relative Y position</param>
-		/// <param name="width">Button width (default 32)</param>
-		/// <param name="height">Button height (default 20)</param>
 		/// <returns>New arrow button</returns>
-		protected UIButton ArrowButton(UIComponent parent, float posX, float posY, float width = 32f, float height = 20f)
+		protected UIButton ArrowButton(UIComponent parent, float posX, float posY)
 		{
 			UIButton button = parent.AddUIComponent<UIButton>();
 
 			// Size and position.
-			button.size = new Vector2(width, height);
+			button.size = new Vector2(ArrowButtonWidth, ArrowButtonHeight);
 			button.relativePosition = new Vector2(posX, posY);
 
 			// Appearance.

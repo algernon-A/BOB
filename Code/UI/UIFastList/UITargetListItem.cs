@@ -56,17 +56,4 @@ namespace BOB
 		// Lane list.
 		public List<int> lanes = new List<int>();
 	}
-
-
-	/// <summary>
-	///  Data record for UI prop list item for showing creators.
-	/// </summary>
-	public class PrefabRowItem
-    {
-		// Prefab record.
-		public PrefabInfo prefab;
-
-		// Creator name.
-		public string creatorName;
-    }
 }

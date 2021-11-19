@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using ColossalFramework;
@@ -21,7 +22,7 @@ namespace BOB
 		// Layout constants - Y.
 		private const float SliderHeight = 38f;
 		private const float ToolY = TitleHeight + Margin;
-		private const float ListY = ToolY + ToolbarHeight + Margin;
+		private const float ListY = ToolY + ToolbarHeight + ArrowButtonHeight + Margin;
 		private const float MinOffsetY = ListY;
 		private const float MaxOffsetY = MinOffsetY + SliderHeight;
 		private const float RevertY = MaxOffsetY + SliderHeight + 45f;
@@ -37,6 +38,7 @@ namespace BOB
 		private readonly UIFastList loadedList;
 		private readonly BOBSlider minScaleSlider, maxScaleSlider;
 		private readonly UIButton revertButton;
+		private readonly UIButton loadedCreatorButton;
 
 		// Current selection.
 		private PrefabInfo selectedLoadedPrefab;
@@ -222,6 +224,9 @@ namespace BOB
 			loadedNameButton = ArrowButton(this, LoadedX + 10f, ListY - 20f);
 			loadedNameButton.eventClicked += SortLoaded;
 
+			loadedCreatorButton = ArrowButton(this, LoadedX + UILoadedScalingPropRow.CreatorX + 10f, ListY - 20f);
+			loadedCreatorButton.eventClicked += SortLoaded;
+
 			// Default is name ascending.
 			SetFgSprites(loadedNameButton, "IconUpArrow2");
 
@@ -290,17 +295,29 @@ namespace BOB
 				}
 			}
 
-			// Master lists should already be sorted by display name so no need to sort again here.
-			// Reverse order of filtered list if we're searching name descending.
-			if (loadedSearchStatus == (int)OrderBy.NameDescending)
+
+			// Create new object list for fastlist, ordering as approprite.
+			object[] objectArray;
+			switch (loadedSearchStatus)
 			{
-				list.Reverse();
+				case (int)OrderBy.NameDescending:
+					objectArray = list.OrderByDescending(item => item.displayName).ToArray();
+					break;
+				case (int)OrderBy.CreatorAscending:
+					objectArray = list.OrderBy(item => item.creatorName).ToArray();
+					break;
+				case (int)OrderBy.CreatorDescending:
+					objectArray = list.OrderByDescending(item => item.creatorName).ToArray();
+					break;
+				default:
+					objectArray = list.OrderBy(item => item.displayName).ToArray();
+					break;
 			}
 
 			// Create return fastlist from our filtered list.
 			loadedList.rowsData = new FastList<object>
 			{
-				m_buffer = list.ToArray(),
+				m_buffer = objectArray,
 				m_size = list.Count
 			};
 
@@ -374,6 +391,58 @@ namespace BOB
 			}
 		}
 
+
+		/// <summary>
+		/// Loaded list sort button event handler.
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="mouseEvent">Mouse event (unused)</param>
+		/// </summary>
+		protected override void SortLoaded(UIComponent control, UIMouseEventParameter mouseEvent)
+		{
+			// Check if we are using the name or creator button.
+			if (control == loadedNameButton)
+			{
+				// Name button.
+				// Toggle status (set to descending if we're currently ascending, otherwise set to ascending).
+				if (loadedSearchStatus == (int)OrderBy.NameAscending)
+				{
+					// Order by name descending.
+					loadedSearchStatus = (int)OrderBy.NameDescending;
+				}
+				else
+				{
+					// Order by name ascending.
+					loadedSearchStatus = (int)OrderBy.NameAscending;
+				}
+
+				// Reset name order buttons.
+				SetSortButton(loadedNameButton, loadedCreatorButton, loadedSearchStatus);
+			}
+			else if (control == loadedCreatorButton)
+			{
+				// Creator button.
+				// Toggle status (set to descending if we're currently ascending, otherwise set to ascending).
+				if (loadedSearchStatus == (int)OrderBy.CreatorAscending)
+				{
+					// Order by creator descending.
+					loadedSearchStatus = (int)OrderBy.CreatorDescending;
+				}
+				else
+				{
+					// Order by name ascending.
+					loadedSearchStatus = (int)OrderBy.CreatorAscending;
+				}
+
+				// Reset name order buttons.
+				SetSortButton(loadedCreatorButton, loadedNameButton, loadedSearchStatus);
+			}
+
+
+			// Regenerate loaded list.
+			LoadedList();
+		}
+
+
 		/// <summary>
 		/// Revert button event handler.
 		/// <param name="control">Calling component (unused)</param>
@@ -420,6 +489,39 @@ namespace BOB
 			{
 				Scaling.Instance.ApplyMaxScale(selectedLoadedPrefab, value);
 			}
+		}
+
+
+		/// <summary>
+		/// Sets the states of the given sort button to match the given search status.
+		/// </summary>
+		/// <param name="activeButton">Currently active sort button</param>
+		/// <param name="inactiveButton">Inactive button (other sort button for same list)</param>
+		/// <param name="searchStatus">Search status to apply</param>
+		protected void SetSortButton(UIButton activeButton, UIButton inactiveButton, int searchStatus)
+		{
+			// Null check.
+			if (activeButton == null || inactiveButton == null)
+			{
+				return;
+			}
+
+			bool ascending = searchStatus == (int)OrderBy.CreatorAscending || searchStatus == (int)OrderBy.NameAscending;
+
+			// Toggle status (set to descending if we're currently ascending, otherwise set to ascending).
+			if (ascending)
+			{
+				// Order ascending.
+				SetFgSprites(activeButton, "IconUpArrow2Focused");
+			}
+			else
+			{
+				// Order descending.
+				SetFgSprites(activeButton, "IconDownArrow2Focused");
+			}
+
+			// Reset inactive button.
+			SetFgSprites(inactiveButton, "IconUpArrow2");
 		}
 
 
