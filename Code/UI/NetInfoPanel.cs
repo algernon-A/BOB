@@ -17,7 +17,7 @@ namespace BOB
 
 		// Current selection references.
 		private NetInfo currentNet;
-		private NetPropListItem currentNetItem;
+		private NetTargetListItem currentNetItem;
 
 
 		// Button tooltips.
@@ -40,7 +40,7 @@ namespace BOB
 		/// <summary>
 		/// Handles changes to the currently selected target prefab.
 		/// </summary>
-		internal override PropListItem CurrentTargetItem
+		internal override TargetListItem CurrentTargetItem
         {
 			set
 			{
@@ -48,7 +48,7 @@ namespace BOB
 				base.CurrentTargetItem = value;
 
 				// Set net item reference.
-				currentNetItem = value as NetPropListItem;
+				currentNetItem = value as NetTargetListItem;
 
 				// Ensure valid selections before proceeding.
 				if (currentNetItem != null && currentNet != null)
@@ -171,7 +171,7 @@ namespace BOB
 					else
 					{
 						// Individual replacement.
-						NetPropListItem netItem = CurrentTargetItem as NetPropListItem;
+						NetTargetListItem netItem = CurrentTargetItem as NetTargetListItem;
 
 						IndividualNetworkReplacement.Instance.Replace(currentNet, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, netItem.lane, CurrentTargetItem.index, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
 
@@ -274,9 +274,9 @@ namespace BOB
 		/// Updates the target item record for changes in replacement status (e.g. after applying or reverting changes).
 		/// </summary>
 		/// <param name="propListItem">Target item</param>
-		protected override void UpdateTargetItem(PropListItem propListItem)
+		protected override void UpdateTargetItem(TargetListItem targetListItem)
 		{
-			if (propListItem is NetPropListItem netItem)
+			if (targetListItem is NetTargetListItem netItem)
 			{
 				// Determine index to test - if no individual index, just grab first one from list.
 				int propIndex = netItem.index;
@@ -296,51 +296,51 @@ namespace BOB
 				BOBNetReplacement packReplacement = NetworkPackReplacement.Instance.ActiveReplacement(currentNet, lane, propIndex);
 				if (packReplacement != null)
 				{
-					propListItem.packagePrefab = packReplacement.replacementInfo;
+					targetListItem.packagePrefab = packReplacement.replacementInfo;
 				}
 				else
 				{
 					// If no active current record, ensure that it's reset to null.
-					propListItem.packagePrefab = null;
+					targetListItem.packagePrefab = null;
 				}
 
 				// All-network replacement and original probability (if any).
 				BOBNetReplacement allNetReplacement = AllNetworkReplacement.Instance.ActiveReplacement(currentNet, lane, propIndex);
 				if (allNetReplacement != null)
 				{
-					propListItem.allPrefab = allNetReplacement.replacementInfo;
-					propListItem.allProb = allNetReplacement.probability;
+					targetListItem.allPrefab = allNetReplacement.replacementInfo;
+					targetListItem.allProb = allNetReplacement.probability;
 				}
 				else
 				{
 					// If no active current record, ensure that it's reset to null.
-					propListItem.allPrefab = null;
+					targetListItem.allPrefab = null;
 				}
 
 				// Network replacement and original probability (if any).
 				BOBNetReplacement netReplacement = NetworkReplacement.Instance.ActiveReplacement(currentNet, lane, propIndex);
 				if (netReplacement != null)
 				{
-					propListItem.replacementPrefab = netReplacement.replacementInfo;
-					propListItem.replacementProb = netReplacement.probability;
+					targetListItem.replacementPrefab = netReplacement.replacementInfo;
+					targetListItem.replacementProb = netReplacement.probability;
 				}
 				else
 				{
 					// If no active current record, ensure that it's reset to null.
-					propListItem.replacementPrefab = null;
+					targetListItem.replacementPrefab = null;
 				}
 
 				// Individual replacement and original probability (if any).
 				BOBNetReplacement individualReplacement = IndividualNetworkReplacement.Instance.ActiveReplacement(currentNet, lane, propIndex);
 				if (individualReplacement != null)
 				{
-					propListItem.individualPrefab = individualReplacement.replacementInfo;
-					propListItem.individualProb = individualReplacement.probability;
+					targetListItem.individualPrefab = individualReplacement.replacementInfo;
+					targetListItem.individualProb = individualReplacement.probability;
 				}
 				else
 				{
 					// If no active current record, ensure that it's reset to null.
-					propListItem.individualPrefab = null;
+					targetListItem.individualPrefab = null;
 				}
 			}
 		}
@@ -355,7 +355,7 @@ namespace BOB
 			targetList.selectedIndex = -1;
 
 			// List of prefabs that have passed filtering.
-			List<NetPropListItem> propList = new List<NetPropListItem>();
+			List<TargetListItem> itemList = new List<TargetListItem>();
 
 			// Check to see if this building contains any props.
 			if (currentNet.m_lanes == null || currentNet.m_lanes.Length == 0)
@@ -385,7 +385,7 @@ namespace BOB
 				for (int propIndex = 0; propIndex < laneProps.Length; ++propIndex)
 				{
 					// Create new list item.
-					NetPropListItem propListItem = new NetPropListItem();
+					NetTargetListItem targetListItem = new NetTargetListItem();
 
 					// Try to get relevant prefab (prop/tree), using finalProp.
 					PrefabInfo finalInfo = IsTree ? (PrefabInfo)laneProps[propIndex]?.m_finalTree : (PrefabInfo)laneProps[propIndex]?.m_finalProp;
@@ -397,80 +397,80 @@ namespace BOB
 					}
 
 					// Get original (pre-replacement) tree/prop prefab and current probability (as default original probability).
-					propListItem.originalPrefab = finalInfo;
-					propListItem.originalProb = laneProps[propIndex].m_probability;
-					propListItem.originalAngle = laneProps[propIndex].m_angle;
+					targetListItem.originalPrefab = finalInfo;
+					targetListItem.originalProb = laneProps[propIndex].m_probability;
+					targetListItem.originalAngle = laneProps[propIndex].m_angle;
 
 					// Grouped or individual?
 					if (indCheck.isChecked)
 					{
 						// Individual - set index to the current prop indexes.
-						propListItem.index = propIndex;
-						propListItem.lane = lane;
+						targetListItem.index = propIndex;
+						targetListItem.lane = lane;
 					}
 					else
 					{
 						// Grouped - set index to -1 and add to our list of indexes.
-						propListItem.index = -1;
-						propListItem.lane = -1;
-						propListItem.indexes.Add(propIndex);
-						propListItem.lanes.Add(lane);
+						targetListItem.index = -1;
+						targetListItem.lane = -1;
+						targetListItem.indexes.Add(propIndex);
+						targetListItem.lanes.Add(lane);
 					}
 
 					// All-network replacement and original probability (if any).
 					BOBNetReplacement allNetReplacement = AllNetworkReplacement.Instance.ActiveReplacement(currentNet, lane, propIndex);
 					if (allNetReplacement != null)
 					{
-						propListItem.allPrefab = allNetReplacement.replacementInfo;
-						propListItem.allProb = allNetReplacement.probability;
+						targetListItem.allPrefab = allNetReplacement.replacementInfo;
+						targetListItem.allProb = allNetReplacement.probability;
 
 						// Update original prop reference.
-						propListItem.originalPrefab = allNetReplacement.targetInfo;
+						targetListItem.originalPrefab = allNetReplacement.targetInfo;
 					}
 
 					// Network replacement and original probability (if any).
 					BOBNetReplacement netReplacement = NetworkReplacement.Instance.ActiveReplacement(currentNet, lane, propIndex);
 					if (netReplacement != null)
 					{
-						propListItem.replacementPrefab = netReplacement.replacementInfo;
-						propListItem.replacementProb = netReplacement.probability;
+						targetListItem.replacementPrefab = netReplacement.replacementInfo;
+						targetListItem.replacementProb = netReplacement.probability;
 
 						// Update original prop reference.
-						propListItem.originalPrefab = netReplacement.targetInfo;
+						targetListItem.originalPrefab = netReplacement.targetInfo;
 					}
 
 					// Individual replacement and original probability (if any).
 					BOBNetReplacement individualReplacement = IndividualNetworkReplacement.Instance.ActiveReplacement(currentNet, lane, propIndex);
 					if (individualReplacement != null)
 					{
-						propListItem.individualPrefab = individualReplacement.replacementInfo;
-						propListItem.individualProb = individualReplacement.probability;
+						targetListItem.individualPrefab = individualReplacement.replacementInfo;
+						targetListItem.individualProb = individualReplacement.probability;
 
 						// Update original prop reference.
-						propListItem.originalPrefab = individualReplacement.targetInfo;
+						targetListItem.originalPrefab = individualReplacement.targetInfo;
 					}
 
 					// Replacement pack replacement and original probability (if any).
 					BOBNetReplacement packReplacement = NetworkPackReplacement.Instance.ActiveReplacement(currentNet, lane, propIndex);
 					if (packReplacement != null)
 					{
-						propListItem.packagePrefab = packReplacement.replacementInfo;
+						targetListItem.packagePrefab = packReplacement.replacementInfo;
 
 						// Update original prop reference.
-						propListItem.originalPrefab = packReplacement.targetInfo;
+						targetListItem.originalPrefab = packReplacement.targetInfo;
 					}
 
 					// Are we grouping?
-					if (propListItem.index == -1)
+					if (targetListItem.index == -1)
 					{
 						// Yes, grouping - initialise a flag to show if we've matched.
 						bool matched = false;
 
 						// Iterate through each item in our existing list of props.
-						foreach (NetPropListItem item in propList)
+						foreach (NetTargetListItem item in itemList)
 						{
 							// Check to see if we already have this in the list - matching original prefab, individual replacement prefab, network replacement prefab, all-network replacement prefab, and probability.
-							if (item.originalPrefab == propListItem.originalPrefab && item.individualPrefab == propListItem.individualPrefab && item.replacementPrefab == propListItem.replacementPrefab && propListItem.allPrefab == item.allPrefab)
+							if (item.originalPrefab == targetListItem.originalPrefab && item.individualPrefab == targetListItem.individualPrefab && item.replacementPrefab == targetListItem.replacementPrefab && targetListItem.allPrefab == item.allPrefab)
 							{
 								// We've already got an identical grouped instance of this item - add this index and lane to the lists of indexes and lanes under that item and set the flag to indicate that we've done so.
 								item.indexes.Add(propIndex);
@@ -491,21 +491,21 @@ namespace BOB
 					}
 
 					// Add this item to our list.
-					propList.Add(propListItem);
+					itemList.Add(targetListItem);
 				}
 			}
 
 			// Create return fastlist from our filtered list, ordering by name.
 			targetList.rowsData = new FastList<object>()
 			{
-				m_buffer = targetSearchStatus == (int)OrderBy.NameDescending ? propList.OrderByDescending(item => item.DisplayName).ToArray() : propList.OrderBy(item => item.DisplayName).ToArray(),
-				m_size = propList.Count
+				m_buffer = targetSearchStatus == (int)OrderBy.NameDescending ? itemList.OrderByDescending(item => item.DisplayName).ToArray() : itemList.OrderBy(item => item.DisplayName).ToArray(),
+				m_size = itemList.Count
 			};
 
 			targetList.Refresh();
 
 			// If the list is empty, show the 'no props' label; otherwise, hide it.
-			if (propList.Count == 0)
+			if (itemList.Count == 0)
 			{
 				noPropsLabel.Show();
 			}

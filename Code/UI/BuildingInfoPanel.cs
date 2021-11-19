@@ -115,7 +115,7 @@ namespace BOB
 		/// <summary>
 		/// Handles changes to the currently selected target prefab.
 		/// </summary>
-		internal override PropListItem CurrentTargetItem
+		internal override TargetListItem CurrentTargetItem
 		{
 			set
 			{
@@ -441,52 +441,52 @@ namespace BOB
 		/// Updates the target item record for changes in replacement status (e.g. after applying or reverting changes).
 		/// </summary>
 		/// <param name="propListItem">Target item</param>
-		protected override void UpdateTargetItem(PropListItem propListItem)
+		protected override void UpdateTargetItem(TargetListItem targetListItem)
 		{
 			// Determine index to test - if no individual index, just grab first one from list.
-			int propIndex = propListItem.index;
+			int propIndex = targetListItem.index;
 			if (propIndex < 0)
             {
-				propIndex = propListItem.indexes[0];
+				propIndex = targetListItem.indexes[0];
             }
 
 			// All-building replacement and original probability (if any).
 			BOBBuildingReplacement allBuildingReplacement = AllBuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex);
 			if (allBuildingReplacement != null)
 			{
-				propListItem.allPrefab = allBuildingReplacement.replacementInfo;
-				propListItem.allProb = allBuildingReplacement.probability;
+				targetListItem.allPrefab = allBuildingReplacement.replacementInfo;
+				targetListItem.allProb = allBuildingReplacement.probability;
 			}
 			else
 			{
 				// If no active current record, ensure that it's reset to null.
-				propListItem.allPrefab = null;
+				targetListItem.allPrefab = null;
 			}
 
 			// Building replacement and original probability (if any).
 			BOBBuildingReplacement buildingReplacement = BuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex);
 			if (buildingReplacement != null)
 			{
-				propListItem.replacementPrefab = buildingReplacement.replacementInfo;
-				propListItem.replacementProb = buildingReplacement.probability;
+				targetListItem.replacementPrefab = buildingReplacement.replacementInfo;
+				targetListItem.replacementProb = buildingReplacement.probability;
 			}
 			else
 			{
 				// If no active current record, ensure that it's reset to null.
-				propListItem.replacementPrefab = null;
+				targetListItem.replacementPrefab = null;
 			}
 
 			// Individual replacement and original probability (if any).
 			BOBBuildingReplacement individualReplacement = IndividualBuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex);
 			if (individualReplacement != null)
 			{
-				propListItem.individualPrefab = individualReplacement.replacementInfo;
-				propListItem.individualProb = individualReplacement.probability;
+				targetListItem.individualPrefab = individualReplacement.replacementInfo;
+				targetListItem.individualProb = individualReplacement.probability;
 			}
 			else
 			{
 				// If no active current record, ensure that it's reset to null.
-				propListItem.individualPrefab = null;
+				targetListItem.individualPrefab = null;
 			}
 		}
 
@@ -500,7 +500,7 @@ namespace BOB
 			targetList.selectedIndex = -1;
 
 			// List of prefabs that have passed filtering.
-			List<PropListItem> propList = new List<PropListItem>();
+			List<TargetListItem> itemList = new List<TargetListItem>();
 
 			// Check to see if this building contains any props.
 			if (currentBuilding.m_props == null || currentBuilding.m_props.Length == 0)
@@ -515,7 +515,7 @@ namespace BOB
 			for (int propIndex = 0; propIndex < currentBuilding.m_props.Length; ++propIndex)
 			{
 				// Create new list item.
-				PropListItem propListItem = new PropListItem();
+				TargetListItem targetListItem = new TargetListItem();
 
 				// Try to get relevant prefab (prop/tree), using finalProp.
 				PrefabInfo finalInfo = IsTree ? (PrefabInfo)currentBuilding.m_props[propIndex]?.m_finalTree : (PrefabInfo)currentBuilding.m_props[propIndex]?.m_finalProp;
@@ -530,64 +530,64 @@ namespace BOB
 				if (indCheck.isChecked)
 				{
 					// Individual - set index to the current building prop indexes.
-					propListItem.index = propIndex;
+					targetListItem.index = propIndex;
 				}
 				else
 				{
 					// Grouped - set index to -1 and add to our list of indexes.
-					propListItem.index = -1;
-					propListItem.indexes.Add(propIndex);
+					targetListItem.index = -1;
+					targetListItem.indexes.Add(propIndex);
 				}
 
 				// Get original (pre-replacement) tree/prop prefab and current probability (as default original probability).
-				propListItem.originalPrefab = finalInfo;
-				propListItem.originalProb = currentBuilding.m_props[propIndex].m_probability;
-				propListItem.originalAngle = (currentBuilding.m_props[propIndex].m_radAngle * 180f) / Mathf.PI;
+				targetListItem.originalPrefab = finalInfo;
+				targetListItem.originalProb = currentBuilding.m_props[propIndex].m_probability;
+				targetListItem.originalAngle = (currentBuilding.m_props[propIndex].m_radAngle * 180f) / Mathf.PI;
 
 				// All-building replacement and original probability (if any).
 				BOBBuildingReplacement allBuildingReplacement = AllBuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex);
 				if (allBuildingReplacement != null)
 				{
-					propListItem.allPrefab = allBuildingReplacement.replacementInfo;
-					propListItem.allProb = allBuildingReplacement.probability;
+					targetListItem.allPrefab = allBuildingReplacement.replacementInfo;
+					targetListItem.allProb = allBuildingReplacement.probability;
 
 					// Update original prop reference.
-					propListItem.originalPrefab = allBuildingReplacement.targetInfo;
+					targetListItem.originalPrefab = allBuildingReplacement.targetInfo;
 				}
 
 				// Building replacement and original probability (if any).
 				BOBBuildingReplacement buildingReplacement = BuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex);
 				if (buildingReplacement != null)
 				{
-					propListItem.replacementPrefab = buildingReplacement.replacementInfo;
-					propListItem.replacementProb = buildingReplacement.probability;
+					targetListItem.replacementPrefab = buildingReplacement.replacementInfo;
+					targetListItem.replacementProb = buildingReplacement.probability;
 
 					// Update original prop reference.
-					propListItem.originalPrefab = buildingReplacement.targetInfo;
+					targetListItem.originalPrefab = buildingReplacement.targetInfo;
 				}
 
 				// Individual replacement and original probability (if any).
 				BOBBuildingReplacement individualReplacement = IndividualBuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex);
 				if (individualReplacement != null)
 				{
-					propListItem.individualPrefab = individualReplacement.replacementInfo;
-					propListItem.individualProb = individualReplacement.probability;
+					targetListItem.individualPrefab = individualReplacement.replacementInfo;
+					targetListItem.individualProb = individualReplacement.probability;
 
 					// Update original prop reference.
-					propListItem.originalPrefab = individualReplacement.targetInfo;
+					targetListItem.originalPrefab = individualReplacement.targetInfo;
 				}
 
 				// Are we grouping?
-				if (propListItem.index == -1)
+				if (targetListItem.index == -1)
 				{
 					// Yes, grouping - initialise a flag to show if we've matched.
 					bool matched = false;
 
 					// Iterate through each item in our existing list of props.
-					foreach (PropListItem item in propList)
+					foreach (TargetListItem item in itemList)
 					{
 						// Check to see if we already have this in the list - matching original prefab, individual replacement prefab, building replacement prefab, all-building replacement prefab, and probability.
-						if (item.originalPrefab == propListItem.originalPrefab && item.individualPrefab == propListItem.individualPrefab && item.replacementPrefab == propListItem.replacementPrefab && propListItem.allPrefab == item.allPrefab)
+						if (item.originalPrefab == targetListItem.originalPrefab && item.individualPrefab == targetListItem.individualPrefab && item.replacementPrefab == targetListItem.replacementPrefab && targetListItem.allPrefab == item.allPrefab)
 						{
 							// We've already got an identical grouped instance of this item - add this index and lane to the lists of indexes and lanes under that item and set the flag to indicate that we've done so.
 							item.indexes.Add(propIndex);
@@ -607,14 +607,14 @@ namespace BOB
 				}
 
 				// Add this item to our list.
-				propList.Add(propListItem);
+				itemList.Add(targetListItem);
 			}
 
 			// Create return fastlist from our filtered list, ordering by name.
 			targetList.rowsData = new FastList<object>
 			{
-				m_buffer = targetSearchStatus == (int)OrderBy.NameDescending ? propList.OrderByDescending(item => item.DisplayName).ToArray() : propList.OrderBy(item => item.DisplayName).ToArray(),
-				m_size = propList.Count
+				m_buffer = targetSearchStatus == (int)OrderBy.NameDescending ? itemList.OrderByDescending(item => item.DisplayName).ToArray() : itemList.OrderBy(item => item.DisplayName).ToArray(),
+				m_size = itemList.Count
 			};
 
 			// If the list is empty, show the 'no props' label; otherwise, hide it.

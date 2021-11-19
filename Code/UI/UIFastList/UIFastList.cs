@@ -504,10 +504,10 @@ namespace BOB
             for (int i = 0; i < m_rowsData.m_size; ++i)
             {
                 // Skip anything that's not a valid item.
-                if (m_rowsData.m_buffer[i] is PropListItem propListItem)
+                if (m_rowsData.m_buffer[i] is TargetListItem targetListItem)
                 {
                     // Match to replacement prefab if any, if none then match against original prefab.
-                    PrefabInfo targetInfo = propListItem.replacementPrefab ?? propListItem.originalPrefab;
+                    PrefabInfo targetInfo = targetListItem.replacementPrefab ?? targetListItem.originalPrefab;
 
                     // Look for a prefab match.
                     if (targetInfo != null && targetInfo == item)
@@ -516,7 +516,7 @@ namespace BOB
                         selectedIndex = i;
 
                         // Set current panel selection.
-                        InfoPanelManager.Panel.CurrentTargetItem = propListItem;
+                        InfoPanelManager.Panel.CurrentTargetItem = targetListItem;
 
                         // If the selected index is outside the current visibility range, move the to show it.
                         if (selectedIndex < listPosition || selectedIndex > listPosition + m_rows.m_size)

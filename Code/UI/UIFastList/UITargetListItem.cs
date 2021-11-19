@@ -6,7 +6,7 @@ namespace BOB
 	/// <summary>
 	/// Data record for UI prop list line items.
 	/// </summary>
-	public class PropListItem
+	public class TargetListItem
 	{
 		// Original prefab.
 		public PrefabInfo originalPrefab;
@@ -48,7 +48,7 @@ namespace BOB
 	/// <summary>
 	/// Data record for UI prop list item for network props.
 	/// </summary>
-	public class NetPropListItem : PropListItem
+	public class NetTargetListItem : TargetListItem
 	{
 		// Lane reference.
 		public int lane;

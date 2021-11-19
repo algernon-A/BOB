@@ -28,7 +28,7 @@ namespace BOB
         private UISprite lineSprite;
 
         // ObjectData.
-		protected PropListItem thisItem;
+		protected TargetListItem thisItem;
 		protected int index;
 
 
@@ -133,7 +133,7 @@ namespace BOB
             labelX = LeftMargin;
 
             // See if our attached data is a PropListItem replacement record).
-            if (data is PropListItem propListItem)
+            if (data is TargetListItem targetListItem)
             {
                 // Hide any existing line sprites; it will be re-shown as necessary.
                 if (lineSprite != null)
@@ -148,11 +148,11 @@ namespace BOB
                 StringBuilder displayText = new StringBuilder();
 
                 // Set local references.
-                thisItem = propListItem;
+                thisItem = targetListItem;
                 index = thisItem.index;
 
                 // See if this is a network prop.
-                NetPropListItem thisNetItem = data as NetPropListItem;
+                NetTargetListItem thisNetItem = data as NetTargetListItem;
 
                 // Clear label text.
                 indexLabel.text = "";

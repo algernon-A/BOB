@@ -34,7 +34,7 @@ namespace BOB
 
 		// Current selections.
 		protected PrefabInfo selectedPrefab;
-		private PropListItem currentTargetItem;
+		private TargetListItem currentTargetItem;
 		private PrefabInfo replacementPrefab;
 
 		// Panel components.
@@ -90,7 +90,7 @@ namespace BOB
         /// <summary>
         /// Sets the current target item and updates button states accordingly.
         /// </summary>
-        internal virtual PropListItem CurrentTargetItem
+        internal virtual TargetListItem CurrentTargetItem
 		{
 			get => currentTargetItem;
 
@@ -155,10 +155,10 @@ namespace BOB
 			// Iterate through each item in list.
 			foreach (object item in targetList.rowsData)
 			{
-				if (item is PropListItem propListItem)
+				if (item is TargetListItem targetListItem)
 				{
 					// Update status.
-					UpdateTargetItem(propListItem);
+					UpdateTargetItem(targetListItem);
 				}
 			}
 
@@ -380,7 +380,7 @@ namespace BOB
 		/// Updates the target item record for changes in replacement status (e.g. after applying or reverting changes).
 		/// </summary>
 		/// <param name="propListItem">Target item</param>
-		protected virtual void UpdateTargetItem(PropListItem propListItem)
+		protected virtual void UpdateTargetItem(TargetListItem targetListItem)
 		{
 
 			propCheck.eventCheckChanged += (control, isChecked) =>

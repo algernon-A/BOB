@@ -116,7 +116,7 @@ namespace BOB
 			try
 			{
 				// Individual building prop reversion - ensuire that we've got a current selection before doing anything.
-				if (CurrentTargetItem != null && CurrentTargetItem is PropListItem)
+				if (CurrentTargetItem != null && CurrentTargetItem is TargetListItem)
 				{
 					// Individual reversion.
 					if (CurrentTargetItem.replacementPrefab is TreeInfo tree)
@@ -198,7 +198,7 @@ namespace BOB
 			Logging.Message("starting TargetList");
 
 			// List of prefabs that have passed filtering.
-			List<PropListItem> itemList = new List<PropListItem>();
+			List<TargetListItem> itemList = new List<TargetListItem>();
 
 			// Local references.
 			TreeInstance[] trees = Singleton<TreeManager>.instance.m_trees.m_buffer;
@@ -207,7 +207,7 @@ namespace BOB
 			for (uint i = 0; i < (IsTree ? trees.Length : PropAPI.PropBufferLen); ++i)
 			{
 				// Create new list item, hiding probabilities.
-				PropListItem propListItem = new PropListItem { showProbs = false };
+				TargetListItem propListItem = new TargetListItem { showProbs = false };
 
 				if (IsTree)
 				{
@@ -282,7 +282,7 @@ namespace BOB
 					bool matched = false;
 
 					// Iterate through each item in our existing list of props.
-					foreach (PropListItem item in itemList)
+					foreach (TargetListItem item in itemList)
 					{
 						// Check to see if we already have this in the list - matching original prefab.
 						if (item.originalPrefab == propListItem.originalPrefab)
