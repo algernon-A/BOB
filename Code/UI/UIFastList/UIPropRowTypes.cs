@@ -10,7 +10,7 @@ namespace BOB
 	public class UILoadedPropRow : UIPropRow
 	{
 		protected PrefabInfo thisPrefab;
-		//private BOBRandomPrefab thisRandomPrefab;
+		protected LoadedListItem thisListItem;
 		private string displayName;
 
 
@@ -31,7 +31,6 @@ namespace BOB
 		/// <param name="isRowOdd">If the row is an odd-numbered row (for background banding)</param>
 		public override void Display(object data, bool isRowOdd)
 		{
-
 			// Perform initial setup for new rows.
 			if (nameLabel == null)
 			{
@@ -65,18 +64,24 @@ namespace BOB
 				{
 					thisPrefab = randomPrefab.tree;
 				}
-				
+
 				// Grey colour for random props with missing variants.
 				if (randomPrefab.missingVariant)
-                {
+				{
 					nameLabel.textColor = Color.grey;
-                }
+				}
+			}
+			else if (data is LoadedListItem loadedItem)
+			{
+				// Loaded list item.
+				thisListItem = loadedItem;
+				thisPrefab = loadedItem.thisPrefab;
 			}
 			else
-            {
+			{
 				// Standard PropInfo/TreeInfo prefab.
 				thisPrefab = data as PrefabInfo;
-            }
+			}
 
 			displayName = PrefabLists.GetDisplayName(thisPrefab);
 			nameLabel.text = displayName;
@@ -108,6 +113,12 @@ namespace BOB
 	/// </summary>
 	public class UILoadedScalingPropRow : UILoadedPropRow
 	{
+		// Layout constants.
+		public const float CreatorX = 260f;
+
+		// Creator name label.
+		private UILabel creatorLabel;
+
 		/// <summary>
 		/// Called when this item is selected.
 		/// </summary>
@@ -116,6 +127,41 @@ namespace BOB
 			// Update currently selected loaded prefab.
 			BOBScalePanel.Panel.SelectedLoadedPrefab = thisPrefab;
 		}
+
+		/// <summary>
+		/// Generates and displays a list row.
+		/// </summary>
+		/// <param name="data">Object to list</param>
+		/// <param name="isRowOdd">If the row is an odd-numbered row (for background banding)</param>
+		public override void Display(object data, bool isRowOdd)
+		{
+			base.Display(data, isRowOdd);
+
+			// Add creator name label if it doesn't already exist.
+			if (creatorLabel == null)
+			{
+				creatorLabel = AddUIComponent<UILabel>();
+				creatorLabel.width = this.width - 10f;
+				creatorLabel.textScale = TextScale;
+				creatorLabel.relativePosition = new Vector2(CreatorX, PaddingY);
+			}
+
+			// Set creator name.
+			creatorLabel.text = thisListItem?.creatorName ?? string.Empty;
+		}
+
+		/// <summary>
+		/// Called when dimensions are changed, including as part of initial setup (required to set correct relative position of label).
+		/// </summary>
+		protected override void OnSizeChanged()
+        {
+			base.OnSizeChanged();
+
+			if (creatorLabel != null)
+            {
+				creatorLabel.relativePosition = new Vector2(CreatorX, PaddingY);
+            }
+        }
 	}
 
 

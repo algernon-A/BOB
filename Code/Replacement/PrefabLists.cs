@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Linq;
+using System.Collections.Generic;
+using ColossalFramework;
+using ColossalFramework.Packaging;
+using ColossalFramework.PlatformServices;
 
 
 namespace BOB
@@ -17,6 +21,10 @@ namespace BOB
 		// Lists of loaded trees and props.
 		internal static PropInfo[] LoadedProps { get; private set; }
 		internal static TreeInfo[] LoadedTrees { get; private set; }
+
+
+		// Creator asset dictionary.
+		private readonly static Dictionary<ulong, string> creators = new Dictionary<ulong, string>();
 
 
 		/// <summary>
@@ -83,6 +91,9 @@ namespace BOB
 			// Order lists by name.
 			LoadedProps = props.OrderBy(prop => GetDisplayName(prop)).ToList().ToArray();
 			LoadedTrees = trees.OrderBy(tree => GetDisplayName(tree)).ToList().ToArray();
+
+			// Populate creators dictionary.
+			GetCreators();
 		}
 
 
@@ -123,6 +134,64 @@ namespace BOB
 			// Otherwise, omit the package number, and trim off any trailing _Data.
 			int index = name.IndexOf('.');
 			return name.Substring(index + 1).Replace("_Data", "");
+		}
+
+
+		/// <summary>
+		/// Gets the name of the creator of the given prefab.
+		/// </summary>
+		/// <param name="network">Prefab to check</param>
+		/// <returns>Creator name (empty string if none)</returns>
+		internal static string GetCreator(PrefabInfo prefab)
+		{
+			// See if we can parse network workshop number from network name (number before period).
+			if (prefab?.name != null)
+			{
+				int period = prefab.name.IndexOf(".");
+				if (period > 0)
+				{
+					// Attempt to parse substring before period.
+					if (UInt64.TryParse(prefab.name.Substring(0, period), out ulong steamID))
+					{
+						// Check to see if we have an entry.
+						if (creators.ContainsKey(steamID))
+						{
+							return creators[steamID];
+						}
+					}
+				}
+			}
+
+			// If we got here, we didn't find a valid creator.
+			return string.Empty;
+		}
+
+
+		/// <summary>
+		/// Populates the creators dictionary.
+		/// </summary>
+		private static void GetCreators()
+		{
+			// Iterate through all loaded packages.
+			foreach (Package.Asset asset in PackageManager.FilterAssets(new Package.AssetType[] { UserAssetType.CustomAssetMetaData }))
+			{
+				if (asset?.package != null)
+				{
+					// Try to get steam ID of this package.
+					if (UInt64.TryParse(asset.package.packageName, out ulong steamID) && !asset.package.packageAuthor.IsNullOrWhiteSpace())
+					{
+						// Check to see if we already have a record for the steam ID.
+						if (!creators.ContainsKey(steamID))
+						{
+							// No existing record - get package author name and add to dictionary.
+							if (UInt64.TryParse(asset.package.packageAuthor.Substring("steamid:".Length), out ulong authorID))
+							{
+								creators.Add(steamID, new Friend(new UserID(authorID)).personaName);
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 }

@@ -458,6 +458,42 @@ namespace BOB
 
 
         /// <summary>
+        /// Sets the selection to the given LoadedListItem item.
+        /// If no item is found, clears the selection and resets the list.
+        /// </summary>
+        /// <param name="prefab">The prefab to find</param>
+        public  void FindPrefabInItem(PrefabInfo prefab)
+        {
+            // Iterate through the rows list.
+            for (int i = 0; i < m_rowsData.m_size; ++i)
+            {
+                // Look for an index match; individual or grouped (contained within propListItem.indexes list).
+                if (m_rowsData.m_buffer[i] is LoadedListItem listItem && listItem.thisPrefab == prefab)
+                {
+                    // Found a match; set the selected index to this one.
+                    selectedIndex = i;
+
+                    // Set current panel selection.
+                    InfoPanelManager.Panel.ReplacementPrefab = prefab;
+
+                    // If the selected index is outside the current visibility range, move the to show it.
+                    if (selectedIndex < listPosition || selectedIndex > listPosition + m_rows.m_size)
+                    {
+                        listPosition = selectedIndex;
+                    }
+
+                    // Done here; return.
+                    return;
+                }
+            }
+
+            // If we got here, we didn't find a match; clear the selection and reset the list position.
+            selectedIndex = -1;
+            listPosition = 0f;
+        }
+
+
+        /// <summary>
         /// Sets the selection to the prop list item that has the given prefab as its originalPrefab.
         /// If no item is found, clears the selection and resets the list.
         /// </summary>

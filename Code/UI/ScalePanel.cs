@@ -16,7 +16,7 @@ namespace BOB
 		private const float ControlX = (Margin * 2f);
 		private const float ControlWidth = 250f;
 		private const float LoadedX = ControlX + ControlWidth + (Margin * 2f);
-		private const float LoadedWidth = 320f;
+		private const float LoadedWidth = 440f;
 
 		// Layout constants - Y.
 		private const float SliderHeight = 38f;
@@ -245,7 +245,7 @@ namespace BOB
 		protected override void LoadedList()
 		{
 			// List of prefabs that have passed filtering.
-			List<PrefabInfo> list = new List<PrefabInfo>();
+			List<LoadedListItem> list = new List<LoadedListItem>();
 
 			bool nameFilterActive = !nameFilter.text.IsNullOrWhiteSpace();
 
@@ -264,7 +264,7 @@ namespace BOB
 						if (!nameFilterActive || displayName.ToLower().Contains(nameFilter.text.Trim().ToLower()))
 						{
 							// Filtering passed - add this prefab to our list.
-							list.Add(loadedTree);
+							list.Add(new LoadedListItem(loadedTree));
 						}
 					}
 				}
@@ -284,7 +284,7 @@ namespace BOB
 						if (!nameFilterActive || displayName.ToLower().Contains(nameFilter.text.Trim().ToLower()))
 						{
 							// Filtering passed - add this prefab to our list.
-							list.Add(loadedProp);
+							list.Add(new LoadedListItem(loadedProp));
 						}
 					}
 				}
@@ -307,7 +307,7 @@ namespace BOB
 			// Select currently selected prefab, if any.
 			if (selectedLoadedPrefab != null)
 			{
-				loadedList.FindItem(selectedLoadedPrefab);
+				loadedList.FindPrefabInItem(selectedLoadedPrefab);
 			}
 			else
 			{

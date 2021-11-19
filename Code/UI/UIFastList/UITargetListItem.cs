@@ -49,11 +49,24 @@ namespace BOB
 	/// Data record for UI prop list item for network props.
 	/// </summary>
 	public class NetPropListItem : PropListItem
-    {
+	{
 		// Lane reference.
 		public int lane;
 
 		// Lane list.
 		public List<int> lanes = new List<int>();
 	}
+
+
+	/// <summary>
+	///  Data record for UI prop list item for showing creators.
+	/// </summary>
+	public class PrefabRowItem
+    {
+		// Prefab record.
+		public PrefabInfo prefab;
+
+		// Creator name.
+		public string creatorName;
+    }
 }

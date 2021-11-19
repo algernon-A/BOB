@@ -86,6 +86,7 @@
     <Compile Include="Code\UI\PanelBase.cs" />
     <Compile Include="Code\UI\RandomPanel.cs" />
     <Compile Include="Code\UI\ScalePanel.cs" />
+    <Compile Include="Code\UI\UIFastList\LoadedListItem.cs" />
     <Compile Include="Code\UI\UIFastList\UIRandomPropRow.cs" />
     <Compile Include="Code\UI\UIThreading.cs" />
     <Compile Include="Code\Utils\Logging.cs" />
@@ -132,7 +133,7 @@
     <Compile Include="Code\Utils\ModUtils.cs" />
     <Compile Include="Code\Utils\UIControls.cs" />
     <Compile Include="Code\UI\UIFastList\UIFastList.cs" />
-    <Compile Include="Code\UI\UIFastList\UIPropListItem.cs" />
+    <Compile Include="Code\UI\UIFastList\UITargetListItem.cs" />
     <Compile Include="Code\UI\UIFastList\UIPropRow.cs" />
     <Compile Include="Code\UI\UIFastList\UIPropRowTypes.cs" />
     <Compile Include="Code\Loading.cs" />
