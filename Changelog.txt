@@ -1,4 +1,8 @@
-﻿Version 0.8.4.2 hotfix -
+﻿
+- Add creator name display and sorting to scaling panel
+
+
+Version 0.8.4.2 hotfix -
 
 - Fix sliders not responding to mouse dragging after scroll wheel is used
 - Fix scale slider values not properly resetting on selection change
