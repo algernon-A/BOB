@@ -65,6 +65,8 @@
     <Translation ID="BOB_CFG_DEL" String="Delete selected configuration" />
     <Translation ID="BOB_CFG_LAA" String="Load and apply selected configuration" />
     <Translation ID="BOB_CFG_LGL" String="Load and apply global configuration" />
+    <Translation ID="BOB_CFG_CLE" String="Clean current config" />
+    <Translation ID="BOB_CFG_CLE_TIP" String="Removes any references to unloaded buildings, networks, props and/or trees from the current configuration file" />
     <Translation ID="BOB_OPT_GEN" String="General options" />
     <Translation ID="BOB_OPT_CFG" String="Configurations" />
     <Translation ID="BOB_OPT_RUI" String="Ruining" />

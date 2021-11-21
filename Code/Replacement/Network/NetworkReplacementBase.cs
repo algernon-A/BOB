@@ -246,12 +246,12 @@ namespace BOB
 			foreach (BOBNetworkElement element in elementList)
 			{
 				// Try to find network prefab.
-				element.netInfo = PrefabCollection<NetInfo>.FindLoaded(element.network);
+				element.prefab = PrefabCollection<NetInfo>.FindLoaded(element.network);
 
 				// Don't bother deserializing further if the network info wasn't found.
-				if (element.netInfo != null)
+				if (element.NetInfo != null)
 				{
-					Deserialize(element.netInfo, element.replacements);
+					Deserialize(element.NetInfo, element.replacements);
 				}
 			}
 		}
@@ -295,12 +295,7 @@ namespace BOB
 			// If no existing entry, create a new one.
 			if (thisNetwork == null)
 			{
-				thisNetwork = new BOBNetworkElement
-				{
-					network = netInfo.name,
-					netInfo = netInfo,
-					replacements = new List<BOBNetReplacement>()
-				};
+				thisNetwork = new BOBNetworkElement(netInfo);
 				NetworkElementList.Add(thisNetwork);
 			}
 
@@ -499,7 +494,7 @@ namespace BOB
 		/// </summary>
 		/// <param name="netInfo">Network prefab</param>
 		/// <returns>Replacement record for the specified network prefab (null if none)</returns>
-		protected BOBNetworkElement NetworkElement(NetInfo netInfo) => netInfo == null ? null : NetworkElementList?.Find(x => x.netInfo == netInfo);
+		protected BOBNetworkElement NetworkElement(NetInfo netInfo) => netInfo == null ? null : NetworkElementList?.Find(x => x.NetInfo == netInfo);
 
 
 		/// <summary>

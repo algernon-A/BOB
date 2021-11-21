@@ -238,12 +238,12 @@ namespace BOB
 			foreach (BOBBuildingElement element in elementList)
 			{
 				// Try to find building prefab.
-				element.buildingInfo = PrefabCollection<BuildingInfo>.FindLoaded(element.building);
+				element.prefab = PrefabCollection<BuildingInfo>.FindLoaded(element.building);
 
 				// Don't bother deserializing further if the building info wasn't found.
-				if (element.buildingInfo != null)
+				if (element.BuildingInfo != null)
 				{
-					Deserialize(element.buildingInfo, element.replacements);
+					Deserialize(element.BuildingInfo, element.replacements);
 				}
 			}
 		}
@@ -286,12 +286,7 @@ namespace BOB
 			// If no existing entry, create a new one.
 			if (thisBuilding == null)
 			{
-				thisBuilding = new BOBBuildingElement
-				{
-					building = buildingInfo.name,
-					buildingInfo = buildingInfo,
-					replacements = new List<BOBBuildingReplacement>()
-				};
+				thisBuilding = new BOBBuildingElement(buildingInfo);
 				BuildingElementList.Add(thisBuilding);
 			}
 
@@ -468,7 +463,7 @@ namespace BOB
 		/// </summary>
 		/// <param name="buildingInfo">Building prefab</param>
 		/// <returns>Replacement record for the specified building prefab (null if none)</returns>
-		protected BOBBuildingElement BuildingElement(BuildingInfo buildingInfo) => buildingInfo == null ? null : BuildingElementList?.Find(x => x.buildingInfo == buildingInfo);
+		protected BOBBuildingElement BuildingElement(BuildingInfo buildingInfo) => buildingInfo == null ? null : BuildingElementList?.Find(x => x.BuildingInfo == buildingInfo);
 
 
 		/// <summary>

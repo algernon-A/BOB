@@ -126,8 +126,13 @@ namespace BOB
                 UIButton globalButton = UIControls.AddButton(panel, Margin, FooterY + 50f, Translations.Translate("BOB_CFG_LGL"), 400f, scale: 0.8f);
                 globalButton.eventClicked += UseGlobal;
 
+                // Clean up config button.
+                UIButton cleanUpButton = UIControls.AddButton(panel, Margin + 50f, FooterY + 150f, Translations.Translate("BOB_CFG_CLE"), 300f);
+                cleanUpButton.tooltip = Translations.Translate("BOB_CFG_CLE_TIP");
+                cleanUpButton.eventClicked += (control, clickEvent) => ConfigurationUtils.Cleanup();
+
                 // Nuke all settings button.
-                UIButton nukeButton = UIControls.AddButton(panel, Margin + 50f, FooterY + 150f, Translations.Translate("BOB_NUKE"), 300f);
+                UIButton nukeButton = UIControls.AddButton(panel, Margin + 50f, FooterY + 200f, Translations.Translate("BOB_NUKE"), 300f);
                 nukeButton.eventClicked += (control, clickEvent) =>
                 {
                     // Revert all-building and building settings.

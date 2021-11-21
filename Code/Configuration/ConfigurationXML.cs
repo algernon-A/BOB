@@ -84,31 +84,89 @@ namespace BOB
 	}
 
 
-	public class BOBNetworkElement
+	/// <summary>
+	/// Building/network element base class.
+	/// </summary>
+	public abstract class BOBElementBase
+    {
+		[XmlIgnore]
+		public PrefabInfo prefab;
+    }
+
+
+	/// <summary>
+	///  Network element record - for recording per-network replacements.
+	/// </summary>
+	public class BOBNetworkElement : BOBElementBase
     {
 		[XmlElement("network")]
 		public string network = string.Empty;
 
 		[XmlIgnore]
-		public NetInfo netInfo;
+		public NetInfo NetInfo => prefab as NetInfo;
 
 		[XmlArray("replacements")]
 		[XmlArrayItem("replacement")]
-		public List<BOBNetReplacement> replacements;
+		public readonly List<BOBNetReplacement> replacements;
+
+
+		/// <summary>
+		/// Constructor - default.
+		/// </summary>
+		public BOBNetworkElement()
+		{
+			replacements = new List<BOBNetReplacement>();
+		}
+
+
+		/// <summary>
+		/// Constructor - provided net prefab.
+		/// </summary>
+		/// <param name="netInfo">Network prefab to record</param>
+		public BOBNetworkElement(NetInfo netInfo)
+		{
+			network = netInfo.name;
+			prefab = netInfo;
+			replacements = new List<BOBNetReplacement>();
+		}
 	}
 
 
-	public class BOBBuildingElement
+	/// <summary>
+	/// Building element record - for recording per-building replacments.
+	/// </summary>
+	public class BOBBuildingElement : BOBElementBase
 	{
 		[XmlElement("building")]
 		public string building = string.Empty;
 
 		[XmlIgnore]
-		public BuildingInfo buildingInfo;
+		public BuildingInfo BuildingInfo => prefab as BuildingInfo;
 
 		[XmlArray("replacements")]
 		[XmlArrayItem("replacement")]
-		public List<BOBBuildingReplacement> replacements;
+		public readonly List<BOBBuildingReplacement> replacements;
+
+
+		/// <summary>
+		/// Constructor - default.
+		/// </summary>
+		public BOBBuildingElement()
+		{
+			replacements = new List<BOBBuildingReplacement>();
+		}
+
+
+		/// <summary>
+		/// Constructor - provided building prefab.
+		/// </summary>
+		/// <param name="buildingInfo">Building prefab to record</param>
+		public BOBBuildingElement(BuildingInfo buildingInfo)
+		{
+			building = buildingInfo.name;
+			prefab = buildingInfo;
+			replacements = new List<BOBBuildingReplacement>();
+		}
 	}
 
 

@@ -352,6 +352,105 @@ namespace BOB
 
 
 		/// <summary>
+		/// Cleans up the current configuration by removing any entries that feature unloaded prefabs (buildings, networks, props, trees).
+		/// </summary>
+		internal static void Cleanup()
+        {
+			// Cleanup buildngs.
+
+			// Remove replacments referring to unloaded props/trees.
+			CleanReplacements(CurrentConfig.allBuildingProps);
+			CleanElements(CurrentConfig.buildings);
+			CleanElements(CurrentConfig.indBuildings);
+
+			// Cleanup networks.
+			CleanReplacements(CurrentConfig.allNetworkProps);
+			CleanElements(CurrentConfig.networks);
+			CleanElements(CurrentConfig.indNetworks);
+
+			// Save config.
+			SaveConfig();
+        }
+
+
+		/// <summary>
+		/// Cleans up elements from the specified element list.
+		/// </summary>
+		/// <param name="elementList">Element list to clean</param>
+		private static void CleanElements<T>(List<T> elementList) where T: BOBElementBase
+		{
+
+			// List of networkl elements to remove.
+			List<T> removeElementList = new List<T>();
+
+			// Clean up networks.
+			foreach (T element in elementList)
+			{
+				// Remove any reference to unloaded prefabs, or references with null lists.
+				if (element?.prefab == null)
+				{
+					removeElementList.Add(element);
+					continue;
+				}
+
+				if (element is BOBNetworkElement networkElement)
+                {
+					// Remove replacments referring to unloaded props/trees.
+					CleanReplacements(networkElement.replacements);
+
+					// If all replacements have been removed, remove this element as well.
+					if (networkElement.replacements.Count == 0)
+					{
+						removeElementList.Add(element);
+					}
+				}
+				else if (element is BOBBuildingElement buildingElement)
+                {
+
+					// Remove replacments referring to unloaded props/trees.
+					CleanReplacements(buildingElement.replacements);
+
+					// If all replacements have been removed, remove this element as well.
+					if (buildingElement.replacements.Count == 0)
+					{
+						removeElementList.Add(element);
+					}
+				}
+			}
+
+			// Remove all replacements recorded in remove list.
+			foreach (T element in removeElementList)
+			{
+				elementList.Remove(element);
+			}
+		}
+
+
+		/// <summary>
+		/// Removes any replacements in the specified list that refer to unloaded props or trees.
+		/// </summary>
+		/// <param name="replacementList">Replacement list to clean</param>
+		private static void CleanReplacements<T>(List<T> replacementList) where T : BOBReplacementBase
+		{
+			// Iterate through replacements for this building and remove any that refer to unloaded props/trees.
+			List<T> removeReplacementList = new List<T>();
+			foreach (T replacement in replacementList)
+			{
+				if (replacement.targetInfo == null || replacement.replacementInfo == null)
+				{
+					removeReplacementList.Add(replacement);
+				}
+			}
+
+			// Remove all replacements recorded in remove list.
+			foreach (T replacement in removeReplacementList)
+			{
+				replacementList.Remove(replacement);
+			}
+		}
+
+
+		/// <summary>
 		/// Returns the absolute filepath of the config file for the given config name.
 		/// </summary>
 		/// <param name="configName">Config filepath</param>
