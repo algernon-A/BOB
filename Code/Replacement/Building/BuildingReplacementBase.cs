@@ -47,7 +47,7 @@ namespace BOB
 				foreach (BOBBuildingReplacement replacement in buildingElement.replacements)
 				{
 					// Revert all references for this replacement.
-					RevertReferences(replacement.buildingInfo, replacement.references);
+					RevertReferences(replacement.BuildingInfo, replacement.references);
 				}
 			}
 
@@ -126,7 +126,7 @@ namespace BOB
 			{
 				thisReplacement = new BOBBuildingReplacement
 				{
-					buildingInfo = buildingInfo,
+					parentInfo = buildingInfo,
 					target = targetInfo.name,
 					targetInfo = targetInfo,
 					propIndex = propIndex
@@ -318,10 +318,10 @@ namespace BOB
 				if (removeEntries)
 				{
 					// Remove from replacement list.
-					ReplacementList(replacement.buildingInfo).Remove(replacement);
+					ReplacementList(replacement.BuildingInfo).Remove(replacement);
 
 					// See if we've got a parent building element record, and if so, if it has any remaining replacement entries.
-					BOBBuildingElement thisElement = BuildingElement(replacement.buildingInfo);
+					BOBBuildingElement thisElement = BuildingElement(replacement.BuildingInfo);
 					if (thisElement != null && (thisElement.replacements == null || thisElement.replacements.Count == 0))
 					{
 						// No replacement entries left - delete entire building entry and return true to indicate that we've done so.
@@ -479,7 +479,7 @@ namespace BOB
 				try
 				{
 					// Assign building info.
-					replacement.buildingInfo = buildingInfo;
+					replacement.parentInfo = buildingInfo;
 
 					// Try to find target prefab.
 					replacement.targetInfo = replacement.isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);

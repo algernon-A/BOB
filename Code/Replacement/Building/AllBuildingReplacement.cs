@@ -270,7 +270,7 @@ namespace BOB
 			if (removeEntries)
 			{
 				// Remove from replacement list.
-				ReplacementList(replacement.buildingInfo).Remove(replacement);
+				ReplacementList(replacement.BuildingInfo).Remove(replacement);
 			}
 
 			// If we got here, we didn't remove any network entries from the list; return false.

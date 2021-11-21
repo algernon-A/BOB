@@ -312,7 +312,7 @@ namespace BOB
 			if (removeEntries)
 			{
 				// Remove from replacement list.
-				ReplacementList(replacement.netInfo).Remove(replacement);
+				ReplacementList(replacement.NetInfo).Remove(replacement);
 			}
 
 			// If we got here, we didn't remove any network entries from the list; return false.

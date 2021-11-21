@@ -48,13 +48,13 @@ namespace BOB
 		protected override void ApplyReplacement(BOBNetReplacement replacement)
 		{
 			// Don't do anything if prefabs can't be found.
-			if (replacement?.targetInfo == null || replacement.replacementInfo == null || replacement.netInfo == null)
+			if (replacement?.targetInfo == null || replacement.replacementInfo == null || replacement.NetInfo == null)
 			{
 				return;
 			}
 
 			// Check lane index.
-			NetInfo.Lane thisLane = replacement.netInfo.m_lanes[replacement.laneIndex];
+			NetInfo.Lane thisLane = replacement.NetInfo.m_lanes[replacement.laneIndex];
 			if (thisLane == null)
 			{
 				return;
@@ -68,12 +68,12 @@ namespace BOB
 			}
 
 			// Reset any pack, network, or all-network replacements first.
-			NetworkReplacement.Instance.RemoveEntry(replacement.netInfo, replacement.targetInfo, replacement.laneIndex, replacement.propIndex);
-			AllNetworkReplacement.Instance.RemoveEntry(replacement.netInfo, replacement.targetInfo, replacement.laneIndex, replacement.propIndex);
-			NetworkPackReplacement.Instance.RemoveEntry(replacement.netInfo, replacement.targetInfo, replacement.laneIndex, replacement.propIndex);
+			NetworkReplacement.Instance.RemoveEntry(replacement.NetInfo, replacement.targetInfo, replacement.laneIndex, replacement.propIndex);
+			AllNetworkReplacement.Instance.RemoveEntry(replacement.NetInfo, replacement.targetInfo, replacement.laneIndex, replacement.propIndex);
+			NetworkPackReplacement.Instance.RemoveEntry(replacement.NetInfo, replacement.targetInfo, replacement.laneIndex, replacement.propIndex);
 
 			// Create replacment entry.
-			NetPropReference newPropReference = CreateReference(replacement.netInfo, replacement.targetInfo, replacement.laneIndex, replacement.propIndex, replacement.isTree);
+			NetPropReference newPropReference = CreateReference(replacement.NetInfo, replacement.targetInfo, replacement.laneIndex, replacement.propIndex, replacement.isTree);
 
 			// Reset replacement list to be only our new replacement entry.
 			replacement.references = new List<NetPropReference> { newPropReference };

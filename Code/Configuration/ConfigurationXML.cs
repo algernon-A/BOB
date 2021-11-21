@@ -210,6 +210,9 @@ namespace BOB
 		private string replacementName;
 
 		[XmlIgnore]
+		public PrefabInfo parentInfo;
+
+		[XmlIgnore]
 		public PrefabInfo replacementInfo;
 
 		[XmlIgnore]
@@ -235,7 +238,7 @@ namespace BOB
 	public class BOBBuildingReplacement : BOBReplacementBase
 	{
 		[XmlIgnore]
-		public BuildingInfo buildingInfo;
+		public BuildingInfo BuildingInfo => parentInfo as BuildingInfo;
 
 		[XmlIgnore]
 		public List<BuildingPropReference> references = new List<BuildingPropReference>();
@@ -248,7 +251,7 @@ namespace BOB
 	public class BOBNetReplacement : BOBReplacementBase
 	{
 		[XmlIgnore]
-		public NetInfo netInfo;
+		public NetInfo NetInfo => parentInfo as NetInfo;
 
 		[XmlAttribute("lane")]
 		public int laneIndex = -1;

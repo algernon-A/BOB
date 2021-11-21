@@ -49,7 +49,7 @@ namespace BOB
 				foreach (BOBNetReplacement replacement in netElement.replacements)
 				{
 					// Revert all references for this replacement.
-					RevertReferences(replacement.netInfo, replacement.references);
+					RevertReferences(replacement.NetInfo, replacement.references);
 				}
 			}
 
@@ -130,7 +130,7 @@ namespace BOB
 			{
 				thisReplacement = new BOBNetReplacement
 				{
-					netInfo = netInfo,
+					parentInfo = netInfo,
 					target = targetInfo.name,
 					targetInfo = targetInfo,
 					laneIndex = laneIndex,
@@ -328,10 +328,10 @@ namespace BOB
 				if (removeEntries)
 				{
 					// Remove from replacement list.
-					ReplacementList(replacement.netInfo).Remove(replacement);
+					ReplacementList(replacement.NetInfo).Remove(replacement);
 
 					// See if we've got a parent network element record, and if so, if it has any remaining replacement entries.
-					BOBNetworkElement thisElement = NetworkElement(replacement.netInfo);
+					BOBNetworkElement thisElement = NetworkElement(replacement.NetInfo);
 					if (thisElement != null && (thisElement.replacements == null || thisElement.replacements.Count == 0))
 					{
 						// No replacement entries left - delete entire network entry and return true to indicate that we've done so.
@@ -510,7 +510,7 @@ namespace BOB
 				try
 				{
 					// Assign network info.
-					replacement.netInfo = NetInfo;
+					replacement.parentInfo = NetInfo;
 
 					// Try to find target prefab.
 					replacement.targetInfo = replacement.isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.target);

@@ -46,7 +46,7 @@ namespace BOB
 		protected override void ApplyReplacement(BOBBuildingReplacement replacement)
 		{
 			// Don't do anything if prefabs can't be found.
-			if (replacement?.targetInfo == null || replacement.replacementInfo == null || replacement.buildingInfo == null)
+			if (replacement?.targetInfo == null || replacement.replacementInfo == null || replacement.BuildingInfo == null)
 			{
 				return;
 			}
@@ -55,20 +55,20 @@ namespace BOB
 			replacement.references = new List<BuildingPropReference>();
 
 			// Iterate through each prop in building.
-			for (int propIndex = 0; propIndex < replacement.buildingInfo.m_props.Length; ++propIndex)
+			for (int propIndex = 0; propIndex < replacement.BuildingInfo.m_props.Length; ++propIndex)
 			{
 				// Check for any currently active individual building prop replacement.
-				if (IndividualBuildingReplacement.Instance.ActiveReplacement(replacement.buildingInfo, propIndex) != null)
+				if (IndividualBuildingReplacement.Instance.ActiveReplacement(replacement.BuildingInfo, propIndex) != null)
 				{
 					// Active individual building prop replacement; skip this one.
 					continue;
 				}
 
 				// Local reference.
-				BuildingInfo.Prop thisBuildingProp = replacement.buildingInfo.m_props[propIndex];
+				BuildingInfo.Prop thisBuildingProp = replacement.BuildingInfo.m_props[propIndex];
 
 				// Check for any existing all-building replacement.
-				PrefabInfo thisProp = AllBuildingReplacement.Instance.ActiveReplacement(replacement.buildingInfo, propIndex)?.targetInfo;
+				PrefabInfo thisProp = AllBuildingReplacement.Instance.ActiveReplacement(replacement.BuildingInfo, propIndex)?.targetInfo;
 				if (thisProp == null)
 				{
 					// No active replacement; use current PropInfo.
@@ -86,7 +86,7 @@ namespace BOB
 				if (thisProp != null && thisProp == replacement.targetInfo)
 				{
 					// Match!  Add reference data to the list.
-					replacement.references.Add(CreateReference(replacement.buildingInfo, thisProp, propIndex, replacement.isTree));
+					replacement.references.Add(CreateReference(replacement.BuildingInfo, thisProp, propIndex, replacement.isTree));
 				}
 			}
 

@@ -46,24 +46,24 @@ namespace BOB
 		protected override void ApplyReplacement(BOBBuildingReplacement replacement)
 		{
 			// Don't do anything if prefabs can't be found.
-			if (replacement?.targetInfo == null || replacement.replacementInfo == null || replacement.buildingInfo == null)
+			if (replacement?.targetInfo == null || replacement.replacementInfo == null || replacement.BuildingInfo == null)
 			{
 				return;
 			}
 
 			// Check prop index.
-			BuildingInfo.Prop thisProp = replacement.buildingInfo.m_props[replacement.propIndex];
+			BuildingInfo.Prop thisProp = replacement.BuildingInfo.m_props[replacement.propIndex];
 			if (thisProp == null)
             {
 				return;
 			}
 
 			// Reset any building or all-building replacements first.
-			BuildingReplacement.Instance.RemoveEntry(replacement.buildingInfo, replacement.targetInfo, replacement.propIndex); ;
-			AllBuildingReplacement.Instance.RemoveEntry(replacement.buildingInfo, replacement.targetInfo, replacement.propIndex);
+			BuildingReplacement.Instance.RemoveEntry(replacement.BuildingInfo, replacement.targetInfo, replacement.propIndex); ;
+			AllBuildingReplacement.Instance.RemoveEntry(replacement.BuildingInfo, replacement.targetInfo, replacement.propIndex);
 
 			// Create replacment entry.
-			BuildingPropReference newPropReference = CreateReference(replacement.buildingInfo, replacement.targetInfo, replacement.propIndex, replacement.isTree);
+			BuildingPropReference newPropReference = CreateReference(replacement.BuildingInfo, replacement.targetInfo, replacement.propIndex, replacement.isTree);
 
 			// Reset replacement list to be only our new replacement entry.
 			replacement.references = new List<BuildingPropReference> { newPropReference };
