@@ -42,7 +42,7 @@
     <Translation ID="BOB_RND_REN" String="Переименовать" />
     <Translation ID="BOB_RND_ADD" String="Добавить к вариантам" />
     <Translation ID="BOB_RND_SUB" String="Удалить из вариантов" />
-    <Translation ID="BOB_SCA_TIT" String="настройка масштабирования реквизита" />
+    <Translation ID="BOB_SCA_TIT" String="масштаб-ние реквизита" />
     <Translation ID="BOB_SCA_MIN" String="Минимальный масштаб" />
     <Translation ID="BOB_SCA_MAX" String="Максимальный масштаб" />
     <Translation ID="BOB_SPR_SBL" String="В настоящее время применяется замена для этих зданий" />
