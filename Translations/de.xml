@@ -64,7 +64,7 @@
     <Translation ID="BOB_CFG_LAA" String="Ausgewählte Konfiguration laden und anwenden" />
     <Translation ID="BOB_CFG_LGL" String="Globale Konfiguration laden und anwenden" />
     <Translation ID="BOB_CFG_DEL" String="Lösche die ausgewählte Konfiguration" />
-    <Translation ID="BOB_CFG_CLE" String="Aktuelle Konfigurration bereinigen" />
+    <Translation ID="BOB_CFG_CLE" String="Aktuelle Konfiguration bereinigen" />
     <Translation ID="BOB_CFG_CLE_TIP" String="Entfernt alle Einträge zu nicht geladenen Gebäuden, Netzwerken, Dekorationen und/oder Bäumen aus der aktuell geladenen Konfiguration" />
     <Translation ID="BOB_OPT_GEN" String="Algemeine Einstellungen" />
     <Translation ID="BOB_OPT_CFG" String="Konfigurationen" />
