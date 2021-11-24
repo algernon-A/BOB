@@ -2,6 +2,7 @@
 
 - Add creator name display and sorting to scaling panel
 - Add button to clean current config of any references to unloaded prefabs
+- Update EManagersLib.API
 
 
 Version 0.8.4.2 hotfix -
