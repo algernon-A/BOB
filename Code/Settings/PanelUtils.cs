@@ -33,7 +33,7 @@ namespace BOB
             tabStrip.selectedIndex = tabIndex;
 
             // Force width.
-            tabButton.width = 240f;
+            tabButton.width = 240;
 
             // Get tab root panel.
             UIPanel rootPanel = tabStrip.tabContainer.components[tabIndex] as UIPanel;

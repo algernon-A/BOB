@@ -109,6 +109,12 @@ namespace BOB
             // Set up Network Skins 2 reflection.
             ModUtils.NS2Reflection();
 
+            // Enable thin wires, if applicable.
+            if (ModSettings.ThinnerWires)
+            {
+                ElectricalWires.Instance.ApplyThinnerWires();
+            }
+
             // Force update of any dirty net or building prefabs from replacement process.
             Logging.Message("updating dirty prefabs");
             BuildingData.Update();

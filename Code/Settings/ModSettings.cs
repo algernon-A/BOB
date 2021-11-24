@@ -12,14 +12,6 @@ namespace BOB
 	[XmlRoot("TreePropReplacer")]
 	public class ModSettings
 	{
-        // Tree ruining.
-        [XmlElement("StopTreeRuining")]
-        public bool NoTreeRuining { get => StopTreeRuining; set => StopTreeRuining = value; }
-
-        // Prop ruining.
-        [XmlElement("StopPropRuining")]
-        public bool NoPropRuining { get => StopPropRuining; set => StopPropRuining = value; }
-
         // Default behaviour of the show individual props setting.
         [XmlIgnore]
         internal static int indDefault;
@@ -53,53 +45,49 @@ namespace BOB
         private static readonly SavedInputKey uuiSavedKey = new SavedInputKey("BOB hotkey", "BOB hotkey", key: KeyCode.B, control: false, shift: false, alt: true, false);
 
 
-        // Tree ruining.
+        /// <summary>
+        /// Disable tree ruining (true means ruining is disabled).
+        /// </summary>
         [XmlIgnore]
         internal static bool StopTreeRuining { get; set; } = false;
 
-        // Prop ruining.
+
+        /// <summary>
+        /// Disable prop ruining (true means ruining is disabled).
+        /// </summary>
         [XmlIgnore]
         internal static bool StopPropRuining { get; set; } = false;
 
 
-        // "What's new" notification last notified version.
-
-        [XmlElement("WhatsNewVersion")]
-		public string WhatsNewVersion { get => whatsNewVersion; set => whatsNewVersion = value; }
-
-
-		// Language.
-		[XmlElement("Language")]
-		public string Language
-		{
-			get => Translations.Language;
-
-			set => Translations.Language = value;
-        }
-
-
-        // Hotkey element.
-        [XmlElement("PanelKey")]
-        public KeyBinding PanelKey
+        /// <summary>
+        /// Enable thinner electrical wires (true means wires are made thinner).
+        /// </summary>
+        [XmlIgnore]
+        internal static bool ThinnerWires
         {
-            get
-            {
-                return new KeyBinding
-                {
-                    keyCode = (int)PanelSavedKey.Key,
-                    control = PanelSavedKey.Control,
-                    shift = PanelSavedKey.Shift,
-                    alt = PanelSavedKey.Alt
-                };
-            }
+            get => _thinnerWires;
+
             set
             {
-                uuiSavedKey.Key = (KeyCode)value.keyCode;
-                uuiSavedKey.Control = value.control;
-                uuiSavedKey.Shift = value.shift;
-                uuiSavedKey.Alt = value.alt;
+                // Don't do anything if no change.
+                if (value != _thinnerWires)
+                {
+                    // Update reference.
+                    _thinnerWires = value;
+
+                    // Apply/revert thinner wires according to toggle state.
+                    if (value)
+                    {
+                        ElectricalWires.Instance.ApplyThinnerWires();
+                    }
+                    else
+                    {
+                        ElectricalWires.Instance.RevertThinnerWires();
+                    }
+                }
             }
         }
+        private static bool _thinnerWires = false;
 
 
         /// <summary>
@@ -121,13 +109,62 @@ namespace BOB
         }
 
 
+        // "What's new" notification last notified version.
+        [XmlElement("WhatsNewVersion")]
+		public string XMLWhatsNewVersion { get => whatsNewVersion; set => whatsNewVersion = value; }
+
+
+		// Language.
+		[XmlElement("Language")]
+		public string XMLLanguage
+		{
+			get => Translations.Language;
+
+			set => Translations.Language = value;
+        }
+
+        // Hotkey element.
+        [XmlElement("PanelKey")]
+        public KeyBinding XMLPanelKey
+        {
+            get
+            {
+                return new KeyBinding
+                {
+                    keyCode = (int)PanelSavedKey.Key,
+                    control = PanelSavedKey.Control,
+                    shift = PanelSavedKey.Shift,
+                    alt = PanelSavedKey.Alt
+                };
+            }
+            set
+            {
+                uuiSavedKey.Key = (KeyCode)value.keyCode;
+                uuiSavedKey.Control = value.control;
+                uuiSavedKey.Shift = value.shift;
+                uuiSavedKey.Alt = value.alt;
+            }
+        }
+
 		// Grouping behaviour.
 		[XmlElement("GroupDefault")]
-		public int GroupDefault { get => indDefault; set => indDefault = value; }
+		public int XMLGroupDefault { get => indDefault; set => indDefault = value; }
 
 		// Remember position.
 		[XmlElement("RememberPos")]
-		public bool RememberPos { get => rememberPosition; set => rememberPosition = value; }
+		public bool XMLRememberPos { get => rememberPosition; set => rememberPosition = value; }
+
+        // Disable tree ruining.
+        [XmlElement("StopTreeRuining")]
+        public bool XMLNoTreeRuining { get => StopTreeRuining; set => StopTreeRuining = value; }
+
+        // Disable prop ruining.
+        [XmlElement("StopPropRuining")]
+        public bool XMLNoPropRuining { get => StopPropRuining; set => StopPropRuining = value; }
+
+        // Thinner wires.
+        [XmlElement("ThinnerWires")]
+        public bool XMLThinnerWires { get => _thinnerWires; set => _thinnerWires = value; }
 
     }
 

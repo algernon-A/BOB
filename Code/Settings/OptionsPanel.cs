@@ -103,7 +103,7 @@ namespace BOB
                 // Add tabs and panels.
                 new GeneralOptionsPanel(tabStrip, 0);
                 new ConfigurationsPanel(tabStrip, 1);
-                new RuiningOptionsPanel(tabStrip, 2);
+                new VisualOptionsPanel(tabStrip, 2);
 
                 // Disable hotkey while options panel is open.
                 UIThreading.Operating = false;

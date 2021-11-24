@@ -69,12 +69,15 @@
     <Translation ID="BOB_CFG_CLE_TIP" String="Removes any references to unloaded buildings, networks, props and/or trees from the current configuration file" />
     <Translation ID="BOB_OPT_GEN" String="General options" />
     <Translation ID="BOB_OPT_CFG" String="Configurations" />
+    <Translation ID="BOB_OPT_VIS" String="Visual effects" />
     <Translation ID="BOB_OPT_RUI" String="Ruining" />
+    <Translation ID="BOB_OPT_WIR" String="Wires" />
     <Translation ID="BOB_OPT_KEY" String="Hotkey" />
     <Translation ID="BOB_OPT_PRS" String="Press any key" />
     <Translation ID="BOB_OPT_RGL" String="Changes will take effect on restart" />
     <Translation ID="BOB_OPT_RRT" String="Prevent ruining by trees" />
     <Translation ID="BOB_OPT_RRP" String="Prevent ruining by props" />
+    <Translation ID="BOB_OPT_WTH" String="Thinner electrical wires (requires restart)" />
     <Translation ID="BOB_NUKE" String="Clear current configuration" />
     <Translation ID="BOB_PER_IND" String="Show individual items by default" />
     <Translation ID="BOB_PER_SIN" String="Always off" />

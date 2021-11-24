@@ -80,7 +80,8 @@
     <Compile Include="Code\Replacement\RandomProps.cs" />
     <Compile Include="Code\Replacement\ReplacementReferences.cs" />
     <Compile Include="Code\Replacement\Scaling.cs" />
-    <Compile Include="Code\Settings\OptionsPanelTabs\RuiningOptions.cs" />
+    <Compile Include="Code\Replacement\ElectricalWires.cs" />
+    <Compile Include="Code\Settings\OptionsPanelTabs\VisualOptions.cs" />
     <Compile Include="Code\UI\BOBSlider.cs" />
     <Compile Include="Code\UI\MapPanel.cs" />
     <Compile Include="Code\UI\PanelBase.cs" />
