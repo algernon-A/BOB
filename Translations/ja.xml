@@ -69,12 +69,15 @@
     <Translation ID="BOB_CFG_CLE_TIP" String="現在の構成ファイルから、未使用な建物・ネットワークやProp・ツリーなどの参照情報を全て削除します"/>
     <Translation ID="BOB_OPT_GEN" String="一般設定"/>
     <Translation ID="BOB_OPT_CFG" String="構成の設定"/>
+    <Translation ID="BOB_OPT_VIS" String="視覚効果"/>
     <Translation ID="BOB_OPT_RUI" String="荒れ地"/>
+    <Translation ID="BOB_OPT_WIR" String="電線・架線"/>
     <Translation ID="BOB_OPT_KEY" String="ホットキー"/>
     <Translation ID="BOB_OPT_PRS" String="Press any key"/>
     <Translation ID="BOB_OPT_RGL" String="変更はゲームの再起動時に反映"/>
     <Translation ID="BOB_OPT_RRT" String="ツリー下に出来る荒れ地を防止"/>
     <Translation ID="BOB_OPT_RRP" String="Prop下に出来る荒れ地を防止"/>
+    <Translation ID="BOB_OPT_WTH" String="細い電線を使用"/>
     <Translation ID="BOB_NUKE" String="現在の構成をクリア"/>
     <Translation ID="BOB_PER_IND" String="デフォルトでアイテムの内訳を表示"/>
     <Translation ID="BOB_PER_SIN" String="常にオフ"/>
@@ -84,11 +87,11 @@
     <Translation ID="BOB_FIL_NAME" String="検索:"/>
     <Translation ID="MES_PAGE" String="詳細は、MODがあるSteamのワークショップを確認してください。"/>
     <Translation ID="BOB_ERR_FAT" String="正常にMODが起動できないため、動作をシャットダウンしました。"/>
-    <Translation ID="BOB_ERR_HAR" String="BOB: the tree and prop replacerは、必要なHarmony 2.0 MODのパッチ動作を完了できません。"/>
-    <Translation ID="ERR_HAR0" String="Harmony 2.0 MODでエラーが発生しました"/>
+    <Translation ID="BOB_ERR_HAR" String="BOB: the tree and prop replacerは、必要なHarmony2 MODのパッチ動作を完了できません"/>
+    <Translation ID="ERR_HAR0" String="Harmony2 MODでエラーが発生しました"/>
     <Translation ID="ERR_HAR1" String="エラーが起きる原因として、考えられるのは以下の通りです。"/>
-    <Translation ID="ERR_HAR2" String="依存関係にある、必要なHarmony 2 MODがインストールされていません。"/>
-    <Translation ID="ERR_HAR3" String="古いMODや壊れたMODが、Harmony 2.0 MODの動作を妨げています。"/>
+    <Translation ID="ERR_HAR2" String="依存関係にある、必要なHarmony2 MODがインストールされていません"/>
+    <Translation ID="ERR_HAR3" String="古いMODや壊れたMODが、Harmony2 MODの動作を妨げています"/>
     <Translation ID="BOB_UPD_040_0" String="マップ上のツリーを、いつでも置き換え可能です！ BOBツールを起動して、立っているツリーをクリックしましょう"/>
     <Translation ID="BOB_UPD_041_0" String="ターゲットのアイテム変更時に建物の置換パネルで、例外処理が断続的に発生する問題を修正しました"/>
     <Translation ID="BOB_UPD_042_0" String="サブビルディングの選択を有効化する"/>
