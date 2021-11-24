@@ -70,11 +70,13 @@
     <Translation ID="BOB_CFG_CLE_TIP" String="Удалить все ссылки на незагруженные здания, дороги, реквизиты и/или деревья из текущего файла конфигурации" />
     <Translation ID="BOB_OPT_CFG" String="Конфигурации" />
     <Translation ID="BOB_OPT_RUI" String="Разрушенная текстура" />
+    <Translation ID="BOB_OPT_WIR" String="Провода" />
     <Translation ID="BOB_OPT_KEY" String="Горячая клавиша" />
     <Translation ID="BOB_OPT_PRS" String="Нажмите любую клавишу" />
     <Translation ID="BOB_OPT_RGL" String="Изменения вступят в силу после перезагрузки" />
     <Translation ID="BOB_OPT_RRT" String="Отключить разрушенную текстуру под деревьями" />
     <Translation ID="BOB_OPT_RRP" String="Отключить разрушенную текстуру под декорациями" />
+    <Translation ID="BOB_OPT_WTH" String="Более тонкие электрические провода" />
     <Translation ID="BOB_NUKE" String="Сбросить конфигурацию" />
     <Translation ID="BOB_PER_IND" String="Показывать отдельные элементы по умолчанию" />
     <Translation ID="BOB_PER_SIN" String="Всегда выключен" />
