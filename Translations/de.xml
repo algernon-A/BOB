@@ -69,11 +69,13 @@
     <Translation ID="BOB_OPT_GEN" String="Algemeine Einstellungen" />
     <Translation ID="BOB_OPT_CFG" String="Konfigurationen" />
     <Translation ID="BOB_OPT_RUI" String="Zerstörung von Gras" />
+    <Translation ID="BOB_OPT_WIR" String="Elektrische Leitungen" />
     <Translation ID="BOB_OPT_KEY" String="Tastenkürzel" />
     <Translation ID="BOB_OPT_PRS" String="Drücke eine Taste" />
     <Translation ID="BOB_OPT_RGL" String="Änderungen werden nach dem Neustart übernommen" />
     <Translation ID="BOB_OPT_RRT" String="Verhindert die Zerstörung von Gras durch Bäume" />
     <Translation ID="BOB_OPT_RRP" String="Verhindert die Zerstörung von Gras durch Dekorationen" />
+    <Translation ID="BOB_OPT_WTH" String="Dünnere elektrische Leitungen" />
     <Translation ID="BOB_NUKE" String="Konfiguration zurücksetzen" />
     <Translation ID="BOB_PER_IND" String="Zeige standardmäßig einzelne Dekorationen" />
     <Translation ID="BOB_PER_SIN" String="Immer aus" />
