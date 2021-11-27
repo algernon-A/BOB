@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Language UniqueName="ko" ReadableName="한국어">
+  <Translations>
+    <Translation ID="BOB_NAM" String="BOB: 나무와 프롭 교체기" />
+    <Translation ID="BOB_DESC" String="개발 중: 나무와 소품을 교체합니다." />
+    <Translation ID="TRN_CHOICE" String="언어 설정" />
+    <Translation ID="TRN_SYS" String="게임 언어 사용" />
+    <Translation ID="MES_CLS" String="닫기" />
+    <Translation ID="MES_DSA" String="다시 표시하지 않기" />
+    <Translation ID="BOB_MBX_OK" String="확인" />
+    <Translation ID="BOB_ROW_WAS" String="기존:" />
+    <Translation ID="BOB_PNL_NOP" String="발견된 프롭 없음" />
+    <Translation ID="BOB_PNL_NOT" String="발견된 나무 없음" />
+    <Translation ID="BOB_PNL_TRE" String="나무" />
+    <Translation ID="BOB_PNL_PRP" String="프롭" />
+    <Translation ID="BOB_PNL_IND" String="개별 프롭 표시" />
+    <Translation ID="BOB_PNL_HDV" String="바닐라 숨기기" />
+    <Translation ID="BOB_PNL_REP" String="교체" />
+    <Translation ID="BOB_PNL_RTB" String="이 건물들" />
+    <Translation ID="BOB_PNL_RAB" String="모든 건물" />
+    <Translation ID="BOB_PNL_RTN" String="이 네트워크들" />
+    <Translation ID="BOB_PNL_RAN" String="모든 네트워크" />
+    <Translation ID="BOB_PNL_RTT" String="맵 나무" />
+    <Translation ID="BOB_PNL_RTP" String="맵 프롭" />
+    <Translation ID="BOB_PNL_RSW" String="랜덤 표시" />
+    <Translation ID="BOB_PNL_RST" String="랜덤 설정" />
+    <Translation ID="BOB_PNL_SCA" String="프롭과 나무 스케일링" />
+    <Translation ID="BOB_PNL_REV" String="되돌리기" />
+    <Translation ID="BOB_PNL_REV_UND" String="선택된 교체 되돌리기" />
+    <Translation ID="BOB_PNL_REV_TIP" String="이 아이템에 활성화된 교체가 없으므로 되돌릴 수 없습니다" />
+    <Translation ID="BOB_PNL_PKB" String="교체 팩" />
+    <Translation ID="BOB_PNL_PRB" String="확률" />
+    <Translation ID="BOB_PNL_ANG" String="각도" />
+    <Translation ID="BOB_PNL_OFF" String="오프셋" />
+    <Translation ID="BOB_PNL_XOF" String="X" />
+    <Translation ID="BOB_PNL_YOF" String="Y" />
+    <Translation ID="BOB_PNL_ZOF" String="Z" />
+    <Translation ID="BOB_PNL_SUB" String="서브-빌딩" />
+    <Translation ID="BOB_RND_TIT" String="랜덤 나무와 프롭 구성" />
+    <Translation ID="BOB_RND_NEW" String="새로 만들기" />
+    <Translation ID="BOB_RND_DEL" String="삭제" />
+    <Translation ID="BOB_RND_REN" String="이름 변경" />
+    <Translation ID="BOB_RND_ADD" String="변형에 추가" />
+    <Translation ID="BOB_RND_SUB" String="변형에서 제거" />
+    <Translation ID="BOB_SCA_TIT" String="프롭 스케일링 구성" />
+    <Translation ID="BOB_SCA_MIN" String="최소 크기" />
+    <Translation ID="BOB_SCA_MAX" String="최대 크기" />
+    <Translation ID="BOB_SPR_SBL" String="현재 교체가 이 건물들에 적용됨" />
+    <Translation ID="BOB_SPR_ABL" String="현재 교체가 모든 건물에 적용됨" />
+    <Translation ID="BOB_SPR_SNT" String="현재 교체가 이 네트워크들에 적용됨" />
+    <Translation ID="BOB_SPR_ANT" String="현재 교체가 모든 네트워크에 적용됨" />
+    <Translation ID="BOB_SPR_PCK" String="현재 교체 팩이 적용됨" />
+    <Translation ID="BOB_PCK_APP" String="팩 적용" />
+    <Translation ID="BOB_PCK_APP_A" String="선택한 교체 팩을 적용합니다" />
+    <Translation ID="BOB_PCK_APP_C" String="이미 적용된 팩과 충돌하므로 팩을 적용할 수 없습니다" />
+    <Translation ID="BOB_PCK_APP_I" String="현재 팩이 적용됨" />
+    <Translation ID="BOB_PCK_RVT" String="팩 되돌리기" />
+    <Translation ID="BOB_PCK_RVT_A" String="선택한 교체 팩을 적용하지 않기" />
+    <Translation ID="BOB_PCK_RVT_I" String="현재 팩이 적용되지 않음" />
+    <Translation ID="BOB_PCK_NAL" String="모든 교체가 이용가능하지 않습니다" />
+    <Translation ID="BOB_CFG_UCS" String="이 세이브에 선택한 구성 사용(전역 구성 대신)" />
+    <Translation ID="BOB_CFG_SAC" String="현재 구성 저장" />
+    <Translation ID="BOB_CFG_SSC" String="선택된 구성 복사" />
+    <Translation ID="BOB_CFG_SEC" String="새 빈 구성 만들기" />
+    <Translation ID="BOB_CFG_DEL" String="선택된 구성 삭제" />
+    <Translation ID="BOB_CFG_LAA" String="선택된 구성을 불러오고 저장" />
+    <Translation ID="BOB_CFG_LGL" String="전역 구성을 불러오고 저장" />
+    <Translation ID="BOB_CFG_CLE" String="현재 구성 비우기" />
+    <Translation ID="BOB_CFG_CLE_TIP" String="현재 구성 파일에서 언로드된 건물, 네트워크, 프롭 및/또는 나무에 대한 참조를 제거합니다" />
+    <Translation ID="BOB_OPT_GEN" String="일반 옵션" />
+    <Translation ID="BOB_OPT_CFG" String="구성" />
+    <Translation ID="BOB_OPT_VIS" String="시각적 효과" />
+    <Translation ID="BOB_OPT_RUI" String="Ruining" />
+    <Translation ID="BOB_OPT_WIR" String="와이어" />
+    <Translation ID="BOB_OPT_KEY" String="단축키" />
+    <Translation ID="BOB_OPT_PRS" String="아무 키나 누르세요" />
+    <Translation ID="BOB_OPT_RGL" String="변경은 재시작 시 적용됩니다" />
+    <Translation ID="BOB_OPT_RRT" String="나무에 의한 ruin 생성 방지" />
+    <Translation ID="BOB_OPT_RRP" String="프롭에 의한 ruin 생성 방지" />
+    <Translation ID="BOB_OPT_WTH" String="얇아진 전선" />
+    <Translation ID="BOB_NUKE" String="현재 구성 비우기" />
+    <Translation ID="BOB_PER_IND" String="기본적으로 개별 아이템 표시" />
+    <Translation ID="BOB_PER_SIN" String="언제나 끄기" />
+    <Translation ID="BOB_PER_GRP" String="언제나 켜기" />
+    <Translation ID="BOB_PER_LST" String="이전 설정을 기억하기" />
+    <Translation ID="BOB_OPT_POS" String="이전 패널 위치를 기억하기" />
+    <Translation ID="BOB_FIL_NAME" String="검색:" />
+    <Translation ID="MES_PAGE" String="자세한 내용은 모드의 스팀 창작마당 페이지를 참고하십시오." />
+    <Translation ID="BOB_ERR_FAT" String="즉, 모드를 작동할 수 없고 종료되었다는 의미입니다." />
+    <Translation ID="BOB_ERR_HAR" String="BOB, the tree and prop replacer가 필요한 Harmony 패치를 완료할 수 없습니다." />
+    <Translation ID="ERR_HAR0" String="Harmony 패치 에러" />
+    <Translation ID="ERR_HAR1" String="이 문제의 가능한 원인은 다음과 같습니다:" />
+    <Translation ID="ERR_HAR2" String="필요한 Harmony 2 모드 종속성이 설치되지 않았습니다." />
+    <Translation ID="ERR_HAR3" String="오래되거나 고장난 모드가 Harmony 2의 적절한 작동을 방해합니다." />
+    <Translation ID="BOB_UPD_040_0" String="맵 나무 교체를 소개합니다! 평소처럼 BOB 도구를 활성화하고 독립형 나무를 클릭하세요." />
+    <Translation ID="BOB_UPD_041_0" String="대상 아이템 변경 시 간헐적인 건물 교체 패널 예외 수정." />
+    <Translation ID="BOB_UPD_042_0" String="서브-빌딩 선택 활성화" />
+    <Translation ID="BOB_UPD_042_1" String="게임 로드에 따른 잠재적 레이스 조건 수정" />
+    <Translation ID="BOB_UPD_043_0" String="모든 구성 또는 모든 네트워크 교체로 되돌릴 때 확률 새로고침 수정" />
+    <Translation ID="BOB_UPD_043_1" String="모든 네트워크 또는 모든 건물 교체 후 LOD가 새로 고쳐지지 않음 수정" />
+    <Translation ID="BOB_UPD_043_2" String="긴 번역 문자열에 맞게 정보 패널 텍스트 필드 레이블 조정" />
+    <Translation ID="BOB_UPD_050_0" String="네트워크 교체 팩의 초기 구현" />
+    <Translation ID="BOB_UPD_050_1" String="이제 네트워크 스킨 2와 제대로 호환됩니다" />
+    <Translation ID="BOB_UPD_050_2" String="더 빠른 교체 처리" />
+    <Translation ID="BOB_UPD_051_0" String="어떤 유형의 교체가 활성화되어있는지 알려주는 아이콘이 있는 새 나무/프롭 목록 레이아웃" />
+    <Translation ID="BOB_UPD_052_0" String="옵션 패널을 통해 액세스할 수 있는 여러 구성 파일을 처리하기 위한 구성 관리 추가" />
+    <Translation ID="BOB_UPD_060_0" String="독립형 프롭 교체" />
+    <Translation ID="BOB_UPD_060_1" String="선택된 프롭이나 나무에 대한 하이라이트" />
+    <Translation ID="BOB_UPD_060_2" String="이제 건물의 네트워크를 선택할 수 있습니다" />
+    <Translation ID="BOB_UPD_060_3" String="이제 장식 건물을 선택할 수 있습니다" />
+    <Translation ID="BOB_UPD_060_4" String="리디자인된 작은 교체 패널" />
+    <Translation ID="BOB_UPD_061_0" String="목록에 오름차순/내림차순 이름 정렬 필터 추가" />
+    <Translation ID="BOB_UPD_062_0" String="모든 나무 및/또는 프롭에서 지형 ruining을 제거하는 기능 추가(옵션 패널 안)" />
+    <Translation ID="BOB_UPD_062_1" String="이제 페리 경로를 선택할 수 있습니다 (페리 경로 마커 부표를 변경/숨기기 위해)" />
+    <Translation ID="BOB_UPD_062_2" String="선택 시 네트워크 프롭 각도가 가끔 잘못 표시됨 수정" />
+    <Translation ID="BOB_UPD_080_0" String="개별 네트워크 프롭 교체 추가" />
+    <Translation ID="BOB_UPD_080_1" String="Unified UI (UUI) 버튼 추가" />
+  </Translations>
+</Language>
