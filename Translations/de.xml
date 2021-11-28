@@ -113,5 +113,6 @@
     <Translation ID="BOB_UPD_062_2" String="Fehler behoben, der manchmal die Winkel-Angaben von Netzwerk-Dekoration fehlerhaft anzeigte" />
     <Translation ID="BOB_UPD_080_0" String="Einzelne Dekorationen von Netzwerken ändern hinzugefügt" />
     <Translation ID="BOB_UPD_080_1" String="Unified UI (UUI) Button hinzugefügt" />
+    <Translation ID="BOB_UPD_086_0" String="Option hinzugefügt, mit der Kabel in Netzwerken (Strom- und Oberleitungen) dünner und somit realistischer dargestellt werden " />
   </Translations>
 </Language>
