@@ -67,12 +67,15 @@
     <Translation ID="BOB_CFG_LGL" String="加载并应用全局配置" />
     <Translation ID="BOB_OPT_GEN" String="常规选项" />
     <Translation ID="BOB_OPT_CFG" String="配置" />
+    <Translation ID="BOB_OPT_VIS" String="视觉效果" />
     <Translation ID="BOB_OPT_RUI" String="毁坏" />
+    <Translation ID="BOB_OPT_WIR" String="电线" />
     <Translation ID="BOB_OPT_KEY" String="热键" />
     <Translation ID="BOB_OPT_PRS" String="请按任意键" />
     <Translation ID="BOB_OPT_RGL" String="更改将在重启后生效" />
     <Translation ID="BOB_OPT_RRT" String="禁止树木被毁坏" />
     <Translation ID="BOB_OPT_RRP" String="禁止摆件被毁坏" />
+    <Translation ID="BOB_OPT_WTH" String="薄电线" />
     <Translation ID="BOB_NUKE" String="重置配置信息" />
     <Translation ID="BOB_PER_IND" String="默认显示单个树木/摆件" />
     <Translation ID="BOB_PER_SIN" String="始终关闭" />
@@ -110,5 +113,6 @@
     <Translation ID="BOB_UPD_062_2" String="修复固定网络支柱角度有时不正确显示选择" />
     <Translation ID="BOB_UPD_080_0" String="添加个人道路道具替换" />
     <Translation ID="BOB_UPD_080_1" String="添加Unified UI (UUI) 按钮" />
+    <Translation ID="BOB_UPD_086_0" String="增加可选使得道路中的电线(电力线和铁路悬链线)拥有更真实的尺寸大小" />
   </Translations>
 </Language>
