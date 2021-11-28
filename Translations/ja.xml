@@ -115,5 +115,6 @@
     <Translation ID="BOB_UPD_062_2" String="選択時にネットワーク内のPropで、角度が間違って表示される問題を修正しました"/>
     <Translation ID="BOB_UPD_080_0" String="個々のネットワークでPropの置換機能を追加"/>
     <Translation ID="BOB_UPD_080_1" String="Unified UI (UUI) ボタンを追加"/>
+    <Translation ID="BOB_UPD_086_0" String="ネットワークの電線類（送電線や鉄道の架線）を、よりリアルなサイズに変更するオプションを追加"/>
   </Translations>
 </Language>
