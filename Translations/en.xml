@@ -115,5 +115,6 @@
     <Translation ID="BOB_UPD_062_2" String="Fix network prop angles sometimes being incorrectly displayed on selection" />
     <Translation ID="BOB_UPD_080_0" String="Add individual network prop replacement" />
     <Translation ID="BOB_UPD_080_1" String="Add Unified UI (UUI) button" />
+    <Translation ID="BOB_UPD_086_0" String="Add option to make wires in networks (power lines and railway catenaries) more realistically sized" />
   </Translations>
 </Language>
