@@ -115,5 +115,6 @@
     <Translation ID="BOB_UPD_062_2" String="선택 시 네트워크 프롭 각도가 가끔 잘못 표시됨 수정" />
     <Translation ID="BOB_UPD_080_0" String="개별 네트워크 프롭 교체 추가" />
     <Translation ID="BOB_UPD_080_1" String="Unified UI (UUI) 버튼 추가" />
+    <Translation ID="BOB_UPD_086_0" String="네트워크의 와이어(전선 및 철도 가선)의 크기를 더 현실적으로 만들기 위한 옵션 추가" />
   </Translations>
 </Language>
