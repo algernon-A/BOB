@@ -210,6 +210,12 @@ namespace BOB
 
 					// Write to file.
 					xmlSerializer.Serialize(textWriter, CurrentConfig);
+
+					// Delete any old config.
+					if (File.Exists(GeneralConfigName))
+                    {
+						File.Delete(GeneralConfigName);
+                    }
 				}
 			}
 			catch (Exception e)
