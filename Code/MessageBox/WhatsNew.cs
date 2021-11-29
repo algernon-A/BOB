@@ -154,7 +154,7 @@ namespace BOB
 
             // Save current version header as beta.
             ModSettings.whatsNewBetaVersion = WhatsNewMessages[0].betaVersion;
-            SettingsUtils.SaveSettings();
+            ModSettings.Save();
 
             return true;
         }

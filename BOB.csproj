@@ -122,7 +122,6 @@
     <Compile Include="Code\Serialization.cs" />
     <Compile Include="Code\Settings\ModSettings.cs" />
     <Compile Include="Code\Settings\OptionsKeymapping.cs" />
-    <Compile Include="Code\Settings\SettingsUtils.cs" />
     <Compile Include="Code\TranslationFramework\TranslationFramework.cs" />
     <Compile Include="Code\TranslationFramework\TranslationXML.cs" />
     <Compile Include="Code\UI\InfoPanelBase.cs" />

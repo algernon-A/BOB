@@ -1,4 +1,6 @@
-﻿using System.Xml.Serialization;
+﻿using System;
+using System.IO;
+using System.Xml.Serialization;
 using UnityEngine;
 using ColossalFramework;
 
@@ -12,6 +14,18 @@ namespace BOB
 	[XmlRoot("TreePropReplacer")]
 	public class ModSettings
 	{
+        // BOB settings file name (old).
+        [XmlIgnore]
+        private static readonly string OldSettingsFileName = "TreePropReplacer-settings.xml";
+
+        // BOB settings file name (current).
+        [XmlIgnore]
+        private static readonly string NewSettingsFileName = "BOB-settings.xml";
+
+        // User settings directory.
+        [XmlIgnore]
+        private static readonly string UserSettingsDir = ColossalFramework.IO.DataLocation.localApplicationData + Path.DirectorySeparatorChar;
+
         // Default behaviour of the show individual props setting.
         [XmlIgnore]
         internal static int indDefault;
@@ -166,6 +180,81 @@ namespace BOB
         [XmlElement("ThinnerWires")]
         public bool XMLThinnerWires { get => _thinnerWires; set => _thinnerWires = value; }
 
+
+        /// <summary>
+        /// Load settings from XML file.
+        /// </summary>
+        internal static void Load()
+        {
+            try
+            {
+                // Attempt to read new settings file (in user settings directory.
+                string fileName = UserSettingsDir + NewSettingsFileName;
+                if (!File.Exists(fileName))
+                {
+                    // No settings file in user directory; use application directory instead; if that fails, try to read the old one.
+                    fileName = NewSettingsFileName;
+                    if (!File.Exists(NewSettingsFileName))
+                    {
+                        fileName = OldSettingsFileName;
+                    }
+                }
+
+                // Check to see if configuration file exists.
+                if (File.Exists(fileName))
+                {
+                    // Read it.
+                    using (StreamReader reader = new StreamReader(fileName))
+                    {
+                        XmlSerializer xmlSerializer = new XmlSerializer(typeof(ModSettings));
+                        if (!(xmlSerializer.Deserialize(reader) is ModSettings settingsFile))
+                        {
+                            Logging.Error("couldn't deserialize settings file");
+                        }
+                    }
+                }
+                else
+                {
+                    Logging.Message("no settings file found");
+                }
+            }
+            catch (Exception e)
+            {
+                Logging.LogException(e, "exception reading XML settings file");
+            }
+        }
+
+
+        /// <summary>
+        /// Save settings to XML file.
+        /// </summary>
+        internal static void Save()
+        {
+            try
+            {
+                // Save into user local settings.
+                using (StreamWriter writer = new StreamWriter(UserSettingsDir + NewSettingsFileName))
+                {
+                    XmlSerializer xmlSerializer = new XmlSerializer(typeof(ModSettings));
+                    xmlSerializer.Serialize(writer, new ModSettings());
+                }
+
+                // Cleaning up after ourselves - delete any old config file in the application direcotry.
+                if (File.Exists(NewSettingsFileName))
+                {
+                    File.Delete(NewSettingsFileName);
+                }
+
+                if (File.Exists(OldSettingsFileName))
+                {
+                    File.Delete(OldSettingsFileName);
+                }
+            }
+            catch (Exception e)
+            {
+                Logging.LogException(e, "exception saving XML settings file");
+            }
+        }
     }
 
 

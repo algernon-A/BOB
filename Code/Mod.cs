@@ -27,7 +27,7 @@ namespace BOB
             HarmonyHelper.DoOnHarmonyReady(() => Patcher.PatchAll());
 
             // Load the settings file.
-            SettingsUtils.LoadSettings();
+            ModSettings.Load();
 
             // Attaching options panel event hook - check to see if UIView is ready.
             if (UIView.GetAView() != null)

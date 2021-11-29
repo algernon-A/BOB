@@ -121,7 +121,7 @@ namespace BOB
         private static void Close()
         {
             // Save settings first.
-            SettingsUtils.SaveSettings();
+            ModSettings.Save();
 
             // We're no longer visible - destroy our game object.
             if (optionsGameObject != null)

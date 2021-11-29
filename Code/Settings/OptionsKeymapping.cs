@@ -146,7 +146,7 @@ namespace BOB
         {
             // Apply key to current settings and save.
             ModSettings.CurrentHotkey = key;
-            SettingsUtils.SaveSettings();
+            ModSettings.Save();
 
             // Set the label for the new hotkey.
             button.text = SavedInputKey.ToLocalizedString("KEYNAME", key);
