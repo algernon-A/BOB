@@ -58,7 +58,7 @@ namespace BOB
 						// Userdir config doesn't exist; try copying file from application directory.
 						if (File.Exists(GeneralConfigName))
                         {
-							File.Copy(GeneralConfigName, GeneralConfigFile);
+							File.Move(GeneralConfigName, GeneralConfigFile);
                         }
 					}
 				}
