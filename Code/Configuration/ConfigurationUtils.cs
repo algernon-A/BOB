@@ -14,8 +14,10 @@ namespace BOB
 	internal static class ConfigurationUtils
 	{
 		// Filenames and locations.
-		internal static readonly string GeneralConfigFile = "BOB-config.xml";
-		internal static readonly string ConfigDirectory = ColossalFramework.IO.DataLocation.localApplicationData + Path.DirectorySeparatorChar + ConfigDirectory + "BOBconfigs";
+		internal static readonly string UserDirPath = ColossalFramework.IO.DataLocation.localApplicationData;
+		internal static readonly string GeneralConfigName = "BOB-config.xml";
+		internal static readonly string GeneralConfigFile = Path.Combine(UserDirPath, GeneralConfigName);
+		internal static readonly string ConfigDirectory = UserDirPath + "BOBconfigs";
 
 
 		/// <summary>
@@ -42,20 +44,27 @@ namespace BOB
 		/// <param name="config">Configuration name; null for default file (default null)</param>
 		internal static void LoadConfig(string config = null)
 		{
-			string fileName = null;
-
+			// Default file location is the general config file.
+			string fileName = GeneralConfigFile;
 
 			try
 			{
-				// Set file location to save to.
+				// See if we've got an assigned custom config.
 				if (config == null)
 				{
-					// No file name provided; use general configuration file.
-					fileName = GeneralConfigFile;
+					// No assigned  custom config; check if general config exists in userdir.
+					if (!File.Exists(fileName))
+					{
+						// Userdir config doesn't exist; try copying file from application directory.
+						if (File.Exists(GeneralConfigName))
+                        {
+							File.Copy(GeneralConfigName, GeneralConfigFile);
+                        }
+					}
 				}
 				else
 				{
-					// Filename provided - use this filename in the configuration settings directory.
+					// Custom config provided - use this filename in the configuration settings directory.
 					fileName = FullConfigPath(config);
 				}
 
@@ -141,20 +150,15 @@ namespace BOB
 		/// <param name="clean">Set to true to generate a blank file (default false)</param>
 		internal static void SaveConfig(string config = null, bool clean = false)
 		{
-			string fileName = null;
-
+			// Default file location is the general config file.
+			string fileName = GeneralConfigFile;
 
 			try
 			{
-				// Set file location to save to.
-				if (config == null)
+				// Check if we've got an assigned custom config.
+				if (config != null)
 				{
-					// No file name provided; use general configuration file.
-					fileName = GeneralConfigFile;
-				}
-				else
-				{
-					// Filename provided - use this filename in the configuration settings directory (creating directory if it doesn't already exist).
+					// Custom config assigned - use this filename in the configuration settings directory (creating directory if it doesn't already exist).
 					if (!Directory.Exists(ConfigDirectory))
 					{
 						Directory.CreateDirectory(ConfigDirectory);
