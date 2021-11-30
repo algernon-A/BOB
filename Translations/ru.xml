@@ -65,10 +65,11 @@
     <Translation ID="BOB_CFG_DEL" String="Удалить выбранную конфигурацию" />
     <Translation ID="BOB_CFG_LAA" String="Загрузить и применить выбранную конфигурацию" />
     <Translation ID="BOB_CFG_LGL" String="Загрузить и применить глобальную конфигурацию" />
-    <Translation ID="BOB_OPT_GEN" String="Общие настройки" />
     <Translation ID="BOB_CFG_CLE" String="Очистить текущую конфигурацию" />
     <Translation ID="BOB_CFG_CLE_TIP" String="Удалить все ссылки на незагруженные здания, дороги, реквизиты и/или деревья из текущего файла конфигурации" />
+    <Translation ID="BOB_OPT_GEN" String="Общие настройки" />
     <Translation ID="BOB_OPT_CFG" String="Конфигурации" />
+    <Translation ID="BOB_OPT_VIS" String="Визуальные эффекты" />
     <Translation ID="BOB_OPT_RUI" String="Разрушенная текстура" />
     <Translation ID="BOB_OPT_WIR" String="Провода" />
     <Translation ID="BOB_OPT_KEY" String="Горячая клавиша" />
