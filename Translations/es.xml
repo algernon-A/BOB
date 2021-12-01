@@ -62,14 +62,21 @@
     <Translation ID="BOB_CFG_SSC" String="Copiar la configuración seleccionada" />
     <Translation ID="BOB_CFG_SEC" String="Nueva configuración vacía" />
     <Translation ID="BOB_CFG_DEL" String="Eliminar la configuración seleccionada" />
+    <Translation ID="BOB_CFG_LAA" String="Cargar y aplicat configuracion seleccionada" />
+    <Translation ID="BOB_CFG_LGL" String="Cargar y aplicar configuración global" />
+    <Translation ID="BOB_CFG_CLE" String="Limpiar configuración actual" />
+    <Translation ID="BOB_CFG_CLE_TIP" String="Elimna todas las referencias de edificios, redes, elementos y/o árboles que no pudieron ser cargados del archivo de configuración actual" />
     <Translation ID="BOB_OPT_GEN" String="Opciones generales" />
     <Translation ID="BOB_OPT_CFG" String="Configuraciones" />
+    <Translation ID="BOB_OPT_VIS" String="Efectos visuales" />
     <Translation ID="BOB_OPT_RUI" String="Ruinas del terreno" />
+    <Translation ID="BOB_OPT_WIR" String="Cables" />
     <Translation ID="BOB_OPT_KEY" String="Atajo" />
     <Translation ID="BOB_OPT_PRS" String="Presiona cualquier tecla" />
     <Translation ID="BOB_OPT_RGL" String="Los cambios harán efecto al reiniciar" />
     <Translation ID="BOB_OPT_RRT" String="Evita que los árboles arruinen el terreno" />
     <Translation ID="BOB_OPT_RRP" String="Evita que las decoraciones arruinen el terreno" />
+    <Translation ID="BOB_OPT_WTH" String="Cables eléctricos más delgados" />
     <Translation ID="BOB_NUKE" String="Restablecer configuración" />
     <Translation ID="BOB_PER_IND" String="Mostrar elementos individuales de forma predeterminada" />
     <Translation ID="BOB_PER_SIN" String="Siempre apagado" />
@@ -101,11 +108,12 @@
     <Translation ID="BOB_UPD_060_2" String="Ahora puede seleccionar redes en edificios." />
     <Translation ID="BOB_UPD_060_3" String="Ahora puede seleccionar edificios de decoración." />
     <Translation ID="BOB_UPD_060_4" String="Rediseño panel de reemplazo más pequeño" />
-    <Translation ID="BOB_UPD_061_0" String="Añadir filtros de clasificación por nombres ascendentes/descendentes" />
+    <Translation ID="BOB_UPD_061_0" String="Añadido filtros de clasificación por nombres ascendentes/descendentes" />
     <Translation ID="BOB_UPD_062_0" String="Agregado la capacidad de eliminar las ruinas del terreno de todos los árboles y/o decoraciones (en el panel de opciones)" />
     <Translation ID="BOB_UPD_062_1" String="Ahora se puede seleccionar las rutas de los transbordadores (para cambiar/ocultar esas boyas marcadoras de ruta)" />
     <Translation ID="BOB_UPD_062_2" String="Se corrigieron los ángulos de decoraciones en redes que a veces se mostraban incorrectamente en la selección" />
-    <Translation ID="BOB_UPD_080_0" String="Añadir reemplazo de decoración individual de redes" />
-    <Translation ID="BOB_UPD_080_1" String="Añadir botón de Unified UI (UUI)" />
+    <Translation ID="BOB_UPD_080_0" String="Añadido reemplazo de decoración individual de redes" />
+    <Translation ID="BOB_UPD_080_1" String="Añadido botón de Unified UI (UUI)" />
+    <Translation ID="BOB_UPD_086_0" String="Añadida opción para hacer cableado en redes (líneas eléctricas y cables eléctricos de trenes) de tamaños más realistas" />
   </Translations>
 </Language>
