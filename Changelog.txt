@@ -1,4 +1,9 @@
-﻿Version 0.8.6 -
+﻿Version 0.8.6.1 hotfix -
+
+- Fix regression: custom configuration directory not being detected
+
+
+Version 0.8.6 -
 
 - Add option to make wires in networks (power lines and railway catenaries) more realistically sized
 - Move settings and global configuration file locations from application directory to user directory

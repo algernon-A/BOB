@@ -17,7 +17,7 @@ namespace BOB
 		internal static readonly string UserDirPath = ColossalFramework.IO.DataLocation.localApplicationData;
 		internal static readonly string GeneralConfigName = "BOB-config.xml";
 		internal static readonly string GeneralConfigFile = Path.Combine(UserDirPath, GeneralConfigName);
-		internal static readonly string ConfigDirectory = UserDirPath + "BOBconfigs";
+		internal static readonly string ConfigDirectory = Path.Combine(UserDirPath, "BOBconfigs");
 
 
 		/// <summary>
