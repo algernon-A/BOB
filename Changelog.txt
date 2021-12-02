@@ -1,6 +1,6 @@
 ﻿Version 0.8.6.2 -
 
-- Update Externded Managers Library API (EML 0.8.9)
+- Update Extended Managers Library API (EML 0.8.9)
 
 
 Version 0.8.6.1 hotfix -
