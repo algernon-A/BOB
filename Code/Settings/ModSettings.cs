@@ -188,7 +188,7 @@ namespace BOB
         {
             try
             {
-                // Attempt to read new settings file (in user settings directory.
+                // Attempt to read new settings file (in user settings directory).
                 string fileName = UserSettingsDir + NewSettingsFileName;
                 if (!File.Exists(fileName))
                 {
