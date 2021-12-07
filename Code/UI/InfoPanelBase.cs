@@ -26,22 +26,18 @@ namespace BOB
 		protected const float ListHeight = UIPropRow.RowHeight * 16f;
 		protected const float BigIconSize = 64f;
 
-		// Component locations.
-		protected const float ReplaceLabelY = ListY;
-		protected const float ReplaceY = ReplaceLabelY + 25f;
-		protected const float ReplaceAllY = ReplaceY + 30f;
-		protected const float RevertY = ReplaceAllY + 45f;
-
 		// Current selections.
 		protected PrefabInfo selectedPrefab;
 		private TargetListItem currentTargetItem;
 		private PrefabInfo replacementPrefab;
 
 		// Panel components.
+		// Panel components.
+		protected UIButton replaceButton;
 		protected UIPanel rightPanel;
 		protected UIFastList targetList, loadedList;
 		protected UILabel noPropsLabel;
-		protected UIButton replaceButton, revertButton;
+		protected UIButton revertButton;
 		private readonly UIButton targetNameButton;
 		private readonly PreviewPanel previewPanel;
 
@@ -49,23 +45,33 @@ namespace BOB
 		protected int targetSearchStatus;
 
 
-		// Button tooltips.
-		protected abstract string ReplaceTooltipKey { get; }
-
-		// Trees or props?
+		/// <summary>
+		// Current tree/prop state.
+		/// </summary>
 		protected virtual bool IsTree => treeCheck?.isChecked ?? false;
 
-		// Replace button atlas.
-		protected abstract UITextureAtlas ReplaceAtlas { get; }
 
-		// Panel width.
+		/// <summary>
+		/// Panel width.
+		/// </summary>
 		protected override float PanelWidth => RightX + RightWidth + Margin;
 
-		// Panel height.
+
+		/// <summary>
+		/// Panel height.
+		/// </summary>
 		protected override float PanelHeight => ListY + ListHeight + (Margin * 2f);
 
-		// Panel opacity.
+		/// <summary>
+		/// Panel opacity.
+		/// </summary>
 		protected override float PanelOpacity => 0.8f;
+
+
+		/// <summary>
+		/// Revert button Y-position.
+		/// </summary>
+		protected abstract float RevertButtonY { get; }
 
 
 		/// <summary>
@@ -218,17 +224,8 @@ namespace BOB
 				noPropsLabel.relativePosition = new Vector2(Margin, Margin);
 				noPropsLabel.Hide();
 
-				// Replace text label.
-				UILabel replaceLabel = AddUIComponent<UILabel>();
-				replaceLabel.text = Translations.Translate("BOB_PNL_REP");
-				replaceLabel.relativePosition = new Vector2(MidControlX, ReplaceLabelY);
-
-				// Replace button.
-				replaceButton = AddIconButton(this, MidControlX, ReplaceY, BigIconSize, ReplaceTooltipKey, ReplaceAtlas);
-				replaceButton.eventClicked += Replace;
-
 				// Revert button.
-				revertButton = UIControls.AddSmallerButton(this, MidControlX, RevertY, Translations.Translate("BOB_PNL_REV"), MidControlWidth);
+				revertButton = UIControls.AddSmallerButton(this, MidControlX, RevertButtonY, Translations.Translate("BOB_PNL_REV"), MidControlWidth);
 				revertButton.eventClicked += Revert;
 
 				// Scale button.
@@ -277,14 +274,6 @@ namespace BOB
 		/// Updates button states (enabled/disabled) according to current control states.
 		/// </summary>
 		protected abstract void UpdateButtonStates();
-
-
-		/// <summary>
-		/// Replace button event handler.
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="mouseEvent">Mouse event (unused)</param>
-		/// </summary>
-		protected abstract void Replace(UIComponent control, UIMouseEventParameter mouseEvent);
 
 
 		/// <summary>
@@ -382,7 +371,6 @@ namespace BOB
 		/// <param name="propListItem">Target item</param>
 		protected virtual void UpdateTargetItem(TargetListItem targetListItem)
 		{
-
 			propCheck.eventCheckChanged += (control, isChecked) =>
 			{
 				if (isChecked)

@@ -30,6 +30,7 @@ namespace BOB
 		// Layout constants - Y.
 		protected const float TitleHeight = 40f;
 		protected const float ToolbarHeight = 42f;
+		protected const float ToggleY = TitleHeight + Margin;
 		protected const float FilterY = TitleHeight + ToolbarHeight;
 		protected const float FilterHeight = 20f;
 
@@ -55,6 +56,7 @@ namespace BOB
 		/// Panel height.
 		/// </summary>
 		protected abstract float PanelHeight { get; }
+
 
 		/// <summary>
 		/// Panel opacity.
@@ -106,8 +108,8 @@ namespace BOB
 			hideVanilla.eventCheckChanged += VanillaCheckChanged;
 
 			// Tree/Prop checkboxes.
-			propCheck = IconToggleCheck(this, Margin, TitleHeight + Margin, "BOB-PropsSmall", "BOB_PNL_PRP");
-			treeCheck = IconToggleCheck(this, Margin + ToggleSize, TitleHeight + Margin, "BOB-TreesSmall", "BOB_PNL_TRE");
+			propCheck = IconToggleCheck(this, Margin, ToggleY, "BOB-PropsSmall", "BOB_PNL_PRP");
+			treeCheck = IconToggleCheck(this, Margin + ToggleSize, ToggleY, "BOB-TreesSmall", "BOB_PNL_TRE");
 			propCheck.isChecked = !InitialTreeCheckedState;
 			treeCheck.isChecked = InitialTreeCheckedState;
 			propCheck.eventCheckChanged += PropCheckChanged;
@@ -405,7 +407,7 @@ namespace BOB
 		/// <param name="atlasName">Atlas name (for loading from file)</param>
 		/// <param name="tooltipKey">Tooltip translation key</param>
 		/// <returns>New checkbox</returns>
-		private UICheckBox IconToggleCheck(UIComponent parent, float xPos, float yPos, string atlasName, string tooltipKey)
+		protected UICheckBox IconToggleCheck(UIComponent parent, float xPos, float yPos, string atlasName, string tooltipKey)
 		{
 			// Size and position.
 			UICheckBox checkBox = parent.AddUIComponent<UICheckBox>();
@@ -416,6 +418,7 @@ namespace BOB
 
 			// Checkbox sprites.
 			UISprite sprite = checkBox.AddUIComponent<UISprite>();
+			sprite.name = "UncheckedSprite";
 			sprite.atlas = TextureUtils.LoadSpriteAtlas(atlasName);
 			sprite.spriteName = "disabled";
 			sprite.size = new Vector2(ToggleSize, ToggleSize);

@@ -30,10 +30,6 @@ namespace BOB
         [XmlIgnore]
         internal static int indDefault;
 
-        // Last selected individual setting.
-        [XmlIgnore]
-        internal static bool lastInd;
-
         [XmlIgnore]
         // Last selected vanilla filter state.
         internal static bool hideVanilla = false;

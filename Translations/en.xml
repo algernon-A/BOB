@@ -13,18 +13,31 @@
     <Translation ID="BOB_PNL_NOT" String="No trees found" />
     <Translation ID="BOB_PNL_TRE" String="Trees" />
     <Translation ID="BOB_PNL_PRP" String="Props" />
-    <Translation ID="BOB_PNL_IND" String="Show individual props" />
+    <Translation ID="BOB_PNL_IND" String="REMOVE Show individual props" />
     <Translation ID="BOB_PNL_HDV" String="Hide vanilla" />
     <Translation ID="BOB_PNL_REP" String="Replace" />
-    <Translation ID="BOB_PNL_RTB" String="These buildings" />
-    <Translation ID="BOB_PNL_RAB" String="All buildings" />
-    <Translation ID="BOB_PNL_RTN" String="These networks" />
-    <Translation ID="BOB_PNL_RAN" String="All networks" />
+    <Translation ID="BOB_PNL_M_PIB" String="Individual props in these buildings" />
+    <Translation ID="BOB_PNL_M_PGB" String="All props of this type in these buildings" />
+    <Translation ID="BOB_PNL_M_PAB" String="All props of this type in all buildings" />
+    <Translation ID="BOB_PNL_M_TIB" String="Individual trees in these buildings" />
+    <Translation ID="BOB_PNL_M_TGB" String="All trees of this type in these buildings" />
+    <Translation ID="BOB_PNL_M_TAB" String="All trees of this type in all buildings" />
+    <Translation ID="BOB_PNL_M_PIN" String="Individual props in these networks" />
+    <Translation ID="BOB_PNL_M_PGN" String="All props of this type in these networks" />
+    <Translation ID="BOB_PNL_M_PAN" String="All props of this type in all networks" />
+    <Translation ID="BOB_PNL_M_TIN" String="Individual trees in these networks" />
+    <Translation ID="BOB_PNL_M_TGN" String="All trees of this type in these networks" />
+    <Translation ID="BOB_PNL_M_TAN" String="All trees of this type in all networks" />
+    <Translation ID="BOB_PNL_RTB" String="REMOVE These buildings" />
+    <Translation ID="BOB_PNL_RAB" String="REMOVE All buildings" />
+    <Translation ID="BOB_PNL_RTN" String="REMOVE These networks" />
+    <Translation ID="BOB_PNL_RAN" String="REMOVE All networks" />
     <Translation ID="BOB_PNL_RTT" String="Map trees" />
     <Translation ID="BOB_PNL_RTP" String="Map props" />
     <Translation ID="BOB_PNL_RSW" String="Show random" />
     <Translation ID="BOB_PNL_RST" String="Random setup" />
     <Translation ID="BOB_PNL_SCA" String="Prop and tree scaling" />
+    <Translation ID="BOB_PNL_APP" String="Apply" />
     <Translation ID="BOB_PNL_REV" String="Revert" />
     <Translation ID="BOB_PNL_REV_UND" String="Undo the selected replacement" />
     <Translation ID="BOB_PNL_REV_TIP" String="Revert is not available as there is no active replacement for this item" />

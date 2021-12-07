@@ -108,7 +108,7 @@ namespace BOB
         public static void HighlightBuildingProp(RenderManager.CameraInfo camera, int index, BuildingInfo.Prop prop, ref Building building)
         {
             // Check for match - prop, index (if applicable) and building (if applicable).
-            if (prop.m_finalProp == CurrentProp && (CurrentIndex < 0 || (CurrentIndex == index && CurrentBuilding != null && CurrentBuilding == building.Info)))
+            if (prop.m_finalProp == CurrentProp && (CurrentBuilding == null || CurrentBuilding == building.Info) && (CurrentIndex < 0 || CurrentIndex == index))
             {
                 // Get transform matrix for building and use to convert prop location to worldspace.
                 Matrix4x4 m = Matrix4x4.TRS(building.m_position, Quaternion.Euler(0, -Mathf.Rad2Deg * building.m_angle, 0), Vector3.one);
@@ -141,7 +141,7 @@ namespace BOB
         /// <param name="position">Tree position</param>
         public static void HighlightBuildingTree(int index, TreeInfo tree, ref Building building, Vector3 position)
         {
-            if (CurrentIndex < 0 || (CurrentIndex == index && CurrentBuilding != null && CurrentBuilding == building.Info))
+            if (CurrentIndex < 0 || (CurrentIndex == index) && (CurrentBuilding == null || CurrentBuilding == building.Info))
             {
                 HighlightTree(tree, position);
             }
@@ -155,7 +155,7 @@ namespace BOB
         /// <param name="position">Prop position</param>
         public static void HighlightNetworkProp(PropInfo prop, Vector3 position, ushort segmentID, NetInfo.Lane lane, int index)
         {
-            if (InfoPanelManager.Panel != null && CurrentProp != null && CurrentProp == prop && (CurrentIndex < 0 || (CurrentLane == lane && CurrentIndex == index && CurrentNet != null && CurrentNet == Singleton<NetManager>.instance.m_segments.m_buffer[segmentID].Info)))
+            if (InfoPanelManager.Panel != null && CurrentProp != null && CurrentProp == prop && (CurrentNet == null || CurrentNet == Singleton<NetManager>.instance.m_segments.m_buffer[segmentID].Info) && (CurrentIndex < 0 || (CurrentLane == lane && CurrentIndex == index)))
             {
                 // Calculate radius of effect - largest of x and z size of props (minimum of 1 in any case).
                 Vector3 size = prop.m_mesh.bounds.size;

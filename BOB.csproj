@@ -173,6 +173,10 @@
     <Content Include="Resources\BOB-Trees.png" />
     <Content Include="Resources\BOB-TreesSmall.png" />
     <Content Include="Resources\BOB-UUI.png" />
+    <Content Include="Resources\BOB-SamePropSmall.png" />
+    <Content Include="Resources\BOB-SameTreeSmall.png" />
+    <Content Include="Resources\BOB-ThisPropSmall.png" />
+    <Content Include="Resources\BOB-ThisTreeSmall.png" />
     <Content Include="Translations\de.xml" />
     <Content Include="Translations\en.xml" />
     <Content Include="Translations\es.xml" />
