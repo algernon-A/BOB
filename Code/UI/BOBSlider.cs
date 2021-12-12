@@ -4,8 +4,6 @@ using ColossalFramework.UI;
 
 namespace BOB
 {
-
-
 	/// <summary>
 	/// Slider with integrated components.
 	/// </summary>
