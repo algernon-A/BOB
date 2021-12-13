@@ -52,6 +52,7 @@ namespace BOB
 
 		// Status flag.
 		private bool ignoreModeCheckChanged = false;
+		protected bool ignoreSliderValueChange = true;
 
 
 		/// <summary>
@@ -151,7 +152,7 @@ namespace BOB
 
 				// Revert button.
 				replaceButton = UIControls.AddSmallerButton(this, MidControlX, ReplaceY, Translations.Translate("BOB_PNL_APP"), MidControlWidth);
-				replaceButton.eventClicked += Apply;
+				replaceButton.eventClicked += (control, clickEvent) => Apply();
 
 				// Probability.
 				UIPanel probabilityPanel = Sliderpanel(this, MidControlX, ProbabilityY, SliderHeight);
@@ -178,6 +179,13 @@ namespace BOB
 				xSlider = AddBOBSlider(offsetPanel, Margin, XOffsetY, MidControlWidth - (Margin * 2f), "BOB_PNL_XOF", -8f, 8f, 0.01f, "X offset");
 				ySlider = AddBOBSlider(offsetPanel, Margin, YOffsetY, MidControlWidth - (Margin * 2f), "BOB_PNL_YOF", -8f, 8f, 0.01f, "Y offset");
 				zSlider = AddBOBSlider(offsetPanel, Margin, ZOffsetY, MidControlWidth - (Margin * 2f), "BOB_PNL_ZOF", -8f, 8f, 0.01f, "Z offset");
+
+				// Live application of position changes.
+				xSlider.eventValueChanged += (control, value) => SliderChange();
+				ySlider.eventValueChanged += (control, value) => SliderChange();
+				zSlider.eventValueChanged += (control, value) => SliderChange();
+				angleSlider.eventValueChanged += (control, value) => SliderChange();
+				probabilitySlider.eventValueChanged += (control, value) => SliderChange();
 
 				// Normal/random toggle.
 				randomCheck = UIControls.LabelledCheckBox((UIComponent)(object)this, hideVanilla.relativePosition.x, hideVanilla.relativePosition.y + hideVanilla.height + (Margin / 2f), Translations.Translate("BOB_PNL_RSW"), 12f, 0.7f);
@@ -271,7 +279,7 @@ namespace BOB
 		/// <param name="control">Calling component (unused)</param>
 		/// <param name="mouseEvent">Mouse event (unused)</param>
 		/// </summary>
-		protected abstract void Apply(UIComponent control, UIMouseEventParameter mouseEvent);
+		protected abstract void Apply();
 
 
 		/// <summary>
@@ -335,27 +343,31 @@ namespace BOB
 		/// <param name="replacement">Replacement record to use</param>
 		protected void SetSliders(BOBReplacementBase replacement)
         {
+			// Disable events.
+			ignoreSliderValueChange = true;
+
 			// Null check first.
 			if (replacement == null)
-            {
-				Logging.Error("null replacement passed to SetSliders");
-
+			{
 				// In the absense of valid data, set all offset fields to defaults.
 				angleSlider.TrueValue = 0f;
 				xSlider.TrueValue = 0;
 				ySlider.TrueValue = 0;
 				zSlider.TrueValue = 0;
-				probabilitySlider.TrueValue = CurrentTargetItem != null ? CurrentTargetItem.originalProb : 0;
+				probabilitySlider.TrueValue = CurrentTargetItem != null ? CurrentTargetItem.originalProb : 100;
+			}
+			else
+			{
+				// Valid replacement - set slider values.
+				angleSlider.TrueValue = replacement.angle;
+				xSlider.TrueValue = replacement.offsetX;
+				ySlider.TrueValue = replacement.offsetY;
+				zSlider.TrueValue = replacement.offsetZ;
+				probabilitySlider.TrueValue = replacement.probability;
+			}
 
-				return;
-            }
-
-			// Set slider values.
-			angleSlider.TrueValue = replacement.angle;
-			xSlider.TrueValue = replacement.offsetX;
-			ySlider.TrueValue = replacement.offsetY;
-			zSlider.TrueValue = replacement.offsetZ;
-			probabilitySlider.TrueValue = replacement.probability;
+			// Re-enable events.
+			ignoreSliderValueChange = false;
 		}
 
 
@@ -417,6 +429,22 @@ namespace BOB
 
 			// Resume event handling.
 			ignoreModeCheckChanged = false;
+		}
+
+
+		/// <summary>
+		/// Event handler for applying live changes on slider value change.
+		/// </summary>
+		private void SliderChange()
+		{
+			// Don't do anything if already ignoring events.
+			if (!ignoreSliderValueChange)
+			{
+				// Disable events while applying changes.
+				ignoreSliderValueChange = true;
+				Apply();
+				ignoreSliderValueChange = false;
+			}
 		}
 
 

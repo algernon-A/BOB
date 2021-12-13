@@ -118,12 +118,8 @@ namespace BOB
 					}
 				}
 
-				// If we got here, there's no valid current selection; set all offset fields to defaults.
-				angleSlider.TrueValue = 0f;
-				xSlider.TrueValue = 0;
-				ySlider.TrueValue = 0;
-				zSlider.TrueValue = 0;
-				probabilitySlider.TrueValue = value != null ? value.originalProb : 0;
+				// If we got here, there's no valid current selection; set all offset fields to defaults by passing null to SetSliders().
+				SetSliders(null);
 			}
 		}
 
@@ -176,10 +172,8 @@ namespace BOB
 
 		/// <summary>
 		/// Apply button event handler.
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="mouseEvent">Mouse event (unused)</param>
 		/// </summary>
-		protected override void Apply(UIComponent control, UIMouseEventParameter mouseEvent)
+		protected override void Apply()
 		{
 			try
 			{

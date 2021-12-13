@@ -32,7 +32,6 @@ namespace BOB
 		private PrefabInfo replacementPrefab;
 
 		// Panel components.
-		// Panel components.
 		protected UIButton replaceButton;
 		protected UIPanel rightPanel;
 		protected UIFastList targetList, loadedList;
