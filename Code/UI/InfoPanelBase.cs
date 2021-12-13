@@ -265,6 +265,14 @@ namespace BOB
 
 
 		/// <summary>
+		/// Performs any actions-on-close for the panel.
+		/// </summary>
+		internal virtual void Close()
+        {
+        }
+
+
+		/// <summary>
 		/// Populates the target fastlist with a list of target-specific trees or props.
 		/// </summary>
 		protected abstract void TargetList();

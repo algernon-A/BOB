@@ -196,6 +196,16 @@ namespace BOB
 
 
 		/// <summary>
+		/// Performs any actions-on-close for the panel.
+		/// </summary>
+		internal override void Close()
+		{
+			// Perform post-update tasks, such as saving the config file and refreshing renders.
+			FinishUpdate();
+		}
+
+
+		/// <summary>
 		/// Tree check event handler.
 		/// </summary>
 		/// <param name="control">Calling component (unused)</param>

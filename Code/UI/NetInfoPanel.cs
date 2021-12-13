@@ -219,9 +219,6 @@ namespace BOB
 							Logging.Error("invalid replacement mode at NetInfoPanel.Apply");
 							return;
 					}
-
-					// Perform post-replacment updates.
-					FinishUpdate();
 				}
 			}
 			catch (Exception e)
@@ -255,28 +252,16 @@ namespace BOB
 
 					// Clear current target replacement prefab.
 					CurrentTargetItem.individualPrefab = null;
-
-					// Perform post-replacment updates.
-					FinishUpdate();
 				}
 				else if (currentNetItem.replacementPrefab != null)
 				{
 					// Network reversion.
 					NetworkReplacement.Instance.Revert(SelectedNet, currentNetItem.originalPrefab, -1, -1, true);
-
-					// Perform post-reversion updates.
-					FinishUpdate();
 				}
 				else if (currentNetItem.allPrefab != null)
 				{
 					// All-network reversion.
 					AllNetworkReplacement.Instance.Revert(SelectedNet, currentNetItem.originalPrefab, -1, -1, true);
-
-					// Save configuration file and refresh target list (to reflect our changes).
-					ConfigurationUtils.SaveConfig();
-
-					// Perform post-reversion updates.
-					FinishUpdate();
 				}
 			}
 			catch (Exception e)

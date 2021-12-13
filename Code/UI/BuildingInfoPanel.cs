@@ -365,9 +365,6 @@ namespace BOB
 							Logging.Error("invalid replacement mode at BuildingInfoPanel.Apply");
 							return;
 					}
-
-					// Perform post-replacment updates.
-					FinishUpdate();
 				}
 			}
 			catch (Exception e)
@@ -401,9 +398,6 @@ namespace BOB
 
 					// Clear current target replacement prefab.
 					CurrentTargetItem.individualPrefab = null;
-
-					// Perform post-replacment updates.
-					FinishUpdate();
 				}
 				else if (CurrentTargetItem.replacementPrefab != null)
 				{
@@ -412,9 +406,6 @@ namespace BOB
 
 					// Clear current target replacement prefab.
 					CurrentTargetItem.replacementPrefab = null;
-
-					// Perform post-replacment updates.
-					FinishUpdate();
 				}
 				else if (CurrentTargetItem.allPrefab != null)
 				{
@@ -426,9 +417,6 @@ namespace BOB
 
 						// Clear current target 'all' prefab.
 						CurrentTargetItem.allPrefab = null;
-
-						// Perform post-replacment updates.
-						FinishUpdate();
 					}
 				}
 			}
