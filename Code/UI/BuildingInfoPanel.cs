@@ -413,6 +413,12 @@ namespace BOB
 						CurrentTargetItem.allPrefab = null;
 					}
 				}
+
+				// Update current item.
+				UpdateTargetItem(CurrentTargetItem);
+
+				// Update controls.
+				CurrentTargetItem = CurrentTargetItem;
 			}
 			catch (Exception e)
 			{

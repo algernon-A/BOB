@@ -257,6 +257,12 @@ namespace BOB
 					// All-network reversion.
 					AllNetworkReplacement.Instance.Revert(SelectedNet, currentNetItem.originalPrefab, -1, -1, true);
 				}
+
+				// Update current item.
+				UpdateTargetItem(currentNetItem);
+
+				// Update controls.
+				CurrentTargetItem = currentNetItem;
 			}
 			catch (Exception e)
 			{
@@ -353,10 +359,10 @@ namespace BOB
 			// List of prefabs that have passed filtering.
 			List<TargetListItem> itemList = new List<TargetListItem>();
 
-			// Check to see if this building contains any props.
-			if (SelectedNet.m_lanes == null || SelectedNet.m_lanes.Length == 0)
+			// Check to see if this building contains any lanes.
+			if (SelectedNet?.m_lanes == null || SelectedNet.m_lanes.Length == 0)
 			{
-				// No props - show 'no props' label and return an empty list.
+				// No lanes - show 'no props' label and return an empty list.
 				noPropsLabel.Show();
 				targetList.rowsData = new FastList<object>();
 				return;
@@ -422,6 +428,17 @@ namespace BOB
 
 						// Update original prop reference.
 						targetListItem.originalPrefab = allNetReplacement.targetInfo;
+
+
+						// See if we can find an active reference.
+						Logging.Message("finding original probability - all-network");
+						NetPropReference originalReference = allNetReplacement?.references?.Find(x =>  x.netInfo == SelectedNet && x.laneIndex == lane && x.propIndex == propIndex);
+						if (originalReference != null)
+                        {
+							// Original reference found; update original probability.
+							targetListItem.originalProb = originalReference.probability;
+                        }
+						Logging.Message("original probability not found");
 					}
 
 					// Network replacement and original probability (if any).
@@ -433,6 +450,9 @@ namespace BOB
 
 						// Update original prop reference.
 						targetListItem.originalPrefab = netReplacement.targetInfo;
+						Logging.Message("finding original probability - grouped");
+						targetListItem.originalProb = netReplacement.references.Find(x => x.laneIndex == lane && x.propIndex == propIndex).probability;
+						Logging.Message("original probability found");
 					}
 
 					// Individual replacement and original probability (if any).
@@ -441,6 +461,9 @@ namespace BOB
 					{
 						targetListItem.individualPrefab = individualReplacement.replacementInfo;
 						targetListItem.individualProb = individualReplacement.probability;
+						Logging.Message("finding original probability - individual");
+						targetListItem.originalProb = individualReplacement.references.Find(x => x.laneIndex == lane && x.propIndex == propIndex).probability;
+						Logging.Message("original probability found");
 
 						// Update original prop reference.
 						targetListItem.originalPrefab = individualReplacement.targetInfo;
@@ -454,6 +477,7 @@ namespace BOB
 
 						// Update original prop reference.
 						targetListItem.originalPrefab = packReplacement.targetInfo;
+						targetListItem.originalProb = packReplacement.references.Find(x => x.laneIndex == lane && x.propIndex == propIndex).probability;
 					}
 
 					// Are we grouping?
