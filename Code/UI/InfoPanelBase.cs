@@ -137,9 +137,9 @@ namespace BOB
 
 
 		/// <summary>
-		/// Sets the current replacement prefab and updates buttons states accordingly.
+		/// Sets the current replacement prefab and updates button states accordingly.
 		/// </summary>
-		internal PrefabInfo ReplacementPrefab
+		internal virtual PrefabInfo ReplacementPrefab
 		{
 			get => replacementPrefab;
 

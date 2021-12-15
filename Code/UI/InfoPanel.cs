@@ -53,6 +53,7 @@ namespace BOB
 		// Status flag.
 		private bool ignoreModeCheckChanged = false;
 		protected bool ignoreSliderValueChange = true;
+		protected bool ignoreSelectedPrefabChange = true;
 
 
 		/// <summary>
@@ -101,6 +102,25 @@ namespace BOB
 		/// Currently selected network.
 		/// </summary>
 		protected NetInfo SelectedNet => selectedPrefab as NetInfo;
+
+
+
+		/// <summary>
+		/// Sets the current replacement prefab and updates button states accordingly.
+		/// </summary>
+		internal override PrefabInfo ReplacementPrefab
+        {
+            set
+            {
+				base.ReplacementPrefab = value;
+
+				// If not ignoring events and value isn't null, apply live changes.
+				if (!ignoreSelectedPrefabChange && value != null)
+                {
+					Apply();
+                }
+            }
+        }
 
 
 		/// <summary>

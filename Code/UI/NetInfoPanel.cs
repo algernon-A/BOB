@@ -75,8 +75,10 @@ namespace BOB
         {
 			set
 			{
-				// Call base.
+				// Call base, while ignoring replacement prefab change live application.
+				ignoreSelectedPrefabChange = true;
 				base.CurrentTargetItem = value;
+				ignoreSelectedPrefabChange = false;
 
 				// Set net item reference.
 				currentNetItem = value as NetTargetListItem;
@@ -95,10 +97,11 @@ namespace BOB
 					{
 						// Use IndividualIndex and IndividualLane to handle case of switching from individual to grouped props (values will be -1, actual values in relevant lists).
 						SetSliders(IndividualNetworkReplacement.Instance.EligibileReplacement(SelectedNet, CurrentTargetItem.originalPrefab, IndividualLane, IndividualIndex));
+
 						// All done here.
 						return;
 					}
-					// Ditto for any network replacement
+					// Ditto for any netwz80gAReork replacement
 					else if (CurrentTargetItem.replacementPrefab != null)
 					{
 						// Get replacement and update control values.
@@ -213,6 +216,13 @@ namespace BOB
 							Logging.Error("invalid replacement mode at NetInfoPanel.Apply");
 							return;
 					}
+
+					// Update target list.
+					targetList.Refresh();
+
+					// Update highlighting target.
+					RenderOverlays.CurrentProp = ReplacementPrefab as PropInfo;
+					RenderOverlays.CurrentTree = ReplacementPrefab as TreeInfo;
 				}
 			}
 			catch (Exception e)
@@ -263,6 +273,9 @@ namespace BOB
 
 				// Update controls.
 				CurrentTargetItem = currentNetItem;
+
+				// Update target list.
+				targetList.Refresh();
 			}
 			catch (Exception e)
 			{

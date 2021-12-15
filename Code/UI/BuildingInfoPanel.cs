@@ -155,8 +155,10 @@ namespace BOB
 		{
 			set
 			{
-				// Call base.
+				// Call base, while ignoring replacement prefab change live application.
+				ignoreSelectedPrefabChange = true;
 				base.CurrentTargetItem = value;
+				ignoreSelectedPrefabChange = false;
 
 				// Ensure valid selections before proceeding.
 				if (CurrentTargetItem != null && currentBuilding != null)
@@ -359,6 +361,13 @@ namespace BOB
 							Logging.Error("invalid replacement mode at BuildingInfoPanel.Apply");
 							return;
 					}
+
+					// Update target list.
+					targetList.Refresh();
+
+					// Update highlighting target.
+					RenderOverlays.CurrentProp = ReplacementPrefab as PropInfo;
+					RenderOverlays.CurrentTree = ReplacementPrefab as TreeInfo;
 				}
 			}
 			catch (Exception e)
@@ -419,6 +428,9 @@ namespace BOB
 
 				// Update controls.
 				CurrentTargetItem = CurrentTargetItem;
+
+				// Update target list.
+				targetList.Refresh();
 			}
 			catch (Exception e)
 			{
