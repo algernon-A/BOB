@@ -109,26 +109,27 @@ namespace BOB
 			// Check for valid parameters.
 			if (target != null && replacement != null)
 			{
-				// Local references.
-				PropManager propManager = Singleton<PropManager>.instance;
-				PropInstance[] props = propManager.m_props.m_buffer;
-
 				// Iterate through each prop in map.
-				for (uint propIndex = 0; propIndex < props.Length; ++propIndex)
+				for (uint propIndex = 0; propIndex < PropAPI.PropBufferLen; ++propIndex)
 				{
-					// Local reference.
-					PropInstance prop = props[propIndex];
-
-					// Skip non-existent trees (those with no flags).
-					if (prop.m_flags == (ushort)PropInstance.Flags.None)
+					// Skip non-existent props (those with no flags).
+					if (PropAPI.Wrapper.GetFlags(propIndex) == (ushort)PropInstance.Flags.None)
 					{
 						continue;
 					}
 
-					// If tree matches, replace!
-					if (prop.Info == target)
+					// If props matches, replace!
+					if (PropAPI.Wrapper.GetInfo(propIndex) == target)
 					{
-						props[propIndex].Info = replacement;
+						// Replace via direct reference to buffer, EPropInstance[] or PropInstance[] depending on whether or not EML is intalled.
+						if (PropAPI.m_isEMLInstalled)
+                        {
+							EMLPropWrapper.m_defBuffer[propIndex].Info = replacement;
+                        }
+						else
+						{
+							DefPropWrapper.m_defBuffer[propIndex].Info = replacement;
+						}
 
 						// Update prop render (to update LOD) via simulation thread, creating local propID reference to avoid race condition.
 						uint propID = propIndex;
