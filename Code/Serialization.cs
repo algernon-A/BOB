@@ -25,11 +25,8 @@ namespace BOB
         {
             base.OnSaveData();
 
-
             using (MemoryStream stream = new MemoryStream())
             {
-                BinaryFormatter formatter = new BinaryFormatter();
-
                 // Serialise savegame settings.
                 DataSerializer.Serialize(stream, DataSerializer.Mode.Memory, DataVersion, new BOBSerializer());
 
@@ -58,8 +55,6 @@ namespace BOB
                 // Data was read - go ahead and deserialise.
                 using (MemoryStream stream = new MemoryStream(data))
                 {
-                    BinaryFormatter formatter = new BinaryFormatter();
-
                     // Deserialise savegame settings.
                     DataSerializer.Deserialize<BOBSerializer>(stream, DataSerializer.Mode.Memory);
                     Logging.Message("read ", stream.Length);
