@@ -49,6 +49,7 @@ namespace BOB
 		protected BOBSlider probabilitySlider, angleSlider, xSlider, ySlider, zSlider;
 		private readonly UICheckBox randomCheck;
 		private readonly UICheckBox[] modeChecks = new UICheckBox[(int)ReplacementModes.NumModes];
+		private UIPanel anglePanel;
 
 		// Status flag.
 		private bool ignoreModeCheckChanged = false;
@@ -177,7 +178,7 @@ namespace BOB
 				probabilitySlider.LimitToVisible = true;
 
 				// Angle.
-				UIPanel anglePanel = Sliderpanel(this, MidControlX, AngleY, SliderHeight);
+				anglePanel = Sliderpanel(this, MidControlX, AngleY, SliderHeight);
 				angleSlider = AddBOBSlider(anglePanel, Margin, 0f, MidControlWidth - (Margin * 2f), "BOB_PNL_ANG", -180, 180, 1, "Angle");
 
 				// Offset panel.
@@ -248,6 +249,9 @@ namespace BOB
             {
 				UpdateModeIcons(PropModeAtlas, PropModeTipKeys);
             }
+
+			// Don't show angle slider for trees.
+			anglePanel.isVisible = !isChecked;
         }
 
 
