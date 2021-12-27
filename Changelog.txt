@@ -1,4 +1,10 @@
-﻿Version 0.8.6.2 -
+﻿Version 0.8.6.3 -
+
+- Update Extended Managers Library API (EML 0.9.7)
+- Fix map prop replacement EML compatibility
+
+
+Version 0.8.6.2 -
 
 - Update Extended Managers Library API (EML 0.8.9)
 
