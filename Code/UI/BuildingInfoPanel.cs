@@ -329,7 +329,6 @@ namespace BOB
 					{
 						case ReplacementModes.Individual:
 							// Individual replacement.
-							Logging.Message("applying individual building replacement for building ", currentBuilding.name ?? "null", ", target ", CurrentTargetItem.originalPrefab.name ?? "null", ", and replacement ", ReplacementPrefab.name ?? "null");
 							IndividualBuildingReplacement.Instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, CurrentTargetItem.index, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
 
 							// Update current target.
@@ -339,7 +338,6 @@ namespace BOB
 
 						case ReplacementModes.Grouped:
 							// Grouped replacement.
-							Logging.Message("applying grouped building replacement for building ", currentBuilding.name ?? "null", ", target ", CurrentTargetItem.originalPrefab.name ?? "null", ", and replacement ", ReplacementPrefab.name ?? "null");
 							BuildingReplacement.Instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
 
 							// Update current target.
@@ -349,7 +347,6 @@ namespace BOB
 
 						case ReplacementModes.All:
 							// All- replacement.
-							Logging.Message("applying all-building replacement");
 							AllBuildingReplacement.Instance.Replace(null, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
 
 							// Update current target.
@@ -361,6 +358,9 @@ namespace BOB
 							Logging.Error("invalid replacement mode at BuildingInfoPanel.Apply");
 							return;
 					}
+
+					// Update any dirty building renders.
+					BuildingData.Update();
 
 					// Update target list.
 					targetList.Refresh();
@@ -641,6 +641,67 @@ namespace BOB
 
 			// Update any dirty building renders.
 			BuildingData.Update();
+		}
+
+
+		/// <summary>
+		/// Adds a new tree or prop.
+		/// </summary>
+		private void AddNew()
+		{
+			// Make sure a valid replacement prefab is set, and that we've got space for another prop.
+			if (ReplacementPrefab != null)
+			{
+				// New prop index.
+				int newIndex = 0;
+				
+				// Check to see if we've got a current prop array.
+				if (currentBuilding.m_props != null)
+				{
+					// Existing m_props array - check that we've got space for another entry.
+					newIndex = currentBuilding.m_props.Length;
+					if (newIndex > 63)
+					{
+						// Props maxed out - exit.
+						return;
+					}
+
+					// Get old props reference.
+					BuildingInfo.Prop[] oldBuildingProps = currentBuilding.m_props;
+
+					// Create new props array with one extra entry, and copy the old props to it.
+					currentBuilding.m_props = new BuildingInfo.Prop[newIndex + 1];
+					for (int i = 0; i < newIndex; ++i)
+					{
+						currentBuilding.m_props[i] = oldBuildingProps[i];
+					}
+				}
+				else
+				{
+					// No m_props array already; create one.
+					currentBuilding.m_props = new BuildingInfo.Prop[1];
+				}
+
+				// Add new prop.
+				currentBuilding.m_props[newIndex] = new BuildingInfo.Prop
+				{
+					m_angle = angleSlider.TrueValue,
+					m_prop = ReplacementPrefab as PropInfo,
+					m_tree = ReplacementPrefab as TreeInfo,
+					m_finalProp = ReplacementPrefab as PropInfo,
+					m_finalTree = ReplacementPrefab as TreeInfo,
+					m_fixedHeight = true,
+					m_position = new Vector3(xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue),
+					m_probability = (int)probabilitySlider.TrueValue
+				};
+
+				// Refresh render to recgonise new prop.
+				BuildingData.DirtyList.Add(currentBuilding);
+				BuildingData.Update();
+
+				// Regenerate target list.
+				TargetList();
+			}
 		}
 	}
 }

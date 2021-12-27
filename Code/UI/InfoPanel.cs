@@ -170,10 +170,6 @@ namespace BOB
 				// Set initial mode state.
 				modeChecks[(int)CurrentMode].isChecked = true;
 
-				// Revert button.
-				replaceButton = UIControls.AddSmallerButton(this, MidControlX, ReplaceY, Translations.Translate("BOB_PNL_APP"), MidControlWidth);
-				replaceButton.eventClicked += (control, clickEvent) => Apply();
-
 				// Probability.
 				UIPanel probabilityPanel = Sliderpanel(this, MidControlX, ProbabilityY, SliderHeight);
 				probabilitySlider = AddBOBSlider(probabilityPanel, Margin, 0f, MidControlWidth - (Margin * 2f), "BOB_PNL_PRB", 0, 100, 1, "Probability");

@@ -424,11 +424,15 @@ namespace BOB
 			NetLaneProps.Prop thisProp = reference.netInfo.m_lanes[reference.laneIndex].m_laneProps.m_props?[reference.propIndex];
 			if (thisProp != null)
 			{
-				thisProp.m_finalProp = reference.originalProp;
-				thisProp.m_finalTree = reference.originalTree;
+				thisProp.m_prop = reference.originalProp;
+				thisProp.m_tree = reference.originalTree;
 				thisProp.m_angle = reference.angle;
 				thisProp.m_position = reference.position;
 				thisProp.m_probability = reference.probability;
+
+				// Update network.
+				reference.netInfo.CheckReferences();
+				NetData.DirtyList.Add(reference.netInfo);
 			}
 		}
 
@@ -460,15 +464,16 @@ namespace BOB
 			// Apply replacement.
 			if (replacement.replacementInfo is PropInfo propInfo)
 			{
-				thisLane.m_laneProps.m_props[propReference.propIndex].m_finalProp = propInfo;
+				thisLane.m_laneProps.m_props[propReference.propIndex].m_prop = propInfo;
 			}
 			else if (replacement.replacementInfo is TreeInfo treeInfo)
 			{
-				thisLane.m_laneProps.m_props[propReference.propIndex].m_finalTree = treeInfo;
+				thisLane.m_laneProps.m_props[propReference.propIndex].m_tree = treeInfo;
 			}
 			else
 			{
 				Logging.Error("invalid replacement ", replacement.replacementInfo?.name ?? "null", " passed to NetworkReplacement.ReplaceProp");
+				return;
 			}
 
 			// Invert x offset to match original prop x position.
@@ -483,6 +488,9 @@ namespace BOB
 
 			// Probability.
 			thisLane.m_laneProps.m_props[propReference.propIndex].m_probability = replacement.probability;
+
+			// Update network prop references.
+			propReference.netInfo.CheckReferences();
 
 			// Add network to dirty list.
 			NetData.DirtyList.Add(propReference.netInfo);
