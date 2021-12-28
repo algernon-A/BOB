@@ -28,6 +28,7 @@ namespace BOB
 	{
 		public BuildingInfo buildingInfo;
 		public float radAngle;
+		public bool fixedHeight;
 	}
 
 

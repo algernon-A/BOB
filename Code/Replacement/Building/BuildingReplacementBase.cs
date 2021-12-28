@@ -391,6 +391,7 @@ namespace BOB
 					originalProp = isTree ? thisProp.m_finalProp : originalPrefab as PropInfo,
 					originalTree = isTree ? originalPrefab as TreeInfo : thisProp.m_finalTree,
 					radAngle = thisProp.m_radAngle,
+					fixedHeight = thisProp.m_fixedHeight,
 					position = thisProp.m_position,
 					probability = thisProp.m_probability
 				};
@@ -415,6 +416,7 @@ namespace BOB
 				thisProp.m_prop = reference.originalProp;
 				thisProp.m_tree = reference.originalTree;
 				thisProp.m_radAngle = reference.radAngle;
+				thisProp.m_fixedHeight = reference.fixedHeight;
 				thisProp.m_position = reference.position;
 				thisProp.m_probability = reference.probability;
 
@@ -444,10 +446,12 @@ namespace BOB
 			if (replacement.replacementInfo is PropInfo propInfo)
 			{
 				propReference.buildingInfo.m_props[propReference.propIndex].m_prop = propInfo;
+				propReference.buildingInfo.m_props[propReference.propIndex].m_fixedHeight = !(propInfo.m_requireHeightMap || propInfo.m_requireWaterMap);
 			}
 			else if (replacement.replacementInfo is TreeInfo treeInfo)
 			{
 				propReference.buildingInfo.m_props[propReference.propIndex].m_tree = treeInfo;
+				propReference.buildingInfo.m_props[propReference.propIndex].m_fixedHeight = true;
 			}
 			else
 			{
@@ -461,7 +465,6 @@ namespace BOB
 
 			// Probability.
 			propReference.buildingInfo.m_props[propReference.propIndex].m_probability = replacement.probability;
-
 
 			// Update building prop references.
 			propReference.buildingInfo.CheckReferences();
