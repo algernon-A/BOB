@@ -30,8 +30,9 @@ namespace BOB
 		// Layout constants - Y.
 		protected const float TitleHeight = 40f;
 		protected const float ToolbarHeight = 42f;
-		protected const float ToggleY = TitleHeight + Margin;
-		protected const float FilterY = TitleHeight + ToolbarHeight;
+		protected const float ToggleHeaderHeight = 15f;
+		protected const float ToggleY = TitleHeight + ToggleHeaderHeight + Margin;
+		protected const float FilterY = TitleHeight + ToggleHeaderHeight + ToolbarHeight;
 		protected const float FilterHeight = 20f;
 
 

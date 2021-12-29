@@ -16,6 +16,7 @@
     <Translation ID="BOB_PNL_IND" String="REMOVE Show individual props" />
     <Translation ID="BOB_PNL_HDV" String="Hide vanilla" />
     <Translation ID="BOB_PNL_REP" String="Replace" />
+	<Translation ID="BOB_PNL_MOD" String="Replacement mode" />
     <Translation ID="BOB_PNL_M_PIB" String="Individual props in these buildings" />
     <Translation ID="BOB_PNL_M_PGB" String="All props of this type in these buildings" />
     <Translation ID="BOB_PNL_M_PAB" String="All props of this type in all buildings" />

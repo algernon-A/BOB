@@ -171,6 +171,10 @@ namespace BOB
 				// Set initial mode state.
 				modeChecks[(int)CurrentMode].isChecked = true;
 
+				// Mode label.
+				UILabel modeLabel = UIControls.AddLabel(this, ModeX, ModeY, Translations.Translate("BOB_PNL_MOD"), textScale: 0.8f);
+				modeLabel.relativePosition -= new Vector3(0f, modeLabel.height);
+
 				// Probability.
 				UIPanel probabilityPanel = Sliderpanel(this, MidControlX, ProbabilityY, SliderHeight);
 				probabilitySlider = AddBOBSlider(probabilityPanel, Margin, 0f, MidControlWidth - (Margin * 2f), "BOB_PNL_PRB", 0, 100, 1, "Probability");
