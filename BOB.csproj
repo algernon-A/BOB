@@ -123,7 +123,7 @@
     <Compile Include="Code\Settings\ModSettings.cs" />
     <Compile Include="Code\Settings\OptionsKeymapping.cs" />
     <Compile Include="Code\TranslationFramework\TranslationFramework.cs" />
-    <Compile Include="Code\TranslationFramework\TranslationXML.cs" />
+    <Compile Include="Code\TranslationFramework\Language.cs" />
     <Compile Include="Code\UI\InfoPanelBase.cs" />
     <Compile Include="Code\UI\BuildingInfoPanel.cs" />
     <Compile Include="Code\UI\InfoPanelManager.cs" />
@@ -177,18 +177,19 @@
     <Content Include="Resources\BOB-SameTreeSmall.png" />
     <Content Include="Resources\BOB-ThisPropSmall.png" />
     <Content Include="Resources\BOB-ThisTreeSmall.png" />
-    <Content Include="Translations\de.xml" />
-    <Content Include="Translations\en.xml" />
-    <Content Include="Translations\es.xml" />
-    <Content Include="Translations\ja.xml" />
-    <Content Include="Translations\ko.xml" />
-    <Content Include="Translations\ru.xml" />
-    <Content Include="Translations\zh.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="PrefabTemplates\BOBRandomPropTemplate.crp" />
     <None Include="PrefabTemplates\BOBRandomTreeTemplate.crp" />
+    <None Include="Translations\de.csv" />
+    <None Include="Translations\en.csv" />
+    <None Include="Translations\es.csv" />
+    <None Include="Translations\ja.csv" />
+    <None Include="Translations\ko.csv" />
+    <None Include="Translations\ru.csv" />
+    <None Include="Translations\pl.csv" />
+    <None Include="Translations\zh.csv" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
@@ -200,7 +201,7 @@ xcopy /y "$(SolutionDir)packages\CitiesHarmony.API.2.0.0\lib\net35\CitiesHarmony
 xcopy /y "$(ProjectDir)\Libraries\*.dll" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)"
 
 mkdir "$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\Translations"
-del "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\Translations\*"
+del "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\Translations\*.csv"
 xcopy /y "$(ProjectDir)\Translations\" "$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\Translations" /s /e
 
 mkdir "$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\Resources"

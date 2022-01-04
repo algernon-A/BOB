@@ -128,9 +128,9 @@ namespace BOB
 		[XmlElement("Language")]
 		public string XMLLanguage
 		{
-			get => Translations.Language;
+			get => Translations.CurrentLanguage;
 
-			set => Translations.Language = value;
+			set => Translations.CurrentLanguage = value;
         }
 
         // Hotkey element.
