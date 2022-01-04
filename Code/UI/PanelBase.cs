@@ -31,7 +31,8 @@ namespace BOB
 		protected const float TitleHeight = 40f;
 		protected const float ToolbarHeight = 42f;
 		protected const float ToggleHeaderHeight = 15f;
-		protected const float ToggleY = TitleHeight + ToggleHeaderHeight + Margin;
+		protected const float ToggleHeaderY = TitleHeight + Margin;
+		protected const float ToggleY = ToggleHeaderY + ToggleHeaderHeight;
 		protected const float FilterY = TitleHeight + ToggleHeaderHeight + ToolbarHeight;
 		protected const float FilterHeight = 20f;
 
@@ -41,6 +42,7 @@ namespace BOB
 		protected UICheckBox hideVanilla;
 		protected UICheckBox treeCheck, propCheck;
 		protected UIButton loadedNameButton;
+		protected UILabel modeLabel;
 		private UILabel titleLabel;
 
 		// Search settings.
@@ -107,6 +109,9 @@ namespace BOB
 			hideVanilla = UIControls.LabelledCheckBox((UIComponent)(object)this, nameFilter.relativePosition.x, nameFilter.relativePosition.y + nameFilter.height + (Margin / 2f), Translations.Translate("BOB_PNL_HDV"), 12f, 0.7f);
 			hideVanilla.isChecked = ModSettings.hideVanilla;
 			hideVanilla.eventCheckChanged += VanillaCheckChanged;
+
+			// Mode label.
+			modeLabel = UIControls.AddLabel(this, Margin, ToggleHeaderY, Translations.Translate("BOB_PNL_MOD"), textScale: 0.8f);
 
 			// Tree/Prop checkboxes.
 			propCheck = IconToggleCheck(this, Margin, ToggleY, "BOB-PropsSmall", "BOB_PNL_PRP");

@@ -16,6 +16,7 @@ BOB_PNL_IND,REMOVE Show individual props
 BOB_PNL_HDV,Hide vanilla
 BOB_PNL_REP,Replace
 BOB_PNL_MOD,Replacement mode
+BOB_PNL_FUN,Extra functions
 BOB_PNL_M_PIB,Individual props in these buildings
 BOB_PNL_M_PGB,All props of this type in these buildings
 BOB_PNL_M_PAB,All props of this type in all buildings

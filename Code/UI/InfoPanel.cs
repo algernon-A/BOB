@@ -171,9 +171,10 @@ namespace BOB
 				// Set initial mode state.
 				modeChecks[(int)CurrentMode].isChecked = true;
 
-				// Mode label.
-				UILabel modeLabel = UIControls.AddLabel(this, ModeX, ModeY, Translations.Translate("BOB_PNL_MOD"), textScale: 0.8f);
-				modeLabel.relativePosition -= new Vector3(0f, modeLabel.height);
+				// Adjust mode label position to be centred over all mode toggles.
+				float modeRight = ModeX + ((float)ReplacementModes.NumModes * ToggleSize);
+				float modeOffset = (modeRight - Margin - modeLabel.width) / 2f;
+				modeLabel.relativePosition += new Vector3(modeOffset, 0f);
 
 				// Probability.
 				UIPanel probabilityPanel = Sliderpanel(this, MidControlX, ProbabilityY, SliderHeight);
@@ -213,7 +214,7 @@ namespace BOB
 				randomCheck.eventCheckChanged += RandomCheckChanged;
 
 				// Random settings button.
-				UIButton randomButton = AddIconButton(this, RandomButtonX, TitleHeight + Margin, ToggleSize, "BOB_PNL_RST", TextureUtils.LoadSpriteAtlas("BOB-Random"));
+				UIButton randomButton = AddIconButton(this, RandomButtonX, ToggleY, ToggleSize, "BOB_PNL_RST", TextureUtils.LoadSpriteAtlas("BOB-Random"));
 				randomButton.eventClicked += (control, clickEvent) => BOBRandomPanel.Create();
 			}
 			catch (Exception e)

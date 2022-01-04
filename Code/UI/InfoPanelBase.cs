@@ -227,8 +227,11 @@ namespace BOB
 				revertButton = UIControls.AddSmallerButton(this, MidControlX, RevertButtonY, Translations.Translate("BOB_PNL_REV"), MidControlWidth);
 				revertButton.eventClicked += Revert;
 
+				// Extra functions label.
+				UILabel functionsLabel = UIControls.AddLabel(this, MiddleX, ToggleHeaderY, Translations.Translate("BOB_PNL_FUN"), textScale: 0.8f);
+
 				// Scale button.
-				UIButton scaleButton = AddIconButton(this, MiddleX, TitleHeight + Margin, ToggleSize, "BOB_PNL_SCA", TextureUtils.LoadSpriteAtlas("BOB-Scale"));
+				UIButton scaleButton = AddIconButton(this, MiddleX, ToggleY, ToggleSize, "BOB_PNL_SCA", TextureUtils.LoadSpriteAtlas("BOB-Scale"));
 				scaleButton.eventClicked += (control, clickEvent) => BOBScalePanel.Create(IsTree, replacementPrefab);
 
 				// Preview image.
