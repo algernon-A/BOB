@@ -1,4 +1,15 @@
-﻿Version 0.8.6.3 -
+﻿Version 0.9 -
+
+- Reconfigure UI for replacement in real-time
+- Convert translation framework to CSV (for CrowdIn)
+- Trees no longer have an angle setting (as this is ignored when a random tree rotation mod is active)
+- Increase offset slider range and ensure values are properly updated when outside visible range
+- Improve handling of replacements where the fixed height flag differs between original and replacement
+- Building and network special flags are now automatically regenerated on replacement
+- Add additional check for invalid savegame data on deserialization
+
+
+Version 0.8.6.3 -
 
 - Update Extended Managers Library API (EML 0.9.7)
 - Fix map prop replacement EML compatibility
