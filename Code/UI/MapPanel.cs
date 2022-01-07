@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using UnityEngine;
 using ColossalFramework;
 using ColossalFramework.UI;
 using EManagersLib.API;
@@ -13,18 +14,31 @@ namespace BOB
 	/// </summary>
 	internal class BOBMapInfoPanel : BOBInfoPanelBase
 	{
-		// Button labels.
-		protected override string ReplaceTooltipKey => IsTree ? "BOB_PNL_RTT" : "BOB_PNL_RTP";
+		// Component locations.
+		private const float ReplaceLabelY = ListY;
+		private const float ReplaceY = ReplaceLabelY + 25f;
+		private const float RevertY = ReplaceY + 75f;
 
-		// Trees or props?
+
+		// Button labels.
+		private string ReplaceTooltipKey => IsTree ? "BOB_PNL_RTT" : "BOB_PNL_RTP";
+
+		/// <summary>
+		// Current tree/prop state.
+		/// </summary>
 		protected override bool IsTree => treeCheck?.isChecked ?? false;
 
+
+		/// <summary>
 		// Initial tree/prop checked state.
+		/// </summary>
 		protected override bool InitialTreeCheckedState => selectedPrefab is TreeInfo;
 
 
-		// Replace button atlas.
-		protected override UITextureAtlas ReplaceAtlas => TextureUtils.LoadSpriteAtlas("BOB-Trees");
+		/// <summary>
+		/// Revert button Y-position.
+		/// </summary>
+		protected override float RevertButtonY => RevertY;
 
 
 		/// <summary>
@@ -38,6 +52,11 @@ namespace BOB
 
 			// Title label.
 			SetTitle(Translations.Translate("BOB_NAM"));
+
+			// Replace text label.
+			UILabel replaceLabel = AddUIComponent<UILabel>();
+			replaceLabel.text = Translations.Translate("BOB_PNL_REP");
+			replaceLabel.relativePosition = new Vector2(MidControlX, ReplaceLabelY);
 
 			// Set trees/props.
 			propCheck.isChecked = !InitialTreeCheckedState;
@@ -62,6 +81,10 @@ namespace BOB
         {
 			try
 			{
+				// Replace button.
+				replaceButton = AddIconButton(this, MidControlX, ReplaceY, BigIconSize, ReplaceTooltipKey, TextureUtils.LoadSpriteAtlas("BOB-Trees"));
+				replaceButton.eventClicked += Replace;
+
 				// Populate loaded list.
 				LoadedList();
 			}
@@ -78,7 +101,7 @@ namespace BOB
 		/// <param name="control">Calling component (unused)</param>
 		/// <param name="mouseEvent">Mouse event (unused)</param>
 		/// </summary>
-		protected override void Replace(UIComponent control, UIMouseEventParameter mouseEvent)
+		private void Replace(UIComponent control, UIMouseEventParameter mouseEvent)
 		{
 			try
 			{

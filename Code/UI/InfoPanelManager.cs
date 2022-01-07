@@ -90,6 +90,9 @@ namespace BOB
 			// Check for null, just in case - this is also called by pressing Esc when BOB tool is active.
 			if (panel != null)
 			{
+				// Perform any panel actions on close.
+				panel.Close();
+
 				// Stop highlighting.
 				panel.CurrentTargetItem = null;
 				RenderOverlays.CurrentBuilding = null;

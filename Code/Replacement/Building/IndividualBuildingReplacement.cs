@@ -50,6 +50,13 @@ namespace BOB
 			{
 				return;
 			}
+			
+			// Check index bounds.
+			if (replacement.BuildingInfo.m_props == null || replacement.propIndex >= replacement.BuildingInfo.m_props.Length)
+            {
+				Logging.Message("ignoring invalid individual building replacement index ", replacement.propIndex, " for building ", replacement.BuildingInfo.name);
+				return;
+            }
 
 			// Check prop index.
 			BuildingInfo.Prop thisProp = replacement.BuildingInfo.m_props[replacement.propIndex];
@@ -59,7 +66,7 @@ namespace BOB
 			}
 
 			// Reset any building or all-building replacements first.
-			BuildingReplacement.Instance.RemoveEntry(replacement.BuildingInfo, replacement.targetInfo, replacement.propIndex); ;
+			BuildingReplacement.Instance.RemoveEntry(replacement.BuildingInfo, replacement.targetInfo, replacement.propIndex);
 			AllBuildingReplacement.Instance.RemoveEntry(replacement.BuildingInfo, replacement.targetInfo, replacement.propIndex);
 
 			// Create replacment entry.

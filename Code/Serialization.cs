@@ -173,7 +173,12 @@ namespace BOB
                     }
 
                     // Attempt to load original tree prefab (value).
-                    TreeInfo replacementTree = PrefabCollection<TreeInfo>.FindLoaded(treeNames[++i]);
+                    if (++i >= treeNames.Length)
+                    {
+                        Logging.Error("invalid savegame data detected");
+                        break;
+                    }
+                    TreeInfo replacementTree = PrefabCollection<TreeInfo>.FindLoaded(treeNames[i]);
                     if (replacementTree == null)
                     {
                         // Failed to find matching tree prefab - skip this one.
@@ -192,21 +197,26 @@ namespace BOB
                 // Iterate through each keyvalue pair read.
                 for (int i = 0; i < propNames.Length; ++i)
                 {
-                    // Attempt to load replacement tree prefab (key).
+                    // Attempt to load replacement prop prefab (key).
                     PropInfo targetProp = PrefabCollection<PropInfo>.FindLoaded(propNames[i]);
                     if (targetProp == null)
                     {
-                        // Failed to find matching tree prefab - skip this one.
-                        Logging.Message("couldn't find replacement tree ", treeNames[i]);
+                        // Failed to find matching prop prefab - skip this one.
+                        Logging.Message("couldn't find replacement prop ", treeNames[i]);
                         continue;
                     }
 
-                    // Attempt to load original tree prefab (value).
-                    PropInfo replacementProp = PrefabCollection<PropInfo>.FindLoaded(propNames[++i]);
+                    // Attempt to load original prop prefab (value).
+                    if (++i >= propNames.Length)
+                    {
+                        Logging.Error("invalid savegame data detected");
+                        break;
+                    }
+                    PropInfo replacementProp = PrefabCollection<PropInfo>.FindLoaded(propNames[i]);
                     if (replacementProp == null)
                     {
-                        // Failed to find matching tree prefab - skip this one.
-                        Logging.Message("couldn't find original tree ", treeNames[i]);
+                        // Failed to find matching prop prefab - skip this one.
+                        Logging.Message("couldn't find original prop ", propNames[i]);
                         continue;
                     }
 

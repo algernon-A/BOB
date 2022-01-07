@@ -11,7 +11,22 @@ namespace BOB
 	/// </summary>
 	internal abstract class BOBInfoPanel : BOBInfoPanelBase
 	{
-		// Controls - align bottom with bottom of lists, and work up.
+		/// <summary>
+		/// Replacement modes.
+		/// </summary>
+		internal enum ReplacementModes
+		{
+			Individual = 0,
+			Grouped,
+			All,
+			NumModes
+		}
+
+		// Layout constants - mode buttons.
+		private const float ModeX = Margin + (ToggleSize * 3f);
+		protected const float ModeY = ToggleY;
+
+		// Layout constants - detail controls - align bottom with bottom of lists, and work up.
 		private const float SliderHeight = 38f;
 		private const float FieldOffset = SliderHeight + Margin;
 		private const float OffsetPanelBase = ListY + ListHeight;
@@ -22,25 +37,121 @@ namespace BOB
 		private const float OffsetPanelHeight = ZOffsetY + SliderHeight;
 		private const float OffsetPanelY = OffsetPanelBase - OffsetPanelHeight;
 		protected const float RandomButtonX = MiddleX + ToggleSize;
-
 		private const float AngleY = OffsetPanelY - FieldOffset;
 		private const float ProbabilityY = AngleY - FieldOffset;
 
+		// Layout constants - detail controls - from top.
+		private const float ReplaceY = ListY;
+		private const float RevertY = ReplaceY + 40f;
+
 
 		// Panel components.
-		protected UIButton replaceAllButton;
 		protected BOBSlider probabilitySlider, angleSlider, xSlider, ySlider, zSlider;
-		protected readonly UICheckBox indCheck;
 		private readonly UICheckBox randomCheck;
+		private readonly UICheckBox[] modeChecks = new UICheckBox[(int)ReplacementModes.NumModes];
+		private UIPanel anglePanel;
 
-		// Button tooltips.
-		protected abstract string ReplaceAllTooltipKey { get; }
+		// Status flag.
+		private bool ignoreModeCheckChanged = false;
+		protected bool ignoreSliderValueChange = true;
+		protected bool ignoreSelectedPrefabChange = true;
 
+
+		/// <summary>
+		/// Mode icon atlas names for prop modes.
+		/// </summary>
+		protected abstract string[] PropModeAtlas { get; }
+
+
+		/// <summary>
+		/// Mode icon atlas names for tree modes.
+		/// </summary>
+		protected abstract string[] TreeModeAtlas { get; }
+
+
+		/// <summary>
+		/// Mode icon tootlip keys for prop modes.
+		/// </summary>
+		protected abstract string[] PropModeTipKeys { get; }
+
+
+		/// <summary>
+		/// Mode icon tootlip keys for tree modes.
+		/// </summary>
+		protected abstract string[] TreeModeTipKeys { get; }
+
+
+		/// <summary>
 		// Initial tree/prop checked state.
+		/// </summary>
 		protected override bool InitialTreeCheckedState => ModSettings.treeSelected;
 
-		// Replace all button atlas.
-		protected abstract UITextureAtlas ReplaceAllAtlas { get; }
+
+		/// <summary>
+		/// Revert button Y-position.
+		/// </summary>
+		protected override float RevertButtonY => RevertY;
+
+
+		/// <summary>
+		/// Currently selected building.
+		/// </summary>
+		protected BuildingInfo SelectedBuilding => selectedPrefab as BuildingInfo;
+
+
+		/// <summary>
+		/// Currently selected network.
+		/// </summary>
+		protected NetInfo SelectedNet => selectedPrefab as NetInfo;
+
+
+
+		/// <summary>
+		/// Sets the current replacement prefab and updates button states accordingly.
+		/// </summary>
+		internal override PrefabInfo ReplacementPrefab
+        {
+            set
+            {
+				base.ReplacementPrefab = value;
+
+				// If not ignoring events and value isn't null, apply live changes.
+				if (!ignoreSelectedPrefabChange && value != null)
+                {
+					Apply();
+                }
+            }
+        }
+
+
+		/// <summary>
+		/// Current replacement mode.
+		/// </summary>
+		protected ReplacementModes CurrentMode
+        {
+			get => _currentMode;
+
+			private set
+			{
+				if (_currentMode != value)
+				{
+					_currentMode = value;
+
+					if (_currentMode == ReplacementModes.Individual || _currentMode == ReplacementModes.Grouped)
+					{
+						RenderOverlays.CurrentBuilding = SelectedBuilding;
+						RenderOverlays.CurrentNet = SelectedNet;
+                    }
+					else
+                    {
+						RenderOverlays.CurrentBuilding = null;
+						RenderOverlays.CurrentNet = null;
+                    }
+				}
+			}
+		}
+		// Current replacement mode.
+		private ReplacementModes _currentMode = ReplacementModes.Grouped;
 
 
 		/// <summary>
@@ -50,13 +161,20 @@ namespace BOB
 		{
 			try
 			{
-				// Replace all button.
-				replaceAllButton = AddIconButton(this, MidControlX + replaceButton.width, ReplaceY, BigIconSize, ReplaceAllTooltipKey, ReplaceAllAtlas);
-				replaceAllButton.eventClicked += ReplaceAll;
+				// Replacement mode buttons.
+				for (int i = 0; i < (int)ReplacementModes.NumModes; ++i)
+                {
+					modeChecks[i] = IconToggleCheck(this, ModeX + (i * ToggleSize), ModeY, IsTree ? TreeModeAtlas[i] : PropModeAtlas[i], IsTree ? TreeModeTipKeys[i] : PropModeTipKeys[i]);
+					modeChecks[i].objectUserData = i;
+					modeChecks[i].eventCheckChanged += ModeCheckChanged;
+                }
+				// Set initial mode state.
+				modeChecks[(int)CurrentMode].isChecked = true;
 
-				// Add group checkbox.
-				indCheck = UIControls.LabelledCheckBox(this, 155f, TitleHeight + Margin, Translations.Translate("BOB_PNL_IND"), 12f, 0.7f);
-				indCheck.eventCheckChanged += IndividualCheckChanged;
+				// Adjust mode label position to be centred over all mode toggles.
+				float modeRight = ModeX + ((float)ReplacementModes.NumModes * ToggleSize);
+				float modeOffset = (modeRight - Margin - modeLabel.width) / 2f;
+				modeLabel.relativePosition += new Vector3(modeOffset, 0f);
 
 				// Probability.
 				UIPanel probabilityPanel = Sliderpanel(this, MidControlX, ProbabilityY, SliderHeight);
@@ -65,7 +183,7 @@ namespace BOB
 				probabilitySlider.LimitToVisible = true;
 
 				// Angle.
-				UIPanel anglePanel = Sliderpanel(this, MidControlX, AngleY, SliderHeight);
+				anglePanel = Sliderpanel(this, MidControlX, AngleY, SliderHeight);
 				angleSlider = AddBOBSlider(anglePanel, Margin, 0f, MidControlWidth - (Margin * 2f), "BOB_PNL_ANG", -180, 180, 1, "Angle");
 
 				// Offset panel.
@@ -80,19 +198,23 @@ namespace BOB
 				offsetLabel.relativePosition = new Vector2((offsetPanel.width - offsetLabel.width) / 2f, OffsetLabelY);
 
 				// Offset sliders.
-				xSlider = AddBOBSlider(offsetPanel, Margin, XOffsetY, MidControlWidth - (Margin * 2f), "BOB_PNL_XOF", -8f, 8f, 0.01f, "X offset");
-				ySlider = AddBOBSlider(offsetPanel, Margin, YOffsetY, MidControlWidth - (Margin * 2f), "BOB_PNL_YOF", -8f, 8f, 0.01f, "Y offset");
-				zSlider = AddBOBSlider(offsetPanel, Margin, ZOffsetY, MidControlWidth - (Margin * 2f), "BOB_PNL_ZOF", -8f, 8f, 0.01f, "Z offset");
+				xSlider = AddBOBSlider(offsetPanel, Margin, XOffsetY, MidControlWidth - (Margin * 2f), "BOB_PNL_XOF", -16f, 16f, 0.01f, "X offset");
+				ySlider = AddBOBSlider(offsetPanel, Margin, YOffsetY, MidControlWidth - (Margin * 2f), "BOB_PNL_YOF", -16f, 16f, 0.01f, "Y offset");
+				zSlider = AddBOBSlider(offsetPanel, Margin, ZOffsetY, MidControlWidth - (Margin * 2f), "BOB_PNL_ZOF", -16f, 16f, 0.01f, "Z offset");
 
-				// Set initial button states);
-				UpdateButtonStates();
+				// Live application of position changes.
+				xSlider.eventValueChanged += (control, value) => SliderChange();
+				ySlider.eventValueChanged += (control, value) => SliderChange();
+				zSlider.eventValueChanged += (control, value) => SliderChange();
+				angleSlider.eventValueChanged += (control, value) => SliderChange();
+				probabilitySlider.eventValueChanged += (control, value) => SliderChange();
 
 				// Normal/random toggle.
 				randomCheck = UIControls.LabelledCheckBox((UIComponent)(object)this, hideVanilla.relativePosition.x, hideVanilla.relativePosition.y + hideVanilla.height + (Margin / 2f), Translations.Translate("BOB_PNL_RSW"), 12f, 0.7f);
 				randomCheck.eventCheckChanged += RandomCheckChanged;
 
 				// Random settings button.
-				UIButton randomButton = AddIconButton(this, RandomButtonX, TitleHeight + Margin, ToggleSize, "BOB_PNL_RST", TextureUtils.LoadSpriteAtlas("BOB-Random"));
+				UIButton randomButton = AddIconButton(this, RandomButtonX, ToggleY, ToggleSize, "BOB_PNL_RST", TextureUtils.LoadSpriteAtlas("BOB-Random"));
 				randomButton.eventClicked += (control, clickEvent) => BOBRandomPanel.Create();
 			}
 			catch (Exception e)
@@ -101,6 +223,67 @@ namespace BOB
 				Logging.LogException(e, "exception creating info panel");
 			}
 		}
+
+
+		/// <summary>
+		/// Performs any actions-on-close for the panel.
+		/// </summary>
+		internal override void Close()
+		{
+			// Perform post-update tasks, such as saving the config file and refreshing renders.
+			FinishUpdate();
+		}
+
+
+		/// <summary>
+		/// Tree check event handler.
+		/// </summary>
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="isChecked">New checked state</param>
+		protected override void TreeCheckChanged(UIComponent control, bool isChecked)
+        {
+			// Perform the usual required tasks first.
+			base.TreeCheckChanged(control, isChecked);
+
+			// Update mode icons and tooltips to reflect the new tree/prop state.
+			if (isChecked)
+            {
+				UpdateModeIcons(TreeModeAtlas, TreeModeTipKeys);
+            }
+			else
+            {
+				UpdateModeIcons(PropModeAtlas, PropModeTipKeys);
+            }
+
+			// Don't show angle slider for trees.
+			anglePanel.isVisible = !isChecked;
+        }
+
+
+		/// <summary>
+		/// Updates mode icons and tooltips (when switching between trees and props).
+		/// </summary>
+		/// <param name="atlasNames">Array of atlas names to apply</param>
+		/// <param name="tipKeys">Array of tooltip translation keys to apply</param>
+		private void UpdateModeIcons(string[] atlasNames, string[] tipKeys)
+        {
+			// Iterate through all mode checks.
+			for (int i = 0; i < (int)ReplacementModes.NumModes; ++i)
+			{
+				// Load atlas.
+				UITextureAtlas checkAtlas = TextureUtils.LoadSpriteAtlas(atlasNames[i]);
+
+				// Update unchecked sprite. 
+				UISprite uncheckedSprite = modeChecks[i].Find<UISprite>("UncheckedSprite");
+				uncheckedSprite.atlas = checkAtlas;
+
+				// Update checked sprite.
+				((UISprite)modeChecks[i].checkedBoxObject).atlas = checkAtlas;
+
+				// Update tooltip.
+				modeChecks[i].tooltip = Translations.Translate(tipKeys[i]);
+			}
+        }
 
 
 		/// <summary>
@@ -117,11 +300,11 @@ namespace BOB
 
 
 		/// <summary>
-		/// Replace all button event handler.
+		/// Apply button event handler.
 		/// <param name="control">Calling component (unused)</param>
 		/// <param name="mouseEvent">Mouse event (unused)</param>
 		/// </summary>
-		protected abstract void ReplaceAll(UIComponent control, UIMouseEventParameter mouseEvent);
+		protected abstract void Apply();
 
 
 		/// <summary>
@@ -129,32 +312,6 @@ namespace BOB
 		/// </summary>
 		protected override void UpdateButtonStates()
 		{
-			// Disable by default (selectively (re)-enable if eligible).
-			replaceButton.Disable();
-			replaceAllButton.Disable();
-			revertButton.Disable();
-
-			// Buttons are only enabled if a current target item is selected.
-			if (CurrentTargetItem != null)
-			{
-				// Reversion requires a currently active replacement (for the relevant target/all-building setting).
-				if (CurrentTargetItem.individualPrefab != null || CurrentTargetItem.replacementPrefab != null || CurrentTargetItem.allPrefab != null)
-				{
-					revertButton.Enable();
-					revertButton.tooltip = Translations.Translate("BOB_PNL_REV_UND");
-				}
-				else
-				{
-					revertButton.tooltip = Translations.Translate("BOB_PNL_REV_TIP");
-				}
-
-				// Replacement requires a valid replacement selection.
-				if (ReplacementPrefab != null)
-				{
-					replaceButton.Enable();
-					replaceAllButton.Enable();
-				}
-			}
 		}
 
 
@@ -211,55 +368,107 @@ namespace BOB
 		/// <param name="replacement">Replacement record to use</param>
 		protected void SetSliders(BOBReplacementBase replacement)
         {
+			// Disable events.
+			ignoreSliderValueChange = true;
+
 			// Null check first.
 			if (replacement == null)
-            {
-				Logging.Error("null replacement passed to SetSliders");
-
+			{
 				// In the absense of valid data, set all offset fields to defaults.
 				angleSlider.TrueValue = 0f;
 				xSlider.TrueValue = 0;
 				ySlider.TrueValue = 0;
 				zSlider.TrueValue = 0;
-				probabilitySlider.TrueValue = CurrentTargetItem != null ? CurrentTargetItem.originalProb : 0;
+				probabilitySlider.TrueValue = CurrentTargetItem != null ? CurrentTargetItem.originalProb : 100;
+			}
+			else
+			{
+				// Valid replacement - set slider values.
+				angleSlider.TrueValue = replacement.angle;
+				xSlider.TrueValue = replacement.offsetX;
+				ySlider.TrueValue = replacement.offsetY;
+				zSlider.TrueValue = replacement.offsetZ;
+				probabilitySlider.TrueValue = replacement.probability;
+			}
 
-				return;
-            }
-
-			// Set slider values.
-			angleSlider.TrueValue = replacement.angle;
-			xSlider.TrueValue = replacement.offsetX;
-			ySlider.TrueValue = replacement.offsetY;
-			zSlider.TrueValue = replacement.offsetZ;
-			probabilitySlider.TrueValue = replacement.probability;
+			// Re-enable events.
+			ignoreSliderValueChange = false;
 		}
 
 
 		/// <summary>
-		/// Individual prop check event handler.
+		/// Event handler for mode checkbox changes.
 		/// </summary>
-		/// <param name="control">Calling component (unused)</param>
+		/// <param name="control">Calling component</param>
 		/// <param name="isChecked">New checked state</param>
-		private void IndividualCheckChanged(UIComponent control, bool isChecked)
+		private void ModeCheckChanged(UIComponent control, bool isChecked)
 		{
-			// Rebuild target list.
-			TargetList();
-
-			// Clear selection.
-			targetList.selectedIndex = -1;
-			CurrentTargetItem = null;
-
-			// Store current group state as most recent state.
-			ModSettings.lastInd = isChecked;
-
-			// Toggle replace all button visibility.
-			if (isChecked)
+			// Don't do anything if we're ignoring events.
+			if (ignoreModeCheckChanged)
 			{
-				replaceAllButton.Hide();
+				return;
 			}
-			else
+
+			// Suspend event handling while processing.
+			ignoreModeCheckChanged = true;
+
+			if (control is UICheckBox thisCheck)
 			{
-				replaceAllButton.Show();
+				// If this checkbox is being enabled, uncheck all others:
+				if (isChecked)
+				{
+					// Don't do anything if the selected mode index isn't different to the current mode.
+					if (thisCheck.objectUserData is int index && index != (int)CurrentMode)
+					{
+						// Iterate through all checkboxes, unchecking all those that aren't this one (checkbox index stored in objectUserData).
+						for (int i = 0; i < (int)ReplacementModes.NumModes; ++i)
+						{
+							if (i != index)
+							{
+								modeChecks[i].isChecked = false;
+							}
+						}
+
+						// Set current replacement mode, while saving old value.
+						ReplacementModes oldMode = CurrentMode;
+						CurrentMode = (ReplacementModes)index;
+
+						// Update target list if we've changed between individual and grouped modes (we've already filtered out non-changes, so checking for any individual mode will do).
+						if (oldMode == ReplacementModes.Individual || CurrentMode == ReplacementModes.Individual)
+						{
+							// Rebuild target list.
+							TargetList();
+
+							// Clear selection.
+							targetList.selectedIndex = -1;
+							CurrentTargetItem = null;
+						}
+					}
+				}
+				else
+				{
+					// If no other check is checked, force this one to still be checked.
+					thisCheck.isChecked = true;
+				}
+			}
+
+			// Resume event handling.
+			ignoreModeCheckChanged = false;
+		}
+
+
+		/// <summary>
+		/// Event handler for applying live changes on slider value change.
+		/// </summary>
+		private void SliderChange()
+		{
+			// Don't do anything if already ignoring events.
+			if (!ignoreSliderValueChange)
+			{
+				// Disable events while applying changes.
+				ignoreSliderValueChange = true;
+				Apply();
+				ignoreSliderValueChange = false;
 			}
 		}
 

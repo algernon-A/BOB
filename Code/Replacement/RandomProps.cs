@@ -243,6 +243,7 @@ namespace BOB
 				randomProp.m_isCustomContent = true;
 				randomProp.m_prefabInitialized = false;
 				randomProp.InitializePrefab();
+				randomProp.m_prefabInitialized = true;
 				return randomProp;
 			}
 
@@ -276,6 +277,7 @@ namespace BOB
 				randomTree.m_isCustomContent = true;
 				randomTree.m_prefabInitialized = false;
 				randomTree.InitializePrefab();
+				randomTree.m_prefabInitialized = true;
 				return randomTree;
 			}
 

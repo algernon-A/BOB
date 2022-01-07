@@ -45,8 +45,8 @@ namespace BOB
 		/// <param name="replacement">Replacement record to apply</param>
 		protected override void ApplyReplacement(BOBBuildingReplacement replacement)
 		{
-			// Don't do anything if prefabs can't be found.
-			if (replacement?.targetInfo == null || replacement.replacementInfo == null || replacement.BuildingInfo == null)
+			// Don't do anything if prefabs can't be found, or if building prefab has no prop array.
+			if (replacement?.targetInfo == null || replacement.replacementInfo == null || replacement.BuildingInfo?.m_props == null)
 			{
 				return;
 			}

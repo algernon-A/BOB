@@ -1,0 +1,115 @@
+CODE,de
+NAME,Deutsch
+BOB_NAM,BOB: the tree and prop replacer
+BOB_DESC,UNDER DEVELOPMENT: Ersetzt Bäume und Dekorationen.
+TRN_CHOICE,Sprache einstellen
+TRN_SYS,Verwende die Spiel-Sprache
+MES_CLS,Schließen
+MES_DSA,Nicht erneut zeigen
+BOB_MBX_OK,OK
+BOB_ROW_WAS,war
+BOB_PNL_NOP,Keine Dekorationen gefunden
+BOB_PNL_NOT,Keine Bäume gefunden
+BOB_PNL_TRE,Bäume
+BOB_PNL_PRP,Dekorationen
+BOB_PNL_IND,Zeige einzelne Dekorationen
+BOB_PNL_HDV,Verstecke Vanilla
+BOB_PNL_REP,Ersetze
+BOB_PNL_RTB,Diese Gebäude
+BOB_PNL_RAB,Alle Gebäude
+BOB_PNL_RTN,Diese Netzwerke
+BOB_PNL_RAN,Alle Netzwerke
+BOB_PNL_RTT,Bäume dieser Karte
+BOB_PNL_RTP,Dekorationen dieser Karte
+BOB_PNL_RSW,Zufallspakete anzeigen
+BOB_PNL_RST,Zufallspakete erstellen
+BOB_PNL_SCA,Dekorationen und Bäume skalieren
+BOB_PNL_REV,Zurücksetzen
+BOB_PNL_REV_TIP,"Zurücksetzen ist nicht verfügbar, da es keine aktive Ersetzung für dieses Element gibt"
+BOB_PNL_PKB,Austausch-Pakete
+BOB_PNL_PRB,Wahrscheinlichkeit
+BOB_PNL_ANG,Winkel
+BOB_PNL_OFF,Versatz
+BOB_PNL_XOF,X
+BOB_PNL_YOF,Y
+BOB_PNL_ZOF,Z
+BOB_PNL_SUB,Untergebäude
+BOB_RND_TIT,Zufällige Bäume und Dekorationen einrichten
+BOB_RND_NEW,Neu
+BOB_RND_DEL,Löschen
+BOB_RND_REN,Umbenennen
+BOB_RND_ADD,Zu Variationen hinzufügen
+BOB_RND_SUB,Von Variationen entfernen
+BOB_SCA_TIT,Skalierung einstellen
+BOB_SCA_MIN,Kleinster Skalierungs-Faktor
+BOB_SCA_MAX,Maximaler Skalierungs-Faktor
+BOB_SPR_SBL,Ein Austausch ist für dieses Gebäude angewendet
+BOB_SPR_ABL,Ein Austausch ist für alle Gebäude angewendet
+BOB_SPR_SNT,Ein Austausch ist für dieses Netwerk angewendet
+BOB_SPR_ANT,Ein Austausch ist für alle Netzwerke angewendet
+BOB_SPR_PCK,Ein Austausch-Paket ist angewendet
+BOB_PCK_APP,Paket anwenden
+BOB_PCK_APP_A,Wendet das ausgewählte Austausch-Paket an
+BOB_PCK_APP_C,"Diese Paket kann nicht angewendet werden, da es mit einem bereits aktivierten Paket in Konflikt steht"
+BOB_PCK_APP_I,Paket ist angewendet
+BOB_PCK_RVT,Zurücksetzen
+BOB_PCK_RVT_A,Das ausgewählte Paket wird nicht mehr angewendet
+BOB_PCK_RVT_I,Paket wird nicht angewendet
+BOB_PCK_NAL,Nicht alle Austausch-Optionen sind verfügbar
+BOB_CFG_UCS,Verwende die ausgewählte Konfiguration (anstelle der globalen Konfiguration) für diesen Spielstand
+BOB_CFG_SAC,Speichere die aktuelle Konfiguration
+BOB_CFG_SSC,Kopiere die ausgewählte Konfiguration
+BOB_CFG_SEC,"Neue, leere Konfiguration"
+BOB_CFG_LAA,Ausgewählte Konfiguration laden und anwenden
+BOB_CFG_LGL,Globale Konfiguration laden und anwenden
+BOB_CFG_DEL,Lösche die ausgewählte Konfiguration
+BOB_CFG_CLE,Aktuelle Konfiguration bereinigen
+BOB_CFG_CLE_TIP,"Entfernt alle Einträge zu nicht geladenen Gebäuden, Netzwerken, Dekorationen und/oder Bäumen aus der aktuell geladenen Konfiguration"
+BOB_OPT_GEN,Algemeine Einstellungen
+BOB_OPT_CFG,Konfigurationen
+BOB_OPT_RUI,Zerstörung von Gras
+BOB_OPT_WIR,Elektrische Leitungen
+BOB_OPT_KEY,Tastenkürzel
+BOB_OPT_PRS,Drücke eine Taste
+BOB_OPT_RGL,Änderungen werden nach dem Neustart übernommen
+BOB_OPT_RRT,Verhindert die Zerstörung von Gras durch Bäume
+BOB_OPT_RRP,Verhindert die Zerstörung von Gras durch Dekorationen
+BOB_OPT_WTH,Dünnere elektrische Leitungen
+BOB_NUKE,Konfiguration zurücksetzen
+BOB_PER_IND,Zeige standardmäßig einzelne Dekorationen
+BOB_PER_SIN,Immer aus
+BOB_PER_GRP,Immer an
+BOB_PER_LST,Vorherige Einstellung merken
+BOB_OPT_POS,Vorherige Position der Oberfläche merken
+BOB_FIL_NAME,Suche:
+MES_PAGE,Weitere Informationen sind auf der Steam Workshop-Seite des Mods zu finden.
+BOB_ERR_FAT,"Dies bedeutet, dass der Mod nicht funktioniert und deaktiviert wurde."
+BOB_ERR_HAR,"BOB, the tree and prop replacer, konnte die erforderlichen Harmony-Patches nicht fertigstellen."
+ERR_HAR0,Harmony-Patching Fehler
+ERR_HAR1,Mögliche Ursachen für dieses Problem sind:
+ERR_HAR2,Die erforderliche Harmony 2-Mod-Abhängigkeit wurde nicht installiert
+ERR_HAR3,"Ein alter und/oder defekter Mod verhindert, dass Harmony 2 ordnungsgemäß funktioniert"
+BOB_UPD_040_0,Nun mit Karten-weitem Ersatz von Bäumen! Aktiviere das BOB-Tool wie gewohnt und klicke auf einen freistehenden Baum.
+BOB_UPD_041_0,Behebung einer zeitweiligen Ausnahme beim Ändern des Zielelements.
+BOB_UPD_042_0,Auswahl von Untergebäuden aktivert
+BOB_UPD_042_1,Potentieller Fehler beim Laden behoben
+BOB_UPD_043_0,Korrektur der Wahrscheinlichkeitsaktualisierung beim Zurücksetzen auf einen Ersatz für alle Gebäude/Netzwerke
+BOB_UPD_043_1,"Korrektur zur Aktulaisierung von LODs, nachdem alle Netzwerk- oder Gebäudeersetzungen zurückgesetzt wurden"
+BOB_UPD_043_2,Textfeldbeschriftungen des Infofensters an längere Übersetzungszeichenfolgen angepasst
+BOB_UPD_050_0,Erste Implementierung von Netzwerkersatzpaketen
+BOB_UPD_050_1,Jetzt vollständig kompatibel mit Network Skins 2
+BOB_UPD_050_2,Schnellere Bearbeitung
+BOB_UPD_051_0,"Neues Layout der Baum-/Dekorationenliste mit Symbolen, die angeben, welche Art von Ersetzung aktiv ist"
+BOB_UPD_052_0,Konfigurationsverwaltung für die Verarbeitung verschiedener Konfigurationsdateien in den Einstellungen hinzugefügt
+BOB_UPD_060_0,Austausch freistehender Dekorationen (Karten-weiter Ersatz)
+BOB_UPD_060_1,Ausgewählte Dekorationen oder Bäume werden visuell markiert
+BOB_UPD_060_2,Kann jetzt Netzwerke in Gebäuden auswählen
+BOB_UPD_060_3,Kann jetzt Dekorationsgebäude auswählen
+BOB_UPD_060_4,"Neu gestaltete, kleinere Oberfläche"
+BOB_UPD_061_0,Sortieren nach Name als Filter hinzugefügt
+BOB_UPD_062_0,Funktion hinzugefügt um die Zerstörung von Gras durch alle Bäume und/oder Dekorationen zu verhindern (In den Einstellungen)
+BOB_UPD_062_1,Fährstraßen sind nun anwählbar (um die Makierungs-Bojen auszutauschen oder zu verstecken)
+BOB_UPD_062_2,"Fehler behoben, der manchmal die Winkel-Angaben von Netzwerk-Dekoration fehlerhaft anzeigte"
+BOB_UPD_080_0,Einzelne Dekorationen von Netzwerken ändern hinzugefügt
+BOB_UPD_080_1,Unified UI (UUI) Button hinzugefügt
+BOB_UPD_086_0,"Option hinzugefügt, mit der Kabel in Netzwerken (Strom- und Oberleitungen) dünner und somit realistischer dargestellt werden "

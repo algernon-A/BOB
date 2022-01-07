@@ -1,0 +1,116 @@
+CODE,es
+NAME,Español
+BOB_NAM,BOB: the tree and prop replacer
+BOB_DESC,UNDER DEVELOPMENT: Reemplaza árboles y decoraciones.
+TRN_CHOICE,Elegir idioma
+TRN_SYS,Usa el idioma del juego
+MES_CLS,Cerrar
+MES_DSA,No mostrar de nuevo
+BOB_MBX_OK,OK
+BOB_ROW_WAS,era
+BOB_PNL_NOP,No se encontraron decoraciones
+BOB_PNL_NOT,No se encontraron árboles
+BOB_PNL_TRE,Árboles
+BOB_PNL_PRP,Decoraciones
+BOB_PNL_IND,Mostrar decoraciones individuales
+BOB_PNL_HDV,Ocultar Vanilla
+BOB_PNL_REP,Reemplazar
+BOB_PNL_RTB,Estos edificios
+BOB_PNL_RAB,Todos edificios
+BOB_PNL_RTN,Estas redes
+BOB_PNL_RAN,Todas redes
+BOB_PNL_RTT,Árboles del mapa
+BOB_PNL_RTP,Decoraciones del mapa
+BOB_PNL_RSW,Mostrar aleatorio
+BOB_PNL_RST,Configuración aleatoria
+BOB_PNL_SCA,Escala de Decoraciones y Árboles
+BOB_PNL_REV,Revertir
+BOB_PNL_REV_TIP,No se puede revertir ya que no hay ningún reemplazo disponible para este artículo
+BOB_PNL_PKB,Paquetes de reemplazo
+BOB_PNL_PRB,Probabilidad
+BOB_PNL_ANG,Ángulo
+BOB_PNL_OFF,Desplazamiento
+BOB_PNL_XOF,X
+BOB_PNL_YOF,Y
+BOB_PNL_ZOF,Z
+BOB_PNL_SUB,Subedificio
+BOB_RND_TIT,configura árboles y decoraciones aleatorias
+BOB_RND_NEW,Nuevo
+BOB_RND_DEL,Eliminar
+BOB_RND_REN,Renombrar
+BOB_RND_ADD,Agregar a variaciones
+BOB_RND_SUB,Remover de variaciones
+BOB_SCA_TIT,configurar escala de decoraciones
+BOB_SCA_MIN,Escala mínima
+BOB_SCA_MAX,Escala máxima
+BOB_SPR_SBL,Actualmente se aplica un reemplazo para estos edificios
+BOB_SPR_ABL,Actualmente se aplica un reemplazo para todos edificios
+BOB_SPR_SNT,Actualmente se aplica un reemplazo para estas redes
+BOB_SPR_ANT,Actualmente se aplica un reemplazo para todas redes
+BOB_SPR_PCK,Actualmente se aplica un paquete de reemplazo
+BOB_PCK_APP,Aplicar paquete
+BOB_PCK_APP_A,Se aplica el paquete de reemplazo seleccionado
+BOB_PCK_APP_C,El paquete no se puede aplicar porque entra en conflicto con un paquete ya aplicado
+BOB_PCK_APP_I,El paquete está aplicado actualmente
+BOB_PCK_RVT,Revertir paquete
+BOB_PCK_RVT_A,Se elimina la aplicación del paquete de reemplazo seleccionado
+BOB_PCK_RVT_I,El paquete no se aplica actualmente
+BOB_PCK_NAL,No todos los reemplazos están disponibles
+BOB_CFG_UCS,Utilice la configuración seleccionada (en lugar de la configuración global) para este guardado
+BOB_CFG_SAC,Guardar la configuración actual
+BOB_CFG_SSC,Copiar la configuración seleccionada
+BOB_CFG_SEC,Nueva configuración vacía
+BOB_CFG_DEL,Eliminar la configuración seleccionada
+BOB_CFG_LAA,Cargar y aplicat configuracion seleccionada
+BOB_CFG_LGL,Cargar y aplicar configuración global
+BOB_CFG_CLE,Limpiar configuración actual
+BOB_CFG_CLE_TIP,"Elimna todas las referencias de edificios, redes, elementos y/o árboles que no pudieron ser cargados del archivo de configuración actual"
+BOB_OPT_GEN,Opciones generales
+BOB_OPT_CFG,Configuraciones
+BOB_OPT_VIS,Efectos visuales
+BOB_OPT_RUI,Ruinas del terreno
+BOB_OPT_WIR,Cables
+BOB_OPT_KEY,Atajo
+BOB_OPT_PRS,Presiona cualquier tecla
+BOB_OPT_RGL,Los cambios harán efecto al reiniciar
+BOB_OPT_RRT,Evita que los árboles arruinen el terreno
+BOB_OPT_RRP,Evita que las decoraciones arruinen el terreno
+BOB_OPT_WTH,Cables eléctricos más delgados
+BOB_NUKE,Restablecer configuración
+BOB_PER_IND,Mostrar elementos individuales de forma predeterminada
+BOB_PER_SIN,Siempre apagado
+BOB_PER_GRP,Siempre encendido
+BOB_PER_LST,Recordar la configuración anterior
+BOB_OPT_POS,Recordar la posición anterior del panel
+BOB_FIL_NAME,Búsqueda:
+MES_PAGE,Consulta la página de Steam Workshop del mod para obtener más información.
+BOB_ERR_FAT,Esto significa que el mod no puede funcionar y se ha deshabilitado.
+BOB_ERR_HAR,"BOB, the tree and prop replacer, no pudo completar los parches de Harmony requeridos."
+ERR_HAR0,Error de parcheo de Harmony
+ERR_HAR1,Las posibles causas de este problema incluyen:
+ERR_HAR2,No se instaló la dependencia del mod Harmony 2 requerida
+ERR_HAR3,Un mod antiguo y/o roto impide que Harmony 2 funcione correctamente
+BOB_UPD_040_0,¡Presentamos el reemplazo del árbol de mapas! Active la herramienta BOB como siempre y haga clic en un árbol independiente.
+BOB_UPD_041_0,Se corrigió la excepción intermitente del panel de reemplazo del edificio al cambiar el elemento de destino.
+BOB_UPD_042_0,Se habilitó la selección de sub-edificios
+BOB_UPD_042_1,Se corrigió un error potencial al cargar el juego.
+BOB_UPD_043_0,Se corrigió la actualización de probabilidad al revertir a un reemplazo de todos los edificios o todas las redes
+BOB_UPD_043_1,Se corrigieron los LOD que no se actualizan después de revertir los reemplazos de todas las redes o todos los edificios
+BOB_UPD_043_2,Ajuste en las etiquetas de las casillas del panel de información para que se ajusten a cadenas de traducción más largas
+BOB_UPD_050_0,Implementación inicial de paquetes de reemplazo de red
+BOB_UPD_050_1,Ahora correctamente compatible con Network Skins 2
+BOB_UPD_050_2,Procesamiento de reemplazo más rápido
+BOB_UPD_051_0,"Nuevo diseño de lista de árboles/decoraciones, con íconos para indicar qué tipo de reemplazo está activo"
+BOB_UPD_052_0,"Agregado administración de configuraciones para manejar múltiples archivos de configuración diferentes, accesibles a través del panel de opciones"
+BOB_UPD_060_0,Reemplazo de decoración independiente
+BOB_UPD_060_1,Resalte decoraciones o árboles seleccionados
+BOB_UPD_060_2,Ahora puede seleccionar redes en edificios.
+BOB_UPD_060_3,Ahora puede seleccionar edificios de decoración.
+BOB_UPD_060_4,Rediseño panel de reemplazo más pequeño
+BOB_UPD_061_0,Añadido filtros de clasificación por nombres ascendentes/descendentes
+BOB_UPD_062_0,Agregado la capacidad de eliminar las ruinas del terreno de todos los árboles y/o decoraciones (en el panel de opciones)
+BOB_UPD_062_1,Ahora se puede seleccionar las rutas de los transbordadores (para cambiar/ocultar esas boyas marcadoras de ruta)
+BOB_UPD_062_2,Se corrigieron los ángulos de decoraciones en redes que a veces se mostraban incorrectamente en la selección
+BOB_UPD_080_0,Añadido reemplazo de decoración individual de redes
+BOB_UPD_080_1,Añadido botón de Unified UI (UUI)
+BOB_UPD_086_0,Añadida opción para hacer cableado en redes (líneas eléctricas y cables eléctricos de trenes) de tamaños más realistas

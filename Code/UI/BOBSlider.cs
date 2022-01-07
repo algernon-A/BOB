@@ -44,6 +44,8 @@ namespace BOB
 				{
 					// Yes; use clamped value.
 					trueValue = visibleValue;
+
+					OnValueChanged();
 				}
 				else
 				{
@@ -51,11 +53,17 @@ namespace BOB
 					trueValue = value;
 				}
 
+				// If slider visible value isn't going to change, then make sure we manually invoke OnValueChanged.
+				if (this.value != visibleValue)
+				{
+					OnValueChanged();
+				}
+
 				// Set slider display value - clamped to slider extents.
 				this.value = visibleValue;
 
 				// Forcibly set text.
-				ValueField.text = IsInt ? Mathf.RoundToInt(TrueValue).ToString() : TrueValue.ToString();
+				//ValueField.text = IsInt ? Mathf.RoundToInt(TrueValue).ToString() : TrueValue.ToString();
 			}
 		}
 

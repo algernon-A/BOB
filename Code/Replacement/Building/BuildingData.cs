@@ -46,9 +46,20 @@ namespace BOB
                 // Check that this is a valid building in the dirty list.
                 if (building.m_flags != Building.Flags.None && DirtyList.Contains(building.Info))
                 {
-                    // Match - update building render via simulation thread, creating local buildingID reference to avoid race condition.
+                    // Match - update building instance renders directly in main thread, before simulation thread starts trying to render the instances.
+                    RenderManager renderManager = Singleton<RenderManager>.instance;
+                    if (renderManager.RequireInstance(i, 1u, out var instanceIndex))
+                    {
+                        renderManager.m_instances[instanceIndex].m_dirty = true;
+                        //BuildingAI.RefreshInstance(buildingInfo, renderManager.CurrentCameraInfo, i, ref Singleton<BuildingManager>.instance.m_buildings.m_buffer[i], buildingInfo.m_prefabDataLayer, ref renderManager.m_instances[instanceIndex], true);
+                    }
+
+                    // Then, update building prefab render (for LOD model) via simulation thread, creating local reference to avoid race condition.
                     ushort buildingID = i;
-                    Singleton<SimulationManager>.instance.AddAction(delegate { Singleton<BuildingManager>.instance.UpdateBuildingRenderer(buildingID, true); });
+                    Singleton<SimulationManager>.instance.AddAction(delegate
+                    {
+                        Singleton<BuildingManager>.instance.UpdateBuildingRenderer(buildingID, true);
+                    });
                 }
             }
 

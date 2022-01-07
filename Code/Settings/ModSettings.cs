@@ -30,10 +30,6 @@ namespace BOB
         [XmlIgnore]
         internal static int indDefault;
 
-        // Last selected individual setting.
-        [XmlIgnore]
-        internal static bool lastInd;
-
         [XmlIgnore]
         // Last selected vanilla filter state.
         internal static bool hideVanilla = false;
@@ -132,9 +128,9 @@ namespace BOB
 		[XmlElement("Language")]
 		public string XMLLanguage
 		{
-			get => Translations.Language;
+			get => Translations.CurrentLanguage;
 
-			set => Translations.Language = value;
+			set => Translations.CurrentLanguage = value;
         }
 
         // Hotkey element.

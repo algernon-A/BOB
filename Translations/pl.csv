@@ -1,0 +1,98 @@
+CODE,pl
+NAME,Polski
+BOB_NAM,BOB: Zamiana drzew i rekwizytów
+BOB_DESC,W BUDOWIE: zamienia drzewa i rekwizyty.
+TRN_CHOICE,Wybierz język
+TRN_SYS,Użyj języka gry
+MES_CLS,Zamknij
+MES_DSA,Nie pokazuj więcej
+BOB_MBX_OK,OK
+BOB_ROW_WAS,było
+BOB_PNL_NOP,Nie znaleziono rekwizytów
+BOB_PNL_NOT,Nie znaleziono drzew
+BOB_PNL_TRE,Drzewa
+BOB_PNL_PRP,Rekwizyty
+BOB_PNL_IND,Pokaż indywidualne rekwizyty
+BOB_PNL_HDV,Ukryj standardowe
+BOB_PNL_REP,Zamień
+BOB_PNL_RTB,Te budynki
+BOB_PNL_RAB,Wszystkie budynki
+BOB_PNL_RTN,Te sieci
+BOB_PNL_RAN,Wszystkie sieci
+BOB_PNL_RTT,Drzewa na mapie
+BOB_PNL_RTP,Rekwizyty na mapie
+BOB_PNL_REV,Cofnij
+BOB_PNL_PKB,Paczki zastępcze
+BOB_PNL_PRB,Prawdopodobieństwo
+BOB_PNL_ANG,Kąt
+BOB_PNL_OFF,Przesunięcie
+BOB_PNL_XOF,X
+BOB_PNL_YOF,Y
+BOB_PNL_ZOF,Z
+BOB_PNL_SUB,Budynek podrzędny
+BOB_SPR_SBL,Zmiana jest obecnie stosowana w tych budynkach
+BOB_SPR_ABL,Zmiana jest obecnie stosowana we wszystkich budynkach
+BOB_SPR_SNT,Zmiana jest obecnie stosowana w tych sieciach
+BOB_SPR_ANT,Zmiana jest obecnie stosowana we wszystkich sieciach
+BOB_SPR_PCK,Paczka zastępcza jest obecnie zastosowana
+BOB_PCK_APP,Zastosuj paczkę
+BOB_PCK_APP_A,Stosuje wybraną paczkę zastępczą
+BOB_PCK_APP_C,"Paczka nie może być zastosowana, ponieważ istnieje konflikt z inną zastosowaną paczką"
+BOB_PCK_APP_I,Paczka jest obecnie zastosowana
+BOB_PCK_RVT,Cofnij paczkę
+BOB_PCK_RVT_A,Cofa zastosowanie wybranej paczki zastępczej
+BOB_PCK_RVT_I,Paczka nie jest zastosowana
+BOB_PCK_NAL,Nie wszystkie zamienniki są dostępne
+BOB_CFG_UCS,Użyj wybraną konfigurację (zamiast konfiguracji ogólnej) dla tego zapisu
+BOB_CFG_SAC,Zapisz obecną konfigurację
+BOB_CFG_SSC,Kopiuj wybraną konfigurację
+BOB_CFG_SEC,Nowa pusta konfiguracja
+BOB_CFG_DEL,Usuń wybraną konfigurację
+BOB_OPT_GEN,Opcje ogólne
+BOB_OPT_CFG,Konfiguracje
+BOB_OPT_RUI,Rujnowanie
+BOB_OPT_KEY,Klawisz skrótu
+BOB_OPT_PRS,Nacisnij dowolny klawisz
+BOB_OPT_RGL,Zmiany zostaną wprowadzone po ponownym uruchomieniu
+BOB_OPT_RRT,Zapobiegaj rujnowaniu terenu przez drzewa
+BOB_OPT_RRP,Zapobiegaj rujnowaniu terenu przez rekwizyty
+BOB_NUKE,Resetuj konfigurację
+BOB_PER_IND,Domyślnie pokazuj indywidualne przedmioty
+BOB_PER_SIN,Zawsze wyłączone
+BOB_PER_GRP,Zawsze włączone
+BOB_PER_LST,Pamiętaj poprzednie ustawienia
+BOB_OPT_POS,Pamiętaj poprzednią pozycję panelu
+BOB_FIL_NAME,Szukaj:
+MES_PAGE,Więcej informacji znajdziesz na stronie moda w Warsztacie Steam.
+BOB_ERR_FAT,"Oznacza to, że mod nie może działać i został wyłączony."
+BOB_ERR_HAR,"BOB, Zamiana drzew i rekwizytów, nie był w stanie ukończyć wymaganych poprawek Harmony."
+ERR_HAR0,Błąd aktualizacji Harmony.
+ERR_HAR1,Możliwe przyczyny problemu zawierają:
+ERR_HAR2,Wymagany mod Harmony 2 nie został zainstalowany
+ERR_HAR3,Stary lub zepsuty mod uniemożliwia poprawne działanie moda Harmony 2
+BOB_UPD_040_0,Przedstawiamy zamianę drzew na mapie! Aktywuj narzędzie BOB tak jak zazwyczaj i kliknij na wolno stojące drzewo na mapie.
+BOB_UPD_041_0,Naprawiono sporadyczny wyjątek panelu wymiany budynku podczas zmiany przedmiotu docelowego.
+BOB_UPD_042_0,Umożliwiono wybór budynków podrzędnych
+BOB_UPD_042_1,Naprawiono potencjalne race conditions podczas ładowania gry
+BOB_UPD_043_0,Naprawiono odświeżanie prawdopodobieństwa podczas cofania zmian dla wszystkich budynków i wszystkich sieci
+BOB_UPD_043_1,Naprawiono błąd odświeżania LOD-a podczas cofania zmian dla wszystkich budynków i wszystkich sieci
+BOB_UPD_043_2,"Poprawiono etykiety pól tekstowych panelu informacyjnego, aby pasowały do dłuższych ciągów znaków tłumaczeń"
+BOB_UPD_050_0,Wstępne wdrożenie pakietów zastępczych dla sieci
+BOB_UPD_050_1,Teraz poprawnie kompatybilny z Network Skins 2
+BOB_UPD_050_2,Szybsze przetwarzanie zmian
+BOB_UPD_051_0,Nowy wygląd listy drzew/rekwizytów z ikonami do identyfikacji jaki rodzaj zmiany jest aktywny
+BOB_UPD_052_0,"Dodano zarządzanie konfiguracjami do obsługi wielu różnych plików konfiguracyjnych, dostępnych za pośrednictwem panelu opcji"
+BOB_UPD_060_0,Zamiana wolnostojących rekwizytów
+BOB_UPD_060_1,Podświetlenie wybranych rekwizytów lub drzew
+BOB_UPD_060_2,Można teraz wybierać sieci w budynkach
+BOB_UPD_060_3,Można teraz wybierać budynki dekoracyjne
+BOB_UPD_060_4,Przeprojektowany mniejszy panel zastępczy
+BOB_UPD_061_0,Dodano możliwość sortowania listy rosnąco/malejąco według nazw
+BOB_UPD_062_0,Dodano możliwość usuwania rujnowania terenu ze wszystkich drzew i / lub rekwizytów (w panelu opcji)
+BOB_UPD_062_1,Można teraz wybrać ścieżki promowe (aby zmienić / ukryć boje znaczników tras promowych)
+BOB_UPD_062_2,Naprawiono błędne wyświetlanie kątów rekwizytów sieci podczas wyboru
+BOB_PNL_RSW,Pokaż losowo
+BOB_PNL_RST,Losowe ustawienie
+BOB_RND_NEW,Nowy
+BOB_RND_DEL,Usuń
+BOB_RND_REN,Zmień nazwę

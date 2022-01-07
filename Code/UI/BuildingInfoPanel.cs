@@ -15,6 +15,7 @@ namespace BOB
 		// Sub-building reference index.
 		private int subBuildingIndex;
 
+
 		/// <summary>
 		/// Called when this item is selected.
 		/// </summary>
@@ -80,14 +81,49 @@ namespace BOB
 		private UIFastList subBuildingList;
 
 
-		// Button tooltips.
-		protected override string ReplaceTooltipKey => "BOB_PNL_RTB";
-		protected override string ReplaceAllTooltipKey => "BOB_PNL_RAB";
+		/// <summary>
+		/// Mode icon atlas names for prop modes.
+		/// </summary>
+		protected override string[] PropModeAtlas => new string[(int)ReplacementModes.NumModes]
+		{
+			"BOB-ThisPropSmall",
+			"BOB-SamePropSmall",
+			"BOB-BuildingsSmall"
+		};
 
 
-		// Replace button atlases.
-		protected override UITextureAtlas ReplaceAtlas => TextureUtils.LoadSpriteAtlas("BOB-Building");
-		protected override UITextureAtlas ReplaceAllAtlas => TextureUtils.LoadSpriteAtlas("BOB-Buildings");
+		/// <summary>
+		/// Mode icon atlas names for tree modes.
+		/// </summary>
+		protected override string[] TreeModeAtlas => new string[(int)ReplacementModes.NumModes]
+		{
+			"BOB-ThisTreeSmall",
+			"BOB-SameTreeSmall",
+			"BOB-BuildingsSmall"
+		};
+
+
+		/// <summary>
+		/// Mode icon tootlip keys for prop modes.
+		/// </summary>
+		protected override string[] PropModeTipKeys => new string[(int)ReplacementModes.NumModes]
+		{
+			"BOB_PNL_M_PIB",
+			"BOB_PNL_M_PGB",
+			"BOB_PNL_M_PAB"
+		};
+
+
+		/// <summary>
+		/// Mode icon tootlip keys for tree modes.
+		/// </summary>
+		protected override string[] TreeModeTipKeys => new string[(int)ReplacementModes.NumModes]
+		{
+			"BOB_PNL_M_TIB",
+			"BOB_PNL_M_TGB",
+			"BOB_PNL_M_TAB"
+		};
+
 
 
 		/// <summary>
@@ -119,8 +155,10 @@ namespace BOB
 		{
 			set
 			{
-				// Call base.
+				// Call base, while ignoring replacement prefab change live application.
+				ignoreSelectedPrefabChange = true;
 				base.CurrentTargetItem = value;
+				ignoreSelectedPrefabChange = false;
 
 				// Ensure valid selections before proceeding.
 				if (CurrentTargetItem != null && currentBuilding != null)
@@ -153,12 +191,8 @@ namespace BOB
 					}
 				}
 
-				// If we got here, there's no valid current selection; set all offset fields to defaults.
-				angleSlider.TrueValue = 0f;
-				xSlider.TrueValue = 0;
-				ySlider.TrueValue = 0;
-				zSlider.TrueValue = 0;
-				probabilitySlider.TrueValue = value != null ? value.originalProb : 0;
+				// If we got here, there's no valid current selection; set all offset fields to defaults by passing null to SetSliders().
+				SetSliders(null);
 			}
 		}
 
@@ -187,17 +221,17 @@ namespace BOB
 		/// <param name="targetPrefabInfo">Target prefab to set</param>
 		internal override void SetTarget(PrefabInfo targetPrefabInfo)
 		{
-			// Don't do anything if target hasn't changed.
-			if (currentBuilding == targetPrefabInfo)
+			// Don't do anything if invalid target, or target hasn't changed.
+			if (!(targetPrefabInfo is BuildingInfo) || selectedPrefab == targetPrefabInfo)
             {
 				return;
-            }
-
-			// Set target reference.
-			currentBuilding = targetPrefabInfo as BuildingInfo;
+			}
 
 			// Base setup.
 			base.SetTarget(targetPrefabInfo);
+
+			// Set target reference.
+			currentBuilding = SelectedBuilding;
 
 			// Does this building have sub-buildings?
 			if (currentBuilding.m_subBuildings != null && currentBuilding.m_subBuildings.Length > 0)
@@ -272,23 +306,6 @@ namespace BOB
 				subBuildingPanel?.Hide();
             }
 
-			// Set grouped checkbox initial state according to preferences.
-			switch (ModSettings.indDefault)
-			{
-				case 0:
-					// Most recent state.
-					indCheck.isChecked = ModSettings.lastInd;
-					break;
-				case 1:
-					// Grouping off by default.
-					indCheck.isChecked = false;
-					break;
-				case 2:
-					// Grouping on by default.
-					indCheck.isChecked = true;
-					break;
-			}
-
 			// Populate target list and select target item.
 			TargetList();
 
@@ -299,46 +316,65 @@ namespace BOB
 
 
 		/// <summary>
-		/// Replace button event handler.
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="mouseEvent">Mouse event (unused)</param>
+		/// Apply button event handler.
 		/// </summary>
-		protected override void Replace(UIComponent control, UIMouseEventParameter mouseEvent)
-        {
+		protected override void Apply()
+		{
 			try
 			{
 				// Make sure we have valid a target and replacement.
 				if (CurrentTargetItem != null && ReplacementPrefab != null)
 				{
-					// Grouped or individual?
-					if (CurrentTargetItem.index < 0)
+					switch (CurrentMode)
 					{
-						// Grouped replacement.
-						BuildingReplacement.Instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+						case ReplacementModes.Individual:
+							// Individual replacement.
+							IndividualBuildingReplacement.Instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, CurrentTargetItem.index, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
 
-						// Update current target.
-						CurrentTargetItem.replacementPrefab = ReplacementPrefab;
-						CurrentTargetItem.replacementProb = (int)probabilitySlider.TrueValue;
+							// Update current target.
+							CurrentTargetItem.individualPrefab = ReplacementPrefab;
+							CurrentTargetItem.individualProb = (int)probabilitySlider.TrueValue;
+							break;
+
+						case ReplacementModes.Grouped:
+							// Grouped replacement.
+							BuildingReplacement.Instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+
+							// Update current target.
+							CurrentTargetItem.replacementPrefab = ReplacementPrefab;
+							CurrentTargetItem.replacementProb = (int)probabilitySlider.TrueValue;
+							break;
+
+						case ReplacementModes.All:
+							// All- replacement.
+							AllBuildingReplacement.Instance.Replace(null, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+
+							// Update current target.
+							CurrentTargetItem.allPrefab = ReplacementPrefab;
+							CurrentTargetItem.allProb = (int)probabilitySlider.TrueValue;
+							break;
+
+						default:
+							Logging.Error("invalid replacement mode at BuildingInfoPanel.Apply");
+							return;
 					}
-					else
-					{
-						// Individual replacement.
-						IndividualBuildingReplacement.Instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, CurrentTargetItem.index, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
 
-						// Update current target.
-						CurrentTargetItem.individualPrefab = ReplacementPrefab;
-						CurrentTargetItem.individualProb = (int)probabilitySlider.TrueValue;
-					}
+					// Update any dirty building renders.
+					BuildingData.Update();
 
-					// Perform post-replacment updates.
-					FinishUpdate();
+					// Update target list.
+					targetList.Refresh();
+
+					// Update highlighting target.
+					RenderOverlays.CurrentProp = ReplacementPrefab as PropInfo;
+					RenderOverlays.CurrentTree = ReplacementPrefab as TreeInfo;
 				}
 			}
 			catch (Exception e)
-            {
+			{
 				// Log and report any exception.
-				Logging.LogException(e, "exception perforiming building replacement");
-            }
+				Logging.LogException(e, "exception applying building replacement");
+			}
 		}
 
 
@@ -365,9 +401,6 @@ namespace BOB
 
 					// Clear current target replacement prefab.
 					CurrentTargetItem.individualPrefab = null;
-
-					// Perform post-replacment updates.
-					FinishUpdate();
 				}
 				else if (CurrentTargetItem.replacementPrefab != null)
 				{
@@ -376,9 +409,6 @@ namespace BOB
 
 					// Clear current target replacement prefab.
 					CurrentTargetItem.replacementPrefab = null;
-
-					// Perform post-replacment updates.
-					FinishUpdate();
 				}
 				else if (CurrentTargetItem.allPrefab != null)
 				{
@@ -390,49 +420,22 @@ namespace BOB
 
 						// Clear current target 'all' prefab.
 						CurrentTargetItem.allPrefab = null;
-
-						// Perform post-replacment updates.
-						FinishUpdate();
 					}
 				}
+
+				// Update current item.
+				UpdateTargetItem(CurrentTargetItem);
+
+				// Update controls.
+				CurrentTargetItem = CurrentTargetItem;
+
+				// Update target list.
+				targetList.Refresh();
 			}
 			catch (Exception e)
 			{
 				// Log and report any exception.
 				Logging.LogException(e, "exception perforiming building reversion");
-			}
-		}
-
-
-		/// <summary>
-		/// Replace all button event handler.
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="mouseEvent">Mouse event (unused)</param>
-		/// </summary>
-		protected override void ReplaceAll(UIComponent control, UIMouseEventParameter mouseEvent)
-		{
-			try
-			{
-				// Saftey net - don't do anything if individual check is selected.
-				if (indCheck.isChecked)
-				{
-					return;
-				}
-
-				// Apply replacement.
-				AllBuildingReplacement.Instance.Replace(null, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
-
-				// Update current target.
-				CurrentTargetItem.allPrefab = ReplacementPrefab;
-				CurrentTargetItem.allProb = (int)probabilitySlider.TrueValue;
-
-				// Perform post-replacment updates.
-				FinishUpdate();
-			}
-			catch (Exception e)
-			{
-				// Log and report any exception.
-				Logging.LogException(e, "exception perforiming all-building replacement");
 			}
 		}
 
@@ -527,7 +530,7 @@ namespace BOB
 				}
 
 				// Grouped or individual?
-				if (indCheck.isChecked)
+				if (CurrentMode == ReplacementModes.Individual)
 				{
 					// Individual - set index to the current building prop indexes.
 					targetListItem.index = propIndex;
@@ -638,6 +641,67 @@ namespace BOB
 
 			// Update any dirty building renders.
 			BuildingData.Update();
+		}
+
+
+		/// <summary>
+		/// Adds a new tree or prop.
+		/// </summary>
+		private void AddNew()
+		{
+			// Make sure a valid replacement prefab is set, and that we've got space for another prop.
+			if (ReplacementPrefab != null)
+			{
+				// New prop index.
+				int newIndex = 0;
+				
+				// Check to see if we've got a current prop array.
+				if (currentBuilding.m_props != null)
+				{
+					// Existing m_props array - check that we've got space for another entry.
+					newIndex = currentBuilding.m_props.Length;
+					if (newIndex > 63)
+					{
+						// Props maxed out - exit.
+						return;
+					}
+
+					// Get old props reference.
+					BuildingInfo.Prop[] oldBuildingProps = currentBuilding.m_props;
+
+					// Create new props array with one extra entry, and copy the old props to it.
+					currentBuilding.m_props = new BuildingInfo.Prop[newIndex + 1];
+					for (int i = 0; i < newIndex; ++i)
+					{
+						currentBuilding.m_props[i] = oldBuildingProps[i];
+					}
+				}
+				else
+				{
+					// No m_props array already; create one.
+					currentBuilding.m_props = new BuildingInfo.Prop[1];
+				}
+
+				// Add new prop.
+				currentBuilding.m_props[newIndex] = new BuildingInfo.Prop
+				{
+					m_angle = angleSlider.TrueValue,
+					m_prop = ReplacementPrefab as PropInfo,
+					m_tree = ReplacementPrefab as TreeInfo,
+					m_finalProp = ReplacementPrefab as PropInfo,
+					m_finalTree = ReplacementPrefab as TreeInfo,
+					m_fixedHeight = true,
+					m_position = new Vector3(xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue),
+					m_probability = (int)probabilitySlider.TrueValue
+				};
+
+				// Refresh render to recgonise new prop.
+				BuildingData.DirtyList.Add(currentBuilding);
+				BuildingData.Update();
+
+				// Regenerate target list.
+				TargetList();
+			}
 		}
 	}
 }

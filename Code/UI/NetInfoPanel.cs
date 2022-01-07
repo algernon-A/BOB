@@ -14,21 +14,8 @@ namespace BOB
 		// Layout constants.
 		private const float PackButtonX = RandomButtonX + ToggleSize;
 
-
-		// Current selection references.
-		private NetInfo currentNet;
+		// Current selection reference.
 		private NetTargetListItem currentNetItem;
-
-
-		// Button tooltips.
-		protected override string ReplaceTooltipKey => "BOB_PNL_RTN";
-		protected override string ReplaceAllTooltipKey => "BOB_PNL_RAN";
-
-
-		// Replace button atlases.
-		protected override UITextureAtlas ReplaceAtlas => TextureUtils.LoadSpriteAtlas("BOB-Road");
-		protected override UITextureAtlas ReplaceAllAtlas => TextureUtils.LoadSpriteAtlas("BOB-Roads");
-
 
 
 		/// <summary>
@@ -38,40 +25,87 @@ namespace BOB
 
 
 		/// <summary>
+		/// Mode icon atlas names for prop modes.
+		/// </summary>
+		protected override string[] PropModeAtlas => new string[(int)ReplacementModes.NumModes]
+		{
+			"BOB-ThisPropSmall",
+			"BOB-SamePropSmall",
+			"BOB-RoadsSmall"
+		};
+
+
+		/// <summary>
+		/// Mode icon atlas names for tree modes.
+		/// </summary>
+		protected override string[] TreeModeAtlas => new string[(int)ReplacementModes.NumModes]
+		{
+			"BOB-ThisTreeSmall",
+			"BOB-SameTreeSmall",
+			"BOB-RoadsSmall"
+		};
+
+
+		/// <summary>
+		/// Mode icon tootlip keys for prop modes.
+		/// </summary>
+		protected override string[] PropModeTipKeys => new string[(int)ReplacementModes.NumModes]
+		{
+			"BOB_PNL_M_PIN",
+			"BOB_PNL_M_PGN",
+			"BOB_PNL_M_PAN"
+		};
+
+
+		/// <summary>
+		/// Mode icon tootlip keys for tree modes.
+		/// </summary>
+		protected override string[] TreeModeTipKeys => new string[(int)ReplacementModes.NumModes]
+		{
+			"BOB_PNL_M_TIN",
+			"BOB_PNL_M_TGN",
+			"BOB_PNL_M_TAN"
+		};
+
+
+		/// <summary>
 		/// Handles changes to the currently selected target prefab.
 		/// </summary>
 		internal override TargetListItem CurrentTargetItem
         {
 			set
 			{
-				// Call base.
+				// Call base, while ignoring replacement prefab change live application.
+				ignoreSelectedPrefabChange = true;
 				base.CurrentTargetItem = value;
+				ignoreSelectedPrefabChange = false;
 
 				// Set net item reference.
 				currentNetItem = value as NetTargetListItem;
 
 				// Ensure valid selections before proceeding.
-				if (currentNetItem != null && currentNet != null)
+				if (currentNetItem != null && SelectedNet != null)
 				{
 					// Set lane highlighting selection for individual items.
 					if (currentNetItem.lane > -1)
 					{
-						RenderOverlays.CurrentLane = currentNet.m_lanes[currentNetItem.lane];
+						RenderOverlays.CurrentLane = SelectedNet.m_lanes[currentNetItem.lane];
 					}
 
 					// If we've got an individual replacement, update the offset fields with the replacement values.
 					if (CurrentTargetItem.individualPrefab != null)
 					{
 						// Use IndividualIndex and IndividualLane to handle case of switching from individual to grouped props (values will be -1, actual values in relevant lists).
-						SetSliders(IndividualNetworkReplacement.Instance.EligibileReplacement(currentNet, CurrentTargetItem.originalPrefab, IndividualLane, IndividualIndex));
+						SetSliders(IndividualNetworkReplacement.Instance.EligibileReplacement(SelectedNet, CurrentTargetItem.originalPrefab, IndividualLane, IndividualIndex));
+
 						// All done here.
 						return;
 					}
-					// Ditto for any network replacement
+					// Ditto for any netwz80gAReork replacement
 					else if (CurrentTargetItem.replacementPrefab != null)
 					{
 						// Get replacement and update control values.
-						SetSliders(NetworkReplacement.Instance.EligibileReplacement(currentNet, CurrentTargetItem.originalPrefab, -1, -1));
+						SetSliders(NetworkReplacement.Instance.EligibileReplacement(SelectedNet, CurrentTargetItem.originalPrefab, -1, -1));
 
 						// All done here.
 						return;
@@ -80,19 +114,15 @@ namespace BOB
 					else if (CurrentTargetItem.allPrefab != null)
 					{
 						// Get replacement and update control values.
-						SetSliders(AllNetworkReplacement.Instance.EligibileReplacement(currentNet, CurrentTargetItem.originalPrefab, -1, -1));
+						SetSliders(AllNetworkReplacement.Instance.EligibileReplacement(SelectedNet, CurrentTargetItem.originalPrefab, -1, -1));
 
 						// All done here.
 						return;
 					}
 				}
 
-				// If we got here, there's no valid current selection; set all offset fields to defaults.
-				angleSlider.TrueValue = 0f;
-				xSlider.TrueValue = 0;
-				ySlider.TrueValue = 0;
-				zSlider.TrueValue = 0;
-				probabilitySlider.TrueValue = value != null ? value.originalProb : 0;
+				// If we got here, there's no valid current selection; set all offset fields to defaults by passing null to SetSliders().
+				SetSliders(null);
 			}
 		}
 
@@ -105,7 +135,7 @@ namespace BOB
 			try
 			{
 				// Add pack button.
-				UIButton packButton = AddIconButton(this, PackButtonX, TitleHeight + Margin, ToggleSize, "BOB_PNL_PKB", TextureUtils.LoadSpriteAtlas("BOB-PropPack"));
+				UIButton packButton = AddIconButton(this, PackButtonX, ToggleY, ToggleSize, "BOB_PNL_PKB", TextureUtils.LoadSpriteAtlas("BOB-PropPack"));
 				packButton.eventClicked += (component, clickEvent) => PackPanelManager.Create();
 
 				// Populate loaded list.
@@ -126,13 +156,10 @@ namespace BOB
 		internal override void SetTarget(PrefabInfo targetPrefabInfo)
 		{
 			// Don't do anything if target hasn't changed.
-			if (currentNet == targetPrefabInfo)
+			if (SelectedNet == targetPrefabInfo)
 			{
 				return;
 			}
-
-			// Set target reference.
-			currentNet = targetPrefabInfo as NetInfo;
 
 			// Base setup.
 			base.SetTarget(targetPrefabInfo);
@@ -141,53 +168,67 @@ namespace BOB
 			TargetList();
 
 			// Apply Harmony rendering patches.
-			RenderOverlays.CurrentNet = currentNet;
+			RenderOverlays.CurrentNet = SelectedNet;
 			Patcher.PatchNetworkOverlays(true);
 		}
 
 
 		/// <summary>
-		/// Replace button event handler.
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="mouseEvent">Mouse event (unused)</param>
+		/// Apply button event handler.
 		/// </summary>
-		protected override void Replace(UIComponent control, UIMouseEventParameter mouseEvent)
+		protected override void Apply()
 		{
 			try
 			{
 				// Make sure we have valid a target and replacement.
-				if (CurrentTargetItem != null && ReplacementPrefab != null)
+				if (CurrentTargetItem is NetTargetListItem netItem && ReplacementPrefab != null)
 				{
-					// Grouped or individual?
-					if (CurrentTargetItem.index < 0)
+					switch (CurrentMode)
 					{
-						// Grouped replacement.
-						NetworkReplacement.Instance.Replace(currentNet, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, -1, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+						case ReplacementModes.Individual:
+							// Individual replacement.
+							IndividualNetworkReplacement.Instance.Replace(SelectedNet, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, netItem.lane, CurrentTargetItem.index, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
 
-						// Update current target.
-						CurrentTargetItem.replacementPrefab = ReplacementPrefab;
-						CurrentTargetItem.replacementProb = (int)probabilitySlider.TrueValue;
+							// Update current target.
+							CurrentTargetItem.individualPrefab = ReplacementPrefab;
+							CurrentTargetItem.individualProb = (int)probabilitySlider.TrueValue;
+							break;
+
+						case ReplacementModes.Grouped:
+							// Grouped replacement.
+							NetworkReplacement.Instance.Replace(SelectedNet, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, -1, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+
+							// Update current target.
+							CurrentTargetItem.replacementPrefab = ReplacementPrefab;
+							CurrentTargetItem.replacementProb = (int)probabilitySlider.TrueValue;
+							break;
+
+						case ReplacementModes.All:
+							// All- replacement.
+							AllNetworkReplacement.Instance.Replace(null, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, -1, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+
+							// Update current target.
+							CurrentTargetItem.allPrefab = ReplacementPrefab;
+							CurrentTargetItem.allProb = (int)probabilitySlider.TrueValue;
+							break;
+
+						default:
+							Logging.Error("invalid replacement mode at NetInfoPanel.Apply");
+							return;
 					}
-					else
-					{
-						// Individual replacement.
-						NetTargetListItem netItem = CurrentTargetItem as NetTargetListItem;
 
-						IndividualNetworkReplacement.Instance.Replace(currentNet, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, netItem.lane, CurrentTargetItem.index, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+					// Update target list.
+					targetList.Refresh();
 
-						// Update current target.
-						CurrentTargetItem.individualPrefab = ReplacementPrefab;
-						CurrentTargetItem.individualProb = (int)probabilitySlider.TrueValue;
-					}
-
-					// Perform post-replacment updates.
-					FinishUpdate();
+					// Update highlighting target.
+					RenderOverlays.CurrentProp = ReplacementPrefab as PropInfo;
+					RenderOverlays.CurrentTree = ReplacementPrefab as TreeInfo;
 				}
 			}
 			catch (Exception e)
 			{
 				// Log and report any exception.
-				Logging.LogException(e, "exception perforiming network replacement");
+				Logging.LogException(e, "exception applying building replacement");
 			}
 		}
 
@@ -211,61 +252,35 @@ namespace BOB
 				if (currentNetItem.individualPrefab != null)
 				{
 					// Individual reversion - use IndividualLane and IndividualIndex to ensure valid values for current context are used.
-					IndividualNetworkReplacement.Instance.Revert(currentNet, currentNetItem.originalPrefab, IndividualLane, IndividualIndex, true);
+					IndividualNetworkReplacement.Instance.Revert(SelectedNet, currentNetItem.originalPrefab, IndividualLane, IndividualIndex, true);
 
 					// Clear current target replacement prefab.
 					CurrentTargetItem.individualPrefab = null;
-
-					// Perform post-replacment updates.
-					FinishUpdate();
 				}
 				else if (currentNetItem.replacementPrefab != null)
 				{
 					// Network reversion.
-					NetworkReplacement.Instance.Revert(currentNet, currentNetItem.originalPrefab, -1, -1, true);
-
-					// Perform post-reversion updates.
-					FinishUpdate();
+					NetworkReplacement.Instance.Revert(SelectedNet, currentNetItem.originalPrefab, -1, -1, true);
 				}
 				else if (currentNetItem.allPrefab != null)
 				{
 					// All-network reversion.
-					AllNetworkReplacement.Instance.Revert(currentNet, currentNetItem.originalPrefab, -1, -1, true);
-
-					// Save configuration file and refresh target list (to reflect our changes).
-					ConfigurationUtils.SaveConfig();
-
-					// Perform post-reversion updates.
-					FinishUpdate();
+					AllNetworkReplacement.Instance.Revert(SelectedNet, currentNetItem.originalPrefab, -1, -1, true);
 				}
+
+				// Update current item.
+				UpdateTargetItem(currentNetItem);
+
+				// Update controls.
+				CurrentTargetItem = currentNetItem;
+
+				// Update target list.
+				targetList.Refresh();
 			}
 			catch (Exception e)
 			{
 				// Log and report any exception.
 				Logging.LogException(e, "exception perforiming network reversion");
-			}
-		}
-
-
-		/// <summary>
-		/// Replace all button event handler.
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="mouseEvent">Mouse event (unused)</param>
-		/// </summary>
-		protected override void ReplaceAll(UIComponent control, UIMouseEventParameter mouseEvent)
-		{
-			try
-			{
-				// Apply replacement.
-				AllNetworkReplacement.Instance.Replace(null, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, -1, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
-
-				// Perform post-replacment updates.
-				FinishUpdate();
-			}
-			catch (Exception e)
-			{
-				// Log and report any exception.
-				Logging.LogException(e, "exception perforiming all-network replacement");
 			}
 		}
 
@@ -293,7 +308,7 @@ namespace BOB
 				}
 
 				// Replacement pack replacement and original probability (if any).
-				BOBNetReplacement packReplacement = NetworkPackReplacement.Instance.ActiveReplacement(currentNet, lane, propIndex);
+				BOBNetReplacement packReplacement = NetworkPackReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex);
 				if (packReplacement != null)
 				{
 					targetListItem.packagePrefab = packReplacement.replacementInfo;
@@ -305,7 +320,7 @@ namespace BOB
 				}
 
 				// All-network replacement and original probability (if any).
-				BOBNetReplacement allNetReplacement = AllNetworkReplacement.Instance.ActiveReplacement(currentNet, lane, propIndex);
+				BOBNetReplacement allNetReplacement = AllNetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex);
 				if (allNetReplacement != null)
 				{
 					targetListItem.allPrefab = allNetReplacement.replacementInfo;
@@ -318,7 +333,7 @@ namespace BOB
 				}
 
 				// Network replacement and original probability (if any).
-				BOBNetReplacement netReplacement = NetworkReplacement.Instance.ActiveReplacement(currentNet, lane, propIndex);
+				BOBNetReplacement netReplacement = NetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex);
 				if (netReplacement != null)
 				{
 					targetListItem.replacementPrefab = netReplacement.replacementInfo;
@@ -331,7 +346,7 @@ namespace BOB
 				}
 
 				// Individual replacement and original probability (if any).
-				BOBNetReplacement individualReplacement = IndividualNetworkReplacement.Instance.ActiveReplacement(currentNet, lane, propIndex);
+				BOBNetReplacement individualReplacement = IndividualNetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex);
 				if (individualReplacement != null)
 				{
 					targetListItem.individualPrefab = individualReplacement.replacementInfo;
@@ -357,17 +372,17 @@ namespace BOB
 			// List of prefabs that have passed filtering.
 			List<TargetListItem> itemList = new List<TargetListItem>();
 
-			// Check to see if this building contains any props.
-			if (currentNet.m_lanes == null || currentNet.m_lanes.Length == 0)
+			// Check to see if this building contains any lanes.
+			if (SelectedNet?.m_lanes == null || SelectedNet.m_lanes.Length == 0)
 			{
-				// No props - show 'no props' label and return an empty list.
+				// No lanes - show 'no props' label and return an empty list.
 				noPropsLabel.Show();
 				targetList.rowsData = new FastList<object>();
 				return;
 			}
 
 			// Local reference.
-			NetInfo.Lane[] lanes = currentNet.m_lanes;
+			NetInfo.Lane[] lanes = SelectedNet.m_lanes;
 
 			// Iterate through each lane.
 			for (int lane = 0; lane < lanes.Length; ++lane)
@@ -402,7 +417,7 @@ namespace BOB
 					targetListItem.originalAngle = laneProps[propIndex].m_angle;
 
 					// Grouped or individual?
-					if (indCheck.isChecked)
+					if (CurrentMode == (int)ReplacementModes.Individual)
 					{
 						// Individual - set index to the current prop indexes.
 						targetListItem.index = propIndex;
@@ -418,7 +433,7 @@ namespace BOB
 					}
 
 					// All-network replacement and original probability (if any).
-					BOBNetReplacement allNetReplacement = AllNetworkReplacement.Instance.ActiveReplacement(currentNet, lane, propIndex);
+					BOBNetReplacement allNetReplacement = AllNetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex);
 					if (allNetReplacement != null)
 					{
 						targetListItem.allPrefab = allNetReplacement.replacementInfo;
@@ -426,10 +441,21 @@ namespace BOB
 
 						// Update original prop reference.
 						targetListItem.originalPrefab = allNetReplacement.targetInfo;
+
+
+						// See if we can find an active reference.
+						Logging.Message("finding original probability - all-network");
+						NetPropReference originalReference = allNetReplacement?.references?.Find(x =>  x.netInfo == SelectedNet && x.laneIndex == lane && x.propIndex == propIndex);
+						if (originalReference != null)
+                        {
+							// Original reference found; update original probability.
+							targetListItem.originalProb = originalReference.probability;
+                        }
+						Logging.Message("original probability not found");
 					}
 
 					// Network replacement and original probability (if any).
-					BOBNetReplacement netReplacement = NetworkReplacement.Instance.ActiveReplacement(currentNet, lane, propIndex);
+					BOBNetReplacement netReplacement = NetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex);
 					if (netReplacement != null)
 					{
 						targetListItem.replacementPrefab = netReplacement.replacementInfo;
@@ -437,27 +463,34 @@ namespace BOB
 
 						// Update original prop reference.
 						targetListItem.originalPrefab = netReplacement.targetInfo;
+						Logging.Message("finding original probability - grouped");
+						targetListItem.originalProb = netReplacement.references.Find(x => x.laneIndex == lane && x.propIndex == propIndex).probability;
+						Logging.Message("original probability found");
 					}
 
 					// Individual replacement and original probability (if any).
-					BOBNetReplacement individualReplacement = IndividualNetworkReplacement.Instance.ActiveReplacement(currentNet, lane, propIndex);
+					BOBNetReplacement individualReplacement = IndividualNetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex);
 					if (individualReplacement != null)
 					{
 						targetListItem.individualPrefab = individualReplacement.replacementInfo;
 						targetListItem.individualProb = individualReplacement.probability;
+						Logging.Message("finding original probability - individual");
+						targetListItem.originalProb = individualReplacement.references.Find(x => x.laneIndex == lane && x.propIndex == propIndex).probability;
+						Logging.Message("original probability found");
 
 						// Update original prop reference.
 						targetListItem.originalPrefab = individualReplacement.targetInfo;
 					}
 
 					// Replacement pack replacement and original probability (if any).
-					BOBNetReplacement packReplacement = NetworkPackReplacement.Instance.ActiveReplacement(currentNet, lane, propIndex);
+					BOBNetReplacement packReplacement = NetworkPackReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex);
 					if (packReplacement != null)
 					{
 						targetListItem.packagePrefab = packReplacement.replacementInfo;
 
 						// Update original prop reference.
 						targetListItem.originalPrefab = packReplacement.targetInfo;
+						targetListItem.originalProb = packReplacement.references.Find(x => x.laneIndex == lane && x.propIndex == propIndex).probability;
 					}
 
 					// Are we grouping?
