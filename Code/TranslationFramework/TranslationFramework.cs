@@ -373,8 +373,6 @@ namespace BOB
                             continue;
                         }
 
-                        Logging.Message("reading translation file ", translationFile);
-
                         // Read file.
                         FileStream fileStream = new FileStream(translationFile, FileMode.Open, FileAccess.Read);
                         using (StreamReader reader = new StreamReader(fileStream))
