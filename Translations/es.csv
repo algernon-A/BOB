@@ -13,8 +13,22 @@ BOB_PNL_NOT,No se encontraron árboles
 BOB_PNL_TRE,Árboles
 BOB_PNL_PRP,Decoraciones
 BOB_PNL_IND,Mostrar decoraciones individuales
-BOB_PNL_HDV,Ocultar Vanilla
-BOB_PNL_REP,Reemplazar
+BOB_PNL_HDV,Ocultar vanilla
+BO_BPNL_REP,Reemplazar
+BOB_PNL_MOD,Modo de reemplazo
+BOB_PNL_FUN,Funcionesa extra
+BOB_PNL_M_PIB,Elementos individuales en estos edificios
+BOB_PNL_M_PGB,Todos los elementos de este tipo en estos edificios
+BOB_PNL_M_PAB,Todos los elementos de este tipo en todos los edificios
+BOB_PNL_M_TIB,Árboles individuales en estos edificios
+BOB_PNL_M_TGB,Todos los árboles de este tipo en estos edificios
+BOB_PNL_M_TAB,Todos los árboles de este tipo en todos los edificios
+BOB_PNL_M_PIN,Elementos individuales en estas redes
+BOB_PNL_M_PGN,Todos los elementos de este tipo en estas redes
+BOB_PNL_M_PAN,Todos los elementos de este tipo en todas las redes
+BOB_PNL_M_TIN,Árboles individuales en estas redes
+BOB_PNL_M_TGN,Todos los árboles de este tipo en estas redes
+BOB_PNL_M_TAN,Todos los árboles de este tipo en todas las redes
 BOB_PNL_RTB,Estos edificios
 BOB_PNL_RAB,Todos edificios
 BOB_PNL_RTN,Estas redes
@@ -24,7 +38,9 @@ BOB_PNL_RTP,Decoraciones del mapa
 BOB_PNL_RSW,Mostrar aleatorio
 BOB_PNL_RST,Configuración aleatoria
 BOB_PNL_SCA,Escala de Decoraciones y Árboles
+BOB_PNL_APP,Aplicar
 BOB_PNL_REV,Revertir
+BOB_PNL_REV_UND,Deshacer el reemplazo seleccionado
 BOB_PNL_REV_TIP,No se puede revertir ya que no hay ningún reemplazo disponible para este artículo
 BOB_PNL_PKB,Paquetes de reemplazo
 BOB_PNL_PRB,Probabilidad
@@ -114,3 +130,8 @@ BOB_UPD_062_2,Se corrigieron los ángulos de decoraciones en redes que a veces s
 BOB_UPD_080_0,Añadido reemplazo de decoración individual de redes
 BOB_UPD_080_1,Añadido botón de Unified UI (UUI)
 BOB_UPD_086_0,Añadida opción para hacer cableado en redes (líneas eléctricas y cables eléctricos de trenes) de tamaños más realistas
+BOB_UPD_090_0,Cambios a la interfaz de usuario: los reemplazos son en tiempo real (sin botones de 'aplicar'), con botones dnuevos de modo de reemplazo
+BOB_UPD_090_1,Framework de traducción actualizado para utilizar CrowdIn
+BOB_UPD_090_2,Trees no longer have an angle setting, as this will always be overridden by any mod implementing random tree rotation
+BOB_UPD_090_3,Improve handling of props with special attributes
+BOB_UPD_090_4,Other minor improvements
