@@ -137,9 +137,15 @@ namespace BOB
                 {
                     // Revert all-building and building settings.
                     ReplacementUtils.NukeSettings();
+                };
 
-                    // Save clean configuration.
-                    //ConfigurationUtils.SaveConfig(ConfigurationUtils.CurrentSavedConfigName, true);
+                // Clean map data button.
+                UIButton cleanSaveButton = UIControls.AddButton(panel, Margin + 50f, FooterY + 280f, Translations.Translate("BOB_CFG_CMD"), 300f, scale: 0.8f, tooltip: Translations.Translate("BOB_CFG_CMD_TIP"));
+                cleanSaveButton.eventClicked += (control, clickEvent) =>
+                {
+                    // Clean all map data.
+                    MapTreeReplacement.instance.Setup();
+                    MapPropReplacement.instance.Setup();
                 };
             }
 

@@ -80,7 +80,9 @@ BOB_CFG_DEL,Delete selected configuration
 BOB_CFG_LAA,Load and apply selected configuration
 BOB_CFG_LGL,Load and apply global configuration
 BOB_CFG_CLE,Clean current config
-BOB_CFG_CLE_TIP,"Removes any references to unloaded buildings, networks, props and/or trees from the current configuration file"
+BOB_CFG_CLE_TIP,Removes any references to unloaded buildings, networks, props and/or trees from the current configuration file
+BOB_CFG_CMD,Clear map data
+BOB_CFG_CMD_TIP,Removes records of replaced standalone trees and props from the current savegame.  Will mean that you can no longer revert map replacements (does NOT affect props or trees in buildings or networks)
 BOB_OPT_GEN,General options
 BOB_OPT_CFG,Configurations
 BOB_OPT_VIS,Visual effects
