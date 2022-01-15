@@ -175,24 +175,15 @@ namespace BOB
                     labelX += IndexWidth;
                 }
 
-                bool hasReplacement = false;
+                int replacementProb = 100;
+                PrefabInfo replacementPrefab = null;
 
                 // Check to see if there's a currently active individual replacement.
                 if (thisItem.individualPrefab != null)
                 {
-                    // A replacement is currently active - include it in the text.
-                    displayText.Append(PrefabLists.GetDisplayName(thisItem.individualPrefab));
-
-                    // Append probability to the label, if we're showing it.
-                    if (thisItem.showProbs)
-                    {
-                        displayText.Append(" ");
-                        displayText.Append(thisItem.individualProb);
-                        displayText.Append("%");
-                    }
-
-                    // Set flag.
-                    hasReplacement = true;
+                    // A replacement is currently active.
+                    replacementPrefab = thisItem.individualPrefab;
+                    replacementProb = thisItem.individualProb;
 
                     // Show building replacement sprite.
                     lineSprite.atlas = TextureUtils.LoadSpriteAtlas(thisNetItem == null ? "BOB-BuildingSmall" : "BOB-RoadSmall");
@@ -203,19 +194,9 @@ namespace BOB
                 // If no current individual replacement, check to see if there's a currently active building/network replacement.
                 else if (thisItem.replacementPrefab != null)
                 {
-                    // A replacement is currently active - include it in the text.
-                    displayText.Append(PrefabLists.GetDisplayName(thisItem.replacementPrefab));
-
-                    // Append probability to the label, if we're showing it.
-                    if (thisItem.showProbs)
-                    {
-                        displayText.Append(" ");
-                        displayText.Append(thisItem.replacementProb);
-                        displayText.Append("%");
-                    }
-
-                    // Set flag.
-                    hasReplacement = true;
+                    // A replacement is currently active.
+                    replacementPrefab = thisItem.replacementPrefab;
+                    replacementProb = thisItem.replacementProb;
 
                     // Show building replacement sprite.
                     lineSprite.atlas = TextureUtils.LoadSpriteAtlas(thisNetItem == null ? "BOB-BuildingSmall" : "BOB-RoadSmall");
@@ -226,19 +207,9 @@ namespace BOB
                 // If no current building/network replacement, check to see if any all- replacement is currently active.
                 else if (thisItem.allPrefab != null)
                 {
-                    // An all- replacement is currently active; append name to the label.
-                    displayText.Append(PrefabLists.GetDisplayName(thisItem.allPrefab));
-
-                    // Append probability if this is not a network item and we're showing probs.
-                    if (thisNetItem == null && thisItem.showProbs)
-                    {
-                        displayText.Append(" ");
-                        displayText.Append(thisItem.allProb);
-                        displayText.Append("%");
-                    }
-
-                    // Set flag.
-                    hasReplacement = true;
+                    // A replacement is currently active.
+                    replacementPrefab = thisItem.allPrefab;
+                    replacementProb = thisItem.allProb;
 
                     // Show all- replacement sprite.
                     lineSprite.atlas = TextureUtils.LoadSpriteAtlas(thisNetItem == null ? "BOB-BuildingsSmall" : "BOB-RoadsSmall");
@@ -249,11 +220,10 @@ namespace BOB
                 // If no other replacements, chek to see if any pack replacement is currently active
                 else if (thisItem.packagePrefab != null)
                 {
-                    // Yes; append name to the label.
-                    displayText.Append(PrefabLists.GetDisplayName(thisItem.packagePrefab));
+                    replacementPrefab = thisItem.packagePrefab;
 
-                    // Set flag.
-                    hasReplacement = true;
+                    // Don't show probability for packaged items.
+                    //thisItem.showProbs = false;
 
                     // Show package replacement sprite.
                     lineSprite.atlas = TextureUtils.LoadSpriteAtlas("BOB-PropPackSmall");
@@ -262,24 +232,50 @@ namespace BOB
                     lineSprite.Show();
                 }
 
-                // Do we have a replacement?
-                if (hasReplacement)
+                // Did we find a replacement?
+                if (replacementPrefab != null)
                 {
-                    // Yes; append "was" to the display name.
-                    displayText.Append("; ");
-                    displayText.Append(Translations.Translate("BOB_ROW_WAS"));
-                    displayText.Append(" ");
+                    // Replacement prefab found; append name.
+                    displayText.Append(PrefabLists.GetDisplayName(replacementPrefab));
+
+                    // Show current probability in brackets immediately afterwards.
+                    if (thisItem.showProbs)
+                    {
+                        displayText.Append(" (");
+                        displayText.Append(replacementProb);
+                        displayText.Append("%)");
+                    }
+
+                    // Was the prefab replaced?
+                    if (replacementPrefab != thisItem.originalPrefab)
+                    {
+                        // Yes; append "was " and original prefab name to the display name.
+                        displayText.Append("; ");
+                        displayText.Append(Translations.Translate("BOB_ROW_WAS"));
+                        displayText.Append(" ");
+                        displayText.Append(PrefabLists.GetDisplayName(thisItem.originalPrefab));
+                    }
+
+                    // Show original probability in brackets immediately afterwards.
+                    if (thisItem.showProbs)
+                    {
+                        displayText.Append(" (");
+                        displayText.Append(thisItem.originalProb);
+                        displayText.Append("%)");
+                    }
                 }
-
-                // Original prefab display name.
-                displayText.Append(PrefabLists.GetDisplayName(thisItem.originalPrefab));
-
-                // Show original probability in brackets immediately afterwards.
-                if (thisItem.showProbs)
+                else
                 {
-                    displayText.Append(" (");
-                    displayText.Append(thisItem.originalProb);
-                    displayText.Append("%)");
+                    // No replacement found; append orginal prefab name..
+                    displayText.Append(PrefabLists.GetDisplayName(thisItem.originalPrefab));
+
+                    // Show original probability in brackets immediately afterwards.
+                    if (thisItem.showProbs)
+                    {
+                        displayText.Append(" (");
+                        displayText.Append(thisItem.originalProb);
+                        displayText.Append("%)");
+                    }
                 }
 
                 // Set display text.
