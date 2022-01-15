@@ -53,6 +53,7 @@ namespace BOB
             // Add tooltip.
             if (tooltip != null)
             {
+                button.tooltipBox = TooltipUtils.TooltipBox;
                 button.tooltip = tooltip;
             }
 

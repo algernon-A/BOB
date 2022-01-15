@@ -46,6 +46,9 @@ BOB_PNL_PKB,Replacement packs
 BOB_PNL_PRB,Probability
 BOB_PNL_ANG,Angle
 BOB_PNL_OFF,Offset
+BOB_PNL_HEI,Height
+BOB_PNL_CUH,Custom
+BOB_PNL_CUH_TIP,If this is selected then a the specified custom height offset will be used (instead of using the default prop height)
 BOB_PNL_XOF,X
 BOB_PNL_YOF,Y
 BOB_PNL_ZOF,Z
@@ -102,7 +105,7 @@ BOB_PER_LST,Remember previous setting
 BOB_OPT_POS,Remember previous panel position
 BOB_FIL_NAME,Search:
 MES_PAGE,Please refer to the mod's Steam Workshop page for further information.
-BOB_ERR_FAT,"This means that the mod is not able to operate, and has shut down."
+BOB_ERR_FAT,"This means that the mod is not able to operate and has shut down."
 BOB_ERR_HAR,"BOB, the tree and prop replacer, was unable to complete its required Harmony patches."
 ERR_HAR0,Harmony patching error
 ERR_HAR1,Possible causes of this problem include:

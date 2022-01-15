@@ -4,7 +4,7 @@
 - Convert translation framework to CSV (for CrowdIn)
 - Trees no longer have an angle setting (as this is ignored when a random tree rotation mod is active)
 - Increase offset slider range and ensure values are properly updated when outside visible range
-- Improve handling of replacements where the fixed height flag differs between original and replacement
+- Provide ability to change m_fixedHeight flags on building replacements
 - Building and network special flags are now automatically regenerated on replacement
 - Add additional check for invalid savegame data on deserialization
 

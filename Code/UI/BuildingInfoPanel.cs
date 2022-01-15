@@ -79,6 +79,7 @@ namespace BOB
 		// Panel components.
 		private UIPanel subBuildingPanel;
 		private UIFastList subBuildingList;
+		private UICheckBox customHeightCheck;
 
 
 		/// <summary>
@@ -163,6 +164,9 @@ namespace BOB
 				// Ensure valid selections before proceeding.
 				if (CurrentTargetItem != null && currentBuilding != null)
 				{
+					// Set custom height checkbox.
+					customHeightCheck.isChecked = currentBuilding.m_props[IndividualIndex].m_fixedHeight;
+					Logging.Message("setting fixed height check to ", !currentBuilding.m_props[IndividualIndex].m_fixedHeight, " using index ", IndividualIndex);
 
 					// If we've got an individuial building prop replacement, update the offset fields with the replacement values.
 					if (CurrentTargetItem.individualPrefab != null)
@@ -204,6 +208,15 @@ namespace BOB
 		{
 			try
 			{
+				// Fixed height checkbox.
+				customHeightCheck = UIControls.LabelledCheckBox(heightPanel, Margin, FixedHeightY, Translations.Translate("BOB_PNL_CUH"), tooltip: Translations.Translate("BOB_PNL_CUH_TIP"));
+				customHeightCheck.eventCheckChanged += CustomHeightChange;
+
+				// Adjust y-slider position and panel height.
+				ySlider.relativePosition += new Vector3(0f, 20f);
+				ySlider.ValueField.relativePosition += new Vector3(0f, 20f);
+				heightPanel.height = HeightPanelFullHeight;
+
 				// Populate loaded list.
 				LoadedList();
 			}
@@ -329,7 +342,7 @@ namespace BOB
 					{
 						case ReplacementModes.Individual:
 							// Individual replacement.
-							IndividualBuildingReplacement.Instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, CurrentTargetItem.index, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+							IndividualBuildingReplacement.Instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, CurrentTargetItem.index, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, customHeightCheck.isChecked);
 
 							// Update current target.
 							CurrentTargetItem.individualPrefab = ReplacementPrefab;
@@ -338,7 +351,7 @@ namespace BOB
 
 						case ReplacementModes.Grouped:
 							// Grouped replacement.
-							BuildingReplacement.Instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+							BuildingReplacement.Instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, customHeightCheck.isChecked);
 
 							// Update current target.
 							CurrentTargetItem.replacementPrefab = ReplacementPrefab;
@@ -347,7 +360,7 @@ namespace BOB
 
 						case ReplacementModes.All:
 							// All- replacement.
-							AllBuildingReplacement.Instance.Replace(null, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+							AllBuildingReplacement.Instance.Replace(null, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, customHeightCheck.isChecked);
 
 							// Update current target.
 							CurrentTargetItem.allPrefab = ReplacementPrefab;
@@ -641,6 +654,22 @@ namespace BOB
 
 			// Update any dirty building renders.
 			BuildingData.Update();
+		}
+
+
+		/// <summary>
+		/// Custom height checkbox event handler.
+		/// </summary>
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="isChecked">New checked state</param>
+		private void CustomHeightChange(UIComponent control, bool isChecked)
+		{
+			// Show/hide Y position slider based on value.
+			ySlider.isVisible = isChecked;
+			ySlider.ValueField.isVisible = isChecked;
+
+			// Apply change.
+			Apply();
 		}
 
 

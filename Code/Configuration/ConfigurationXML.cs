@@ -237,6 +237,9 @@ namespace BOB
 	/// </summary>
 	public class BOBBuildingReplacement : BOBReplacementBase
 	{
+		[XmlAttribute("customHeight")]
+		public bool customHeight = true;
+
 		[XmlIgnore]
 		public BuildingInfo BuildingInfo => parentInfo as BuildingInfo;
 

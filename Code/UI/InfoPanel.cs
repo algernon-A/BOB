@@ -29,13 +29,17 @@ namespace BOB
 		// Layout constants - detail controls - align bottom with bottom of lists, and work up.
 		private const float SliderHeight = 38f;
 		private const float FieldOffset = SliderHeight + Margin;
-		private const float OffsetPanelBase = ListY + ListHeight;
 		private const float OffsetLabelY = Margin;
 		private const float XOffsetY = OffsetLabelY + 20f;
-		private const float YOffsetY = XOffsetY + SliderHeight;
-		private const float ZOffsetY = YOffsetY + SliderHeight;
+		private const float ZOffsetY = XOffsetY + SliderHeight;
 		private const float OffsetPanelHeight = ZOffsetY + SliderHeight;
-		private const float OffsetPanelY = OffsetPanelBase - OffsetPanelHeight;
+		private const float OffsetPanelY = HeightPanelY - OffsetPanelHeight - Margin;
+		private const float YOffsetY = FixedHeightY + 20f;
+		protected const float FixedHeightY = OffsetLabelY + 20f;
+		private const float HeightPanelBase = ListY + ListHeight;
+		protected const float HeightPanelFullHeight = YOffsetY + SliderHeight;
+		private const float HeightPanelShortHeight = FixedHeightY + SliderHeight;
+		private const float HeightPanelY = HeightPanelBase - HeightPanelFullHeight;
 		protected const float RandomButtonX = MiddleX + ToggleSize;
 		private const float AngleY = OffsetPanelY - FieldOffset;
 		private const float ProbabilityY = AngleY - FieldOffset;
@@ -49,6 +53,7 @@ namespace BOB
 		protected BOBSlider probabilitySlider, angleSlider, xSlider, ySlider, zSlider;
 		private readonly UICheckBox randomCheck;
 		private readonly UICheckBox[] modeChecks = new UICheckBox[(int)ReplacementModes.NumModes];
+		protected UIPanel heightPanel;
 		private UIPanel anglePanel;
 
 		// Status flag.
@@ -110,25 +115,25 @@ namespace BOB
 		/// Sets the current replacement prefab and updates button states accordingly.
 		/// </summary>
 		internal override PrefabInfo ReplacementPrefab
-        {
-            set
-            {
+		{
+			set
+			{
 				base.ReplacementPrefab = value;
 
 				// If not ignoring events and value isn't null, apply live changes.
 				if (!ignoreSelectedPrefabChange && value != null)
-                {
+				{
 					Apply();
-                }
-            }
-        }
+				}
+			}
+		}
 
 
 		/// <summary>
 		/// Current replacement mode.
 		/// </summary>
 		protected ReplacementModes CurrentMode
-        {
+		{
 			get => _currentMode;
 
 			private set
@@ -141,12 +146,12 @@ namespace BOB
 					{
 						RenderOverlays.CurrentBuilding = SelectedBuilding;
 						RenderOverlays.CurrentNet = SelectedNet;
-                    }
+					}
 					else
-                    {
+					{
 						RenderOverlays.CurrentBuilding = null;
 						RenderOverlays.CurrentNet = null;
-                    }
+					}
 				}
 			}
 		}
@@ -163,11 +168,11 @@ namespace BOB
 			{
 				// Replacement mode buttons.
 				for (int i = 0; i < (int)ReplacementModes.NumModes; ++i)
-                {
+				{
 					modeChecks[i] = IconToggleCheck(this, ModeX + (i * ToggleSize), ModeY, IsTree ? TreeModeAtlas[i] : PropModeAtlas[i], IsTree ? TreeModeTipKeys[i] : PropModeTipKeys[i]);
 					modeChecks[i].objectUserData = i;
 					modeChecks[i].eventCheckChanged += ModeCheckChanged;
-                }
+				}
 				// Set initial mode state.
 				modeChecks[(int)CurrentMode].isChecked = true;
 
@@ -199,8 +204,18 @@ namespace BOB
 
 				// Offset sliders.
 				xSlider = AddBOBSlider(offsetPanel, Margin, XOffsetY, MidControlWidth - (Margin * 2f), "BOB_PNL_XOF", -16f, 16f, 0.01f, "X offset");
-				ySlider = AddBOBSlider(offsetPanel, Margin, YOffsetY, MidControlWidth - (Margin * 2f), "BOB_PNL_YOF", -16f, 16f, 0.01f, "Y offset");
 				zSlider = AddBOBSlider(offsetPanel, Margin, ZOffsetY, MidControlWidth - (Margin * 2f), "BOB_PNL_ZOF", -16f, 16f, 0.01f, "Z offset");
+
+				// Height panel.
+				heightPanel = Sliderpanel(this, MidControlX, HeightPanelY, HeightPanelShortHeight);
+				UILabel heightLabel = UIControls.AddLabel(heightPanel, 0f, OffsetLabelY, Translations.Translate("BOB_PNL_HEI"));
+				ySlider = AddBOBSlider(heightPanel, Margin, YOffsetY - 20f, MidControlWidth - (Margin * 2f), "BOB_PNL_YOF", -16f, 16f, 0.01f, "Y offset");
+				while (heightLabel.width > MidControlWidth)
+				{
+					heightLabel.textScale -= 0.05f;
+					heightLabel.PerformLayout();
+				}
+				heightLabel.relativePosition = new Vector2((heightPanel.width - heightLabel.width) / 2f, OffsetLabelY);
 
 				// Live application of position changes.
 				xSlider.eventValueChanged += (control, value) => SliderChange();
@@ -241,23 +256,23 @@ namespace BOB
 		/// <param name="control">Calling component (unused)</param>
 		/// <param name="isChecked">New checked state</param>
 		protected override void TreeCheckChanged(UIComponent control, bool isChecked)
-        {
+		{
 			// Perform the usual required tasks first.
 			base.TreeCheckChanged(control, isChecked);
 
 			// Update mode icons and tooltips to reflect the new tree/prop state.
 			if (isChecked)
-            {
+			{
 				UpdateModeIcons(TreeModeAtlas, TreeModeTipKeys);
-            }
+			}
 			else
-            {
+			{
 				UpdateModeIcons(PropModeAtlas, PropModeTipKeys);
-            }
+			}
 
 			// Don't show angle slider for trees.
 			anglePanel.isVisible = !isChecked;
-        }
+		}
 
 
 		/// <summary>
@@ -266,7 +281,7 @@ namespace BOB
 		/// <param name="atlasNames">Array of atlas names to apply</param>
 		/// <param name="tipKeys">Array of tooltip translation keys to apply</param>
 		private void UpdateModeIcons(string[] atlasNames, string[] tipKeys)
-        {
+		{
 			// Iterate through all mode checks.
 			for (int i = 0; i < (int)ReplacementModes.NumModes; ++i)
 			{
@@ -283,7 +298,7 @@ namespace BOB
 				// Update tooltip.
 				modeChecks[i].tooltip = Translations.Translate(tipKeys[i]);
 			}
-        }
+		}
 
 
 		/// <summary>
@@ -367,7 +382,7 @@ namespace BOB
 		/// </summary>
 		/// <param name="replacement">Replacement record to use</param>
 		protected void SetSliders(BOBReplacementBase replacement)
-        {
+		{
 			// Disable events.
 			ignoreSliderValueChange = true;
 

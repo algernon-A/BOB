@@ -104,7 +104,8 @@ namespace BOB
 		/// <param name="offsetY">Replacment Y position offset</param>
 		/// <param name="offsetZ">Replacment Z position offset</param>
 		/// <param name="probability">Replacement probability</param>
-		internal void Replace(BuildingInfo buildingInfo, PrefabInfo targetInfo, PrefabInfo replacementInfo, int propIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability)
+		/// <param name="customHeight">Replacement custom height flag</param>
+		internal void Replace(BuildingInfo buildingInfo, PrefabInfo targetInfo, PrefabInfo replacementInfo, int propIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability, bool customHeight)
 		{
 			// Make sure that target and replacement are the same type before doing anything.
 			if (targetInfo?.name == null || replacementInfo?.name == null || (targetInfo is TreeInfo && !(replacementInfo is TreeInfo)) || (targetInfo is PropInfo) && !(replacementInfo is PropInfo))
@@ -141,6 +142,7 @@ namespace BOB
 			thisReplacement.offsetY = offsetY;
 			thisReplacement.offsetZ = offsetZ;
 			thisReplacement.probability = probability;
+			thisReplacement.customHeight = customHeight;
 
 			// Record replacement prop.
 			thisReplacement.replacementInfo = replacementInfo;
@@ -446,18 +448,19 @@ namespace BOB
 			if (replacement.replacementInfo is PropInfo propInfo)
 			{
 				propReference.buildingInfo.m_props[propReference.propIndex].m_prop = propInfo;
-				propReference.buildingInfo.m_props[propReference.propIndex].m_fixedHeight = !(propInfo.m_requireHeightMap || propInfo.m_requireWaterMap);
 			}
 			else if (replacement.replacementInfo is TreeInfo treeInfo)
 			{
 				propReference.buildingInfo.m_props[propReference.propIndex].m_tree = treeInfo;
-				propReference.buildingInfo.m_props[propReference.propIndex].m_fixedHeight = true;
 			}
 			else
 			{
 				Logging.Error("invalid replacement ", replacement.replacementInfo?.name ?? "null", " passed to BuildingInfo.ReplaceProp");
 				return;
 			}
+
+			// Set m_fixedHeight.
+			propReference.buildingInfo.m_props[propReference.propIndex].m_fixedHeight = replacement.customHeight;
 
 			// Angle and offset.
 			propReference.buildingInfo.m_props[propReference.propIndex].m_radAngle = propReference.radAngle + ((replacement.angle * Mathf.PI) / 180f);

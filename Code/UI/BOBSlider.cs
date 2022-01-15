@@ -156,7 +156,7 @@ namespace BOB
 			// Get current multiplier.
 			float multiplier = Multiplier;
 
-			// Set current value according to multiplier state, suppressing events first to avoid value clamping, and manuall updating textfield.
+			// Set current value according to multiplier state, suppressing events first to avoid value clamping, and manually updating textfield.
 			suppressEvents = true;
 			TrueValue = trueValue.RoundToNearest(multiplier) + (mouseEvent.wheelDelta * multiplier);
 			ValueField.text = TrueValue.RoundToNearest(multiplier).ToString();
