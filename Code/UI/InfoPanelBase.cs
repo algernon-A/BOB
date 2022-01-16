@@ -319,6 +319,7 @@ namespace BOB
 
 				// Set loaded lists to 'props'.
 				LoadedList();
+				Logging.Message("PropCheckChanged TargetList");
 				TargetList();
 
 				// Set 'no props' label text.
@@ -356,6 +357,7 @@ namespace BOB
 
 				// Set loaded lists to 'trees'.
 				LoadedList();
+				Logging.Message("TreeCheckChanged TargetList");
 				TargetList();
 
 				// Set 'no trees' label text.
@@ -381,36 +383,6 @@ namespace BOB
 		/// <param name="propListItem">Target item</param>
 		protected virtual void UpdateTargetItem(TargetListItem targetListItem)
 		{
-			propCheck.eventCheckChanged += (control, isChecked) =>
-			{
-				if (isChecked)
-				{
-					// Props are now selected - unset tree check.
-					treeCheck.isChecked = false;
-
-					// Reset current items.
-					CurrentTargetItem = null;
-					ReplacementPrefab = null;
-
-					// Set loaded lists to 'props'.
-					LoadedList();
-					TargetList();
-
-					// Set 'no props' label text.
-					noPropsLabel.text = Translations.Translate("BOB_PNL_NOP");
-				}
-				else
-				{
-					// Props are now unselected - set tree check if it isn't already (letting tree check event handler do the work required).
-					if (!treeCheck.isChecked)
-					{
-						treeCheck.isChecked = true;
-					}
-				}
-
-				// Save state.
-				ModSettings.treeSelected = !isChecked;
-			};
 		}
 
 
@@ -551,6 +523,7 @@ namespace BOB
 				SetSortButton(control as UIButton, targetSearchStatus);
 
 			// Regenerate loaded list.
+			Logging.Message("SortTargets TargetList");
 			TargetList();
 		}
 	}

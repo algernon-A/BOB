@@ -63,6 +63,7 @@ namespace BOB
 			treeCheck.isChecked = InitialTreeCheckedState;
 
 			// Populate target list and select target item.
+			Logging.Message("MapPanel SetTarget");
 			TargetList();
 			targetList.FindTargetItem(targetPrefabInfo);
 
