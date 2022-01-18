@@ -12,6 +12,7 @@ namespace BOB
     {
         public Vector3 position;
         public float radius;
+        public float height;
     }
 
 
@@ -57,8 +58,12 @@ namespace BOB
             // Draw circle and effect at each position in list.
             foreach (OverlayData data in overlays)
             {
-                renderManager.OverlayEffect.DrawCircle(cameraInfo, circleColor, data.position, data.radius, -1f, 1280f, false, true);
-                renderManager.OverlayEffect.DrawCircle(cameraInfo, effectColor, data.position, data.radius + effectRadius, -1f, 1280f, false, true);
+                float yPos = data.position.y;
+                float minY = yPos - 1f;
+                float maxY = yPos + data.height + 1f;
+
+                renderManager.OverlayEffect.DrawCircle(cameraInfo, circleColor, data.position, data.radius, minY, maxY, false, true); ;
+                renderManager.OverlayEffect.DrawCircle(cameraInfo, effectColor, data.position, data.radius + effectRadius, minY, maxY + 15f, false, true);
             }
 
             // All done - clear the list.
@@ -77,7 +82,7 @@ namespace BOB
             {
                 // Calculate radius of effect - largest of x and z size of props (minimum of 1 in any case).
                 Vector3 size = prop.m_mesh.bounds.size;
-                overlays.Add(new OverlayData { position = position, radius = Mathf.Max(1f, size.x, size.z) });
+                overlays.Add(new OverlayData { position = position, radius = Mathf.Max(1f, size.x, size.z), height = size.y });
             }
         }
 
@@ -93,7 +98,7 @@ namespace BOB
             {
                 // Calculate radius of effect - largest of x and z size of props (minimum of 1 in any case).
                 Vector3 size = tree.m_mesh.bounds.size;
-                overlays.Add(new OverlayData { position = position, radius = Mathf.Max(1f, size.x, size.z) });
+                overlays.Add(new OverlayData { position = position, radius = Mathf.Max(1f, size.x, size.z), height = size.y });
             }
         }
 
@@ -126,7 +131,7 @@ namespace BOB
                     Vector3 size = prop.m_finalProp.m_mesh.bounds.size;
 
                     // Add to list of overlays to be rendered.
-                    overlays.Add(new OverlayData { position = propLocation, radius = Mathf.Max(1f, size.x, size.z) });
+                    overlays.Add(new OverlayData { position = propLocation, radius = Mathf.Max(1f, size.x, size.z), height = size.y });
                 }
             }
         }
@@ -159,7 +164,7 @@ namespace BOB
             {
                 // Calculate radius of effect - largest of x and z size of props (minimum of 1 in any case).
                 Vector3 size = prop.m_mesh.bounds.size;
-                overlays.Add(new OverlayData { position = position, radius = Mathf.Max(1f, size.x, size.z) });
+                overlays.Add(new OverlayData { position = position, radius = Mathf.Max(1f, size.x, size.z), height = size.y });
             }
         }
 
@@ -175,7 +180,7 @@ namespace BOB
             {
                 // Calculate radius of effect - largest of x and z size of props (minimum of 1 in any case).
                 Vector3 size = tree.m_mesh.bounds.size;
-                overlays.Add(new OverlayData { position = position, radius = Mathf.Max(1f, size.x, size.z) });
+                overlays.Add(new OverlayData { position = position, radius = Mathf.Max(1f, size.x, size.z), height = size.y });
             }
         }
     }

@@ -248,14 +248,14 @@ namespace BOB
 
 
 		/// <summary>
-		/// Toggles the current tool to/from the zoning tool.
+		/// Toggles the current tool to/from the BOB tool.
 		/// </summary>
 		internal static void ToggleTool()
 		{
-			// Activate zoning tool if it isn't already; if already active, deactivate it by selecting the default tool instead.
+			// Activate BOB tool if it isn't already; if already active, deactivate it by selecting the default tool instead.
 			if (!IsActiveTool)
 			{
-				// Activate RON tool.
+				// Activate BOB tool.
 				ToolsModifierControl.toolController.CurrentTool = Instance;
 			}
 			else
