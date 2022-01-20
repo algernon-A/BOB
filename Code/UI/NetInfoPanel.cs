@@ -229,7 +229,7 @@ namespace BOB
 			catch (Exception e)
 			{
 				// Log and report any exception.
-				Logging.LogException(e, "exception applying building replacement");
+				Logging.LogException(e, "exception applying network replacement");
 			}
 		}
 

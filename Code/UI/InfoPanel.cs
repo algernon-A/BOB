@@ -379,9 +379,8 @@ namespace BOB
 					loadedList.Refresh();
 				}
 
-				// Clear selections.
+				// Clear selection.
 				loadedList.selectedIndex = -1;
-				selectedPrefab = null;
 			}
 			else
 			{
