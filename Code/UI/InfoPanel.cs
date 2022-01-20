@@ -322,8 +322,6 @@ namespace BOB
 		/// <param name="mouseEvent">Mouse event (unused)</param>
 		/// </summary>
 		/// 
-
-
 		protected abstract void Apply();
 
 

@@ -174,7 +174,7 @@ namespace BOB
 
 
 		/// <summary>
-		/// Apply button event handler.
+		/// Applies replacement.
 		/// </summary>
 		protected override void Apply()
 		{
