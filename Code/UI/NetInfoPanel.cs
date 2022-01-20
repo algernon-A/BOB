@@ -217,8 +217,9 @@ namespace BOB
 							return;
 					}
 
-					// Update target list.
+					// Update target list and buttons.
 					targetList.Refresh();
+					UpdateButtonStates();
 
 					// Update highlighting target.
 					RenderOverlays.CurrentProp = ReplacementPrefab as PropInfo;

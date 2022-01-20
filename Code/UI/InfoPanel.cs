@@ -231,6 +231,8 @@ namespace BOB
 				// Random settings button.
 				UIButton randomButton = AddIconButton(this, RandomButtonX, ToggleY, ToggleSize, "BOB_PNL_RST", TextureUtils.LoadSpriteAtlas("BOB-Random"));
 				randomButton.eventClicked += (control, clickEvent) => BOBRandomPanel.Create();
+
+				Logging.Message("InfoPanel constructor complete");
 			}
 			catch (Exception e)
 			{
@@ -315,10 +317,13 @@ namespace BOB
 
 
 		/// <summary>
-		/// Apply button event handler.
+		/// Applies replacement.
 		/// <param name="control">Calling component (unused)</param>
 		/// <param name="mouseEvent">Mouse event (unused)</param>
 		/// </summary>
+		/// 
+
+
 		protected abstract void Apply();
 
 
@@ -327,6 +332,17 @@ namespace BOB
 		/// </summary>
 		protected override void UpdateButtonStates()
 		{
+			// Reversion requires a currently active replacement.
+			if (CurrentTargetItem != null && (CurrentTargetItem.replacementPrefab != null || CurrentTargetItem.allPrefab != null || CurrentTargetItem.individualPrefab != null))
+			{
+				revertButton.Enable();
+				revertButton.tooltip = Translations.Translate("BOB_PNL_REV_UND");
+			}
+			else
+			{
+				revertButton.Disable();
+				revertButton.tooltip = Translations.Translate("BOB_PNL_REV_TIP");
+			}
 		}
 
 

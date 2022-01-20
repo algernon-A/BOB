@@ -6,6 +6,7 @@
 - Increase offset slider range and ensure values are properly updated when outside visible range
 - Provide ability to change m_fixedHeight flags on building replacements
 - Building and network special flags are now automatically regenerated on replacement
+- Prop/tree highlighting better shows vertical position of prop/tree
 - Fix occasional hang when toggling between trees and props in map mode
 - Add additional check for invalid savegame data on deserialization
 

@@ -224,7 +224,7 @@ namespace BOB
 				noPropsLabel.Hide();
 
 				// Revert button.
-				revertButton = UIControls.AddSmallerButton(this, MidControlX, RevertButtonY, Translations.Translate("BOB_PNL_REV"), MidControlWidth);
+				revertButton = AddIconButton(this, MidControlX, RevertButtonY, ToggleSize, "BOB_PNL_REV", TextureUtils.LoadSpriteAtlas("BOB-Revert"));
 				revertButton.eventClicked += Revert;
 
 				// Extra functions label.
@@ -237,6 +237,8 @@ namespace BOB
 				// Preview image.
 				previewPanel = AddUIComponent<PreviewPanel>();
 				previewPanel.relativePosition = new Vector2(this.width + Margin, ListY);
+
+				Logging.Message("InfoPanelBase constructor complete");
 			}
 			catch (Exception e)
 			{

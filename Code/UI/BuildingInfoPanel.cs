@@ -341,6 +341,7 @@ namespace BOB
 					switch (CurrentMode)
 					{
 						case ReplacementModes.Individual:
+
 							// Individual replacement.
 							IndividualBuildingReplacement.Instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, CurrentTargetItem.index, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, customHeightCheck.isChecked);
 
@@ -375,8 +376,9 @@ namespace BOB
 					// Update any dirty building renders.
 					BuildingData.Update();
 
-					// Update target list.
+					// Update target list and buttons.
 					targetList.Refresh();
+					UpdateButtonStates();
 
 					// Update highlighting target.
 					RenderOverlays.CurrentProp = ReplacementPrefab as PropInfo;

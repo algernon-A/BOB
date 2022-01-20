@@ -178,6 +178,9 @@
     <Content Include="Resources\BOB-SameTreeSmall.png" />
     <Content Include="Resources\BOB-ThisPropSmall.png" />
     <Content Include="Resources\BOB-ThisTreeSmall.png" />
+    <Content Include="Resources\BOB-Revert.png" />
+    <Content Include="Resources\BOB-HideProp.png" />
+    <Content Include="Resources\BOB-HideTree.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
