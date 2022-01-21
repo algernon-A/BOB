@@ -120,7 +120,16 @@ namespace BOB
                 
                 // Offset building position to account for extensible yards.
                 Vector3 propPosition = prop.m_position;
-                propPosition.z += (building.m_length - building.Info.m_cellLength) * 4f;
+
+                // Allow for yard expansions.
+                if (building.Info.m_expandFrontYard)
+                {
+                    propPosition.z -= (building.m_length - building.Info.m_cellLength) * 4f;
+                }
+                else
+                {
+                    propPosition.z += (building.m_length - building.Info.m_cellLength) * 4f;
+                }
 
                 Vector3 propLocation = m.MultiplyPoint(propPosition);
 
