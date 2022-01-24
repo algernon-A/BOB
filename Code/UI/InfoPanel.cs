@@ -14,7 +14,7 @@ namespace BOB
 		/// <summary>
 		/// Replacement modes.
 		/// </summary>
-		internal enum ReplacementModes
+		internal enum ReplacementModes : int
 		{
 			Individual = 0,
 			Grouped,
@@ -44,13 +44,10 @@ namespace BOB
 		private const float AngleY = OffsetPanelY - FieldOffset;
 		private const float ProbabilityY = AngleY - FieldOffset;
 
-		// Layout constants - detail controls - from top.
-		private const float ReplaceY = ListY;
-		private const float RevertY = ReplaceY + 40f;
-
 
 		// Panel components.
 		protected BOBSlider probabilitySlider, angleSlider, xSlider, ySlider, zSlider;
+		protected UIButton hideButton;
 		private readonly UICheckBox randomCheck;
 		private readonly UICheckBox[] modeChecks = new UICheckBox[(int)ReplacementModes.NumModes];
 		protected UIPanel heightPanel;
@@ -93,12 +90,6 @@ namespace BOB
 
 
 		/// <summary>
-		/// Revert button Y-position.
-		/// </summary>
-		protected override float RevertButtonY => RevertY;
-
-
-		/// <summary>
 		/// Currently selected building.
 		/// </summary>
 		protected BuildingInfo SelectedBuilding => selectedPrefab as BuildingInfo;
@@ -123,7 +114,7 @@ namespace BOB
 				// If not ignoring events and value isn't null, apply live changes.
 				if (!ignoreSelectedPrefabChange && value != null)
 				{
-					Apply();
+					PreviewChange();
 				}
 			}
 		}
@@ -142,13 +133,16 @@ namespace BOB
 				{
 					_currentMode = value;
 
+					// Update render overlays.
 					if (_currentMode == ReplacementModes.Individual || _currentMode == ReplacementModes.Grouped)
 					{
+						// Update render target to specific building/net.
 						RenderOverlays.CurrentBuilding = SelectedBuilding;
 						RenderOverlays.CurrentNet = SelectedNet;
 					}
 					else
 					{
+						// Clear render prefab references to render overlays for all prefabs.
 						RenderOverlays.CurrentBuilding = null;
 						RenderOverlays.CurrentNet = null;
 					}
@@ -180,6 +174,10 @@ namespace BOB
 				float modeRight = ModeX + ((float)ReplacementModes.NumModes * ToggleSize);
 				float modeOffset = (modeRight - Margin - modeLabel.width) / 2f;
 				modeLabel.relativePosition += new Vector3(modeOffset, 0f);
+
+				// Hide button.
+				hideButton = AddIconButton(this, MidControlX + ActionSize + ActionSize, ActionsY, ActionSize, "BOB_PNL_HID", TextureUtils.LoadSpriteAtlas("BOB-InvisibleProp"));
+				hideButton.eventClicked += HideProp;
 
 				// Probability.
 				UIPanel probabilityPanel = Sliderpanel(this, MidControlX, ProbabilityY, SliderHeight);
@@ -232,6 +230,9 @@ namespace BOB
 				UIButton randomButton = AddIconButton(this, RandomButtonX, ToggleY, ToggleSize, "BOB_PNL_RST", TextureUtils.LoadSpriteAtlas("BOB-Random"));
 				randomButton.eventClicked += (control, clickEvent) => BOBRandomPanel.Create();
 
+				// Set initial button states.
+				UpdateButtonStates();
+
 				Logging.Message("InfoPanel constructor complete");
 			}
 			catch (Exception e)
@@ -253,62 +254,14 @@ namespace BOB
 
 
 		/// <summary>
-		/// Tree check event handler.
-		/// </summary>
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="isChecked">New checked state</param>
-		protected override void TreeCheckChanged(UIComponent control, bool isChecked)
-		{
-			// Perform the usual required tasks first.
-			base.TreeCheckChanged(control, isChecked);
-
-			// Update mode icons and tooltips to reflect the new tree/prop state.
-			if (isChecked)
-			{
-				UpdateModeIcons(TreeModeAtlas, TreeModeTipKeys);
-			}
-			else
-			{
-				UpdateModeIcons(PropModeAtlas, PropModeTipKeys);
-			}
-
-			// Don't show angle slider for trees.
-			anglePanel.isVisible = !isChecked;
-		}
-
-
-		/// <summary>
-		/// Updates mode icons and tooltips (when switching between trees and props).
-		/// </summary>
-		/// <param name="atlasNames">Array of atlas names to apply</param>
-		/// <param name="tipKeys">Array of tooltip translation keys to apply</param>
-		private void UpdateModeIcons(string[] atlasNames, string[] tipKeys)
-		{
-			// Iterate through all mode checks.
-			for (int i = 0; i < (int)ReplacementModes.NumModes; ++i)
-			{
-				// Load atlas.
-				UITextureAtlas checkAtlas = TextureUtils.LoadSpriteAtlas(atlasNames[i]);
-
-				// Update unchecked sprite. 
-				UISprite uncheckedSprite = modeChecks[i].Find<UISprite>("UncheckedSprite");
-				uncheckedSprite.atlas = checkAtlas;
-
-				// Update checked sprite.
-				((UISprite)modeChecks[i].checkedBoxObject).atlas = checkAtlas;
-
-				// Update tooltip.
-				modeChecks[i].tooltip = Translations.Translate(tipKeys[i]);
-			}
-		}
-
-
-		/// <summary>
 		/// Sets the target prefab.
 		/// </summary>
 		/// <param name="targetPrefabInfo">Target prefab to set</param>
 		internal override void SetTarget(PrefabInfo targetPrefabInfo)
 		{
+			// First, undo any preview.
+			RevertPreview();
+
 			base.SetTarget(targetPrefabInfo);
 
 			// Title label.
@@ -317,12 +270,45 @@ namespace BOB
 
 
 		/// <summary>
-		/// Applies replacement.
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="mouseEvent">Mouse event (unused)</param>
+		/// Reverts any previewed changes back to original prop/tree state.
 		/// </summary>
-		/// 
-		protected abstract void Apply();
+		protected abstract void RevertPreview();
+
+
+		/// <summary>
+		/// Previews the current change.
+		/// </summary>
+		protected abstract void PreviewChange();
+
+
+		/// <summary>
+		/// Tree check event handler.
+		/// </summary>
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="isChecked">New checked state</param>
+		protected override void TreeCheckChanged(UIComponent control, bool isChecked)
+		{
+			// First, undo any preview.
+			RevertPreview();
+
+			// Perform the usual required tasks first.
+			base.TreeCheckChanged(control, isChecked);
+
+			// Update mode icons and tooltips to reflect the new tree/prop state.
+			if (isChecked)
+			{
+				UpdateModeIcons(TreeModeAtlas, TreeModeTipKeys);
+				hideButton.atlas = TextureUtils.LoadSpriteAtlas("BOB-InvisibleTree");
+			}
+			else
+			{
+				UpdateModeIcons(PropModeAtlas, PropModeTipKeys);
+				hideButton.atlas = TextureUtils.LoadSpriteAtlas("BOB-InvisibleProp");
+			}
+
+			// Don't show angle slider for trees.
+			anglePanel.isVisible = !isChecked;
+		}
 
 
 		/// <summary>
@@ -330,16 +316,33 @@ namespace BOB
 		/// </summary>
 		protected override void UpdateButtonStates()
 		{
-			// Reversion requires a currently active replacement.
-			if (CurrentTargetItem != null && (CurrentTargetItem.replacementPrefab != null || CurrentTargetItem.allPrefab != null || CurrentTargetItem.individualPrefab != null))
+			// Disable by default (selectively (re)-enable if eligible).
+			applyButton.Disable();
+			revertButton.Disable();
+			hideButton.Disable();
+
+			// Buttons are only enabled if a current target item is selected.
+			if (CurrentTargetItem != null)
 			{
-				revertButton.Enable();
-				revertButton.tooltip = Translations.Translate("BOB_PNL_REV_UND");
-			}
-			else
-			{
-				revertButton.Disable();
-				revertButton.tooltip = Translations.Translate("BOB_PNL_REV_TIP");
+				// Replacement requires a valid replacement selection.
+				if (ReplacementPrefab != null)
+				{
+					applyButton.Enable();
+				}
+
+				// Reversion requires a currently active replacement.
+				if (CurrentTargetItem.replacementPrefab != null)
+				{
+					revertButton.Enable();
+					revertButton.tooltip = Translations.Translate("BOB_PNL_REV_UND");
+				}
+				else
+				{
+					revertButton.tooltip = Translations.Translate("BOB_PNL_REV_TIP");
+				}
+
+				// Hide button is enabled whenever there's a valid target item.
+				hideButton.Enable();
 			}
 		}
 
@@ -486,6 +489,35 @@ namespace BOB
 
 
 		/// <summary>
+		/// Updates mode icons and tooltips (when switching between trees and props).
+		/// </summary>
+		/// <param name="atlasNames">Array of atlas names to apply</param>
+		/// <param name="tipKeys">Array of tooltip translation keys to apply</param>
+		private void UpdateModeIcons(string[] atlasNames, string[] tipKeys)
+		{
+			// Iterate through all mode checks.
+			for (int i = 0; i < (int)ReplacementModes.NumModes; ++i)
+			{
+				// Load atlas.
+				UITextureAtlas checkAtlas = TextureUtils.LoadSpriteAtlas(atlasNames[i]);
+
+				// Update unchecked sprite. 
+				UISprite uncheckedSprite = modeChecks[i].Find<UISprite>("UncheckedSprite");
+				uncheckedSprite.atlas = checkAtlas;
+
+				// Update checked sprite.
+				((UISprite)modeChecks[i].checkedBoxObject).atlas = checkAtlas;
+
+				// Update tooltip.
+				modeChecks[i].tooltip = Translations.Translate(tipKeys[i]);
+
+				// Update apply button icon.
+
+			}
+		}
+
+
+		/// <summary>
 		/// Event handler for applying live changes on slider value change.
 		/// </summary>
 		private void SliderChange()
@@ -495,7 +527,7 @@ namespace BOB
 			{
 				// Disable events while applying changes.
 				ignoreSliderValueChange = true;
-				Apply();
+				PreviewChange();
 				ignoreSliderValueChange = false;
 			}
 		}
@@ -511,6 +543,14 @@ namespace BOB
 			// Regenerate loaded list.
 			LoadedList();
 		}
+
+
+		/// <summary>
+		/// Hides the selected prop/tree.
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="clickEvent">Mouse click event (unused)</param>
+		/// </summary>
+		private void HideProp(UIComponent control, UIMouseEventParameter clickevent) => probabilitySlider.TrueValue = 0f;
 
 
 		/// <summary>

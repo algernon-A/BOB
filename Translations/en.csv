@@ -14,7 +14,7 @@ BOB_PNL_TRE,Trees
 BOB_PNL_PRP,Props
 BOB_PNL_IND,REMOVE Show individual props
 BOB_PNL_HDV,Hide vanilla
-BOB_PNL_REP,Replace
+BOB_PNL_ACT,Actions
 BOB_PNL_MOD,Replacement mode
 BOB_PNL_FUN,Extra functions
 BOB_PNL_M_PIB,Individual props in these buildings
@@ -38,10 +38,11 @@ BOB_PNL_RTP,Map props
 BOB_PNL_RSW,Show random
 BOB_PNL_RST,Random setup
 BOB_PNL_SCA,Prop and tree scaling
-BOB_PNL_APP,Apply
+BOB_PNL_APP,Apply and save changes
 BOB_PNL_REV,Revert
 BOB_PNL_REV_UND,Undo the selected replacement
 BOB_PNL_REV_TIP,Revert is not available as there is no active replacement for this item
+BOB_PNL_HID,Hide this item (sets probability to zero)
 BOB_PNL_PKB,Replacement packs
 BOB_PNL_PRB,Probability
 BOB_PNL_ANG,Angle
@@ -135,8 +136,10 @@ BOB_UPD_062_2,Fix network prop angles sometimes being incorrectly displayed on s
 BOB_UPD_080_0,Add individual network prop replacement
 BOB_UPD_080_1,Add Unified UI (UUI) button
 BOB_UPD_086_0,Add option to make wires in networks (power lines and railway catenaries) more realistically sized
-BOB_UPD_090_0,Change to User Interface: replacment now happens in real-time (no more dedicated 'apply' buttons), with new mode buttons to select the desired replacement mode
-BOB_UPD_090_1,Translation framework has been updated to use CrowdIn
-BOB_UPD_090_2,Trees no longer have an angle setting, as this will always be overridden by any mod implementing random tree rotation
-BOB_UPD_090_3,Improve handling of props with special attributes
-BOB_UPD_090_4,Other minor improvements
+BOB_UPD_090_0,Changes are now previewed in real-time
+BOB_UPD_090_1,Change to User Interface: choose between replacement modes before applying changes
+BOB_UPD_090_2,Change to User Interface: a dedicated 'hide' button to automatically set probabilities to zero
+BOB_UPD_090_3,Translation framework has been updated to use CrowdIn
+BOB_UPD_090_4,Trees no longer have an angle setting, as this will always be overridden by any mod implementing random tree rotation
+BOB_UPD_090_5,Improve handling of props with special attributes
+BOB_UPD_090_6,Other minor UI and functional improvements

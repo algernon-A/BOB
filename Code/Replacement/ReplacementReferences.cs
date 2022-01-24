@@ -6,8 +6,8 @@ namespace BOB
 	// Records original prop/tree data.
 	public class PropReference
     {
-		public PropInfo originalProp;
-		public TreeInfo originalTree;
+		public PropInfo originalProp, originalFinalProp;
+		public TreeInfo originalTree, originalFinalTree;
 		public bool isTree;
 		public int propIndex;
 		public Vector3 position;

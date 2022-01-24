@@ -24,7 +24,9 @@ namespace BOB
                     "BOB_UPD_090_1",
                     "BOB_UPD_090_2",
                     "BOB_UPD_090_3",
-                    "BOB_UPD_090_4"
+                    "BOB_UPD_090_4",
+                    "BOB_UPD_090_5",
+                    "BOB_UPD_090_6"
                 }
             },new WhatsNewMessage
             {

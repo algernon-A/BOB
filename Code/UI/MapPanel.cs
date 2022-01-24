@@ -14,15 +14,6 @@ namespace BOB
 	/// </summary>
 	internal class BOBMapInfoPanel : BOBInfoPanelBase
 	{
-		// Component locations.
-		private const float ReplaceLabelY = ListY;
-		private const float ReplaceY = ReplaceLabelY + 25f;
-		private const float RevertY = ReplaceY + 75f;
-
-
-		// Button labels.
-		private string ReplaceTooltipKey => IsTree ? "BOB_PNL_RTT" : "BOB_PNL_RTP";
-
 		/// <summary>
 		// Current tree/prop state.
 		/// </summary>
@@ -33,12 +24,6 @@ namespace BOB
 		// Initial tree/prop checked state.
 		/// </summary>
 		protected override bool InitialTreeCheckedState => selectedPrefab is TreeInfo;
-
-
-		/// <summary>
-		/// Revert button Y-position.
-		/// </summary>
-		protected override float RevertButtonY => RevertY;
 
 
 		/// <summary>
@@ -53,11 +38,6 @@ namespace BOB
 			// Title label.
 			SetTitle(Translations.Translate("BOB_NAM"));
 
-			// Replace text label.
-			UILabel replaceLabel = AddUIComponent<UILabel>();
-			replaceLabel.text = Translations.Translate("BOB_PNL_REP");
-			replaceLabel.relativePosition = new Vector2(MidControlX, ReplaceLabelY);
-
 			// Set trees/props.
 			propCheck.isChecked = !InitialTreeCheckedState;
 			treeCheck.isChecked = InitialTreeCheckedState;
@@ -66,9 +46,6 @@ namespace BOB
 			Logging.Message("MapPanel SetTarget");
 			TargetList();
 			targetList.FindTargetItem(targetPrefabInfo);
-
-			// Update button states.
-			UpdateButtonStates();
 
 			// Apply Harmony rendering patches.
 			Patcher.PatchMapOverlays(true);
@@ -82,12 +59,11 @@ namespace BOB
         {
 			try
 			{
-				// Replace button.
-				replaceButton = AddIconButton(this, MidControlX, ReplaceY, BigIconSize, ReplaceTooltipKey, TextureUtils.LoadSpriteAtlas("BOB-Trees"));
-				replaceButton.eventClicked += Replace;
-
 				// Populate loaded list.
 				LoadedList();
+
+				// Set initial button states.
+				UpdateButtonStates();
 			}
 			catch (Exception e)
 			{
@@ -98,11 +74,11 @@ namespace BOB
 
 
 		/// <summary>
-		/// Replace button event handler.
+		/// Apply button event handler.
 		/// <param name="control">Calling component (unused)</param>
 		/// <param name="mouseEvent">Mouse event (unused)</param>
 		/// </summary>
-		private void Replace(UIComponent control, UIMouseEventParameter mouseEvent)
+		protected override void Apply(UIComponent control, UIMouseEventParameter mouseEvent)
 		{
 			try
 			{
@@ -168,27 +144,12 @@ namespace BOB
 
 
 		/// <summary>
-		/// Prop check event handler.
-		/// </summary>
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="isChecked">New checked state</param>
-		protected override void PropCheckChanged(UIComponent control, bool isChecked)
-		{
-			base.PropCheckChanged(control, isChecked);
-
-			// Toggle replace button atlas.
-			replaceButton.atlas = isChecked ? TextureUtils.LoadSpriteAtlas("BOB-Props") : TextureUtils.LoadSpriteAtlas("BOB-Trees");
-			replaceButton.tooltip = Translations.Translate(ReplaceTooltipKey);
-		}
-
-
-		/// <summary>
 		/// Updates button states (enabled/disabled) according to current control states.
 		/// </summary>
 		protected override void UpdateButtonStates()
 		{
 			// Disable by default (selectively (re)-enable if eligible).
-			replaceButton.Disable();
+			applyButton.Disable();
 			revertButton.Disable();
 
 			// Buttons are only enabled if a current target item is selected.
@@ -197,7 +158,7 @@ namespace BOB
 				// Replacement requires a valid replacement selection.
 				if (ReplacementPrefab != null)
 				{
-					replaceButton.Enable();
+					applyButton.Enable();
 				}
 
 				// Reversion requires a currently active replacement.

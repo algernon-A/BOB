@@ -72,6 +72,9 @@ namespace BOB
 		// Current selection reference.
 		private BuildingInfo currentBuilding;
 
+		// Original selection values.
+		private BuildingPropReference[] originalValues;
+
 		// Sub-buildings.
 		private BuildingInfo[] subBuildings;
 		internal string[] SubBuildingNames { get; private set; }
@@ -156,17 +159,22 @@ namespace BOB
 		{
 			set
 			{
+				// First, undo any preview.
+				RevertPreview();
+
 				// Call base, while ignoring replacement prefab change live application.
 				ignoreSelectedPrefabChange = true;
 				base.CurrentTargetItem = value;
 				ignoreSelectedPrefabChange = false;
+
+				// Record original stats for preview.
+				RecordOriginal();
 
 				// Ensure valid selections before proceeding.
 				if (CurrentTargetItem != null && currentBuilding != null)
 				{
 					// Set custom height checkbox.
 					customHeightCheck.isChecked = currentBuilding.m_props[IndividualIndex].m_fixedHeight;
-					Logging.Message("setting fixed height check to ", !currentBuilding.m_props[IndividualIndex].m_fixedHeight, " using index ", IndividualIndex);
 
 					// If we've got an individuial building prop replacement, update the offset fields with the replacement values.
 					if (CurrentTargetItem.individualPrefab != null)
@@ -329,10 +337,43 @@ namespace BOB
 
 
 		/// <summary>
-		/// Apply button event handler.
+		/// Previews the current change.
 		/// </summary>
-		protected override void Apply()
+		protected override void PreviewChange()
 		{
+			// Don't do anything if no current selection.
+			if (CurrentTargetItem == null)
+            {
+				return;
+            }
+
+			// Grouped or individual replacement?
+			if (CurrentTargetItem.index < 0)
+			{
+				// Grouped; iterate through each index and apply preview.
+				for (int i = 0; i < CurrentTargetItem.indexes.Count; ++i)
+				{
+					PreviewChange(CurrentTargetItem.indexes[i]);
+				}
+			}
+			else
+            {
+				// Individual; apply preview.
+				PreviewChange(CurrentTargetItem.index);
+            }
+		}
+
+
+		/// <summary>
+		/// Apply button event handler.
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="mouseEvent">Mouse event (unused)</param>
+		/// </summary>
+		protected override void Apply(UIComponent control, UIMouseEventParameter mouseEvent)
+		{
+			// First, undo any preview.
+			RevertPreview();
+
 			try
 			{
 				// Make sure we have valid a target and replacement.
@@ -400,6 +441,9 @@ namespace BOB
 		/// </summary>
 		protected override void Revert(UIComponent control, UIMouseEventParameter mouseEvent)
 		{
+			// First, undo any preview.
+			RevertPreview();
+
 			try
 			{
 				// Make sure we've got a valid selection.
@@ -671,7 +715,7 @@ namespace BOB
 			ySlider.ValueField.isVisible = isChecked;
 
 			// Apply change.
-			Apply();
+			PreviewChange();
 		}
 
 
@@ -733,6 +777,135 @@ namespace BOB
 				// Regenerate target list.
 				TargetList();
 			}
+		}
+
+
+		/// <summary>
+		/// Record original prop values before previewing.
+		/// </summary>
+		private void RecordOriginal()
+		{
+			// Do we have a valid selection?
+			if (CurrentTargetItem?.originalPrefab != null)
+			{
+				// Create new array of original values.
+				originalValues = new BuildingPropReference[CurrentTargetItem.index < 0 ? CurrentTargetItem.indexes.Count() : 1];
+
+				if (CurrentTargetItem.index < 0)
+				{
+					// Grouped replacement - iterate through each instance and record values.
+					for (int i = 0; i < originalValues.Length; ++i)
+					{
+						originalValues[i] = GetOriginalData(CurrentTargetItem.indexes[i]);
+					}
+				}
+				else
+				{
+					// Individual replacement - record original values.
+					originalValues[0] = GetOriginalData(CurrentTargetItem.index);
+				}
+			}
+			else
+			{
+				// No valid selection - clear any stored original values.
+				originalValues = null;
+			}
+		}
+
+
+		/// <summary>
+		/// Reverts any previewed changes back to original prop/tree state.
+		/// </summary>
+		protected override void RevertPreview()
+		{
+			// Make sure that we've got valid original values to revert to.
+			if (originalValues != null && originalValues.Length > 0)
+			{
+				// Iterate through each original value.
+				for (int i = 0; i < originalValues.Length; ++i)
+				{
+					// Local reference.
+					BuildingInfo.Prop thisProp = SelectedBuilding.m_props[originalValues[i].propIndex];
+
+					// Restore original values.
+					thisProp.m_prop = originalValues[i].originalProp;
+					thisProp.m_finalProp = originalValues[i].originalFinalProp;
+					thisProp.m_tree = originalValues[i].originalTree;
+					thisProp.m_finalTree = originalValues[i].originalFinalTree;
+					thisProp.m_radAngle = originalValues[i].radAngle;
+					thisProp.m_position = originalValues[i].position;
+					thisProp.m_probability = originalValues[i].probability;
+					thisProp.m_fixedHeight = originalValues[i].fixedHeight;
+				}
+			}
+
+			// Clear recorded values.
+			originalValues = null;
+		}
+
+
+		/// <summary>
+		/// Previews the change for the given prop index.
+		/// </summary>
+		/// <param name="index">Prop index</param>
+		private void PreviewChange(int index)
+		{
+			// Original position.
+			Vector3 originalPos = new Vector3();
+
+			// Find matching prop reference (by index match) in original values.
+			foreach (BuildingPropReference propReference in originalValues)
+			{
+				if (propReference.propIndex == index)
+				{
+					// Found a match - retrieve original position.
+					originalPos = propReference.position;
+					break;
+				}
+			}
+
+			// Local reference.
+			BuildingInfo.Prop thisProp = SelectedBuilding.m_props[index];
+
+			// Preview new position, probability, and fixed height setting.
+			thisProp.m_position = originalPos + new Vector3(xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue);
+			thisProp.m_probability = (int)probabilitySlider.TrueValue;
+			thisProp.m_fixedHeight = customHeightCheck.isChecked;
+
+			// If a replacement prefab has been selected, then update it too.
+			if (ReplacementPrefab != null)
+			{
+				thisProp.m_prop = ReplacementPrefab as PropInfo;
+				thisProp.m_tree = ReplacementPrefab as TreeInfo;
+				thisProp.m_finalProp = ReplacementPrefab as PropInfo;
+				thisProp.m_finalTree = ReplacementPrefab as TreeInfo;
+			}
+		}
+
+
+		/// <summary>
+		/// Gets original (current) prop data.
+		/// </summary>
+		/// <param name="index">Prop index</param>
+		/// <returns>Original prop data</returns>
+		private BuildingPropReference GetOriginalData(int index)
+		{
+			// Local reference.
+			BuildingInfo.Prop thisProp = SelectedBuilding.m_props[index];
+			
+			// Return original data.
+			return new BuildingPropReference
+			{
+				propIndex = index,
+				originalProp = thisProp.m_prop,
+				originalTree = thisProp.m_tree,
+				originalFinalProp = thisProp.m_finalProp,
+				originalFinalTree = thisProp.m_finalTree,
+				radAngle = thisProp.m_radAngle,
+				position = thisProp.m_position,
+				probability = thisProp.m_probability,
+				fixedHeight = thisProp.m_fixedHeight
+			};
 		}
 	}
 }

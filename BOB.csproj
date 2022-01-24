@@ -181,6 +181,10 @@
     <Content Include="Resources\BOB-Revert.png" />
     <Content Include="Resources\BOB-HideProp.png" />
     <Content Include="Resources\BOB-HideTree.png" />
+    <Content Include="Resources\BOB-OkSmall.png" />
+    <Content Include="Resources\BOB-InvisibleProp.png" />
+    <Content Include="Resources\BOB-InvisibleTree.png" />
+    <Content Include="Resources\BOB-OkSmallWarn.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

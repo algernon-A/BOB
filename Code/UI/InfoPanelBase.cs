@@ -13,18 +13,23 @@ namespace BOB
 	internal abstract class BOBInfoPanelBase : BOBPanelBase
 	{
 		// Layout constants - X.
-		protected const float LeftWidth = 400f;
-		protected const float MidControlWidth = 128f;
+		private const float LeftWidth = 400f;
+		protected const float MidControlWidth = ActionSize * 3f;
 		protected const float MiddleX = LeftWidth + Margin;
-		protected const float MiddleWidth = MidControlWidth + (Margin * 2f);
+		private const float MiddleWidth = MidControlWidth + (Margin * 2f);
 		protected const float MidControlX = MiddleX + Margin;
-		protected const float RightX = MiddleX + MiddleWidth;
-		protected const float RightWidth = 320f;
+		private const float RightX = MiddleX + MiddleWidth;
+		private const float RightWidth = 320f;
 
 		// Layout constants - Y.
 		protected const float ListY = FilterY + FilterHeight;
 		protected const float ListHeight = UIPropRow.RowHeight * 16f;
-		protected const float BigIconSize = 64f;
+		protected const float ActionsY = ListY;
+		protected const float ActionHeaderY = ActionsY - 15f;
+
+		// Layout constants - sizes.
+		protected const float ActionSize = 48f;
+
 
 		// Current selections.
 		protected PrefabInfo selectedPrefab;
@@ -32,7 +37,7 @@ namespace BOB
 		private PrefabInfo replacementPrefab;
 
 		// Panel components.
-		protected UIButton replaceButton;
+		protected UIButton applyButton;
 		protected UIPanel rightPanel;
 		protected UIFastList targetList, loadedList;
 		protected UILabel noPropsLabel;
@@ -68,23 +73,16 @@ namespace BOB
 
 
 		/// <summary>
-		/// Revert button Y-position.
-		/// </summary>
-		protected abstract float RevertButtonY { get; }
-
-
-		/// <summary>
 		/// Returns the current individual index number of the current selection.  This could be either the direct index or in the index array, depending on situation.
 		/// </summary>
 		protected int IndividualIndex => CurrentTargetItem.index < 0 ? CurrentTargetItem.indexes[0] : CurrentTargetItem.index;
-
 
 
 		/// <summary>
 		/// Checks for and displays any exception message.
 		/// Called by the game every update cycle.
 		/// </summary>
-        public override void Update()
+		public override void Update()
         {
             base.Update();
 
@@ -223,8 +221,15 @@ namespace BOB
 				noPropsLabel.relativePosition = new Vector2(Margin, Margin);
 				noPropsLabel.Hide();
 
+				// Actions text label.
+				UILabel actionsLabel = UIControls.AddLabel(this, MidControlX, ActionHeaderY, Translations.Translate("BOB_PNL_ACT"), textScale: 0.8f);
+
+				// Apply button.
+				applyButton = AddIconButton(this, MidControlX, ActionsY, ActionSize, "BOB_PNL_APP", TextureUtils.LoadSpriteAtlas("BOB-OkSmall"));
+				applyButton.eventClicked += Apply;
+
 				// Revert button.
-				revertButton = AddIconButton(this, MidControlX, RevertButtonY, ToggleSize, "BOB_PNL_REV", TextureUtils.LoadSpriteAtlas("BOB-Revert"));
+				revertButton = AddIconButton(this, MidControlX + ActionSize, ActionsY, ActionSize, "BOB_PNL_REV", TextureUtils.LoadSpriteAtlas("BOB-Revert"));
 				revertButton.eventClicked += Revert;
 
 				// Extra functions label.
@@ -264,6 +269,9 @@ namespace BOB
 				CurrentTargetItem = null;
 				targetList.listPosition = 0;
 				targetList.selectedIndex = -1;
+
+				// Update button states.
+				UpdateButtonStates();
 			}
 		}
 
@@ -289,6 +297,14 @@ namespace BOB
 
 
 		/// <summary>
+		/// Apply button event handler.
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="mouseEvent">Mouse event (unused)</param>
+		/// </summary>
+		protected abstract void Apply(UIComponent control, UIMouseEventParameter mouseEvent);
+
+
+		/// <summary>
 		/// Revert button event handler.
 		/// <param name="control">Calling component (unused)</param>
 		/// <param name="mouseEvent">Mouse event (unused)</param>
@@ -300,7 +316,6 @@ namespace BOB
 		/// Close button event handler.
 		/// </summary>
 		protected override void CloseEvent() => InfoPanelManager.Close();
-
 
 
 		/// <summary>
@@ -321,7 +336,6 @@ namespace BOB
 
 				// Set loaded lists to 'props'.
 				LoadedList();
-				Logging.Message("PropCheckChanged TargetList");
 				TargetList();
 
 				// Set 'no props' label text.
@@ -338,6 +352,9 @@ namespace BOB
 
 			// Save state.
 			ModSettings.treeSelected = !isChecked;
+
+			// Update button states.
+			UpdateButtonStates();
 		}
 
 
@@ -359,7 +376,6 @@ namespace BOB
 
 				// Set loaded lists to 'trees'.
 				LoadedList();
-				Logging.Message("TreeCheckChanged TargetList");
 				TargetList();
 
 				// Set 'no trees' label text.
@@ -376,6 +392,9 @@ namespace BOB
 
 			// Save state.
 			ModSettings.treeSelected = isChecked;
+
+			// Update button states.
+			UpdateButtonStates();
 		}
 
 
@@ -525,7 +544,6 @@ namespace BOB
 				SetSortButton(control as UIButton, targetSearchStatus);
 
 			// Regenerate loaded list.
-			Logging.Message("SortTargets TargetList");
 			TargetList();
 		}
 	}
