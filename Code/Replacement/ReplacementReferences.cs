@@ -10,7 +10,7 @@ namespace BOB
 		public TreeInfo originalTree, originalFinalTree;
 		public bool isTree;
 		public int propIndex;
-		public Vector3 position;
+		public Vector3 position, adjustment;
 		public int probability;
 
 

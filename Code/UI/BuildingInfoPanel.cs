@@ -871,7 +871,7 @@ namespace BOB
 		private void PreviewChange(int index)
 		{
 			// Original position.
-			Vector3 originalPos = new Vector3();
+			Vector3 basePosition = new Vector3();
 
 			// Find matching prop reference (by index match) in original values.
 			foreach (BuildingPropReference propReference in originalValues)
@@ -879,7 +879,7 @@ namespace BOB
 				if (propReference.propIndex == index)
 				{
 					// Found a match - retrieve original position.
-					originalPos = propReference.position;
+					basePosition = propReference.position - propReference.adjustment;
 					break;
 				}
 			}
@@ -888,7 +888,7 @@ namespace BOB
 			BuildingInfo.Prop thisProp = SelectedBuilding.m_props[index];
 
 			// Preview new position, probability, and fixed height setting.
-			thisProp.m_position = originalPos + new Vector3(xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue);
+			thisProp.m_position = basePosition + new Vector3(xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue);
 			thisProp.m_probability = (int)probabilitySlider.TrueValue;
 			thisProp.m_fixedHeight = customHeightCheck.isChecked;
 
@@ -909,23 +909,48 @@ namespace BOB
 		/// <summary>
 		/// Gets original (current) prop data.
 		/// </summary>
-		/// <param name="index">Prop index</param>
+		/// <param name="propIndex">Prop index</param>
 		/// <returns>Original prop data</returns>
-		private BuildingPropReference GetOriginalData(int index)
+		private BuildingPropReference GetOriginalData(int propIndex)
 		{
 			// Local reference.
-			BuildingInfo.Prop thisProp = SelectedBuilding.m_props[index];
-			
+			BuildingInfo.Prop thisProp = SelectedBuilding.m_props[propIndex];
+
+			// Get any position adjustments from active replacements, checking in priority order.
+			Vector3 adjustment = Vector3.zero;
+			if (IndividualBuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex) is BOBBuildingReplacement individualReplacement)
+			{
+				// Individual replacement.
+				adjustment.x = individualReplacement.offsetX;
+				adjustment.y = individualReplacement.offsetY;
+				adjustment.z = individualReplacement.offsetZ;
+			}
+			else if (BuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex) is BOBBuildingReplacement buildingReplacement)
+			{
+				// Grouped replacement.
+				adjustment.x = buildingReplacement.offsetX;
+				adjustment.y = buildingReplacement.offsetY;
+				adjustment.z = buildingReplacement.offsetZ;
+			}
+			else if (AllBuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex) is BOBBuildingReplacement allBuildingReplacement)
+			{
+				// All- replacement.
+				adjustment.x = allBuildingReplacement.offsetX;
+				adjustment.y = allBuildingReplacement.offsetY;
+				adjustment.z = allBuildingReplacement.offsetZ;
+			}
+
 			// Return original data.
 			return new BuildingPropReference
 			{
-				propIndex = index,
+				propIndex = propIndex,
 				originalProp = thisProp.m_prop,
 				originalTree = thisProp.m_tree,
 				originalFinalProp = thisProp.m_finalProp,
 				originalFinalTree = thisProp.m_finalTree,
 				radAngle = thisProp.m_radAngle,
 				position = thisProp.m_position,
+				adjustment = adjustment,
 				probability = thisProp.m_probability,
 				fixedHeight = thisProp.m_fixedHeight
 			};

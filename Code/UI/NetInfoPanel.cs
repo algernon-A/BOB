@@ -366,6 +366,10 @@ namespace BOB
 			if (UnappliedChanges)
 			{
 				RevertPreview();
+
+				// Reset slider values by reassigning the current target item.
+				CurrentTargetItem = CurrentTargetItem;
+
 				return;
 			}
 
@@ -701,7 +705,7 @@ namespace BOB
 		private void PreviewChange(int lane, int index)
 		{
 			// Original position.
-			Vector3 originalPos = new Vector3();
+			Vector3 basePosition = new Vector3();
 
 			// Find matching prop reference (by lane and index match) in original values.
 			foreach (NetPropReference propReference in originalValues)
@@ -709,7 +713,7 @@ namespace BOB
 				if (propReference.laneIndex == lane && propReference.propIndex == index)
 				{
 					// Found a match - retrieve original position.
-					originalPos = propReference.position;
+					basePosition = propReference.position - propReference.adjustment;
 					break;
 				}
 			}
@@ -718,7 +722,7 @@ namespace BOB
 			NetLaneProps.Prop thisProp = SelectedNet.m_lanes[lane].m_laneProps.m_props[index];
 
 			// Preview new position and probability setting.
-			thisProp.m_position = originalPos + new Vector3(xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue);
+			thisProp.m_position = basePosition + new Vector3(xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue);
 			thisProp.m_probability = (int)probabilitySlider.TrueValue;
 
 			// If a replacement prefab has been selected, then update it too.
@@ -739,24 +743,49 @@ namespace BOB
 		/// Gets original (current) prop data.
 		/// </summary>
 		/// <param name="lane">Lane index</param>
-		/// <param name="index">Prop index</param>
+		/// <param name="propIndex">Prop index</param>
 		/// <returns>Original prop data</returns>
-		private NetPropReference GetOriginalData(int lane, int index)
+		private NetPropReference GetOriginalData(int lane, int propIndex)
 		{
 			// Local reference.
-			NetLaneProps.Prop thisProp = SelectedNet.m_lanes[lane].m_laneProps.m_props[index];
+			NetLaneProps.Prop thisProp = SelectedNet.m_lanes[lane].m_laneProps.m_props[propIndex];
+
+			// Get any position adjustments from active replacements, checking in priority order.
+			Vector3 adjustment = Vector3.zero;
+			if (IndividualNetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex) is BOBNetReplacement individualReplacement)
+			{
+				// Individual replacement.
+				adjustment.x = individualReplacement.offsetX;
+				adjustment.y = individualReplacement.offsetY;
+				adjustment.z = individualReplacement.offsetZ;
+			}
+			else if (NetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex) is BOBNetReplacement netReplacement)
+			{
+				// Grouped replacement.
+				adjustment.x = netReplacement.offsetX;
+				adjustment.y = netReplacement.offsetY;
+				adjustment.z = netReplacement.offsetZ;
+			}
+			else if (AllNetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex) is BOBNetReplacement allNetReplacement)
+			{
+				// All- replacement.
+				adjustment.x = allNetReplacement.offsetX;
+				adjustment.y = allNetReplacement.offsetY;
+				adjustment.z = allNetReplacement.offsetZ;
+			}
 
 			// Return original data.
 			return new NetPropReference
 			{
 				laneIndex = lane,
-				propIndex = index,
+				propIndex = propIndex,
 				originalProp = thisProp.m_prop,
 				originalTree = thisProp.m_tree,
 				originalFinalProp = thisProp.m_finalProp,
 				originalFinalTree = thisProp.m_finalTree,
 				angle = thisProp.m_angle,
 				position = thisProp.m_position,
+				adjustment = adjustment,
 				probability = thisProp.m_probability
 			};
 		}
