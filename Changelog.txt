@@ -1,5 +1,6 @@
 ﻿Version 0.9 -
 
+- Compatible with game version 1.14 (Airports)
 - Reconfigure UI for replacement in real-time
 - Convert translation framework to CSV (for CrowdIn)
 - Trees no longer have an angle setting (as this is ignored when a random tree rotation mod is active)
