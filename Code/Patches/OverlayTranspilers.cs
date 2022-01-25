@@ -112,7 +112,7 @@ namespace BOB
             const int PropVarIndex = 16;
             const int PropPositionVarIndex = 23;
             const int TreeVarIndex = 31;
-            const int TreePositionVarIndex = 38;
+            const int TreePositionVarIndex = 39;
 
             // ILCode argument indexes.
             const int LaneInfoArg = 4;
