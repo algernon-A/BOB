@@ -399,6 +399,8 @@ namespace BOB
 		/// <param name="replacement">Replacement record to use</param>
 		protected void SetSliders(BOBReplacementBase replacement)
 		{
+			Logging.Message("Setting sliders");
+
 			// Disable events.
 			ignoreSliderValueChange = true;
 

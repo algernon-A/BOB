@@ -219,6 +219,26 @@ namespace BOB
 		/// </summary>
 		protected override void PreviewChange()
 		{
+			// Don't do anything if no current selection.
+			if (CurrentTargetItem == null)
+			{
+				return;
+			}
+
+			// Don't do anything if no changes.
+			if (xSlider.value == 0f &&
+				ySlider.value == 0f &&
+				zSlider.value == 0f &&
+				angleSlider.value == 0f &&
+				probabilitySlider.value.RoundToNearest(1) == CurrentTargetItem.originalProb &&
+				ReplacementPrefab == CurrentTargetItem.originalPrefab)
+			{
+				// Reset apply button icon.
+				applyButton.atlas = TextureUtils.LoadSpriteAtlas("BOB-OkSmall");
+
+				return;
+			}
+
 			// Grouped or individual replacement?
 			if (CurrentTargetItem.index < 0)
 			{
@@ -263,6 +283,9 @@ namespace BOB
 
 			// Clear recorded values.
 			originalValues = null;
+
+			// Reset apply button icon
+			applyButton.atlas = TextureUtils.LoadSpriteAtlas("BOB-OkSmall");
 		}
 
 
@@ -699,6 +722,9 @@ namespace BOB
 				thisProp.m_finalProp = ReplacementPrefab as PropInfo;
 				thisProp.m_finalTree = ReplacementPrefab as TreeInfo;
 			}
+
+			// Update apply button icon to indicate change.
+			applyButton.atlas = TextureUtils.LoadSpriteAtlas("BOB-OkSmallWarn");
 		}
 
 
