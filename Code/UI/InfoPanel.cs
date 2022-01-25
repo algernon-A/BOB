@@ -101,6 +101,30 @@ namespace BOB
 		protected NetInfo SelectedNet => selectedPrefab as NetInfo;
 
 
+		/// <summary>
+		/// Current status of unapplied changes.
+		/// </summary>
+		protected bool UnappliedChanges
+        {
+			get => _unappliedChanges;
+
+			set
+			{
+				// Don't do anything if no changes.
+				if (_unappliedChanges != value)
+				{
+					_unappliedChanges = value;
+
+					// Update apply button atlas to show/hide alert mark as appropriate.
+					applyButton.atlas = TextureUtils.LoadSpriteAtlas(value ? "BOB-OkSmallWarn" : "BOB-OkSmall");
+
+					// Set button states for new state.
+					UpdateButtonStates();
+				}
+			}
+		}
+		private bool _unappliedChanges = false;
+
 
 		/// <summary>
 		/// Sets the current replacement prefab and updates button states accordingly.
@@ -343,6 +367,13 @@ namespace BOB
 
 				// Hide button is enabled whenever there's a valid target item.
 				hideButton.Enable();
+			}
+
+			// Show revert button if unapplied changes.
+			if (UnappliedChanges)
+            {
+				revertButton.Enable();
+				revertButton.tooltip = Translations.Translate("BOB_PNL_REV_UND");
 			}
 		}
 

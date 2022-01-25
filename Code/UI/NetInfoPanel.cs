@@ -234,7 +234,7 @@ namespace BOB
 				ReplacementPrefab == CurrentTargetItem.originalPrefab)
 			{
 				// Reset apply button icon.
-				applyButton.atlas = TextureUtils.LoadSpriteAtlas("BOB-OkSmall");
+				UnappliedChanges = false;
 
 				return;
 			}
@@ -285,7 +285,7 @@ namespace BOB
 			originalValues = null;
 
 			// Reset apply button icon
-			applyButton.atlas = TextureUtils.LoadSpriteAtlas("BOB-OkSmall");
+			UnappliedChanges = false;
 		}
 
 
@@ -362,6 +362,13 @@ namespace BOB
 		/// </summary>
 		protected override void Revert(UIComponent control, UIMouseEventParameter mouseEvent)
 		{
+			// Revert any unapplied changes first.
+			if (UnappliedChanges)
+			{
+				RevertPreview();
+				return;
+			}
+
 			// First, undo any preview.
 			RevertPreview();
 
@@ -724,7 +731,7 @@ namespace BOB
 			}
 
 			// Update apply button icon to indicate change.
-			applyButton.atlas = TextureUtils.LoadSpriteAtlas("BOB-OkSmallWarn");
+			UnappliedChanges = true;
 		}
 
 

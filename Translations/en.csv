@@ -49,7 +49,7 @@ BOB_PNL_ANG,Angle
 BOB_PNL_OFF,Offset
 BOB_PNL_HEI,Height
 BOB_PNL_CUH,Custom
-BOB_PNL_CUH_TIP,If this is selected then a the specified custom height offset will be used (instead of using the default prop height)
+BOB_PNL_CUH_TIP,If this is selected then the specified custom height offset will be used (instead of using the default prop height)
 BOB_PNL_XOF,X
 BOB_PNL_YOF,Y
 BOB_PNL_ZOF,Z
