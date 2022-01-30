@@ -386,6 +386,46 @@ namespace BOB
 
 
 		/// <summary>
+		/// Reverts any previewed changes back to original prop/tree state.
+		/// </summary>
+		protected override void RevertPreview()
+		{
+			// Make sure that we've got valid original values to revert to.
+			if (originalValues != null && originalValues.Length > 0 && currentBuilding?.m_props != null)
+			{
+				// Iterate through each original value.
+				for (int i = 0; i < originalValues.Length; ++i)
+				{
+					// Null check in case any original values failed, or number of props has changed.
+					if (originalValues[i] == null || originalValues[i].propIndex >= currentBuilding.m_props.Length)
+					{
+						continue;
+					}
+
+					// Local reference.
+					BuildingInfo.Prop thisProp = currentBuilding.m_props[originalValues[i].propIndex];
+
+					// Restore original values.
+					thisProp.m_prop = originalValues[i].originalProp;
+					thisProp.m_finalProp = originalValues[i].originalFinalProp;
+					thisProp.m_tree = originalValues[i].originalTree;
+					thisProp.m_finalTree = originalValues[i].originalFinalTree;
+					thisProp.m_radAngle = originalValues[i].radAngle;
+					thisProp.m_position = originalValues[i].position;
+					thisProp.m_probability = originalValues[i].probability;
+					thisProp.m_fixedHeight = originalValues[i].fixedHeight;
+				}
+			}
+
+			// Clear recorded values.
+			originalValues = null;
+
+			// Reset apply button icon.
+			UnappliedChanges = false;
+		}
+
+
+		/// <summary>
 		/// Apply button event handler.
 		/// <param name="control">Calling component (unused)</param>
 		/// <param name="mouseEvent">Mouse event (unused)</param>
@@ -842,46 +882,6 @@ namespace BOB
 				// No valid selection - clear any stored original values.
 				originalValues = null;
 			}
-		}
-
-
-		/// <summary>
-		/// Reverts any previewed changes back to original prop/tree state.
-		/// </summary>
-		protected override void RevertPreview()
-		{
-			// Make sure that we've got valid original values to revert to.
-			if (originalValues != null && originalValues.Length > 0 && currentBuilding?.m_props != null)
-			{
-				// Iterate through each original value.
-				for (int i = 0; i < originalValues.Length; ++i)
-				{
-					// Null check in case any original values failed, or number of props has changed.
-					if (originalValues[i] == null || originalValues[i].propIndex >= currentBuilding.m_props.Length)
-					{
-						continue;
-					}
-
-					// Local reference.
-					BuildingInfo.Prop thisProp = currentBuilding.m_props[originalValues[i].propIndex];
-
-					// Restore original values.
-					thisProp.m_prop = originalValues[i].originalProp;
-					thisProp.m_finalProp = originalValues[i].originalFinalProp;
-					thisProp.m_tree = originalValues[i].originalTree;
-					thisProp.m_finalTree = originalValues[i].originalFinalTree;
-					thisProp.m_radAngle = originalValues[i].radAngle;
-					thisProp.m_position = originalValues[i].position;
-					thisProp.m_probability = originalValues[i].probability;
-					thisProp.m_fixedHeight = originalValues[i].fixedHeight;
-				}
-			}
-
-			// Clear recorded values.
-			originalValues = null;
-
-			// Reset apply button icon.
-			UnappliedChanges = false;
 		}
 
 
