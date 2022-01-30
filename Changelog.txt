@@ -1,7 +1,8 @@
 ﻿- Fix index-out-of-range error related to previewing changes in sub-buildings
 - Fix live previewing not auto-refreshing immediately after replacement
-- Fix 'no trees/props found' message sometimes not showing when replacer panel is opened
 - Fix render highlights not following preview prop changes
+- Fix previewing not resetting on sub-building selection change
+- Fix 'no trees/props found' message sometimes not showing when replacer panel is opened
 
 
 Version 0.9 -
