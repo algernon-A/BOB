@@ -768,6 +768,10 @@ namespace BOB
 				thisProp.m_tree = ReplacementPrefab as TreeInfo;
 				thisProp.m_finalProp = ReplacementPrefab as PropInfo;
 				thisProp.m_finalTree = ReplacementPrefab as TreeInfo;
+
+				// Update highlighting target.
+				RenderOverlays.CurrentProp = ReplacementPrefab as PropInfo;
+				RenderOverlays.CurrentTree = ReplacementPrefab as TreeInfo;
 			}
 
 			// Update apply button icon to indicate change.
