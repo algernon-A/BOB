@@ -262,13 +262,32 @@ namespace BOB
 		protected override void RevertPreview()
 		{
 			// Make sure that we've got valid original values to revert to.
-			if (originalValues != null && originalValues.Length > 0)
+			NetInfo.Lane[] selectedNetLanes = SelectedNet?.m_lanes;
+			if (originalValues != null && originalValues.Length > 0 && selectedNetLanes != null)
 			{
 				// Iterate through each original value.
 				for (int i = 0; i < originalValues.Length; ++i)
 				{
+					// Null check in case any original values failed.
+					if (originalValues[i] == null)
+					{
+						continue;
+					}
+
+					// Sanity check indexes.
+					int laneIndex = originalValues[i].laneIndex;
+					int propIndex = originalValues[i].propIndex;
+
+					if (laneIndex >= selectedNetLanes.Length ||
+						selectedNetLanes[laneIndex].m_laneProps == null ||
+						propIndex >= selectedNetLanes[laneIndex].m_laneProps.m_props.Length)
+                    {
+						continue;
+                    }
+
+
 					// Local reference.
-					NetLaneProps.Prop thisProp = SelectedNet.m_lanes[originalValues[i].laneIndex].m_laneProps.m_props[originalValues[i].propIndex];
+					NetLaneProps.Prop thisProp = SelectedNet.m_lanes[laneIndex].m_laneProps.m_props[propIndex];
 
 					// Restore original values.
 					thisProp.m_prop = originalValues[i].originalProp;
@@ -514,6 +533,10 @@ namespace BOB
 				// No lanes - show 'no props' label and return an empty list.
 				noPropsLabel.Show();
 				targetList.rowsData = new FastList<object>();
+
+				// Force clearance of current target item.
+				CurrentTargetItem = null;
+
 				return;
 			}
 
@@ -704,13 +727,19 @@ namespace BOB
 		/// <param name="index">Prop index</param>
 		private void PreviewChange(int lane, int index)
 		{
+			// Ensure that original values have been recorded before proceeding.
+			if (originalValues == null)
+			{
+				return;
+			}
+
 			// Original position.
 			Vector3 basePosition = new Vector3();
 
 			// Find matching prop reference (by lane and index match) in original values.
 			foreach (NetPropReference propReference in originalValues)
 			{
-				if (propReference.laneIndex == lane && propReference.propIndex == index)
+				if (propReference != null && propReference.laneIndex == lane && propReference.propIndex == index)
 				{
 					// Found a match - retrieve original position.
 					basePosition = propReference.position - propReference.adjustment;
@@ -718,8 +747,12 @@ namespace BOB
 				}
 			}
 
-			// Local reference.
-			NetLaneProps.Prop thisProp = SelectedNet.m_lanes[lane].m_laneProps.m_props[index];
+			// Null check.
+			NetLaneProps.Prop thisProp = SelectedNet?.m_lanes?[lane]?.m_laneProps?.m_props?[index];
+			if (thisProp == null)
+			{
+				return;
+			}
 
 			// Preview new position and probability setting.
 			thisProp.m_position = basePosition + new Vector3(xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue);
@@ -747,8 +780,21 @@ namespace BOB
 		/// <returns>Original prop data</returns>
 		private NetPropReference GetOriginalData(int lane, int propIndex)
 		{
+			// Ensure that the indexes are valid before proceeding.
+			if (SelectedNet?.m_lanes == null || SelectedNet.m_lanes.Length <= lane)
+			{
+				Logging.Error("invalid lane index reference of ", lane, " for selected network ", SelectedNet?.name ?? "null");
+				return null;
+			}
+			NetLaneProps.Prop[] propBuffer = SelectedNet.m_lanes[lane]?.m_laneProps?.m_props;
+			if (propBuffer == null || propBuffer.Length <= propIndex)
+            {
+				Logging.Error("invalid prop index reference of ", propIndex, " for lane ", lane, " of selected network ", SelectedNet?.name ?? "null");
+				return null;
+			}
+
 			// Local reference.
-			NetLaneProps.Prop thisProp = SelectedNet.m_lanes[lane].m_laneProps.m_props[propIndex];
+			NetLaneProps.Prop thisProp = propBuffer[propIndex];
 
 			// Get any position adjustments from active replacements, checking in priority order.
 			Vector3 adjustment = Vector3.zero;

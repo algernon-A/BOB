@@ -590,6 +590,10 @@ namespace BOB
 				// No props - show 'no props' label and return an empty list.
 				noPropsLabel.Show();
                 targetList.rowsData = new FastList<object>();
+
+				// Force clearance of current target item.
+				CurrentTargetItem = null;
+
 				return;
 			}
 
@@ -836,13 +840,19 @@ namespace BOB
 		protected override void RevertPreview()
 		{
 			// Make sure that we've got valid original values to revert to.
-			if (originalValues != null && originalValues.Length > 0)
+			if (originalValues != null && originalValues.Length > 0 && currentBuilding?.m_props != null)
 			{
 				// Iterate through each original value.
 				for (int i = 0; i < originalValues.Length; ++i)
 				{
+					// Null check in case any original values failed, or number of props has changed.
+					if (originalValues[i] == null || originalValues[i].propIndex >= currentBuilding.m_props.Length)
+					{
+						continue;
+					}
+
 					// Local reference.
-					BuildingInfo.Prop thisProp = SelectedBuilding.m_props[originalValues[i].propIndex];
+					BuildingInfo.Prop thisProp = currentBuilding.m_props[originalValues[i].propIndex];
 
 					// Restore original values.
 					thisProp.m_prop = originalValues[i].originalProp;
@@ -870,13 +880,19 @@ namespace BOB
 		/// <param name="index">Prop index</param>
 		private void PreviewChange(int index)
 		{
+			// Ensure that original values have been recorded before proceeding.
+			if (originalValues == null)
+            {
+				return;
+			}
+
 			// Original position.
 			Vector3 basePosition = new Vector3();
 
 			// Find matching prop reference (by index match) in original values.
 			foreach (BuildingPropReference propReference in originalValues)
 			{
-				if (propReference.propIndex == index)
+				if (propReference != null && propReference.propIndex == index)
 				{
 					// Found a match - retrieve original position.
 					basePosition = propReference.position - propReference.adjustment;
@@ -884,9 +900,13 @@ namespace BOB
 				}
 			}
 
-			// Local reference.
-			BuildingInfo.Prop thisProp = SelectedBuilding.m_props[index];
-
+			// Null check.
+			BuildingInfo.Prop thisProp = currentBuilding?.m_props?[index];
+			if (thisProp == null)
+            {
+				return;
+            }
+			
 			// Preview new position, probability, and fixed height setting.
 			thisProp.m_position = basePosition + new Vector3(xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue);
 			thisProp.m_probability = (int)probabilitySlider.TrueValue;
@@ -913,8 +933,15 @@ namespace BOB
 		/// <returns>Original prop data</returns>
 		private BuildingPropReference GetOriginalData(int propIndex)
 		{
+			// Ensure that the index is valid before proceeding.
+			if (currentBuilding?.m_props == null || currentBuilding.m_props.Length <= propIndex)
+            {
+				Logging.Error("invalid prop index reference of ", propIndex, " for selected building ", SelectedBuilding?.name ?? "null");
+				return null;
+            }
+
 			// Local reference.
-			BuildingInfo.Prop thisProp = SelectedBuilding.m_props[propIndex];
+			BuildingInfo.Prop thisProp = currentBuilding.m_props[propIndex];
 
 			// Get any position adjustments from active replacements, checking in priority order.
 			Vector3 adjustment = Vector3.zero;

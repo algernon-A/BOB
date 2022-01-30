@@ -1,4 +1,7 @@
-﻿Version 0.9 -
+﻿- Fix index-out-of-range error related to previewing changes in sub-buildings
+
+
+Version 0.9 -
 
 - Compatible with game version 1.14 (Airports)
 - Reconfigure UI for replacement in real-time
