@@ -231,7 +231,7 @@ namespace BOB
 				zSlider.value == 0f &&
 				angleSlider.value == 0f &&
 				probabilitySlider.value.RoundToNearest(1) == CurrentTargetItem.originalProb &&
-				ReplacementPrefab == CurrentTargetItem.originalPrefab)
+				ReplacementPrefab == CurrentTargetItem.CurrentPrefab)
 			{
 				// Reset apply button icon.
 				UnappliedChanges = false;
@@ -364,6 +364,9 @@ namespace BOB
 					// Update highlighting target.
 					RenderOverlays.CurrentProp = ReplacementPrefab as PropInfo;
 					RenderOverlays.CurrentTree = ReplacementPrefab as TreeInfo;
+
+					// Record updated original data.
+					RecordOriginal();
 				}
 			}
 			catch (Exception e)
