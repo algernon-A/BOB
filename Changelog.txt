@@ -1,4 +1,5 @@
 ﻿- Fix index-out-of-range error related to previewing changes in sub-buildings
+- Fix 'no trees found' message sometimes not showing when replacer panel is opened directly to tree setting
 
 
 Version 0.9 -

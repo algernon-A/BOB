@@ -219,6 +219,7 @@ namespace BOB
 				// 'No props' label (starts hidden).
 				noPropsLabel = leftPanel.AddUIComponent<UILabel>();
 				noPropsLabel.relativePosition = new Vector2(Margin, Margin);
+				noPropsLabel.text = Translations.Translate("BOB_PNL_NOT");
 				noPropsLabel.Hide();
 
 				// Actions text label.
