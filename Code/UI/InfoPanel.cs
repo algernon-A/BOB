@@ -92,7 +92,7 @@ namespace BOB
 		/// <summary>
 		/// Currently selected building.
 		/// </summary>
-		protected BuildingInfo SelectedBuilding => selectedPrefab as BuildingInfo;
+		protected virtual BuildingInfo SelectedBuilding => null;
 
 
 		/// <summary>

@@ -129,6 +129,11 @@ namespace BOB
 		};
 
 
+		/// <summary>
+		/// Currently selected building.
+		/// </summary>
+		protected override BuildingInfo SelectedBuilding => currentBuilding;
+
 
 		/// <summary>
 		/// Sets the current sub-building selection to the specified index.
@@ -136,6 +141,9 @@ namespace BOB
 		/// <param name="index">Index number of specified sub-building</param>
 		internal void SetSubBuilding(int index)
 		{
+			// Revert any preview.
+			RevertPreview();
+
 			// Set current building.
 			currentBuilding = subBuildings[index];
 
@@ -252,7 +260,7 @@ namespace BOB
 			base.SetTarget(targetPrefabInfo);
 
 			// Set target reference.
-			currentBuilding = SelectedBuilding;
+			currentBuilding = targetPrefabInfo as BuildingInfo;
 
 			// Does this building have sub-buildings?
 			if (currentBuilding.m_subBuildings != null && currentBuilding.m_subBuildings.Length > 0)
@@ -331,7 +339,7 @@ namespace BOB
 			TargetList();
 
 			// Apply Harmony rendering patches.
-			RenderOverlays.CurrentBuilding = selectedPrefab as BuildingInfo;
+			RenderOverlays.CurrentBuilding = currentBuilding;
 			Patcher.PatchBuildingOverlays(true);
 		}
 
@@ -943,7 +951,7 @@ namespace BOB
 			// Ensure that the index is valid before proceeding.
 			if (currentBuilding?.m_props == null || currentBuilding.m_props.Length <= propIndex)
             {
-				Logging.Error("invalid prop index reference of ", propIndex, " for selected building ", SelectedBuilding?.name ?? "null");
+				Logging.Error("invalid prop index reference of ", propIndex, " for selected building ", currentBuilding?.name ?? "null");
 				return null;
             }
 
