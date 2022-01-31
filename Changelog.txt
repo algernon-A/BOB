@@ -1,4 +1,6 @@
-﻿- Fix index-out-of-range error related to previewing changes in sub-buildings
+﻿Version 0.9.0.1 -
+
+- Fix index-out-of-range error related to previewing changes in sub-buildings
 - Fix live previewing not auto-refreshing immediately after replacement
 - Fix render highlights not following preview prop changes
 - Fix previewing not resetting on sub-building selection change
