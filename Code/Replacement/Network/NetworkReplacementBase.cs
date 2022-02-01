@@ -582,7 +582,8 @@ namespace BOB
 					m_cornerAngle = existingNetLaneProp.m_cornerAngle,
 					m_probability = existingNetLaneProp.m_probability,
 					m_finalProp = existingNetLaneProp.m_finalProp,
-					m_finalTree = existingNetLaneProp.m_finalTree
+					m_finalTree = existingNetLaneProp.m_finalTree,
+					m_upgradable = existingNetLaneProp.m_upgradable
 				};
 			}
 
