@@ -1,4 +1,8 @@
-﻿Version 0.9.0.1 -
+﻿- Fix network prop preview not correctly showing mirrored X offsets
+- Fix network prop preview not showing angle changes
+
+
+Version 0.9.0.1 -
 
 - Fix index-out-of-range error related to previewing changes in sub-buildings
 - Fix live previewing not auto-refreshing immediately after replacement

@@ -751,15 +751,24 @@ namespace BOB
 			}
 
 			// Null check.
-			NetLaneProps.Prop thisProp = SelectedNet?.m_lanes?[lane]?.m_laneProps?.m_props?[index];
+			NetInfo.Lane thisLane = SelectedNet?.m_lanes?[lane];
+			NetLaneProps.Prop thisProp = thisLane?.m_laneProps?.m_props?[index];
 			if (thisProp == null)
 			{
 				return;
 			}
 
+			// Calculate preview X position, taking into account mirrored trees/props, inverting x offset to match original prop x position.
+			float offsetX = xSlider.TrueValue;
+			if (thisLane.m_position + basePosition.x < 0)
+			{
+				offsetX = 0 - offsetX;
+			}
+
 			// Preview new position and probability setting.
-			thisProp.m_position = basePosition + new Vector3(xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue);
+			thisProp.m_position = basePosition + new Vector3(offsetX, ySlider.TrueValue, zSlider.TrueValue);
 			thisProp.m_probability = (int)probabilitySlider.TrueValue;
+			thisProp.m_angle = (int)angleSlider.TrueValue;
 
 			// If a replacement prefab has been selected, then update it too.
 			if (ReplacementPrefab != null)
