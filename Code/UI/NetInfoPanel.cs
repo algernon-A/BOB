@@ -602,6 +602,7 @@ namespace BOB
 					if (packReplacement != null)
 					{
 						targetListItem.packagePrefab = packReplacement.replacementInfo;
+						targetListItem.originalPrefab = packReplacement.targetInfo;
 					}
 
 					// All-network replacement and original probability (if any).
@@ -610,6 +611,7 @@ namespace BOB
 					{
 						targetListItem.allPrefab = allNetReplacement.replacementInfo;
 						targetListItem.allProb = allNetReplacement.probability;
+						targetListItem.originalPrefab = allNetReplacement.targetInfo;
 					}
 
 					// Network replacement and original probability (if any).
@@ -618,6 +620,7 @@ namespace BOB
 					{
 						targetListItem.replacementPrefab = netReplacement.replacementInfo;
 						targetListItem.replacementProb = netReplacement.probability;
+						targetListItem.originalPrefab = netReplacement.targetInfo;
 					}
 
 					// Individual replacement and original probability (if any).
@@ -626,12 +629,13 @@ namespace BOB
 					{
 						targetListItem.individualPrefab = individualReplacement.replacementInfo;
 						targetListItem.individualProb = individualReplacement.probability;
+						targetListItem.originalPrefab = individualReplacement.targetInfo;
 					}
 
 					// If we found an active replacement, update original reference values.
 					if (propReference != null)
 					{
-						targetListItem.originalPrefab = propReference.OriginalInfo;
+						//targetListItem.originalPrefab = propReference.OriginalInfo;
 						targetListItem.originalAngle = propReference.angle;
 						targetListItem.originalProb = propReference.probability;
 					}

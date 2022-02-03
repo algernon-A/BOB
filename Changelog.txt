@@ -1,4 +1,7 @@
-﻿Version 0.9.0.2 -
+﻿- Fix network replacement original prefab regression
+
+
+Version 0.9.0.2 -
 
 - Improve handling of reversion states
 - Fix network prop preview not correctly showing mirrored X offsets
