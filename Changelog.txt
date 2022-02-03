@@ -1,4 +1,6 @@
-﻿- Fix network prop preview not correctly showing mirrored X offsets
+﻿Version 0.9.0.2 -
+
+- Fix network prop preview not correctly showing mirrored X offsets
 - Fix network prop preview not showing angle changes
 
 
