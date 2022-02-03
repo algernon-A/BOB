@@ -50,7 +50,7 @@ namespace BOB
 		/// <param name="laneIndex">Lane number</param>
 		/// <param name="propIndex">Prop index number</param>
 		/// <returns>Currently-applied individual network replacement (null if none)</returns>
-		internal override BOBNetReplacement EligibileReplacement(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex) => ActiveReplacement(netInfo, laneIndex, propIndex);
+		internal override BOBNetReplacement EligibileReplacement(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex) => ActiveReplacement(netInfo, laneIndex, propIndex, out _);
 
 
 		/// <summary>
@@ -505,13 +505,18 @@ namespace BOB
 					// Iterate through each prop in lane.
 					for (int propIndex = 0; propIndex < network.m_lanes[laneIndex].m_laneProps.m_props.Length; ++propIndex)
 					{
-						// Check for any currently active conflicting replacements.
-						if (NetworkReplacement.Instance.ActiveReplacement(network, laneIndex, propIndex) != null)
+						// Check for any currently active conflicting replacements..
+						if (IndividualNetworkReplacement.Instance.ActiveReplacement(network, laneIndex, propIndex, out _) != null)
 						{
-							// Active network replacement; skip this one.
+							// Active individual network replacement; skip this one.
 							continue;
 						}
-						else if (AllNetworkReplacement.Instance.ActiveReplacement(network, laneIndex, propIndex) != null)
+						else if (NetworkReplacement.Instance.ActiveReplacement(network, laneIndex, propIndex, out _) != null)
+						{
+							// Active grouped network replacement; skip this one.
+							continue;
+						}
+						else if (AllNetworkReplacement.Instance.ActiveReplacement(network, laneIndex, propIndex, out _) != null)
 						{
 							// Active all-network replacement; skip this one.
 							continue;
@@ -584,8 +589,9 @@ namespace BOB
 		/// <param name="netPrefab">Network prefab to check</param>
 		/// <param name="laneIndex">Lane index to check</param>
 		/// <param name="propIndex">Prop index to check</param>
+		/// <param name="propReference">Original prop reference record (null if none)</param>
 		/// <returns>Replacement record if a all-network replacement is currently applied, null if no all-network replacement is currently applied</returns>
-		internal new BOBNetReplacement ActiveReplacement(NetInfo netPrefab, int laneIndex, int propIndex)
+		internal override BOBNetReplacement ActiveReplacement(NetInfo netPrefab, int laneIndex, int propIndex, out NetPropReference propReference)
 		{
 			// Iterate through each entry in master dictionary.
 			foreach (PrefabInfo target in replacements.Keys)
@@ -598,12 +604,14 @@ namespace BOB
 					if (propRef.netInfo == netPrefab && propRef.laneIndex == laneIndex && propRef.propIndex == propIndex)
 					{
 						// Match!  Return the replacement record.
+						propReference = propRef;
 						return replacements[target];
 					}
 				}
 			}
 
 			// If we got here, no entry was found - return null to indicate no active replacement.
+			propReference = null;
 			return null;
 		}
 

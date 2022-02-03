@@ -94,31 +94,33 @@ namespace BOB
 		/// </summary>
 		/// <param name="buildingInfo">Building prefab to check</param>
 		/// <param name="propIndex">Prop index to check</param>
+		/// <param name="propReference">Original prop reference record (null if none)</param>
 		/// <returns>Replacement record if a replacement is currently applied, null if no replacement is currently applied</returns>
-		internal override BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingInfo, int propIndex)
+		internal override BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingInfo, int propIndex, out BuildingPropReference propReference)
 		{
 			// See if we've got any active references for this net prefab.
-			if (!propReferences.TryGetValue(buildingInfo, out Dictionary<PrefabInfo, List<BuildingPropReference>> referenceDict))
+			if (propReferences.TryGetValue(buildingInfo, out Dictionary<PrefabInfo, List<BuildingPropReference>> referenceDict))
 			{
-				return null;
-			}
 
-			// Iterate through entry for each prefab under this network.
-			foreach (KeyValuePair<PrefabInfo, List<BuildingPropReference>> key in referenceDict)
-			{
-				// Iterate through each entry in list.
-				foreach (BuildingPropReference propRef in key.Value)
+				// Iterate through entry for each prefab under this network.
+				foreach (KeyValuePair<PrefabInfo, List<BuildingPropReference>> key in referenceDict)
 				{
-					// Check for a a network(due to all- replacement), lane and prop index match.
-					if (propRef.buildingInfo == buildingInfo && propRef.propIndex == propIndex)
+					// Iterate through each entry in list.
+					foreach (BuildingPropReference propRef in key.Value)
 					{
-						// Match!  Find and return the replacement record.
-						return EligibileReplacement(buildingInfo, key.Key, propRef.propIndex);
+						// Check for a a network(due to all- replacement), lane and prop index match.
+						if (propRef.buildingInfo == buildingInfo && propRef.propIndex == propIndex)
+						{
+							// Match!  Find and return the replacement record.
+							propReference = propRef;
+							return EligibileReplacement(buildingInfo, key.Key, propRef.propIndex);
+						}
 					}
 				}
 			}
 
 			// If we got here, no entry was found - return null to indicate no active replacement.
+			propReference = null;
 			return null;
 		}
 
@@ -161,7 +163,7 @@ namespace BOB
 				for (int propIndex = 0; propIndex < buildingInfo.m_props.Length; ++propIndex)
 				{
 					// Check for any currently active building or individual building prop replacement.
-					if (BuildingReplacement.Instance.ActiveReplacement(buildingInfo, propIndex) != null || IndividualBuildingReplacement.Instance.ActiveReplacement(buildingInfo, propIndex) != null)
+					if (BuildingReplacement.Instance.ActiveReplacement(buildingInfo, propIndex, out _) != null || IndividualBuildingReplacement.Instance.ActiveReplacement(buildingInfo, propIndex, out _) != null)
 					{
 						// Active building replacement; skip this one.
 						continue;

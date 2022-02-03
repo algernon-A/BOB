@@ -58,7 +58,7 @@ namespace BOB
 			for (int propIndex = 0; propIndex < replacement.BuildingInfo.m_props.Length; ++propIndex)
 			{
 				// Check for any currently active individual building prop replacement.
-				if (IndividualBuildingReplacement.Instance.ActiveReplacement(replacement.BuildingInfo, propIndex) != null)
+				if (IndividualBuildingReplacement.Instance.ActiveReplacement(replacement.BuildingInfo, propIndex, out _) != null)
 				{
 					// Active individual building prop replacement; skip this one.
 					continue;
@@ -68,7 +68,7 @@ namespace BOB
 				BuildingInfo.Prop thisBuildingProp = replacement.BuildingInfo.m_props[propIndex];
 
 				// Check for any existing all-building replacement.
-				PrefabInfo thisProp = AllBuildingReplacement.Instance.ActiveReplacement(replacement.BuildingInfo, propIndex)?.targetInfo;
+				PrefabInfo thisProp = AllBuildingReplacement.Instance.ActiveReplacement(replacement.BuildingInfo, propIndex, out _)?.targetInfo;
 				if (thisProp == null)
 				{
 					// No active replacement; use current PropInfo.

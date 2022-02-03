@@ -466,7 +466,7 @@ namespace BOB
 				}
 
 				// Replacement pack replacement and original probability (if any).
-				BOBNetReplacement packReplacement = NetworkPackReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex);
+				BOBNetReplacement packReplacement = NetworkPackReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex, out _);
 				if (packReplacement != null)
 				{
 					targetListItem.packagePrefab = packReplacement.replacementInfo;
@@ -478,7 +478,7 @@ namespace BOB
 				}
 
 				// All-network replacement and original probability (if any).
-				BOBNetReplacement allNetReplacement = AllNetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex);
+				BOBNetReplacement allNetReplacement = AllNetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex, out _);
 				if (allNetReplacement != null)
 				{
 					targetListItem.allPrefab = allNetReplacement.replacementInfo;
@@ -491,7 +491,7 @@ namespace BOB
 				}
 
 				// Network replacement and original probability (if any).
-				BOBNetReplacement netReplacement = NetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex);
+				BOBNetReplacement netReplacement = NetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex, out _);
 				if (netReplacement != null)
 				{
 					targetListItem.replacementPrefab = netReplacement.replacementInfo;
@@ -504,7 +504,7 @@ namespace BOB
 				}
 
 				// Individual replacement and original probability (if any).
-				BOBNetReplacement individualReplacement = IndividualNetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex);
+				BOBNetReplacement individualReplacement = IndividualNetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex, out _);
 				if (individualReplacement != null)
 				{
 					targetListItem.individualPrefab = individualReplacement.replacementInfo;
@@ -594,65 +594,46 @@ namespace BOB
 						targetListItem.lanes.Add(lane);
 					}
 
+					// To record original data if a replacement is in effect.
+					NetPropReference propReference = null;
+
+					// Replacement pack replacement and original probability (if any).
+					BOBNetReplacement packReplacement = NetworkPackReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex, out propReference);
+					if (packReplacement != null)
+					{
+						targetListItem.packagePrefab = packReplacement.replacementInfo;
+					}
+
 					// All-network replacement and original probability (if any).
-					BOBNetReplacement allNetReplacement = AllNetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex);
+					BOBNetReplacement allNetReplacement = AllNetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex, out propReference);
 					if (allNetReplacement != null)
 					{
 						targetListItem.allPrefab = allNetReplacement.replacementInfo;
 						targetListItem.allProb = allNetReplacement.probability;
-
-						// Update original prop reference.
-						targetListItem.originalPrefab = allNetReplacement.targetInfo;
-
-
-						// See if we can find an active reference.
-						Logging.Message("finding original probability - all-network");
-						NetPropReference originalReference = allNetReplacement?.references?.Find(x =>  x.netInfo == SelectedNet && x.laneIndex == lane && x.propIndex == propIndex);
-						if (originalReference != null)
-                        {
-							// Original reference found; update original probability.
-							targetListItem.originalProb = originalReference.probability;
-                        }
-						Logging.Message("original probability not found");
 					}
 
 					// Network replacement and original probability (if any).
-					BOBNetReplacement netReplacement = NetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex);
+					BOBNetReplacement netReplacement = NetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex, out propReference);
 					if (netReplacement != null)
 					{
 						targetListItem.replacementPrefab = netReplacement.replacementInfo;
 						targetListItem.replacementProb = netReplacement.probability;
-
-						// Update original prop reference.
-						targetListItem.originalPrefab = netReplacement.targetInfo;
-						Logging.Message("finding original probability - grouped");
-						targetListItem.originalProb = netReplacement.references.Find(x => x.laneIndex == lane && x.propIndex == propIndex).probability;
-						Logging.Message("original probability found");
 					}
 
 					// Individual replacement and original probability (if any).
-					BOBNetReplacement individualReplacement = IndividualNetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex);
+					BOBNetReplacement individualReplacement = IndividualNetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex, out propReference);
 					if (individualReplacement != null)
 					{
 						targetListItem.individualPrefab = individualReplacement.replacementInfo;
 						targetListItem.individualProb = individualReplacement.probability;
-						Logging.Message("finding original probability - individual");
-						targetListItem.originalProb = individualReplacement.references.Find(x => x.laneIndex == lane && x.propIndex == propIndex).probability;
-						Logging.Message("original probability found");
-
-						// Update original prop reference.
-						targetListItem.originalPrefab = individualReplacement.targetInfo;
 					}
 
-					// Replacement pack replacement and original probability (if any).
-					BOBNetReplacement packReplacement = NetworkPackReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex);
-					if (packReplacement != null)
+					// If we found an active replacement, update original reference values.
+					if (propReference != null)
 					{
-						targetListItem.packagePrefab = packReplacement.replacementInfo;
-
-						// Update original prop reference.
-						targetListItem.originalPrefab = packReplacement.targetInfo;
-						targetListItem.originalProb = packReplacement.references.Find(x => x.laneIndex == lane && x.propIndex == propIndex).probability;
+						targetListItem.originalPrefab = propReference.OriginalInfo;
+						targetListItem.originalAngle = propReference.angle;
+						targetListItem.originalProb = propReference.probability;
 					}
 
 					// Are we grouping?
@@ -814,21 +795,21 @@ namespace BOB
 
 			// Get any position adjustments from active replacements, checking in priority order.
 			Vector3 adjustment = Vector3.zero;
-			if (IndividualNetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex) is BOBNetReplacement individualReplacement)
+			if (IndividualNetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex, out _) is BOBNetReplacement individualReplacement)
 			{
 				// Individual replacement.
 				adjustment.x = individualReplacement.offsetX;
 				adjustment.y = individualReplacement.offsetY;
 				adjustment.z = individualReplacement.offsetZ;
 			}
-			else if (NetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex) is BOBNetReplacement netReplacement)
+			else if (NetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex, out _) is BOBNetReplacement netReplacement)
 			{
 				// Grouped replacement.
 				adjustment.x = netReplacement.offsetX;
 				adjustment.y = netReplacement.offsetY;
 				adjustment.z = netReplacement.offsetZ;
 			}
-			else if (AllNetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex) is BOBNetReplacement allNetReplacement)
+			else if (AllNetworkReplacement.Instance.ActiveReplacement(SelectedNet, lane, propIndex, out _) is BOBNetReplacement allNetReplacement)
 			{
 				// All- replacement.
 				adjustment.x = allNetReplacement.offsetX;

@@ -64,33 +64,33 @@ namespace BOB
 		/// <param name="netInfo">Net prefab to check</param>
 		/// <param name="laneIndex">Lane index to check</param>
 		/// <param name="propIndex">Prop index to check</param>
+		/// <param name="propReference">Original prop reference record (null if none)</param>
 		/// <returns>Replacement record if a replacement is currently applied, null if no replacement is currently applied</returns>
-		internal virtual BOBNetReplacement ActiveReplacement(NetInfo netInfo, int laneIndex, int propIndex)
+		internal virtual BOBNetReplacement ActiveReplacement(NetInfo netInfo, int laneIndex, int propIndex, out NetPropReference propReference)
 		{
 			// See if we've got a replacement entry for this building.
 			List<BOBNetReplacement> replacementList = ReplacementList(netInfo);
-			if (replacementList == null)
+			if (replacementList != null)
 			{
-				// No entry - return null.
-				return null;
-			}
-
-			// Iterate through each replacement record for this network.
-			foreach (BOBNetReplacement netReplacement in replacementList)
-			{
-				// Iterate through each prop reference in this record. 
-				foreach (NetPropReference propRef in netReplacement.references)
+				// Iterate through each replacement record for this network.
+				foreach (BOBNetReplacement netReplacement in replacementList)
 				{
-					// Check for a a network(due to all- replacement), lane and prop index match.
-					if (propRef.netInfo == netInfo && propRef.laneIndex == laneIndex && propRef.propIndex == propIndex)
+					// Iterate through each prop reference in this record. 
+					foreach (NetPropReference propRef in netReplacement.references)
 					{
-						// Match!  Return the replacement record.
-						return netReplacement;
+						// Check for a a network(due to all- replacement), lane and prop index match.
+						if (propRef.netInfo == netInfo && propRef.laneIndex == laneIndex && propRef.propIndex == propIndex)
+						{
+							// Match!  Return the replacement record.
+							propReference = propRef;
+							return netReplacement;
+						}
 					}
 				}
 			}
 
 			// If we got here, no entry was found - return null to indicate no active replacement.
+			propReference = null;
 			return null;
 		}
 

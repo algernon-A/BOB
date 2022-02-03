@@ -355,7 +355,7 @@ namespace BOB
 				}
 
 				// Reversion requires a currently active replacement.
-				if (CurrentTargetItem.replacementPrefab != null)
+				if (CurrentTargetItem.ActiveReplacement)
 				{
 					revertButton.Enable();
 					revertButton.tooltip = Translations.Translate("BOB_PNL_REV_UND");

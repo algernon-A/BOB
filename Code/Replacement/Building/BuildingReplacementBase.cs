@@ -61,33 +61,33 @@ namespace BOB
 		/// </summary>
 		/// <param name="buildingInfo">Building prefab to check</param>
 		/// <param name="propIndex">Prop index to check</param>
+		/// <param name="propReference">Original prop reference record (null if none)</param>
 		/// <returns>Replacement record if a replacement is currently applied, null if no replacement is currently applied</returns>
-		internal virtual BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingInfo, int propIndex)
+		internal virtual BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingInfo, int propIndex, out BuildingPropReference propReference)
 		{
 			// See if we've got a replacement entry for this building.
 			List<BOBBuildingReplacement> replacementList = ReplacementList(buildingInfo);
-			if (replacementList == null)
+			if (replacementList != null)
 			{
-				// No entry - return null.
-				return null;
-			}
-
-			// Iterate through each replacement record for this building.
-			foreach (BOBBuildingReplacement buildingReplacement in replacementList)
-			{
-				// Iterate through each prop reference in this record. 
-				foreach (BuildingPropReference propRef in buildingReplacement.references)
+				// Iterate through each replacement record for this building.
+				foreach (BOBBuildingReplacement buildingReplacement in replacementList)
 				{
-					// Check for building (due to all- replacement) and index match.
-					if (propRef.buildingInfo == buildingInfo && propRef.propIndex == propIndex)
+					// Iterate through each prop reference in this record. 
+					foreach (BuildingPropReference propRef in buildingReplacement.references)
 					{
-						// Match!  Return the replacement record.
-						return buildingReplacement;
+						// Check for building (due to all- replacement) and index match.
+						if (propRef.buildingInfo == buildingInfo && propRef.propIndex == propIndex)
+						{
+							// Match!  Return the replacement record.
+							propReference = propRef;
+							return buildingReplacement;
+						}
 					}
 				}
 			}
 
 			// If we got here, no entry was found - return null to indicate no active replacement.
+			propReference = null;
 			return null;
 		}
 

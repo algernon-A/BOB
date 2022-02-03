@@ -99,31 +99,32 @@ namespace BOB
 		/// <param name="netInfo">Net prefab to check</param>
 		/// <param name="laneIndex">Lane index to check</param>
 		/// <param name="propIndex">Prop index to check</param>
+		/// <param name="propReference">Original prop reference record (null if none)</param>
 		/// <returns>Replacement record if a replacement is currently applied, null if no replacement is currently applied</returns>
-		internal override BOBNetReplacement ActiveReplacement(NetInfo netInfo, int laneIndex, int propIndex)
+		internal override BOBNetReplacement ActiveReplacement(NetInfo netInfo, int laneIndex, int propIndex, out NetPropReference propReference)
 		{
 			// See if we've got any active references for this net prefab.
-			if (!propReferences.TryGetValue(netInfo, out Dictionary<PrefabInfo, List<NetPropReference>> referenceDict))
+			if (propReferences.TryGetValue(netInfo, out Dictionary<PrefabInfo, List<NetPropReference>> referenceDict))
 			{
-				return null;
-			}
-
-			// Iterate through entry for each prefab under this network.
-			foreach (KeyValuePair<PrefabInfo, List<NetPropReference>> key in referenceDict)
-			{
-				// Iterate through each entry in list.
-				foreach (NetPropReference propRef in key.Value)
+				// Iterate through entry for each prefab under this network.
+				foreach (KeyValuePair<PrefabInfo, List<NetPropReference>> key in referenceDict)
 				{
-					// Check for a a network(due to all- replacement), lane and prop index match.
-					if (propRef.netInfo == netInfo && propRef.laneIndex == laneIndex && propRef.propIndex == propIndex)
+					// Iterate through each entry in list.
+					foreach (NetPropReference propRef in key.Value)
 					{
-						// Match!  Find and return the replacement record.
-						return EligibileReplacement(netInfo, key.Key, propRef.laneIndex, propRef.propIndex);
+						// Check for a a network(due to all- replacement), lane and prop index match.
+						if (propRef.netInfo == netInfo && propRef.laneIndex == laneIndex && propRef.propIndex == propIndex)
+						{
+							// Match!  Find and return the replacement record.
+							propReference = propRef;
+							return EligibileReplacement(netInfo, key.Key, propRef.laneIndex, propRef.propIndex);
+						}
 					}
 				}
 			}
 
 			// If we got here, no entry was found - return null to indicate no active replacement.
+			propReference = null;
 			return null;
 		}
 
@@ -187,14 +188,14 @@ namespace BOB
 						}
 
 						// Check for any currently active network or individual replacement.
-						if (NetworkReplacement.Instance.ActiveReplacement(netInfo, laneIndex, propIndex) != null || IndividualNetworkReplacement.Instance.ActiveReplacement(netInfo, laneIndex, propIndex) != null)
+						if (NetworkReplacement.Instance.ActiveReplacement(netInfo, laneIndex, propIndex, out _) != null || IndividualNetworkReplacement.Instance.ActiveReplacement(netInfo, laneIndex, propIndex, out _) != null)
 						{
 							// Active network or individual replacement; skip this one.
 							continue;
 						}
 
 						// Check for any existing pack replacement.
-						PrefabInfo thisProp = NetworkPackReplacement.Instance.ActiveReplacement(netInfo, laneIndex, propIndex)?.targetInfo;
+						PrefabInfo thisProp = NetworkPackReplacement.Instance.ActiveReplacement(netInfo, laneIndex, propIndex, out _)?.targetInfo;
 						if (thisProp == null)
 						{
 							// No active replacement; use current PropInfo.

@@ -80,7 +80,7 @@ namespace BOB
 					}
 
 					// Check for any currently active individual network prop replacement.
-					if (IndividualNetworkReplacement.Instance.ActiveReplacement(replacement.NetInfo, laneIndex, propIndex) != null)
+					if (IndividualNetworkReplacement.Instance.ActiveReplacement(replacement.NetInfo, laneIndex, propIndex, out _) != null)
 					{
 						// Active individual network prop replacement; skip this one.
 						continue;
@@ -91,7 +91,7 @@ namespace BOB
 					NetworkPackReplacement.Instance.RemoveEntry(replacement.NetInfo, replacement.targetInfo, replacement.laneIndex, replacement.propIndex);
 
 					// Check for any existing all-network or pack replacement.
-					PrefabInfo thisProp = NetworkPackReplacement.Instance.ActiveReplacement(replacement.NetInfo, laneIndex, propIndex)?.targetInfo ?? AllNetworkReplacement.Instance.ActiveReplacement(replacement.NetInfo, laneIndex, propIndex)?.targetInfo;
+					PrefabInfo thisProp = NetworkPackReplacement.Instance.ActiveReplacement(replacement.NetInfo, laneIndex, propIndex, out _)?.targetInfo ?? AllNetworkReplacement.Instance.ActiveReplacement(replacement.NetInfo, laneIndex, propIndex, out _)?.targetInfo;
 					if (thisProp == null)
 					{
 						// No active replacement; use current PropInfo.

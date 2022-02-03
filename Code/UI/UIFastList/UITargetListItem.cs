@@ -37,11 +37,23 @@ namespace BOB
 		// Whether or not to show probabilities.
 		public bool showProbs = false;
 
-		// Current prefab.
+		/// <summary>
+		/// Currently effective prefab (active replacement prefab, if any, or original prefab if no replacement).
+		/// </summary>
 		public PrefabInfo CurrentPrefab => individualPrefab ?? replacementPrefab ?? allPrefab ?? packagePrefab ?? originalPrefab;
 
-		// Display name.
+
+		/// <summary>
+		/// Prop/tree display name.
+		/// </summary>
 		public string DisplayName => PrefabLists.GetDisplayName(CurrentPrefab);
+
+		
+		/// <summary>
+		/// Returns true if there's a currently active replacement, false if no active replacement.
+		/// </summary>
+		public bool ActiveReplacement => individualPrefab != null || replacementPrefab != null || allPrefab != null;
+
 	}
 
 
