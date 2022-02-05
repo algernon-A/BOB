@@ -67,36 +67,43 @@ namespace BOB
             // Iterate through each loaded plugin assembly.
             foreach (PluginManager.PluginInfo plugin in PluginManager.instance.GetPluginsInfo())
             {
-                foreach (Assembly assembly in plugin.GetAssemblies())
+                try
                 {
-                    if (assembly.GetName().Name.Equals("NetworkSkins") && plugin.isEnabled)
+                    foreach (Assembly assembly in plugin.GetAssemblies())
                     {
-                        Logging.Message("Found NetworkSkins");
-
-                        // Found NetworkSkins.dll that's part of an enabled plugin; try to get its NetworkSkin class.
-                        networkSkin = assembly.GetType("NetworkSkins.Skins.NetworkSkin");
-                        if (networkSkin != null)
+                        if (assembly.GetName().Name.Equals("NetworkSkins") && plugin.isEnabled)
                         {
-                            Logging.Message("found NetworkSkin");
+                            Logging.Message("Found NetworkSkins");
 
-                            // Success - now try to get NetworkSkinManager class.
-                            networkSkinManager = assembly.GetType("NetworkSkins.Skins.NetworkSkinManager");
-                            if (networkSkinManager != null)
+                            // Found NetworkSkins.dll that's part of an enabled plugin; try to get its NetworkSkin class.
+                            networkSkin = assembly.GetType("NetworkSkins.Skins.NetworkSkin");
+                            if (networkSkin != null)
                             {
-                                Logging.Message("found NetworkSkinManager");
+                                Logging.Message("found NetworkSkin");
 
-                                // Success - now try to get the Recalculate method from NetworkSkin.
-                                ns2Recalculate = networkSkin.GetMethod("Recalculate");
-                                if (ns2Recalculate != null)
+                                // Success - now try to get NetworkSkinManager class.
+                                networkSkinManager = assembly.GetType("NetworkSkins.Skins.NetworkSkinManager");
+                                if (networkSkinManager != null)
                                 {
-                                    Logging.Message("found NetworkSkin.Recalculate");
+                                    Logging.Message("found NetworkSkinManager");
+
+                                    // Success - now try to get the Recalculate method from NetworkSkin.
+                                    ns2Recalculate = networkSkin.GetMethod("Recalculate");
+                                    if (ns2Recalculate != null)
+                                    {
+                                        Logging.Message("found NetworkSkin.Recalculate");
+                                    }
                                 }
                             }
-                        }
 
-                        // At this point, we're done; return.
-                        return;
+                            // At this point, we're done; return.
+                            return;
+                        }
                     }
+                }
+                catch
+                {
+                    // Don't care.
                 }
             }
 
@@ -194,20 +201,27 @@ namespace BOB
             // Iterate through the full list of plugins.
             foreach (PluginManager.PluginInfo plugin in PluginManager.instance.GetPluginsInfo())
             {
-                foreach (Assembly assembly in plugin.GetAssemblies())
+                try
                 {
-                    if (assembly.GetName().Name.ToLower().Equals(assemblyNameLower))
+                    foreach (Assembly assembly in plugin.GetAssemblies())
                     {
-                        Logging.Message("found mod assembly ", assemblyName);
-                        if (enabledOnly)
+                        if (assembly.GetName().Name.ToLower().Equals(assemblyNameLower))
                         {
-                            return plugin.isEnabled;
-                        }
-                        else
-                        {
-                            return true;
+                            Logging.Message("found mod assembly ", assemblyName);
+                            if (enabledOnly)
+                            {
+                                return plugin.isEnabled;
+                            }
+                            else
+                            {
+                                return true;
+                            }
                         }
                     }
+                }
+                catch
+                {
+                    // Don't care.
                 }
             }
 
