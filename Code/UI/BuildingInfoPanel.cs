@@ -678,7 +678,7 @@ namespace BOB
 				// Get original (pre-replacement) tree/prop prefab and current probability (as default original probability).
 				targetListItem.originalPrefab = finalInfo;
 				targetListItem.originalProb = currentBuilding.m_props[propIndex].m_probability;
-				targetListItem.originalAngle = (currentBuilding.m_props[propIndex].m_radAngle * 180f) / Mathf.PI;
+				targetListItem.originalAngle = currentBuilding.m_props[propIndex].m_radAngle * Mathf.Rad2Deg;
 
 				// To record original data if a replacement is in effect.
 				BuildingPropReference propReference = null;
@@ -711,7 +711,7 @@ namespace BOB
 				if (propReference != null)
 				{
 					targetListItem.originalPrefab = propReference.OriginalInfo;
-					targetListItem.originalAngle = (propReference.radAngle * 180f) / Mathf.PI;
+					targetListItem.originalAngle = propReference.radAngle * Mathf.Rad2Deg;
 					targetListItem.originalProb = propReference.probability;
 				}
 
@@ -898,16 +898,18 @@ namespace BOB
 				return;
 			}
 
-			// Original position.
+			// Original position and angle.
 			Vector3 basePosition = new Vector3();
+			float angle = 0f;
 
 			// Find matching prop reference (by index match) in original values.
 			foreach (BuildingPropReference propReference in originalValues)
 			{
 				if (propReference != null && propReference.propIndex == index)
 				{
-					// Found a match - retrieve original position.
+					// Found a match - retrieve original position and angle.
 					basePosition = propReference.position - propReference.adjustment;
+					angle = propReference.radAngle;
 					break;
 				}
 			}
@@ -919,10 +921,11 @@ namespace BOB
 				return;
             }
 			
-			// Preview new position, probability, and fixed height setting.
+			// Preview new position, probability, rotation, and fixed height setting.
 			thisProp.m_position = basePosition + new Vector3(xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue);
 			thisProp.m_probability = (int)probabilitySlider.TrueValue;
 			thisProp.m_fixedHeight = customHeightCheck.isChecked;
+			thisProp.m_radAngle = angle + (angleSlider.TrueValue * Mathf.Deg2Rad);
 
 			// If a replacement prefab has been selected, then update it too.
 			if (ReplacementPrefab != null)

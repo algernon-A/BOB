@@ -721,16 +721,18 @@ namespace BOB
 				return;
 			}
 
-			// Original position.
+			// Original position and angle.
 			Vector3 basePosition = new Vector3();
+			float angle = 0f;
 
 			// Find matching prop reference (by lane and index match) in original values.
 			foreach (NetPropReference propReference in originalValues)
 			{
 				if (propReference != null && propReference.laneIndex == lane && propReference.propIndex == index)
 				{
-					// Found a match - retrieve original position.
+					// Found a match - retrieve original position and angle.
 					basePosition = propReference.position - propReference.adjustment;
+					angle = propReference.angle;
 					break;
 				}
 			}
@@ -753,7 +755,7 @@ namespace BOB
 			// Preview new position and probability setting.
 			thisProp.m_position = basePosition + new Vector3(offsetX, ySlider.TrueValue, zSlider.TrueValue);
 			thisProp.m_probability = (int)probabilitySlider.TrueValue;
-			thisProp.m_angle = (int)angleSlider.TrueValue;
+			thisProp.m_angle = angle + (int)angleSlider.TrueValue;
 
 			// If a replacement prefab has been selected, then update it too.
 			if (ReplacementPrefab != null)

@@ -463,7 +463,7 @@ namespace BOB
 			propReference.buildingInfo.m_props[propReference.propIndex].m_fixedHeight = replacement.customHeight;
 
 			// Angle and offset.
-			propReference.buildingInfo.m_props[propReference.propIndex].m_radAngle = propReference.radAngle + ((replacement.angle * Mathf.PI) / 180f);
+			propReference.buildingInfo.m_props[propReference.propIndex].m_radAngle = propReference.radAngle + (replacement.angle * Mathf.Deg2Rad);
 			propReference.buildingInfo.m_props[propReference.propIndex].m_position = propReference.position + offset;
 
 			// Probability.
