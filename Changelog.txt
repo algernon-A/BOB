@@ -1,4 +1,6 @@
-﻿- Fix preview sometimes showing incorrect prop angles
+﻿Version 0.9.0.4 -
+
+- Fix preview sometimes showing incorrect prop angles
 
 
 Version 0.9.0.3 -
