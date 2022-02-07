@@ -1,6 +1,7 @@
 ﻿Version 0.9.0.4 -
 
 - Fix preview sometimes showing incorrect prop angles
+- Fix building prop list sometimes not showing original prop name
 
 
 Version 0.9.0.3 -

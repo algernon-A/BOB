@@ -689,6 +689,7 @@ namespace BOB
 				{
 					targetListItem.allPrefab = allBuildingReplacement.replacementInfo;
 					targetListItem.allProb = allBuildingReplacement.probability;
+					targetListItem.originalPrefab = allBuildingReplacement.targetInfo;
 				}
 
 				// Building replacement and original probability (if any).
@@ -697,6 +698,7 @@ namespace BOB
 				{
 					targetListItem.replacementPrefab = buildingReplacement.replacementInfo;
 					targetListItem.replacementProb = buildingReplacement.probability;
+					targetListItem.originalPrefab = buildingReplacement.targetInfo;
 				}
 
 				// Individual replacement and original probability (if any).
@@ -705,6 +707,7 @@ namespace BOB
 				{
 					targetListItem.individualPrefab = individualReplacement.replacementInfo;
 					targetListItem.individualProb = individualReplacement.probability;
+					targetListItem.originalPrefab = individualReplacement.targetInfo;
 				}
 
 				// If we found an active replacement, update original reference values.
