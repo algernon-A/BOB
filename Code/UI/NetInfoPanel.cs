@@ -745,11 +745,12 @@ namespace BOB
 				return;
 			}
 
-			// Calculate preview X position, taking into account mirrored trees/props, inverting x offset to match original prop x position.
+			// Calculate preview X position and angle, taking into account mirrored trees/props, inverting x offset to match original prop x position.
 			float offsetX = xSlider.TrueValue;
 			if (thisLane.m_position + basePosition.x < 0)
 			{
 				offsetX = 0 - offsetX;
+				angle -= 180f;
 			}
 
 			// Preview new position and probability setting.

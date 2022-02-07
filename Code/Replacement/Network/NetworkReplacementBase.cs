@@ -476,14 +476,16 @@ namespace BOB
 				return;
 			}
 
-			// Invert x offset to match original prop x position.
+			// Invert x offset and angle to match original prop x position.
+			float angleAdjustment = 180f;
 			if (thisLane.m_position + propReference.position.x < 0)
 			{
 				offset.x = 0 - offset.x;
+				angleAdjustment = -180f;
 			}
 
 			// Angle and offset.
-			thisLane.m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle + replacement.angle;
+			thisLane.m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle + replacement.angle + angleAdjustment;
 			thisLane.m_laneProps.m_props[propReference.propIndex].m_position = propReference.position + offset;
 
 			// Probability.

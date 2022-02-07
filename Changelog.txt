@@ -1,5 +1,6 @@
 ﻿Version 0.9.0.4 -
 
+- Mirrored network props now also mirror their rotation
 - Fix preview sometimes showing incorrect prop angles
 - Fix building prop list sometimes not showing original prop name
 
