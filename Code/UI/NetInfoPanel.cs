@@ -747,16 +747,17 @@ namespace BOB
 
 			// Calculate preview X position and angle, taking into account mirrored trees/props, inverting x offset to match original prop x position.
 			float offsetX = xSlider.TrueValue;
+			float angleMult = 1;
 			if (thisLane.m_position + basePosition.x < 0)
 			{
 				offsetX = 0 - offsetX;
-				angle -= 180f;
+				angleMult = -1;
 			}
 
 			// Preview new position and probability setting.
 			thisProp.m_position = basePosition + new Vector3(offsetX, ySlider.TrueValue, zSlider.TrueValue);
 			thisProp.m_probability = (int)probabilitySlider.TrueValue;
-			thisProp.m_angle = angle + (int)angleSlider.TrueValue;
+			thisProp.m_angle =angle + ((int)angleSlider.TrueValue * angleMult);
 
 			// If a replacement prefab has been selected, then update it too.
 			if (ReplacementPrefab != null)
