@@ -202,7 +202,7 @@ namespace BOB
                     if (targetProp == null)
                     {
                         // Failed to find matching prop prefab - skip this one.
-                        Logging.Message("couldn't find replacement prop ", treeNames[i]);
+                        Logging.Message("couldn't find replacement prop ", propNames[i]);
                         continue;
                     }
 
