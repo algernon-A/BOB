@@ -146,7 +146,6 @@
     <Content Include="Images\PreviewImage-Prod.png" />
     <Content Include="Libraries\EManagersLib.API.dll" />
     <Content Include="Libraries\UnifiedUILib.dll" />
-    <Content Include="ReplacementPacks\TestPacks.xml" />
     <Content Include="ReplacementPacks\RoadArrows.xml" />
     <Content Include="ReplacementPacks\RoadSigns.xml" />
     <Content Include="License.txt" />
