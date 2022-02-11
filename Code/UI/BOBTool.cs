@@ -386,6 +386,18 @@ namespace BOB
 					}
 				}
 			}
+
+			// Check for PageDown/PageUp.
+			if (e.keyCode == KeyCode.PageDown)
+			{
+				// Set mode to underground.
+				Singleton<InfoManager>.instance.SetCurrentMode(InfoManager.InfoMode.Underground, InfoManager.SubInfoMode.Default);
+			}
+			else if (e.keyCode == KeyCode.PageUp)
+			{
+				// Set mode to surface.
+				Singleton<InfoManager>.instance.SetCurrentMode(InfoManager.InfoMode.None, InfoManager.SubInfoMode.Default);
+			}
 		}
 	}
 }
