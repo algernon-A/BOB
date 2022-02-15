@@ -37,11 +37,10 @@ namespace BOB
 		private PrefabInfo replacementPrefab;
 
 		// Panel components.
-		protected UIButton applyButton;
+		protected UIButton applyButton, revertButton;
 		protected UIPanel rightPanel;
 		protected UIFastList targetList, loadedList;
 		protected UILabel noPropsLabel;
-		protected UIButton revertButton;
 		private readonly UIButton targetNameButton;
 		private readonly PreviewPanel previewPanel;
 
