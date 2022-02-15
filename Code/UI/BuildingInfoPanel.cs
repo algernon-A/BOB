@@ -654,7 +654,19 @@ namespace BOB
 				TargetListItem targetListItem = new TargetListItem();
 
 				// Try to get relevant prefab (prop/tree), using finalProp.
-				PrefabInfo finalInfo = IsTree ? (PrefabInfo)currentBuilding.m_props[propIndex]?.m_finalTree : (PrefabInfo)currentBuilding.m_props[propIndex]?.m_finalProp;
+				PrefabInfo finalInfo = null;
+				switch (PropTreeMode)
+				{
+					case PropTreeModes.Prop:
+						finalInfo = currentBuilding.m_props[propIndex]?.m_finalProp;
+						break;
+					case PropTreeModes.Tree:
+						finalInfo = currentBuilding.m_props[propIndex]?.m_finalTree;
+						break;
+					case PropTreeModes.Both:
+						finalInfo = (PrefabInfo)currentBuilding.m_props[propIndex]?.m_finalTree ?? currentBuilding.m_props[propIndex]?.m_finalProp;
+						break;
+				}
 
 				// Check to see if we were succesful - if not (e.g. we only want trees and this is a prop), continue on to next building prop.
 				if (finalInfo?.name == null)

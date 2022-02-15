@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Collections.Generic;
 using ColossalFramework.UI;
 using UnityEngine;
 
@@ -187,7 +188,8 @@ namespace BOB
 				// Replacement mode buttons.
 				for (int i = 0; i < (int)ReplacementModes.NumModes; ++i)
 				{
-					modeChecks[i] = IconToggleCheck(this, ModeX + (i * ToggleSize), ModeY, IsTree ? TreeModeAtlas[i] : PropModeAtlas[i], IsTree ? TreeModeTipKeys[i] : PropModeTipKeys[i]);
+					bool useTreeLabels = PropTreeMode == PropTreeModes.Tree;
+					modeChecks[i] = IconToggleCheck(this, ModeX + (i * ToggleSize), ModeY, useTreeLabels ? TreeModeAtlas[i] : PropModeAtlas[i], useTreeLabels ? TreeModeTipKeys[i] : PropModeTipKeys[i]);
 					modeChecks[i].objectUserData = i;
 					modeChecks[i].eventCheckChanged += ModeCheckChanged;
 				}
@@ -256,8 +258,6 @@ namespace BOB
 
 				// Set initial button states.
 				UpdateButtonStates();
-
-				Logging.Message("InfoPanel constructor complete");
 			}
 			catch (Exception e)
 			{
@@ -387,7 +387,7 @@ namespace BOB
 			if (randomCheck.isChecked)
 			{
 				// Yes - show only random trees/props.
-				if (IsTree)
+				if (PropTreeMode == PropTreeModes.Tree)
 				{
 					// Trees.
 					loadedList.rowsData = new FastList<object>
@@ -396,13 +396,27 @@ namespace BOB
 						m_size = PrefabLists.RandomTrees.Count
 					};
 				}
-				else
+				else if (PropTreeMode == PropTreeModes.Prop)
 				{
 					// Props.
 					loadedList.rowsData = new FastList<object>
 					{
 						m_buffer = PrefabLists.RandomProps.OrderBy(x => x.name.ToLower()).ToArray(),
 						m_size = PrefabLists.RandomProps.Count
+					};
+				}
+				else if (PropTreeMode == PropTreeModes.Both)
+				{
+					// Trees and props - combine both.
+					List<BOBRandomPrefab> randomList = new List<BOBRandomPrefab>(PrefabLists.RandomProps.Count + PrefabLists.RandomTrees.Count);
+					randomList.AddRange(PrefabLists.RandomProps);
+					randomList.AddRange(PrefabLists.RandomTrees);
+
+					// Both props and trees.
+					loadedList.rowsData = new FastList<object>
+					{
+						m_buffer = randomList.OrderBy(x => x.name.ToLower()).ToArray(),
+						m_size = randomList.Count
 					};
 				}
 

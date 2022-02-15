@@ -12,6 +12,17 @@ namespace BOB
 	/// </summary>
 	internal abstract class BOBInfoPanelBase : BOBPanelBase
 	{
+		/// <summary>
+		/// Prop/tree modes.
+		/// </summary>
+		internal enum PropTreeModes : int
+		{
+			Prop = 0,
+			Tree,
+			Both,
+			NumModes
+		}
+
 		// Layout constants - X.
 		private const float LeftWidth = 400f;
 		protected const float MidControlWidth = ActionSize * 3f;
@@ -49,12 +60,6 @@ namespace BOB
 
 
 		/// <summary>
-		// Current tree/prop state.
-		/// </summary>
-		protected virtual bool IsTree => treeCheck?.isChecked ?? false;
-
-
-		/// <summary>
 		/// Panel width.
 		/// </summary>
 		protected override float PanelWidth => RightX + RightWidth + Margin;
@@ -75,6 +80,22 @@ namespace BOB
 		/// Returns the current individual index number of the current selection.  This could be either the direct index or in the index array, depending on situation.
 		/// </summary>
 		protected int IndividualIndex => CurrentTargetItem.index < 0 ? CurrentTargetItem.indexes[0] : CurrentTargetItem.index;
+
+
+		/// <summary>
+		/// Current prop/tree mode.
+		/// </summary>
+		protected PropTreeModes PropTreeMode
+		{
+			get => _propTreeMode;
+
+			set 
+			{
+				_propTreeMode = value;
+			}
+		}
+		// Current replacement mode.
+		private PropTreeModes _propTreeMode = PropTreeModes.Prop;
 
 
 		/// <summary>
@@ -218,7 +239,7 @@ namespace BOB
 				// 'No props' label (starts hidden).
 				noPropsLabel = leftPanel.AddUIComponent<UILabel>();
 				noPropsLabel.relativePosition = new Vector2(Margin, Margin);
-				noPropsLabel.text =Translations.Translate(IsTree ? "BOB_PNL_NOT" : "BOB_PNL_NOP");
+				noPropsLabel.text =Translations.Translate(PropTreeMode == PropTreeModes.Tree ? "BOB_PNL_NOT" : "BOB_PNL_NOP");
 				noPropsLabel.Hide();
 
 				// Actions text label.
@@ -237,7 +258,7 @@ namespace BOB
 
 				// Scale button.
 				UIButton scaleButton = AddIconButton(this, MiddleX, ToggleY, ToggleSize, "BOB_PNL_SCA", TextureUtils.LoadSpriteAtlas("BOB-Scale"));
-				scaleButton.eventClicked += (control, clickEvent) => BOBScalePanel.Create(IsTree, replacementPrefab);
+				scaleButton.eventClicked += (control, clickEvent) => BOBScalePanel.Create(PropTreeMode == PropTreeModes.Tree ||  replacementPrefab is TreeInfo, replacementPrefab);
 
 				// Preview image.
 				previewPanel = AddUIComponent<PreviewPanel>();
@@ -330,16 +351,19 @@ namespace BOB
 				// Props are now selected - unset tree check.
 				treeCheck.isChecked = false;
 
+				// Update current mode.
+				PropTreeMode = PropTreeModes.Prop;
+
 				// Reset current items.
 				CurrentTargetItem = null;
 				ReplacementPrefab = null;
 
-				// Set loaded lists to 'props'.
-				LoadedList();
-				TargetList();
-
 				// Set 'no props' label text.
 				noPropsLabel.text = Translations.Translate("BOB_PNL_NOP");
+
+				// Regenerate lists.
+				LoadedList();
+				TargetList();
 			}
 			else
 			{
@@ -370,16 +394,19 @@ namespace BOB
 				// Trees are now selected - unset prop check.
 				propCheck.isChecked = false;
 
+				// Update current mode.
+				PropTreeMode = PropTreeModes.Tree;
+
 				// Reset current items.
 				CurrentTargetItem = null;
 				ReplacementPrefab = null;
 
+				// Set 'no trees' label text.
+				noPropsLabel.text = Translations.Translate("BOB_PNL_NOT");
+
 				// Set loaded lists to 'trees'.
 				LoadedList();
 				TargetList();
-
-				// Set 'no trees' label text.
-				noPropsLabel.text = Translations.Translate("BOB_PNL_NOT");
 			}
 			else
 			{
@@ -420,8 +447,8 @@ namespace BOB
 
 			bool nameFilterActive = !nameFilter.text.IsNullOrWhiteSpace();
 
-			// Tree or prop?
-			if (IsTree)
+			// Add trees, if applicable.
+			if (PropTreeMode == PropTreeModes.Tree || PropTreeMode == PropTreeModes.Both)
 			{
 				// Tree - iterate through each tree in our list of loaded prefabs.
 				foreach (TreeInfo loadedTree in PrefabLists.LoadedTrees)
@@ -441,9 +468,11 @@ namespace BOB
 					}
 				}
 			}
-			else
+
+			// Add props, if applicable.
+			if (PropTreeMode == PropTreeModes.Prop || PropTreeMode == PropTreeModes.Both)
 			{
-				// Prop - iterate through each prop in our list of loaded prefabs.
+				// Iterate through each prop in our list of loaded prefabs.
 				foreach (PropInfo loadedProp in PrefabLists.LoadedProps)
 				{
 					// Set display name.

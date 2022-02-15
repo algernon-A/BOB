@@ -15,12 +15,6 @@ namespace BOB
 	internal class BOBMapInfoPanel : BOBInfoPanelBase
 	{
 		/// <summary>
-		// Current tree/prop state.
-		/// </summary>
-		protected override bool IsTree => treeCheck?.isChecked ?? false;
-
-
-		/// <summary>
 		// Initial tree/prop checked state.
 		/// </summary>
 		protected override bool InitialTreeCheckedState => selectedPrefab is TreeInfo;
@@ -189,12 +183,12 @@ namespace BOB
 			TreeInstance[] trees = Singleton<TreeManager>.instance.m_trees.m_buffer;
 
 			// Iterate through each prop or tree instance on map.
-			for (uint i = 0; i < (IsTree ? trees.Length : PropAPI.PropBufferLen); ++i)
+			for (uint i = 0; i < (PropTreeMode == PropTreeModes.Tree ? trees.Length : PropAPI.PropBufferLen); ++i)
 			{
 				// Create new list item, hiding probabilities.
 				TargetListItem propListItem = new TargetListItem { showProbs = false };
 
-				if (IsTree)
+				if (PropTreeMode == PropTreeModes.Tree)
 				{
 					// Local reference.
 					TreeInstance tree = trees[i];

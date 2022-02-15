@@ -565,7 +565,19 @@ namespace BOB
 					NetTargetListItem targetListItem = new NetTargetListItem();
 
 					// Try to get relevant prefab (prop/tree), using finalProp.
-					PrefabInfo finalInfo = IsTree ? (PrefabInfo)laneProps[propIndex]?.m_finalTree : (PrefabInfo)laneProps[propIndex]?.m_finalProp;
+					PrefabInfo finalInfo = null;
+					switch (PropTreeMode)
+                    {
+						case PropTreeModes.Prop:
+							finalInfo = laneProps[propIndex]?.m_finalProp;
+							break;
+						case PropTreeModes.Tree:
+							finalInfo = laneProps[propIndex]?.m_finalTree;
+							break;
+						case PropTreeModes.Both:
+							finalInfo = (PrefabInfo)laneProps[propIndex]?.m_finalTree ?? laneProps[propIndex]?.m_finalProp;
+							break;
+					}
 
 					// Check to see if we were succesful - if not (e.g. we only want trees and this is a prop), continue on to next building prop.
 					if (finalInfo?.name == null)
