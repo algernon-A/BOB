@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using UnityEngine;
 using ColossalFramework;
 using ColossalFramework.UI;
 using EManagersLib.API;
@@ -32,12 +31,14 @@ namespace BOB
 			// Title label.
 			SetTitle(Translations.Translate("BOB_NAM"));
 
-			// Set trees/props.
-			propCheck.isChecked = !InitialTreeCheckedState;
-			treeCheck.isChecked = InitialTreeCheckedState;
+			// Set intial prop/tree mode, deselecting previous selection and disabling events throughout.
+			ignorePropTreeCheckChanged = true;
+			propTreeChecks[(int)PropTreeMode].isChecked = false;
+			PropTreeMode = targetPrefabInfo is TreeInfo ? PropTreeModes.Tree : PropTreeModes.Prop;
+			propTreeChecks[(int)PropTreeMode].isChecked = true;
+			ignorePropTreeCheckChanged = false;
 
 			// Populate target list and select target item.
-			Logging.Message("MapPanel SetTarget");
 			TargetList();
 			targetList.FindTargetItem(targetPrefabInfo);
 
@@ -53,6 +54,10 @@ namespace BOB
         {
 			try
 			{
+				// Disable 'both' check.
+				propTreeChecks[(int)PropTreeModes.Both].Disable();
+				propTreeChecks[(int)PropTreeModes.Both].Hide();
+
 				// Populate loaded list.
 				LoadedList();
 

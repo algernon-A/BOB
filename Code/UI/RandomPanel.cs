@@ -147,8 +147,8 @@ namespace BOB
 
 
 		// Trees or props?
-		private bool IsTree => treeCheck?.isChecked ?? false;
-		
+		private bool IsTree => PropTreeMode == PropTreeModes.Tree;
+
 
 		/// <summary>
 		/// Sets the currently selected loaded prefab.
@@ -186,15 +186,15 @@ namespace BOB
 		/// Sets the currently selected random prefab.
 		/// </summary>
 		internal BOBRandomPrefab SelectedRandomPrefab
-        {
+		{
 			set
-            {
+			{
 				// Don't do anything if no change.
 				if (value == selectedRandomPrefab)
-                {
+				{
 					return;
-                }
-				
+				}
+
 				// Set selection.
 				selectedRandomPrefab = value;
 
@@ -211,7 +211,7 @@ namespace BOB
 				// Update button states.
 				UpdateButtonStates();
 			}
-        }
+		}
 
 
 		/// <summary>
@@ -224,6 +224,10 @@ namespace BOB
 
 			// Title label.
 			SetTitle(Translations.Translate("BOB_NAM") + " : " + Translations.Translate("BOB_RND_TIT"));
+
+			// Disable 'both' check.
+			propTreeChecks[(int)PropTreeModes.Both].Disable();
+			propTreeChecks[(int)PropTreeModes.Both].Hide();
 
 			// Selected random prop list.
 			UIPanel randomizerPanel = AddUIComponent<UIPanel>();
@@ -275,13 +279,13 @@ namespace BOB
 			// Order button.
 			loadedNameButton = ArrowButton(this, LoadedX + 10f, ListY - 20f);
 			loadedNameButton.eventClicked += SortLoaded;
-	
+
 			// Probability slider.
 			probSlider = AddBOBSlider(this, SelectedX + Margin, ToolY + Margin, SelectedWidth - (Margin * 2f), "BOB_PNL_PRB", 0, 100, 1, "Probability");
 			probSlider.eventValueChanged += (control, value) =>
 			{
 				if (selectedVariation != null)
-                {
+				{
 					selectedVariation.probability = (int)value;
 					lastChangedVariant = selectedVariation;
 
@@ -292,7 +296,7 @@ namespace BOB
 
 					variationsList.Refresh();
 					ConfigurationUtils.SaveConfig();
-                }
+				}
 			};
 
 			// Default is name ascending.
@@ -333,7 +337,7 @@ namespace BOB
 			if (IsTree)
 			{
 				// Tree - iterate through each prop in our list of loaded prefabs.
-				foreach(TreeInfo loadedTree in PrefabLists.LoadedTrees)
+				foreach (TreeInfo loadedTree in PrefabLists.LoadedTrees)
 				{
 					// Set display name.
 					string displayName = PrefabLists.GetDisplayName(loadedTree);
@@ -395,6 +399,20 @@ namespace BOB
 
 
 		/// <summary>
+		/// Performs actions required after a change to prop/tree mode.
+		/// </summary>
+		protected override void PropTreeChange()
+		{
+			// Reset current items.
+			SelectedRandomPrefab = null;
+
+			// Regenerate lists.
+			RandomList();
+			LoadedList();
+		}
+
+
+		/// <summary>
 		/// Updates button states (enabled/disabled) according to current control states.
 		/// </summary>
 		private void UpdateButtonStates()
@@ -403,66 +421,6 @@ namespace BOB
 			bool buttonState = selectedRandomPrefab != null;
 			removeRandomButton.isEnabled = buttonState;
 			renameButton.isEnabled = buttonState;
-		}
-
-
-		/// <summary>
-		/// Prop check event handler.
-		/// </summary>
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="isChecked">New checked state</param>
-		protected override void PropCheckChanged(UIComponent control, bool isChecked)
-		{
-			if (isChecked)
-			{
-				// Props are now selected - unset tree check.
-				treeCheck.isChecked = false;
-
-				// Reset current items.
-				SelectedRandomPrefab = null;
-
-				// Set loaded lists to 'props'.
-				RandomList();
-				LoadedList();
-			}
-			else
-			{
-				// Props are now unselected - set tree check if it isn't already (letting tree check event handler do the work required).
-				if (!treeCheck.isChecked)
-				{
-					treeCheck.isChecked = true;
-				}
-			}
-		}
-
-
-		/// <summary>
-		/// Tree check event handler.
-		/// </summary>
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="isChecked">New checked state</param>
-		protected override void TreeCheckChanged(UIComponent control, bool isChecked)
-		{
-			if (isChecked)
-			{
-				// Trees are now selected - unset prop check.
-				propCheck.isChecked = false;
-
-				// Reset current items.
-				SelectedRandomPrefab = null;
-
-				// Set loaded lists to 'trees'.
-				RandomList();
-				LoadedList();
-			}
-			else
-			{
-				// Trees are now unselected - set prop check if it isn't already (letting prop check event handler do the work required).
-				if (!propCheck.isChecked)
-				{
-					propCheck.isChecked = true;
-				}
-			}
 		}
 
 

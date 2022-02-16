@@ -143,7 +143,7 @@ namespace BOB
 					// Set tree status.
 					if (isTree)
                     {
-						panel.treeCheck.isChecked = true;
+						panel.PropTreeMode = PropTreeModes.Tree;
                     }
 
 					// Select previously selected prefab, if any.
@@ -195,6 +195,10 @@ namespace BOB
 		{
 			// Default position - centre in screen.
 			relativePosition = new Vector2(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
+
+			// Disable 'both' check.
+			propTreeChecks[(int)PropTreeModes.Both].Disable();
+			propTreeChecks[(int)PropTreeModes.Both].Hide();
 
 			// Title label.
 			SetTitle(Translations.Translate("BOB_NAM") + " : " + Translations.Translate("BOB_SCA_TIT"));
@@ -335,60 +339,15 @@ namespace BOB
 
 
 		/// <summary>
-		/// Prop check event handler.
+		/// Performs actions required after a change to prop/tree mode.
 		/// </summary>
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="isChecked">New checked state</param>
-		protected override void PropCheckChanged(UIComponent control, bool isChecked)
+		protected override void PropTreeChange()
 		{
-			if (isChecked)
-			{
-				// Props are now selected - unset tree check.
-				treeCheck.isChecked = false;
+			// Reset current item.
+			SelectedLoadedPrefab = null;
 
-				// Reset current item.
-				SelectedLoadedPrefab = null;
-
-				// Set loaded lists to 'props'.
-				LoadedList();
-			}
-			else
-			{
-				// Props are now unselected - set tree check if it isn't already (letting tree check event handler do the work required).
-				if (!treeCheck.isChecked)
-				{
-					treeCheck.isChecked = true;
-				}
-			}
-		}
-
-
-		/// <summary>
-		/// Tree check event handler.
-		/// </summary>
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="isChecked">New checked state</param>
-		protected override void TreeCheckChanged(UIComponent control, bool isChecked)
-		{
-			if (isChecked)
-			{
-				// Trees are now selected - unset prop check.
-				propCheck.isChecked = false;
-
-				// Reset current item.
-				SelectedLoadedPrefab = null;
-
-				// Set loaded lists to 'trees'.
-				LoadedList();
-			}
-			else
-			{
-				// Trees are now unselected - set prop check if it isn't already (letting prop check event handler do the work required).
-				if (!propCheck.isChecked)
-				{
-					propCheck.isChecked = true;
-				}
-			}
+			// Regenerate lists.
+			LoadedList();
 		}
 
 
@@ -526,6 +485,6 @@ namespace BOB
 
 
 		// Trees or props?
-		private bool IsTree => treeCheck?.isChecked ?? false;
+		private bool IsTree => PropTreeMode == PropTreeModes.Tree;
 	}
 }

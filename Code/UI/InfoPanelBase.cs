@@ -13,17 +13,6 @@ namespace BOB
 	/// </summary>
 	internal abstract class BOBInfoPanelBase : BOBPanelBase
 	{
-		/// <summary>
-		/// Prop/tree modes.
-		/// </summary>
-		internal enum PropTreeModes : int
-		{
-			Prop = 0,
-			Tree,
-			Both,
-			NumModes
-		}
-
 		// Layout constants - X.
 		private const float LeftWidth = 400f;
 		protected const float MidControlWidth = ActionSize * 3f;
@@ -84,37 +73,21 @@ namespace BOB
 
 
 		/// <summary>
-		/// Current prop/tree mode.
-		/// </summary>
-		protected PropTreeModes PropTreeMode
-		{
-			get => _propTreeMode;
-
-			set 
-			{
-				_propTreeMode = value;
-			}
-		}
-		// Current replacement mode.
-		private PropTreeModes _propTreeMode = PropTreeModes.Prop;
-
-
-		/// <summary>
 		/// Checks for and displays any exception message.
 		/// Called by the game every update cycle.
 		/// </summary>
 		public override void Update()
-        {
-            base.Update();
+		{
+			base.Update();
 
 			InfoPanelManager.CheckException();
 		}
 
 
-        /// <summary>
-        /// Sets the current target item and updates button states accordingly.
-        /// </summary>
-        internal virtual TargetListItem CurrentTargetItem
+		/// <summary>
+		/// Sets the current target item and updates button states accordingly.
+		/// </summary>
+		internal virtual TargetListItem CurrentTargetItem
 		{
 			get => currentTargetItem;
 
@@ -240,7 +213,7 @@ namespace BOB
 				// 'No props' label (starts hidden).
 				noPropsLabel = leftPanel.AddUIComponent<UILabel>();
 				noPropsLabel.relativePosition = new Vector2(Margin, Margin);
-				noPropsLabel.text =Translations.Translate(PropTreeMode == PropTreeModes.Tree ? "BOB_PNL_NOT" : "BOB_PNL_NOP");
+				noPropsLabel.text = Translations.Translate(PropTreeMode == PropTreeModes.Tree ? "BOB_PNL_NOT" : "BOB_PNL_NOP");
 				noPropsLabel.Hide();
 
 				// Actions text label.
@@ -259,7 +232,7 @@ namespace BOB
 
 				// Scale button.
 				UIButton scaleButton = AddIconButton(this, MiddleX, ToggleY, ToggleSize, "BOB_PNL_SCA", TextureUtils.LoadSpriteAtlas("BOB-Scale"));
-				scaleButton.eventClicked += (control, clickEvent) => BOBScalePanel.Create(PropTreeMode == PropTreeModes.Tree ||  replacementPrefab is TreeInfo, replacementPrefab);
+				scaleButton.eventClicked += (control, clickEvent) => BOBScalePanel.Create(PropTreeMode == PropTreeModes.Tree || replacementPrefab is TreeInfo, replacementPrefab);
 
 				// Preview image.
 				previewPanel = AddUIComponent<PreviewPanel>();
@@ -302,8 +275,8 @@ namespace BOB
 		/// Performs any actions-on-close for the panel.
 		/// </summary>
 		internal virtual void Close()
-        {
-        }
+		{
+		}
 
 
 		/// <summary>
@@ -341,97 +314,35 @@ namespace BOB
 
 
 		/// <summary>
-		/// Prop check event handler.
-		/// </summary>
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="isChecked">New checked state</param>
-		protected override void PropCheckChanged(UIComponent control, bool isChecked)
-		{
-			if (isChecked)
-			{
-				// Props are now selected - unset tree check.
-				treeCheck.isChecked = false;
-
-				// Update current mode.
-				PropTreeMode = PropTreeModes.Prop;
-
-				// Reset current items.
-				CurrentTargetItem = null;
-				ReplacementPrefab = null;
-
-				// Set 'no props' label text.
-				noPropsLabel.text = Translations.Translate("BOB_PNL_NOP");
-
-				// Regenerate lists.
-				LoadedList();
-				TargetList();
-			}
-			/*else
-			{
-				// Props are now unselected - set tree check if it isn't already (letting tree check event handler do the work required).
-				if (!treeCheck.isChecked)
-				{
-					treeCheck.isChecked = true;
-				}
-			}*/
-
-			// Save state.
-			ModSettings.treeSelected = !isChecked;
-
-			// Update button states.
-			UpdateButtonStates();
-		}
-
-
-		/// <summary>
-		/// Tree check event handler.
-		/// </summary>
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="isChecked">New checked state</param>
-		protected override void TreeCheckChanged(UIComponent control, bool isChecked)
-		{
-			if (isChecked)
-			{
-				// Trees are now selected - unset prop check.
-				propCheck.isChecked = false;
-
-				// Update current mode.
-				PropTreeMode = PropTreeModes.Tree;
-
-				// Reset current items.
-				CurrentTargetItem = null;
-				ReplacementPrefab = null;
-
-				// Set 'no trees' label text.
-				noPropsLabel.text = Translations.Translate("BOB_PNL_NOT");
-
-				// Set loaded lists to 'trees'.
-				LoadedList();
-				TargetList();
-			}
-			/*else
-			{
-				// Trees are now unselected - set prop check if it isn't already (letting prop check event handler do the work required).
-				if (!propCheck.isChecked)
-				{
-					propCheck.isChecked = true;
-				}
-			}*/
-
-			// Save state.
-			ModSettings.treeSelected = isChecked;
-
-			// Update button states.
-			UpdateButtonStates();
-		}
-
-
-		/// <summary>
 		/// Updates the target item record for changes in replacement status (e.g. after applying or reverting changes).
 		/// </summary>
 		/// <param name="propListItem">Target item</param>
 		protected virtual void UpdateTargetItem(TargetListItem targetListItem)
 		{
+		}
+
+
+		/// <summary>
+		/// Performs actions required after a change to prop/tree mode.
+		/// </summary>
+		protected override void PropTreeChange()
+        {
+			// Reset current items.
+			CurrentTargetItem = null;
+			ReplacementPrefab = null;
+
+			// Set 'no props' label text.
+			noPropsLabel.text = Translations.Translate(PropTreeMode == PropTreeModes.Tree ? "BOB_PNL_NOT" : "BOB_PNL_NOP");
+
+			// Regenerate lists.
+			LoadedList();
+			TargetList();
+
+			// Save state.
+			ModSettings.treeSelected = PropTreeMode == PropTreeModes.Tree;
+
+			// Update button states.
+			UpdateButtonStates();
 		}
 
 
@@ -495,6 +406,7 @@ namespace BOB
 			// If we're combining trees and props, sort by name to combine them.
 			if (PropTreeMode == PropTreeModes.Both)
             {
+				Logging.Message("ordering lists");
 				list.OrderBy(x => x.name.ToLower());
 			}
 

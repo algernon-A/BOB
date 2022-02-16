@@ -9,13 +9,27 @@ namespace BOB
 	/// </summary>
 	internal abstract class BOBPanelBase : UIPanel
 	{
-		// Display order state.
-		internal enum OrderBy
+		/// <summary>
+		/// Display order states.
+		/// </summary>
+		protected enum OrderBy : int
 		{
 			NameAscending = 0,
 			NameDescending,
 			CreatorAscending,
 			CreatorDescending
+		}
+
+
+		/// <summary>
+		/// Prop/tree modes.
+		/// </summary>
+		protected enum PropTreeModes : int
+		{
+			Prop = 0,
+			Tree,
+			Both,
+			NumModes
 		}
 
 
@@ -40,13 +54,38 @@ namespace BOB
 		// Panel components.
 		protected UITextField nameFilter;
 		protected UICheckBox hideVanilla;
-		protected UICheckBox treeCheck, propCheck;
 		protected UIButton loadedNameButton;
 		protected UILabel modeLabel;
 		private UILabel titleLabel;
+		protected readonly UICheckBox[] propTreeChecks = new UICheckBox[(int)PropTreeModes.NumModes];
 
 		// Search settings.
 		protected int loadedSearchStatus;
+
+		// Status flag.
+		protected bool ignorePropTreeCheckChanged = false;
+
+
+		/// <summary>
+		/// Prop/tree check atlases.
+		/// </summary>
+		private readonly string[] propTreepAtlas = new string[(int)PropTreeModes.NumModes]
+		{
+			"BOB-PropsSmall",
+			"BOB-TreesSmall",
+			"BOB-PropsSmall"
+		};
+
+
+		/// <summary>
+		/// Prop/tree check tooltip keys.
+		/// </summary>
+		private string[] propTreeTipKeys = new string[(int)PropTreeModes.NumModes]
+		{
+			"BOB_PNL_PRP",
+			"BOB_PNL_TRE",
+			"BOB_PNL_BOT"
+		};
 
 
 		/// <summary>
@@ -65,6 +104,25 @@ namespace BOB
 		/// Panel opacity.
 		/// </summary>
 		protected abstract float PanelOpacity { get; }
+
+
+		/// <summary>
+		/// Current prop/tree mode.
+		/// </summary>
+		protected PropTreeModes PropTreeMode
+		{
+			get => _propTreeMode;
+
+			set
+			{
+				if (_propTreeMode != value)
+				{
+					_propTreeMode = value;
+				}
+			}
+		}
+		// Current replacement mode.
+		private PropTreeModes _propTreeMode = PropTreeModes.Prop;
 
 
 		/// <summary>
@@ -114,12 +172,18 @@ namespace BOB
 			modeLabel = UIControls.AddLabel(this, Margin, ToggleHeaderY, Translations.Translate("BOB_PNL_MOD"), textScale: 0.8f);
 
 			// Tree/Prop checkboxes.
-			propCheck = IconToggleCheck(this, Margin, ToggleY, "BOB-PropsSmall", "BOB_PNL_PRP");
-			treeCheck = IconToggleCheck(this, Margin + ToggleSize, ToggleY, "BOB-TreesSmall", "BOB_PNL_TRE");
-			propCheck.isChecked = !InitialTreeCheckedState;
-			treeCheck.isChecked = InitialTreeCheckedState;
-			propCheck.eventCheckChanged += PropCheckChanged;
-			treeCheck.eventCheckChanged += TreeCheckChanged;
+
+			for (int i = 0; i < (int)PropTreeModes.NumModes; ++i)
+			{
+				propTreeChecks[i] = IconToggleCheck(this, Margin + (i * ToggleSize), ToggleY, propTreepAtlas[i], propTreeTipKeys[i]);
+				propTreeChecks[i].objectUserData = i;
+				propTreeChecks[i].eventCheckChanged += PropTreeCheckChanged;
+			}
+
+			// Set initial mode state.
+			ignorePropTreeCheckChanged = true;
+			propTreeChecks[(int)PropTreeMode].isChecked = true;
+			ignorePropTreeCheckChanged = false;
 		}
 
 
@@ -152,19 +216,9 @@ namespace BOB
 
 
 		/// <summary>
-		/// Prop check event handler.
+		/// Performs actions required after a change to prop/tree mode.
 		/// </summary>
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="isChecked">New checked state</param>
-		protected abstract void PropCheckChanged(UIComponent control, bool isChecked);
-
-
-		/// <summary>
-		/// Tree check event handler.
-		/// </summary>
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="isChecked">New checked state</param>
-		protected abstract void TreeCheckChanged(UIComponent control, bool isChecked);
+		protected abstract void PropTreeChange();
 
 
 		/// <summary>
@@ -439,6 +493,58 @@ namespace BOB
 			checkBox.tooltip = Translations.Translate(tooltipKey);
 
 			return checkBox;
+		}
+
+
+		/// <summary>
+		/// Event handler for ptop/tree checkbox changes.
+		/// </summary>
+		/// <param name="control">Calling component</param>
+		/// <param name="isChecked">New checked state</param>
+		private void PropTreeCheckChanged(UIComponent control, bool isChecked)
+		{
+			// Don't do anything if we're ignoring events.
+			if (ignorePropTreeCheckChanged)
+			{
+				return;
+			}
+
+			// Suspend event handling while processing.
+			ignorePropTreeCheckChanged = true;
+
+			if (control is UICheckBox thisCheck)
+			{
+				// If this checkbox is being enabled, uncheck all others:
+				if (isChecked)
+				{
+					// Don't do anything if the selected mode index isn't different to the current mode.
+					if (thisCheck.objectUserData is int index && index != (int)PropTreeMode)
+					{
+						// Iterate through all checkboxes, unchecking all those that aren't this one (checkbox index stored in objectUserData).
+						for (int i = 0; i < (int)PropTreeModes.NumModes; ++i)
+						{
+							if (i != index)
+							{
+								propTreeChecks[i].isChecked = false;
+							}
+						}
+
+						// Set current mode.
+						PropTreeMode = (PropTreeModes)index;
+
+						// Perform post-change actions.
+						PropTreeChange();
+					}
+				}
+				else
+				{
+					// If no other check is checked, force this one to still be checked.
+					thisCheck.isChecked = true;
+				}
+			}
+
+			// Resume event handling.
+			ignorePropTreeCheckChanged = false;
 		}
 	}
 }

@@ -15,13 +15,14 @@ namespace BOB
 		/// <summary>
 		/// Replacement modes.
 		/// </summary>
-		internal enum ReplacementModes : int
+		protected enum ReplacementModes : int
 		{
 			Individual = 0,
 			Grouped,
 			All,
 			NumModes
 		}
+
 
 		// Layout constants - mode buttons.
 		private const float ModeX = Margin + (ToggleSize * 4f);
@@ -49,12 +50,12 @@ namespace BOB
 		// Panel components.
 		protected BOBSlider probabilitySlider, angleSlider, xSlider, ySlider, zSlider;
 		protected UIButton hideButton;
-		private readonly UICheckBox randomCheck, bothCheck;
+		private readonly UICheckBox randomCheck;
 		private readonly UICheckBox[] modeChecks = new UICheckBox[(int)ReplacementModes.NumModes];
 		protected UIPanel heightPanel;
 		private UIPanel anglePanel;
 
-		// Status flag.
+		// Status flags.
 		private bool ignoreModeCheckChanged = false;
 		protected bool ignoreSliderValueChange = true;
 		protected bool ignoreSelectedPrefabChange = true;
@@ -200,10 +201,6 @@ namespace BOB
 		{
 			try
 			{
-				// Tree/Prop 'both' checkbox.
-				bothCheck = IconToggleCheck(this, Margin + (ToggleSize * 2f), ToggleY, "BOB-PropsSmall", "BOB_PNL_BOT");
-				bothCheck.eventCheckChanged += BothCheckChanged;
-
 				// Replacement mode buttons.
 				for (int i = 0; i < (int)ReplacementModes.NumModes; ++i)
 				{
@@ -325,90 +322,6 @@ namespace BOB
 
 
 		/// <summary>
-		/// Prop check event handler.
-		/// </summary>
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="isChecked">New checked state</param>
-		protected override void PropCheckChanged(UIComponent control, bool isChecked)
-		{
-			// First, undo any preview.
-			RevertPreview();
-
-			// Perform the usual required tasks first.
-			base.PropCheckChanged(control, isChecked);
-
-			if (isChecked)
-			{
-				// Deselect both checkbox.
-				bothCheck.isChecked = false;
-			}
-		}
-
-
-		/// <summary>
-		/// Tree check event handler.
-		/// </summary>
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="isChecked">New checked state</param>
-		protected override void TreeCheckChanged(UIComponent control, bool isChecked)
-		{
-			// First, undo any preview.
-			RevertPreview();
-
-			// Perform the usual required tasks first.
-			base.TreeCheckChanged(control, isChecked);
-
-			// Update mode icons and tooltips to reflect the new tree/prop state.
-			if (isChecked)
-			{
-				UpdateModeIcons(TreeModeAtlas, TreeModeTipKeys);
-				hideButton.atlas = TextureUtils.LoadSpriteAtlas("BOB-InvisibleTree");
-
-				// Deselect both checkbox.
-				bothCheck.isChecked = false;
-			}
-			else
-			{
-				UpdateModeIcons(PropModeAtlas, PropModeTipKeys);
-				hideButton.atlas = TextureUtils.LoadSpriteAtlas("BOB-InvisibleProp");
-			}
-		}
-
-
-		/// <summary>
-		/// 'Both' (tree and prop) check event handler.
-		/// </summary>
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="isChecked">New checked state</param>
-		private void BothCheckChanged(UIComponent control, bool isChecked)
-		{
-			if (isChecked)
-			{
-				// Props are now selected - unset other checks.
-				treeCheck.isChecked = false;
-				propCheck.isChecked = false;
-
-				// Update current mode.
-				PropTreeMode = PropTreeModes.Both;
-
-				// Reset current items.
-				CurrentTargetItem = null;
-				ReplacementPrefab = null;
-
-				// Set 'no props' label text.
-				noPropsLabel.text = Translations.Translate("BOB_PNL_NOP");
-
-				// Regenerate lists.
-				LoadedList();
-				TargetList();
-
-				// Update button states.
-				UpdateButtonStates();
-			}
-		}
-
-
-		/// <summary>
 		/// Updates button states (enabled/disabled) according to current control states.
 		/// </summary>
 		protected override void UpdateButtonStates()
@@ -491,7 +404,6 @@ namespace BOB
 						m_size = randomList.Count
 					};
 				}
-
 				// Reverse order of filtered list if we're searching name descending.
 				if (loadedSearchStatus == (int)OrderBy.NameDescending)
 				{
