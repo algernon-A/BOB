@@ -1,4 +1,5 @@
-﻿- BOB tool now recognises the underground (PageDown/PageUp to switch)
+﻿- New feature: combined prop/tree mode - replace props (in buildings or networks) with trees, or vice-versa
+- BOB tool now recognises the underground (PageDown/PageUp to switch)
 
 
 Version 0.9.0.4 -

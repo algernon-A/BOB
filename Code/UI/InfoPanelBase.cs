@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using ColossalFramework;
@@ -365,14 +366,14 @@ namespace BOB
 				LoadedList();
 				TargetList();
 			}
-			else
+			/*else
 			{
 				// Props are now unselected - set tree check if it isn't already (letting tree check event handler do the work required).
 				if (!treeCheck.isChecked)
 				{
 					treeCheck.isChecked = true;
 				}
-			}
+			}*/
 
 			// Save state.
 			ModSettings.treeSelected = !isChecked;
@@ -408,14 +409,14 @@ namespace BOB
 				LoadedList();
 				TargetList();
 			}
-			else
+			/*else
 			{
 				// Trees are now unselected - set prop check if it isn't already (letting prop check event handler do the work required).
 				if (!propCheck.isChecked)
 				{
 					propCheck.isChecked = true;
 				}
-			}
+			}*/
 
 			// Save state.
 			ModSettings.treeSelected = isChecked;
@@ -489,6 +490,12 @@ namespace BOB
 						}
 					}
 				}
+			}
+
+			// If we're combining trees and props, sort by name to combine them.
+			if (PropTreeMode == PropTreeModes.Both)
+            {
+				list.OrderBy(x => x.name.ToLower());
 			}
 
 			// Master lists should already be sorted by display name so no need to sort again here.

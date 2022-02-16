@@ -12,6 +12,7 @@ BOB_PNL_NOP,No props found
 BOB_PNL_NOT,No trees found
 BOB_PNL_TRE,Trees
 BOB_PNL_PRP,Props
+BOB_PNL_BOT,Both trees and props
 BOB_PNL_IND,REMOVE Show individual props
 BOB_PNL_HDV,Hide vanilla
 BOB_PNL_ACT,Actions

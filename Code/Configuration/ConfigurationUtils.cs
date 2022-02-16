@@ -350,13 +350,20 @@ namespace BOB
 
 			// Attempt to load from prefab collection.
 			PrefabInfo replacementPrefab = isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacementName) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacementName);
-			if (replacementPrefab == null && CurrentConfig != null)
-			{
-				// If we couldn't load from prefab collection, attempt to find in our list of replacement prefabs.
-				replacementPrefab = isTree ? (PrefabInfo)CurrentConfig.randomTrees.Find(x => x.name.Equals(replacementName))?.tree : (PrefabInfo)CurrentConfig.randomProps.Find(x => x.name.Equals(replacementName))?.prop;
+
+			// If we couldn't find the tree/prop, try the other type instead.
+			if (replacementPrefab == null)
+            {
+				replacementPrefab = isTree ? (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacementName) : (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacementName);
 			}
 
-			// Return what we have.
+			// If we couldn't load from prefab collection, attempt to find in our list of random prefabs (if we have a config file, otherwise there's no random prefabs).
+			if (replacementPrefab == null && CurrentConfig != null)
+			{
+				replacementPrefab = (PrefabInfo)CurrentConfig.randomTrees.Find(x => x.name.Equals(replacementName))?.tree ?? (PrefabInfo)CurrentConfig.randomProps.Find(x => x.name.Equals(replacementName))?.prop;
+			}
+
+			// Return what we have, even if it's null.
 			return replacementPrefab;
 		}
 

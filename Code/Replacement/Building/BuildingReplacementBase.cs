@@ -107,8 +107,8 @@ namespace BOB
 		/// <param name="customHeight">Replacement custom height flag</param>
 		internal void Replace(BuildingInfo buildingInfo, PrefabInfo targetInfo, PrefabInfo replacementInfo, int propIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability, bool customHeight)
 		{
-			// Make sure that target and replacement are the same type before doing anything.
-			if (targetInfo?.name == null || replacementInfo?.name == null || (targetInfo is TreeInfo && !(replacementInfo is TreeInfo)) || (targetInfo is PropInfo) && !(replacementInfo is PropInfo))
+			// Null checks.
+			if (targetInfo?.name == null || replacementInfo?.name == null)
 			{
 				return;
 			}
@@ -416,7 +416,9 @@ namespace BOB
 			if (thisProp != null)
 			{
 				thisProp.m_prop = reference.originalProp;
+				thisProp.m_finalProp = reference.originalProp;
 				thisProp.m_tree = reference.originalTree;
+				thisProp.m_finalTree = reference.originalTree;
 				thisProp.m_radAngle = reference.radAngle;
 				thisProp.m_fixedHeight = reference.fixedHeight;
 				thisProp.m_position = reference.position;
@@ -445,19 +447,8 @@ namespace BOB
 			};
 
 			// Apply replacement.
-			if (replacement.replacementInfo is PropInfo propInfo)
-			{
-				propReference.buildingInfo.m_props[propReference.propIndex].m_prop = propInfo;
-			}
-			else if (replacement.replacementInfo is TreeInfo treeInfo)
-			{
-				propReference.buildingInfo.m_props[propReference.propIndex].m_tree = treeInfo;
-			}
-			else
-			{
-				Logging.Error("invalid replacement ", replacement.replacementInfo?.name ?? "null", " passed to BuildingInfo.ReplaceProp");
-				return;
-			}
+			propReference.buildingInfo.m_props[propReference.propIndex].m_prop = replacement.ReplacementProp;
+			propReference.buildingInfo.m_props[propReference.propIndex].m_tree = replacement.ReplacementTree;
 
 			// Set m_fixedHeight.
 			propReference.buildingInfo.m_props[propReference.propIndex].m_fixedHeight = replacement.customHeight;

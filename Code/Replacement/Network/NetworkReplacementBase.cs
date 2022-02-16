@@ -110,8 +110,8 @@ namespace BOB
 		/// <param name="probability">Replacement probability</param>
 		internal void Replace(NetInfo netInfo, PrefabInfo targetInfo, PrefabInfo replacementInfo, int laneIndex, int propIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability)
 		{
-			// Make sure that target and replacement are the same type before doing anything.
-			if (targetInfo?.name == null || replacementInfo?.name == null || (targetInfo is TreeInfo && !(replacementInfo is TreeInfo)) || (targetInfo is PropInfo) && !(replacementInfo is PropInfo))
+			// Null checks.
+			if (targetInfo?.name == null || replacementInfo?.name == null)
 			{
 				return;
 			}
@@ -323,7 +323,6 @@ namespace BOB
 				// Revert all entries in list.
 				RevertReferences(replacement.targetInfo, replacement.references);
 
-
 				// Remove replacement entry from list of replacements, if we're doing so.
 				if (removeEntries)
 				{
@@ -425,7 +424,9 @@ namespace BOB
 			if (thisProp != null)
 			{
 				thisProp.m_prop = reference.originalProp;
+				thisProp.m_finalProp = reference.originalProp;
 				thisProp.m_tree = reference.originalTree;
+				thisProp.m_finalTree = reference.originalTree;
 				thisProp.m_angle = reference.angle;
 				thisProp.m_position = reference.position;
 				thisProp.m_probability = reference.probability;
@@ -462,19 +463,10 @@ namespace BOB
 			NetInfo.Lane thisLane = propReference.netInfo.m_lanes[propReference.laneIndex];
 
 			// Apply replacement.
-			if (replacement.replacementInfo is PropInfo propInfo)
-			{
-				thisLane.m_laneProps.m_props[propReference.propIndex].m_prop = propInfo;
-			}
-			else if (replacement.replacementInfo is TreeInfo treeInfo)
-			{
-				thisLane.m_laneProps.m_props[propReference.propIndex].m_tree = treeInfo;
-			}
-			else
-			{
-				Logging.Error("invalid replacement ", replacement.replacementInfo?.name ?? "null", " passed to NetworkReplacement.ReplaceProp");
-				return;
-			}
+			thisLane.m_laneProps.m_props[propReference.propIndex].m_prop = replacement.ReplacementProp;
+			thisLane.m_laneProps.m_props[propReference.propIndex].m_finalProp = replacement.ReplacementProp;
+			thisLane.m_laneProps.m_props[propReference.propIndex].m_tree = replacement.ReplacementTree;
+			thisLane.m_laneProps.m_props[propReference.propIndex].m_finalTree = replacement.ReplacementTree;
 
 			// Invert x offset and angle to match original prop x position.
 			float angleMult = 1f;
