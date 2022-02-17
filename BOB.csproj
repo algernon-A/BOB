@@ -184,6 +184,7 @@
     <Content Include="Resources\BOB-InvisibleProp.png" />
     <Content Include="Resources\BOB-InvisibleTree.png" />
     <Content Include="Resources\BOB-OkSmallWarn.png" />
+    <Content Include="Resources\BOB-PropTreeSmall.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

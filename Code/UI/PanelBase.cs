@@ -73,7 +73,7 @@ namespace BOB
 		{
 			"BOB-PropsSmall",
 			"BOB-TreesSmall",
-			"BOB-PropsSmall"
+			"BOB-PropTreeSmall"
 		};
 
 
