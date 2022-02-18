@@ -182,7 +182,7 @@ namespace BOB
                 // Ensure Harmony is ready before patching.
                 if (HarmonyHelper.IsHarmonyInstalled)
                 {
-                    Logging.KeyMessage(active ? "deploying" : "reverting", " tree overlay Harmony patches");
+                    Logging.KeyMessage(active ? "deploying" : "reverting", " map overlay Harmony patches");
 
                     // Manually patch building overlay renderer.
                     Harmony harmonyInstance = new Harmony(harmonyID);

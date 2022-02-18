@@ -14,11 +14,10 @@ namespace BOB
         /// <summary>
         /// Harmony transpiler for BuildingAI.RenderProps, to insert calls to highlight selected props/trees
         /// </summary>
-        /// <param name="original">Original method</param>
         /// <param name="instructions">Original ILCode</param>
         /// <param name="generator">IL generator</param>
         /// <returns>Patched ILCode</returns>
-        public static IEnumerable<CodeInstruction> BuildingTranspiler(MethodBase original, IEnumerable<CodeInstruction> instructions, ILGenerator generator)
+        public static IEnumerable<CodeInstruction> BuildingTranspiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
             // ILCode local variable indexes.
             const int IVarIndex = 11;
@@ -100,11 +99,9 @@ namespace BOB
         /// <summary>
         /// Harmony transpiler for NetLane.RenderInstance, to insert calls to highlight selected props/tree.
         /// </summary>
-        /// <param name="original">Original method</param>
         /// <param name="instructions">Original ILCode</param>
-        /// <param name="generator">IL generator</param>
         /// <returns>Patched ILCode</returns>
-        public static IEnumerable<CodeInstruction> NetTranspiler(MethodBase original, IEnumerable<CodeInstruction> instructions, ILGenerator generator)
+        public static IEnumerable<CodeInstruction> NetTranspiler(IEnumerable<CodeInstruction> instructions)
         {
             // ILCode local variable indexes.
             const int SurfaceMapping2Index = 9;
@@ -202,11 +199,9 @@ namespace BOB
         /// <summary>
         /// Harmony transpiler for TreeInstance.RenderInstance, to insert calls to highlight selected props/tree.
         /// </summary>
-        /// <param name="original">Original method</param>
         /// <param name="instructions">Original ILCode</param>
-        /// <param name="generator">IL generator</param>
         /// <returns>Patched ILCode</returns>
-        public static IEnumerable<CodeInstruction> TreeTranspiler(MethodBase original, IEnumerable<CodeInstruction> instructions, ILGenerator generator)
+        public static IEnumerable<CodeInstruction> TreeTranspiler(IEnumerable<CodeInstruction> instructions)
         {
             // ILCode local variable indexes.
             const int TreeVarIndex = 0;
@@ -254,11 +249,9 @@ namespace BOB
         /// <summary>
         /// Harmony transpiler for PropInstance.RenderInstance, to insert calls to highlight selected map prop.
         /// </summary>
-        /// <param name="original">Original method</param>
         /// <param name="instructions">Original ILCode</param>
-        /// <param name="generator">IL generator</param>
         /// <returns>Patched ILCode</returns>
-        public static IEnumerable<CodeInstruction> PropTranspiler(MethodBase original, IEnumerable<CodeInstruction> instructions, ILGenerator generator)
+        public static IEnumerable<CodeInstruction> PropTranspiler(IEnumerable<CodeInstruction> instructions)
         {
             // ILCode local variable indexes.
             const int PropVarIndex = 0;
