@@ -448,7 +448,9 @@ namespace BOB
 
 			// Apply replacement.
 			propReference.buildingInfo.m_props[propReference.propIndex].m_prop = replacement.ReplacementProp;
+			propReference.buildingInfo.m_props[propReference.propIndex].m_finalProp = replacement.ReplacementProp;
 			propReference.buildingInfo.m_props[propReference.propIndex].m_tree = replacement.ReplacementTree;
+			propReference.buildingInfo.m_props[propReference.propIndex].m_finalTree = replacement.ReplacementTree;
 
 			// Set m_fixedHeight.
 			propReference.buildingInfo.m_props[propReference.propIndex].m_fixedHeight = replacement.customHeight;
