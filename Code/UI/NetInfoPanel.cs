@@ -367,6 +367,9 @@ namespace BOB
 
 					// Record updated original data.
 					RecordOriginal();
+
+					// Perform post-replacement processing.
+					FinishUpdate();
 				}
 			}
 			catch (Exception e)
@@ -434,6 +437,9 @@ namespace BOB
 
 				// Update target list.
 				targetList.Refresh();
+
+				// Perform post-replacement processing.
+				FinishUpdate();
 			}
 			catch (Exception e)
 			{
