@@ -222,6 +222,58 @@ namespace BOB
 
 
 		/// <summary>
+		/// Event handler for ptop/tree checkbox changes.
+		/// </summary>
+		/// <param name="control">Calling component</param>
+		/// <param name="isChecked">New checked state</param>
+		protected virtual void PropTreeCheckChanged(UIComponent control, bool isChecked)
+		{
+			// Don't do anything if we're ignoring events.
+			if (ignorePropTreeCheckChanged)
+			{
+				return;
+			}
+
+			// Suspend event handling while processing.
+			ignorePropTreeCheckChanged = true;
+
+			if (control is UICheckBox thisCheck)
+			{
+				// If this checkbox is being enabled, uncheck all others:
+				if (isChecked)
+				{
+					// Don't do anything if the selected mode index isn't different to the current mode.
+					if (thisCheck.objectUserData is int index && index != (int)PropTreeMode)
+					{
+						// Iterate through all checkboxes, unchecking all those that aren't this one (checkbox index stored in objectUserData).
+						for (int i = 0; i < (int)PropTreeModes.NumModes; ++i)
+						{
+							if (i != index)
+							{
+								propTreeChecks[i].isChecked = false;
+							}
+						}
+
+						// Set current mode.
+						PropTreeMode = (PropTreeModes)index;
+
+						// Perform post-change actions.
+						PropTreeChange();
+					}
+				}
+				else
+				{
+					// If no other check is checked, force this one to still be checked.
+					thisCheck.isChecked = true;
+				}
+			}
+
+			// Resume event handling.
+			ignorePropTreeCheckChanged = false;
+		}
+
+
+		/// <summary>
 		/// Loaded list sort button event handler.
 		/// <param name="control">Calling component (unused)</param>
 		/// <param name="mouseEvent">Mouse event (unused)</param>
@@ -493,58 +545,6 @@ namespace BOB
 			checkBox.tooltip = Translations.Translate(tooltipKey);
 
 			return checkBox;
-		}
-
-
-		/// <summary>
-		/// Event handler for ptop/tree checkbox changes.
-		/// </summary>
-		/// <param name="control">Calling component</param>
-		/// <param name="isChecked">New checked state</param>
-		private void PropTreeCheckChanged(UIComponent control, bool isChecked)
-		{
-			// Don't do anything if we're ignoring events.
-			if (ignorePropTreeCheckChanged)
-			{
-				return;
-			}
-
-			// Suspend event handling while processing.
-			ignorePropTreeCheckChanged = true;
-
-			if (control is UICheckBox thisCheck)
-			{
-				// If this checkbox is being enabled, uncheck all others:
-				if (isChecked)
-				{
-					// Don't do anything if the selected mode index isn't different to the current mode.
-					if (thisCheck.objectUserData is int index && index != (int)PropTreeMode)
-					{
-						// Iterate through all checkboxes, unchecking all those that aren't this one (checkbox index stored in objectUserData).
-						for (int i = 0; i < (int)PropTreeModes.NumModes; ++i)
-						{
-							if (i != index)
-							{
-								propTreeChecks[i].isChecked = false;
-							}
-						}
-
-						// Set current mode.
-						PropTreeMode = (PropTreeModes)index;
-
-						// Perform post-change actions.
-						PropTreeChange();
-					}
-				}
-				else
-				{
-					// If no other check is checked, force this one to still be checked.
-					thisCheck.isChecked = true;
-				}
-			}
-
-			// Resume event handling.
-			ignorePropTreeCheckChanged = false;
 		}
 	}
 }

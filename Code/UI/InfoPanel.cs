@@ -51,7 +51,7 @@ namespace BOB
 		protected BOBSlider probabilitySlider, angleSlider, xSlider, ySlider, zSlider;
 		protected UIButton hideButton;
 		private readonly UICheckBox randomCheck;
-		private readonly UICheckBox[] modeChecks = new UICheckBox[(int)ReplacementModes.NumModes];
+		private readonly UICheckBox[] modeChecks;
 		protected UIPanel heightPanel;
 		private UIPanel anglePanel;
 
@@ -202,6 +202,7 @@ namespace BOB
 			try
 			{
 				// Replacement mode buttons.
+				modeChecks = new UICheckBox[(int)ReplacementModes.NumModes];
 				for (int i = 0; i < (int)ReplacementModes.NumModes; ++i)
 				{
 					bool useTreeLabels = PropTreeMode == PropTreeModes.Tree;
@@ -274,6 +275,7 @@ namespace BOB
 
 				// Set initial button states.
 				UpdateButtonStates();
+				UpdateModeIcons();
 			}
 			catch (Exception e)
 			{
@@ -319,6 +321,20 @@ namespace BOB
 		/// Previews the current change.
 		/// </summary>
 		protected abstract void PreviewChange();
+
+
+		/// <summary>
+		/// Event handler for ptop/tree checkbox changes.
+		/// </summary>
+		/// <param name="control">Calling component</param>
+		/// <param name="isChecked">New checked state</param>
+		protected override void PropTreeCheckChanged(UIComponent control, bool isChecked)
+        {
+			base.PropTreeCheckChanged(control, isChecked);
+
+			// Update mode icons.
+			UpdateModeIcons();
+        }
 
 
 		/// <summary>
@@ -522,10 +538,28 @@ namespace BOB
 		/// <summary>
 		/// Updates mode icons and tooltips (when switching between trees and props).
 		/// </summary>
-		/// <param name="atlasNames">Array of atlas names to apply</param>
-		/// <param name="tipKeys">Array of tooltip translation keys to apply</param>
-		private void UpdateModeIcons(string[] atlasNames, string[] tipKeys)
+		private void UpdateModeIcons()
 		{
+			string[] atlasNames, tipKeys;
+
+			// Null check to avoid race condition with base constructor.
+			if (modeChecks == null)
+            {
+				return;
+            }				
+
+			// Get releveant atlases and tooltips for current mode.
+			if (PropTreeMode == PropTreeModes.Tree)
+            {
+				atlasNames = TreeModeAtlas;
+				tipKeys = TreeModeTipKeys;
+            }
+			else
+            {
+				atlasNames = PropModeAtlas;
+				tipKeys = PropModeTipKeys;
+            }
+
 			// Iterate through all mode checks.
 			for (int i = 0; i < (int)ReplacementModes.NumModes; ++i)
 			{
@@ -541,9 +575,6 @@ namespace BOB
 
 				// Update tooltip.
 				modeChecks[i].tooltip = Translations.Translate(tipKeys[i]);
-
-				// Update apply button icon.
-
 			}
 		}
 
