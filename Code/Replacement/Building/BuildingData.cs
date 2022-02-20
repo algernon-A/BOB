@@ -37,7 +37,6 @@ namespace BOB
         /// </summary>
         internal static void Update()
         {
-
             // Hashset of render group coordinates to update.
             HashSet<KeyValuePair<int, int>> groupHash = new HashSet<KeyValuePair<int, int>>();
 
@@ -73,14 +72,14 @@ namespace BOB
                 // Iterate through each key in group.
                 foreach (KeyValuePair<int, int> keyPair in groupHash)
                 {
-                    // Update group render (all 32 layers, since we've got all kinds of mismatches with replacements).
-                    for (int i = 0; i < 32; ++i)
+                    // Update group render (all 31 layers, since we've got all kinds of mismatches with replacements).
+                    for (int i = 0; i < 31; ++i)
                     {
                         Singleton<RenderManager>.instance.UpdateGroup(keyPair.Key, keyPair.Value, i);
                     }
                 }
             });
-
+            
             // Clear dirty prefabs list.
             DirtyList.Clear();
         }
