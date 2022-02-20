@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 using ColossalFramework;
 
 
@@ -36,32 +37,49 @@ namespace BOB
         /// </summary>
         internal static void Update()
         {
+
+            // Hashset of render group coordinates to update.
+            HashSet<KeyValuePair<int, int>> groupHash = new HashSet<KeyValuePair<int, int>>();
+
+            // Local references.
+            BuildingManager buildingManager = Singleton<BuildingManager>.instance;
+            RenderManager renderManager = Singleton<RenderManager>.instance;
+            Building[] buildings = buildingManager.m_buildings.m_buffer;
+
             // Need to do this for each building instance, so iterate through all buildings.
-            Building[] buildings = BuildingManager.instance.m_buildings.m_buffer;
             for (ushort i = 0; i < buildings.Length; ++i)
             {
-                // Local reference.
-                Building building = buildings[i];
-
                 // Check that this is a valid building in the dirty list.
-                if (building.m_flags != Building.Flags.None && DirtyList.Contains(building.Info))
+                if (buildings[i].m_flags != Building.Flags.None && DirtyList.Contains(buildings[i].Info))
                 {
-                    // Match - update building instance renders directly in main thread, before simulation thread starts trying to render the instances.
-                    RenderManager renderManager = Singleton<RenderManager>.instance;
-                    if (renderManager.RequireInstance(i, 1u, out var instanceIndex))
-                    {
-                        renderManager.m_instances[instanceIndex].m_dirty = true;
-                        //BuildingAI.RefreshInstance(buildingInfo, renderManager.CurrentCameraInfo, i, ref Singleton<BuildingManager>.instance.m_buildings.m_buffer[i], buildingInfo.m_prefabDataLayer, ref renderManager.m_instances[instanceIndex], true);
-                    }
+                    // Update building instance.
+                    renderManager.UpdateInstance(i);
 
-                    // Then, update building prefab render (for LOD model) via simulation thread, creating local reference to avoid race condition.
-                    ushort buildingID = i;
-                    Singleton<SimulationManager>.instance.AddAction(delegate
-                    {
-                        Singleton<BuildingManager>.instance.UpdateBuildingRenderer(buildingID, true);
-                    });
+                    // Cakculate building render group.
+                    Vector3 position = buildings[i].m_position;
+                    int num = Mathf.Clamp((int)(position.x / 64f + 135f), 0, 269);
+                    int num2 = Mathf.Clamp((int)(position.z / 64f + 135f), 0, 269);
+                    int x = num * 45 / 270;
+                    int z = num2 * 45 / 270;
+
+                    // Add render group coordinates to hashlist (ignore if already there).
+                    groupHash.Add(new KeyValuePair<int, int>(x, z));
                 }
             }
+
+            // Update render groups via simulation thread.
+            Singleton<SimulationManager>.instance.AddAction(delegate
+            {
+                // Iterate through each key in group.
+                foreach (KeyValuePair<int, int> keyPair in groupHash)
+                {
+                    // Update group render (all 32 layers, since we've got all kinds of mismatches with replacements).
+                    for (int i = 0; i < 32; ++i)
+                    {
+                        Singleton<RenderManager>.instance.UpdateGroup(keyPair.Key, keyPair.Value, i);
+                    }
+                }
+            });
 
             // Clear dirty prefabs list.
             DirtyList.Clear();

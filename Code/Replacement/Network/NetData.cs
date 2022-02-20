@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using ColossalFramework;
 using UnityEngine;
+using ColossalFramework;
 
 
 namespace BOB
@@ -37,10 +37,12 @@ namespace BOB
         /// </summary>
         internal static void Update()
         {
+            // Hashset of render group coordinates to update.
             HashSet<KeyValuePair<int, int>> groupHash = new HashSet<KeyValuePair<int, int>>();
 
             // Local references.
             NetManager netManager = Singleton<NetManager>.instance;
+            RenderManager renderManager = Singleton<RenderManager>.instance;
             NetSegment[] segments = netManager.m_segments.m_buffer;
             NetNode[] nodes = netManager.m_nodes.m_buffer;
 
@@ -50,6 +52,9 @@ namespace BOB
 				// Check that this is a valid network in the dirty list.
 				if (segments[i].m_flags != NetSegment.Flags.None && DirtyList.Contains(segments[i].Info))
 				{
+                    // Update segment instance.
+                    renderManager.UpdateInstance((uint)(49152 + i));
+
                     // Caclulate segment render group.
                     ushort startNode = segments[i].m_startNode;
                     ushort endNode = segments[i].m_endNode;

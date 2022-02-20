@@ -228,5 +228,72 @@ namespace BOB
             // If we've made it here, then we haven't found a matching assembly.
             return false;
         }
+
+
+        /// <summary>
+        /// Checks to see if another mod is installed and enabled, based on a provided assembly name, and if so, returns the assembly reference.
+        /// Case-sensitive!  PloppableRICO is not the same as ploppablerico!
+        /// </summary>
+        /// <param name="assemblyName">Name of the mod assembly</param>
+        /// <returns>Assembly reference if target is found and enabled, null otherwise</returns>
+        internal static Assembly GetEnabledAssembly(string assemblyName)
+        {
+            // Iterate through the full list of plugins.
+            foreach (PluginManager.PluginInfo plugin in PluginManager.instance.GetPluginsInfo())
+            {
+                // Only looking at enabled plugins.
+                if (plugin.isEnabled)
+                {
+                    foreach (Assembly assembly in plugin.GetAssemblies())
+                    {
+                        if (assembly.GetName().Name.Equals(assemblyName))
+                        {
+                            Logging.Message("found enabled mod assembly ", assemblyName, ", version ", assembly.GetName().Version);
+                            return assembly;
+                        }
+                    }
+                }
+            }
+
+            // If we've made it here, then we haven't found a matching assembly.
+            Logging.Message("didn't find enabled assembly ", assemblyName);
+            return null;
+        }
+
+
+        /// <summary>
+        /// Attempts to find the EndRenderingImplPrefix method of Tree Anarchy.
+        /// </summary>
+        internal static void TreeAnarchyReflection()
+        {
+            Logging.KeyMessage("Attempting to find Tree Anarchy");
+
+            // Get assembly.
+            Assembly taAssembly = ModUtils.GetEnabledAssembly("TreeAnarchy");
+
+            if (taAssembly == null)
+            {
+                Logging.Message("Tree Anarchy not found");
+                return;
+            }
+
+            // TreeAnarchy.Patches.TreeManagerPatches class.
+            Type taPatches = taAssembly.GetType("TreeAnarchy.Patches.TreeManagerPatches");
+            if (taPatches == null)
+            {
+                Logging.Error("TreeAnarchy.Patches.TreeManagerPatches not reflected");
+                return;
+            }
+
+            // Get EndRenderingImplPrefix method.
+            MethodInfo taPrefix = taPatches.GetMethod("EndRenderingImplPrefix", BindingFlags.Static | BindingFlags.NonPublic);
+            if (taPrefix == null)
+            {
+                Logging.Error("EndRenderingImplPrefix not reflected");
+                return;
+            }
+
+            Logging.Message("Tree Anarchy reflection complete");
+        }
     }
 }
