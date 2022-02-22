@@ -14,9 +14,21 @@ namespace BOB
 	internal class BOBMapInfoPanel : BOBInfoPanelBase
 	{
 		/// <summary>
-		// Initial tree/prop checked state.
+		/// Initial prop-tree mode.
 		/// </summary>
-		protected override bool InitialTreeCheckedState => selectedPrefab is TreeInfo;
+		protected override PropTreeModes InitialPropTreeMode
+        {
+			get
+            {
+				// Set initial mode based on initial selection.
+				if (selectedPrefab is TreeInfo)
+                {
+					return PropTreeModes.Tree;
+                }
+
+				return PropTreeModes.Prop;
+            }
+        }
 
 
 		/// <summary>

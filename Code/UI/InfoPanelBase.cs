@@ -232,7 +232,7 @@ namespace BOB
 
 				// Scale button.
 				UIButton scaleButton = AddIconButton(this, MiddleX, ToggleY, ToggleSize, "BOB_PNL_SCA", TextureUtils.LoadSpriteAtlas("BOB-Scale"));
-				scaleButton.eventClicked += (control, clickEvent) => BOBScalePanel.Create(PropTreeMode == PropTreeModes.Tree || replacementPrefab is TreeInfo, replacementPrefab);
+				scaleButton.eventClicked += (control, clickEvent) => BOBScalePanel.Create(PropTreeMode, replacementPrefab);
 
 				// Preview image.
 				previewPanel = AddUIComponent<PreviewPanel>();
@@ -337,9 +337,6 @@ namespace BOB
 			// Regenerate lists.
 			LoadedList();
 			TargetList();
-
-			// Save state.
-			ModSettings.treeSelected = PropTreeMode == PropTreeModes.Tree;
 
 			// Update button states.
 			UpdateButtonStates();

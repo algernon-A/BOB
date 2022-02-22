@@ -46,11 +46,15 @@ namespace BOB
 		// Status.
 		private bool disableEvents = false;
 
+		// Opening prop/tree mode.
+		private static PropTreeModes openingMode = PropTreeModes.Prop;
+
+
 
 		/// <summary>
-		/// Initial tree/prop checked state.
+		/// Initial prop-tree mode.
 		/// </summary>
-		protected override bool InitialTreeCheckedState => false;
+		protected override PropTreeModes InitialPropTreeMode => openingMode;
 
 
 		// Panel width.
@@ -123,9 +127,9 @@ namespace BOB
 		/// <summary>
 		/// Creates the panel object in-game and displays it.
 		/// </summary>
-		/// <param name="isTree">True if it should be created with trees selected, false for props</param>
+		/// <param name="initialMode">Initial prop-tree opening mode</param>
 		/// <param name="selectedPrefab">Already selected prefab (null if none)</param>
-		internal static void Create(bool isTree, PrefabInfo selectedPrefab)
+		internal static void Create(PropTreeModes initialMode, PrefabInfo selectedPrefab)
 		{
 			try
 			{
@@ -136,15 +140,19 @@ namespace BOB
 					uiGameObject = new GameObject("BOBScalePanel");
 					uiGameObject.transform.parent = UIView.GetAView().transform;
 
+					// Set opening prop-tree mode.
+					if (initialMode == PropTreeModes.Tree)
+                    {
+						openingMode = PropTreeModes.Tree;
+                    }
+					else
+                    {
+						openingMode = PropTreeModes.Prop;
+                    }
+
 					// Create new panel instance and add it to GameObject.
 					panel = uiGameObject.AddComponent<BOBScalePanel>();
 					panel.transform.parent = uiGameObject.transform.parent;
-
-					// Set tree status.
-					if (isTree)
-                    {
-						panel.PropTreeMode = PropTreeModes.Tree;
-                    }
 
 					// Select previously selected prefab, if any.
 					if (selectedPrefab != null)

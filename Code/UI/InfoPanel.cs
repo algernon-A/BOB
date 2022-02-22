@@ -88,7 +88,7 @@ namespace BOB
 		/// <summary>
 		// Initial tree/prop checked state.
 		/// </summary>
-		protected override bool InitialTreeCheckedState => ModSettings.treeSelected;
+		protected override PropTreeModes InitialPropTreeMode => ModSettings.lastPropTreeMode;
 
 
 		/// <summary>
@@ -331,6 +331,10 @@ namespace BOB
 		protected override void PropTreeCheckChanged(UIComponent control, bool isChecked)
         {
 			base.PropTreeCheckChanged(control, isChecked);
+
+
+			// Save last used mode.
+			ModSettings.lastPropTreeMode = PropTreeMode;
 
 			// Update mode icons.
 			UpdateModeIcons();

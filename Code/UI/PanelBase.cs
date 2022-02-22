@@ -24,7 +24,7 @@ namespace BOB
 		/// <summary>
 		/// Prop/tree modes.
 		/// </summary>
-		protected enum PropTreeModes : int
+		internal enum PropTreeModes : int
 		{
 			Prop = 0,
 			Tree,
@@ -172,7 +172,6 @@ namespace BOB
 			modeLabel = UIControls.AddLabel(this, Margin, ToggleHeaderY, Translations.Translate("BOB_PNL_MOD"), textScale: 0.8f);
 
 			// Tree/Prop checkboxes.
-
 			for (int i = 0; i < (int)PropTreeModes.NumModes; ++i)
 			{
 				propTreeChecks[i] = IconToggleCheck(this, Margin + (i * ToggleSize), ToggleY, propTreepAtlas[i], propTreeTipKeys[i]);
@@ -181,6 +180,7 @@ namespace BOB
 			}
 
 			// Set initial mode state.
+			_propTreeMode = InitialPropTreeMode;
 			ignorePropTreeCheckChanged = true;
 			propTreeChecks[(int)PropTreeMode].isChecked = true;
 			ignorePropTreeCheckChanged = false;
@@ -188,9 +188,9 @@ namespace BOB
 
 
 		/// <summary>
-		/// Initial tree/prop checked state.
+		/// Initial prop-tree mode.
 		/// </summary>
-		protected abstract bool InitialTreeCheckedState { get; }
+		protected abstract PropTreeModes InitialPropTreeMode { get; }
 
 
 		/// <summary>

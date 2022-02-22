@@ -68,9 +68,9 @@ namespace BOB
 
 
 		/// <summary>
-		/// Initial tree/prop checked state.
+		/// Initial prop-tree mode.
 		/// </summary>
-		protected override bool InitialTreeCheckedState => false;
+		protected override PropTreeModes InitialPropTreeMode => PropTreeModes.Prop;
 
 
 		/// <summary>

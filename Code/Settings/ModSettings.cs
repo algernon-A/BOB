@@ -36,7 +36,7 @@ namespace BOB
 
         [XmlIgnore]
         // Last selected tree-or-prop state.
-        internal static bool treeSelected = false;
+        internal static BOBPanelBase.PropTreeModes lastPropTreeMode = BOBPanelBase.PropTreeModes.Prop;
 
         [XmlIgnore]
         // Remember last panel position.
