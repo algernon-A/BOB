@@ -14,7 +14,24 @@ namespace BOB
         // Unique harmony identifier.
         private const string harmonyID = "com.github.algernon-A.csl.bob";
 
-        // Flag.
+        // Tree Anarchy Harmony identifier.
+        private const string taHarmonyID = "quistar.treeanarchy.mod";
+
+
+        // Target methods - overlays.
+        private static MethodInfo buildingOverlayTarget, netOverlayTarget, propOverlayTarget, treeOverlayTarget;
+
+        // Target methods - rendering.
+        private static MethodInfo buildingRenderTarget, netRenderTarget, propRenderTarget, treeRenderTarget;
+
+        // Patch methods.
+        private static MethodInfo renderOverlayPatch, buildingTranspiler, netTranspiler, propRenderTranspiler, treeRenderTranspiler;
+
+        // Target methods - tree anarchy.
+        private static MethodInfo treeAnarchyMethod, treeAnarchyTarget, treeAnarchyPatch;
+
+
+        // Flags.
         internal static bool Patched => patched;
         private static bool patched = false;
         private static bool buildingOverlaysPatched = false, netOverlaysPatched = false, treeOverlaysPatched = false;
@@ -70,8 +87,7 @@ namespace BOB
         /// <param name="active">True to enable patches; false to disable</param>
         internal static void PatchBuildingOverlays(bool active)
         {
-            Type[] buildingRenderPropsTypes = { typeof(RenderManager.CameraInfo), typeof(ushort), typeof(Building).MakeByRefType(), typeof(int), typeof(RenderManager.Instance).MakeByRefType(), typeof(bool), typeof(bool), typeof(bool) };
-
+ 
             // Don't do anything if we're already at the current state.
             if (buildingOverlaysPatched != active)
             {
@@ -82,13 +98,9 @@ namespace BOB
 
                     // Manually patch building overlay renderer.
                     Harmony harmonyInstance = new Harmony(harmonyID);
-                    MethodInfo overlayTargetMethod = typeof(BuildingManager).GetMethod("EndOverlay");
-                    MethodInfo overlayPatchMethod = typeof(RenderOverlays).GetMethod(nameof(RenderOverlays.RenderOverlay));
-                    MethodInfo renderTargetMethod = typeof(BuildingAI).GetMethod("RenderProps", BindingFlags.NonPublic | BindingFlags.Instance, null, buildingRenderPropsTypes, null);
-                    MethodInfo renderPatchMethod = typeof(OverlayTranspilers).GetMethod(nameof(OverlayTranspilers.BuildingTranspiler));
 
                     // Safety check.
-                    if (overlayTargetMethod == null || overlayPatchMethod == null || renderTargetMethod == null || renderPatchMethod == null)
+                    if (buildingOverlayTarget == null || renderOverlayPatch == null || buildingRenderTarget == null || buildingTranspiler == null)
                     {
                         Logging.Error("couldn't find required render overlay method");
                         return;
@@ -97,13 +109,13 @@ namespace BOB
                     // Apply or remove patches according to flag.
                     if (active)
                     {
-                        harmonyInstance.Patch(overlayTargetMethod, postfix: new HarmonyMethod(overlayPatchMethod));
-                        harmonyInstance.Patch(renderTargetMethod, transpiler: new HarmonyMethod(renderPatchMethod));
+                        harmonyInstance.Patch(buildingOverlayTarget, postfix: new HarmonyMethod(renderOverlayPatch));
+                        harmonyInstance.Patch(buildingRenderTarget, transpiler: new HarmonyMethod(buildingTranspiler));
                     }
                     else
                     {
-                        harmonyInstance.Unpatch(overlayTargetMethod, overlayPatchMethod);
-                        harmonyInstance.Unpatch(renderTargetMethod, renderPatchMethod);
+                        harmonyInstance.Unpatch(buildingOverlayTarget, renderOverlayPatch);
+                        harmonyInstance.Unpatch(buildingRenderTarget, buildingTranspiler);
                     }
 
                     // Update status flag.
@@ -133,13 +145,9 @@ namespace BOB
 
                     // Manually patch building overlay renderer.
                     Harmony harmonyInstance = new Harmony(harmonyID);
-                    MethodInfo overlayTargetMethod = typeof(NetManager).GetMethod("EndOverlay");
-                    MethodInfo overlayPatchMethod = typeof(RenderOverlays).GetMethod(nameof(RenderOverlays.RenderOverlay));
-                    MethodInfo renderTargetMethod = typeof(NetLane).GetMethod(nameof(NetLane.RenderInstance));
-                    MethodInfo renderPatchMethod = typeof(OverlayTranspilers).GetMethod(nameof(OverlayTranspilers.NetTranspiler));
 
                     // Safety check.
-                    if (overlayTargetMethod == null || overlayPatchMethod == null || renderTargetMethod == null || renderPatchMethod == null)
+                    if (netOverlayTarget == null || renderOverlayPatch == null || netRenderTarget == null || netTranspiler == null)
                     {
                         Logging.Error("couldn't find required render overlay method");
                         return;
@@ -148,13 +156,13 @@ namespace BOB
                     // Apply or remove patches according to flag.
                     if (active)
                     {
-                        harmonyInstance.Patch(overlayTargetMethod, postfix: new HarmonyMethod(overlayPatchMethod));
-                        harmonyInstance.Patch(renderTargetMethod, transpiler: new HarmonyMethod(renderPatchMethod));
+                        harmonyInstance.Patch(netOverlayTarget, postfix: new HarmonyMethod(renderOverlayPatch));
+                        harmonyInstance.Patch(netRenderTarget, transpiler: new HarmonyMethod(netTranspiler));
                     }
                     else
                     {
-                        harmonyInstance.Unpatch(overlayTargetMethod, overlayPatchMethod);
-                        harmonyInstance.Unpatch(renderTargetMethod, renderPatchMethod);
+                        harmonyInstance.Unpatch(netOverlayTarget, renderOverlayPatch);
+                        harmonyInstance.Unpatch(netRenderTarget, netTranspiler);
                     }
 
                     // Update status flag.
@@ -174,8 +182,6 @@ namespace BOB
         /// <param name="active">True to enable patches; false to disable</param>
         internal static void PatchMapOverlays(bool active)
         {
-            Type[] treeRenderTypes = { typeof(RenderManager.CameraInfo), typeof(uint), typeof(int) };
-
             // Don't do anything if we're already at the current state.
             if (treeOverlaysPatched != active)
             {
@@ -186,16 +192,10 @@ namespace BOB
 
                     // Manually patch building overlay renderer.
                     Harmony harmonyInstance = new Harmony(harmonyID);
-                    MethodInfo treeOverlayTargetMethod = typeof(TreeManager).GetMethod("EndOverlay");
-                    MethodInfo propOverlayTargetMethod = typeof(PropManager).GetMethod("EndOverlay");
-                    MethodInfo overlayPatchMethod = typeof(RenderOverlays).GetMethod(nameof(RenderOverlays.RenderOverlay));
-                    MethodInfo treeRenderTargetMethod = typeof(TreeInstance).GetMethod(nameof(TreeInstance.RenderInstance), BindingFlags.Public | BindingFlags.Instance);
-                    MethodInfo treeRenderPatchMethod = typeof(OverlayTranspilers).GetMethod(nameof(OverlayTranspilers.TreeTranspiler));
-                    MethodInfo propRenderTargetMethod = typeof(PropInstance).GetMethod(nameof(PropInstance.RenderInstance), new Type[] { typeof(RenderManager.CameraInfo), typeof(ushort), typeof(int) });
-                    MethodInfo propRenderPatchMethod = typeof(OverlayTranspilers).GetMethod(nameof(OverlayTranspilers.PropTranspiler));
+
 
                     // Safety check.
-                    if (treeOverlayTargetMethod == null || propOverlayTargetMethod == null || overlayPatchMethod == null || treeRenderTargetMethod == null || treeRenderPatchMethod == null || propRenderTargetMethod == null || propRenderPatchMethod == null)
+                    if (treeOverlayTarget == null || propOverlayTarget == null || renderOverlayPatch == null || treeRenderTarget == null || treeRenderTranspiler == null || propRenderTarget == null || propRenderTranspiler == null)
                     {
                         Logging.Error("couldn't find required render overlay method");
                         return;
@@ -204,17 +204,42 @@ namespace BOB
                     // Apply or remove patches according to flag.
                     if (active)
                     {
-                        harmonyInstance.Patch(treeOverlayTargetMethod, postfix: new HarmonyMethod(overlayPatchMethod));
-                        harmonyInstance.Patch(treeRenderTargetMethod, transpiler: new HarmonyMethod(treeRenderPatchMethod));
-                        harmonyInstance.Patch(propOverlayTargetMethod, postfix: new HarmonyMethod(overlayPatchMethod));
-                        harmonyInstance.Patch(propRenderTargetMethod, transpiler: new HarmonyMethod(propRenderPatchMethod));
+                        // Patch game.
+                        harmonyInstance.Patch(treeOverlayTarget, postfix: new HarmonyMethod(renderOverlayPatch));
+                        harmonyInstance.Patch(treeRenderTarget, transpiler: new HarmonyMethod(treeRenderTranspiler));
+                        harmonyInstance.Patch(propOverlayTarget, postfix: new HarmonyMethod(renderOverlayPatch));
+                        harmonyInstance.Patch(propRenderTarget, transpiler: new HarmonyMethod(propRenderTranspiler));
+
+                        // Tree anarchy.
+                        if (treeAnarchyMethod != null)
+                        {
+                            // Remove existing Tree Anarchy prefix.
+                            Harmony taHarmony = new Harmony(taHarmonyID);
+                            taHarmony.Unpatch(treeAnarchyTarget, treeAnarchyMethod);
+
+                            // Apply our own modified replacement.
+                            TreeAnarchyRender.Setup();
+                            harmonyInstance.Patch(treeAnarchyTarget, prefix: new HarmonyMethod(treeAnarchyPatch));
+                        }
                     }
                     else
                     {
-                        harmonyInstance.Unpatch(treeOverlayTargetMethod, overlayPatchMethod);
-                        harmonyInstance.Unpatch(treeRenderTargetMethod, treeRenderPatchMethod);
-                        harmonyInstance.Unpatch(propOverlayTargetMethod, overlayPatchMethod);
-                        harmonyInstance.Unpatch(propRenderTargetMethod, propRenderPatchMethod);
+                        // Unpatch game.
+                        harmonyInstance.Unpatch(treeOverlayTarget, renderOverlayPatch);
+                        harmonyInstance.Unpatch(treeRenderTarget, treeRenderTranspiler);
+                        harmonyInstance.Unpatch(propOverlayTarget, renderOverlayPatch);
+                        harmonyInstance.Unpatch(propRenderTarget, propRenderTranspiler);
+
+                        // Tree anarchy.
+                        if (treeAnarchyMethod != null)
+                        {
+                            // Remove our patch.
+                            harmonyInstance.Unpatch(treeAnarchyTarget, treeAnarchyPatch);
+
+                            // Re-apply Tree Anarchy patch.
+                            Harmony taHarmony = new Harmony(taHarmonyID);
+                            taHarmony.Patch(treeAnarchyTarget, prefix: new HarmonyMethod(treeAnarchyMethod));
+                        }
                     }
 
                     // Update status flag.
@@ -224,6 +249,43 @@ namespace BOB
                 {
                     Logging.Error("Harmony not ready");
                 }
+            }
+        }
+
+
+        /// <summary>
+        /// Performs reflection required for overlay patching.
+        /// </summary>
+        internal static void ReflectOverlays()
+        {
+            // Argument list for correct BuildingAI.RenderProps target.
+            Type[] buildingRenderPropsTypes = { typeof(RenderManager.CameraInfo), typeof(ushort), typeof(Building).MakeByRefType(), typeof(int), typeof(RenderManager.Instance).MakeByRefType(), typeof(bool), typeof(bool), typeof(bool) };
+
+            // Building patches.
+            buildingOverlayTarget = typeof(BuildingManager).GetMethod("EndOverlay");
+            renderOverlayPatch = typeof(RenderOverlays).GetMethod(nameof(RenderOverlays.RenderOverlay));
+            buildingRenderTarget = typeof(BuildingAI).GetMethod("RenderProps", BindingFlags.NonPublic | BindingFlags.Instance, null, buildingRenderPropsTypes, null);
+            buildingTranspiler = typeof(OverlayTranspilers).GetMethod(nameof(OverlayTranspilers.BuildingTranspiler));
+
+            // Network patches.
+            netOverlayTarget = typeof(NetManager).GetMethod("EndOverlay");
+            netRenderTarget = typeof(NetLane).GetMethod(nameof(NetLane.RenderInstance));
+            netTranspiler = typeof(OverlayTranspilers).GetMethod(nameof(OverlayTranspilers.NetTranspiler));
+
+            // Map patches.
+            treeOverlayTarget = typeof(TreeManager).GetMethod("EndOverlay");
+            propOverlayTarget = typeof(PropManager).GetMethod("EndOverlay");
+            treeRenderTarget = typeof(TreeInstance).GetMethod(nameof(TreeInstance.RenderInstance), BindingFlags.Public | BindingFlags.Instance);
+            treeRenderTranspiler = typeof(OverlayTranspilers).GetMethod(nameof(OverlayTranspilers.TreeTranspiler));
+            propRenderTarget = typeof(PropInstance).GetMethod(nameof(PropInstance.RenderInstance), new Type[] { typeof(RenderManager.CameraInfo), typeof(ushort), typeof(int) });
+            propRenderTranspiler = typeof(OverlayTranspilers).GetMethod(nameof(OverlayTranspilers.PropTranspiler));
+
+            // Tree anarchy patch.
+            treeAnarchyMethod = ModUtils.TreeAnarchyReflection();
+            if (treeAnarchyMethod != null)
+            {
+                treeAnarchyTarget = AccessTools.Method(typeof(TreeManager), "EndRenderingImpl");
+                treeAnarchyPatch = AccessTools.Method(typeof(TreeAnarchyRender), nameof(TreeAnarchyRender.EndRenderingImplPrefix));
             }
         }
     }

@@ -264,7 +264,7 @@ namespace BOB
         /// <summary>
         /// Attempts to find the EndRenderingImplPrefix method of Tree Anarchy.
         /// </summary>
-        internal static void TreeAnarchyReflection()
+        internal static MethodInfo TreeAnarchyReflection()
         {
             Logging.KeyMessage("Attempting to find Tree Anarchy");
 
@@ -274,7 +274,7 @@ namespace BOB
             if (taAssembly == null)
             {
                 Logging.Message("Tree Anarchy not found");
-                return;
+                return null;
             }
 
             // TreeAnarchy.Patches.TreeManagerPatches class.
@@ -282,7 +282,7 @@ namespace BOB
             if (taPatches == null)
             {
                 Logging.Error("TreeAnarchy.Patches.TreeManagerPatches not reflected");
-                return;
+                return null;
             }
 
             // Get EndRenderingImplPrefix method.
@@ -290,10 +290,11 @@ namespace BOB
             if (taPrefix == null)
             {
                 Logging.Error("EndRenderingImplPrefix not reflected");
-                return;
+                return null;
             }
 
             Logging.Message("Tree Anarchy reflection complete");
+            return taPrefix;
         }
     }
 }

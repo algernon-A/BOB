@@ -220,7 +220,7 @@ namespace BOB
                 instruction = instructionsEnumerator.Current;
                 yield return instruction;
 
-                // Looking for possible precursor calls to "Void DrawMesh".
+                // Looking for possible precursor calls to "Void RenderInstance".
                 if (instruction.opcode == OpCodes.Ldloc_S && instruction.operand is LocalBuilder localBuilder && localBuilder.LocalIndex == DefaultColorLocationVarIndex)
                 {
                     // Found ldloc.1 - are there following instructions?
