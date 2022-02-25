@@ -27,6 +27,10 @@ namespace BOB
         private readonly static List<OverlayData> overlays = new List<OverlayData>();
 
 
+        // Effect intensity.
+        internal static float intensity = 1f;
+
+
         // Props and trees to highlight.
         internal static int CurrentIndex { get; set; }
         internal static NetInfo.Lane CurrentLane { get; set; }
@@ -46,14 +50,14 @@ namespace BOB
             // 'Contracting circle' effect constants.
             const float Lifetime = 1f;
             const float EffectDistance = 4f;
-            Color circleColor = new Color(1f, 0f, 1f, 1f);
+            Color circleColor = new Color(1f, 0f, 1f, 1f) * intensity;
 
             // Instance reference.
             RenderManager renderManager = Singleton<RenderManager>.instance;
 
             // 'Contracting circle' outside actual highlighted circle.  Alpha increases as it moves inwards.
             float effectRadius = Mathf.Lerp(EffectDistance, 0f, (Singleton<SimulationManager>.instance.m_realTimer % Lifetime) / Lifetime);
-            Color effectColor = new Color(circleColor.r, circleColor.g, circleColor.b, (EffectDistance - effectRadius) * (1f / EffectDistance));
+            Color effectColor = new Color(circleColor.r, circleColor.g, circleColor.b, (EffectDistance - effectRadius) * (1f / EffectDistance) * intensity);
 
             // Draw circle and effect at each position in list.
             foreach (OverlayData data in overlays)

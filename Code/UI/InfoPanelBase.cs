@@ -73,14 +73,32 @@ namespace BOB
 
 
 		/// <summary>
-		/// Checks for and displays any exception message.
 		/// Called by the game every update cycle.
+		/// Handles overlay intensity modifier keys, and checks for and displays any exception message.
 		/// </summary>
 		public override void Update()
 		{
 			base.Update();
 
+			// Check for exceptions.
 			InfoPanelManager.CheckException();
+
+			// Check for overlay intensity modifier keys.
+			if (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt) || Input.GetKey(KeyCode.AltGr))
+            {
+				// Alt - disable overlays.
+				RenderOverlays.intensity = 0f;
+            }
+			else if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+            {
+				// Ctrl - half-intensity.
+				RenderOverlays.intensity = 0.5f;
+            }
+			else
+            {
+				// Default - full intensity.
+				RenderOverlays.intensity = 1f;
+            }
 		}
 
 
