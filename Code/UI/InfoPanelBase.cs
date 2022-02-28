@@ -422,7 +422,7 @@ namespace BOB
 			if (PropTreeMode == PropTreeModes.Both)
             {
 				Logging.Message("ordering lists");
-				list.OrderBy(x => x.name.ToLower());
+				list = list.OrderBy(x => PrefabLists.GetDisplayName(x.name).ToLower()).ToList();
 			}
 
 			// Master lists should already be sorted by display name so no need to sort again here.

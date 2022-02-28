@@ -133,7 +133,7 @@ namespace BOB
 		{
 			// Otherwise, omit the package number, and trim off any trailing _Data.
 			int index = name.IndexOf('.');
-			return name.Substring(index + 1).Replace("_Data", "");
+			return name.Substring(index + 1).Replace("_Data", "").TrimStart();
 		}
 
 
