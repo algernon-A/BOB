@@ -170,27 +170,27 @@ namespace BOB
 
 		/// <summary>
 		/// Returns the current step multiplier based on modifier key states.
-		/// For float 1/0.1/0.01 for Alt/none/Ctrl, for Int 5/1 for Alt/not Alt.
+		/// For float 0.1/0.01 for none/Ctrl, for Int just 1
 		/// </summary>
 		private float Multiplier
 		{
 			get
 			{
-				if (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt) || Input.GetKey(KeyCode.AltGr))
+				// Integer or float?
+				if (!IsInt)
 				{
-					// Alt modifier.
-					return IsInt ? 10 : 1f;
+					if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+					{
+						// Control modifier.
+						return 0.01f;
+					}
+
+					// Default float multiplier.
+					return 0.1f;
 				}
-				else if (!IsInt && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
-				{
-					// Control modifier.
-					return 0.01f;
-				}
-				else
-				{
-					// Default multiplier.
-					return IsInt ? 1 : 0.1f;
-				}
+
+				// Default multiplier.
+				return 1;
 			}
 		}
 	}

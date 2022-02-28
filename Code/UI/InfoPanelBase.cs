@@ -89,9 +89,9 @@ namespace BOB
 				// Alt - disable overlays.
 				RenderOverlays.intensity = 0f;
             }
-			else if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+			else if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
             {
-				// Ctrl - half-intensity.
+				// Shift - half-intensity.
 				RenderOverlays.intensity = 0.5f;
             }
 			else

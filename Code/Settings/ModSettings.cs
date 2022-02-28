@@ -24,7 +24,7 @@ namespace BOB
 
         // User settings directory.
         [XmlIgnore]
-        private static readonly string UserSettingsDir = ColossalFramework.IO.DataLocation.localApplicationData + Path.DirectorySeparatorChar;
+        private static readonly string UserSettingsDir = ColossalFramework.IO.DataLocation.localApplicationData;
 
         // Default behaviour of the show individual props setting.
         [XmlIgnore]
@@ -185,7 +185,7 @@ namespace BOB
             try
             {
                 // Attempt to read new settings file (in user settings directory).
-                string fileName = UserSettingsDir + NewSettingsFileName;
+                string fileName = Path.Combine(UserSettingsDir, NewSettingsFileName);
                 if (!File.Exists(fileName))
                 {
                     // No settings file in user directory; use application directory instead; if that fails, try to read the old one.
@@ -229,13 +229,13 @@ namespace BOB
             try
             {
                 // Save into user local settings.
-                using (StreamWriter writer = new StreamWriter(UserSettingsDir + NewSettingsFileName))
+                using (StreamWriter writer = new StreamWriter(Path.Combine(UserSettingsDir, NewSettingsFileName)))
                 {
                     XmlSerializer xmlSerializer = new XmlSerializer(typeof(ModSettings));
                     xmlSerializer.Serialize(writer, new ModSettings());
                 }
 
-                // Cleaning up after ourselves - delete any old config file in the application direcotry.
+                // Cleaning up after ourselves - delete any old config file in the application directory.
                 if (File.Exists(NewSettingsFileName))
                 {
                     File.Delete(NewSettingsFileName);
