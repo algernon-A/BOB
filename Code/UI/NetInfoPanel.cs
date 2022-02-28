@@ -570,19 +570,15 @@ namespace BOB
 					// Create new list item.
 					NetTargetListItem targetListItem = new NetTargetListItem();
 
-					// Try to get relevant prefab (prop/tree), using finalProp.
+					// Try to get relevant prefab (prop/tree), falling back to the other type if null (to allow for tree-prop changes), using finalProp.
 					PrefabInfo finalInfo = null;
-					switch (PropTreeMode)
-                    {
-						case PropTreeModes.Prop:
-							finalInfo = laneProps[propIndex]?.m_finalProp;
-							break;
-						case PropTreeModes.Tree:
-							finalInfo = laneProps[propIndex]?.m_finalTree;
-							break;
-						case PropTreeModes.Both:
-							finalInfo = (PrefabInfo)laneProps[propIndex]?.m_finalTree ?? laneProps[propIndex]?.m_finalProp;
-							break;
+					if (PropTreeMode == PropTreeModes.Tree)
+					{
+						finalInfo = (PrefabInfo)laneProps[propIndex]?.m_finalTree ?? laneProps[propIndex]?.m_finalProp;
+					}
+					else
+					{
+						finalInfo = (PrefabInfo)laneProps[propIndex]?.m_finalProp ?? laneProps[propIndex]?.m_finalTree;
 					}
 
 					// Check to see if we were succesful - if not (e.g. we only want trees and this is a prop), continue on to next building prop.
@@ -656,6 +652,18 @@ namespace BOB
 						//targetListItem.originalPrefab = propReference.OriginalInfo;
 						targetListItem.originalAngle = propReference.angle;
 						targetListItem.originalProb = propReference.probability;
+					}
+
+					// Check for match with 'prop' mode - either original or replacement needs to be prop.
+					if (PropTreeMode == PropTreeModes.Prop && !(finalInfo is PropInfo) && !(targetListItem.originalPrefab is PropInfo))
+					{
+						continue;
+					}
+
+					// Check for match with 'tree' mode - either original or replacement needs to be tree.
+					if (PropTreeMode == PropTreeModes.Tree && !(finalInfo is TreeInfo) && !(targetListItem.originalPrefab is TreeInfo))
+					{
+						continue;
 					}
 
 					// Are we grouping?
