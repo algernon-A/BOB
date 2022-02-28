@@ -60,8 +60,8 @@
     <Reference Include="TreeAnarchy">
       <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\workshop\content\255710\2527486462\TreeAnarchy.dll</HintPath>
     </Reference>
-    <Reference Include="UnifiedUILib">
-      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\workshop\content\255710\2255219025\UnifiedUILib.dll</HintPath>
+    <Reference Include="UnifiedUILib, Version=2.2.0.25788, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\UnifiedUILib.2.2.0\lib\net35\UnifiedUILib.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\UnityEngine.dll</HintPath>
@@ -150,7 +150,6 @@
     <Content Include="Images\PreviewImage-Beta.png" />
     <Content Include="Images\PreviewImage-Prod.png" />
     <Content Include="Libraries\EManagersLib.API.dll" />
-    <Content Include="Libraries\UnifiedUILib.dll" />
     <Content Include="ReplacementPacks\RoadArrows.xml" />
     <Content Include="ReplacementPacks\RoadSigns.xml" />
     <Content Include="License.txt" />
@@ -213,6 +212,7 @@ del "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName
 xcopy /y "$(TargetPath)" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)"
 
 xcopy /y "$(SolutionDir)packages\CitiesHarmony.API.2.1.0\lib\net35\CitiesHarmony.API.dll" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)"
+xcopy /y "$(SolutionDir)packages\UnifiedUILib.2.2.0\lib\net35\CitiesHarmony.API.dll" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)"
 xcopy /y "$(ProjectDir)\Libraries\*.dll" "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)"
 
 mkdir "$(LOCALAPPDATA)\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\Translations"
