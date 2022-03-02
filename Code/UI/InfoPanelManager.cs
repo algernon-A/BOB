@@ -139,6 +139,18 @@ namespace BOB
 
 
 		/// <summary>
+		/// Refreshes random prop/tree lists on close of random panel.
+		/// </summary>
+		internal static void RefreshRandom()
+        {
+			if (Panel is BOBInfoPanel infoPanel)
+            {
+				infoPanel.RefreshRandom();
+            }
+        }
+
+
+		/// <summary>
 		/// Creates the panel object in-game and displays it.
 		/// </summary>
 		private static void Create(PrefabInfo selectedPrefab)

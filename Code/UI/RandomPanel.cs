@@ -132,6 +132,9 @@ namespace BOB
 				}
 			}*/
 
+			// Refresh random prop/tree lists.
+			InfoPanelManager.RefreshRandom();
+
 
 			// Destroy game objects.
 			GameObject.Destroy(panel);

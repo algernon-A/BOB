@@ -316,6 +316,18 @@ namespace BOB
 
 
 		/// <summary>
+		/// Refreshes the random prop/tree list.
+		/// </summary>
+		internal void RefreshRandom()
+        {
+			if (randomCheck.isChecked)
+            {
+				LoadedList();
+            }
+        }
+
+
+		/// <summary>
 		/// Reverts any previewed changes back to original prop/tree state.
 		/// </summary>
 		protected abstract void RevertPreview();
