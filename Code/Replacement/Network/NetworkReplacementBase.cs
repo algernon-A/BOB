@@ -108,7 +108,8 @@ namespace BOB
 		/// <param name="offsetY">Replacment Y position offset</param>
 		/// <param name="offsetZ">Replacment Z position offset</param>
 		/// <param name="probability">Replacement probability</param>
-		internal void Replace(NetInfo netInfo, PrefabInfo targetInfo, PrefabInfo replacementInfo, int laneIndex, int propIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability)
+		/// <param name="repeatDistance">Replacement repeat distance</param>
+		internal void Replace(NetInfo netInfo, PrefabInfo targetInfo, PrefabInfo replacementInfo, int laneIndex, int propIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability, float repeatDistance)
 		{
 			// Null checks.
 			if (targetInfo?.name == null || replacementInfo?.name == null)
@@ -146,6 +147,7 @@ namespace BOB
 			thisReplacement.offsetY = offsetY;
 			thisReplacement.offsetZ = offsetZ;
 			thisReplacement.probability = probability;
+			thisReplacement.repeatDistance = repeatDistance;
 
 			// Record replacement prop.
 			thisReplacement.replacementInfo = replacementInfo;
@@ -403,7 +405,8 @@ namespace BOB
 					originalTree = isTree? originalPrefab as TreeInfo : thisProp.m_finalTree,
 					angle = thisProp.m_angle,
 					position = thisProp.m_position,
-					probability = thisProp.m_probability
+					probability = thisProp.m_probability,
+					repeatDistance = thisProp.m_repeatDistance
 				};
 			}
 
@@ -430,6 +433,7 @@ namespace BOB
 				thisProp.m_angle = reference.angle;
 				thisProp.m_position = reference.position;
 				thisProp.m_probability = reference.probability;
+				thisProp.m_repeatDistance = reference.repeatDistance;
 
 				// Update network.
 				reference.netInfo.CheckReferences();
@@ -482,6 +486,12 @@ namespace BOB
 
 			// Probability.
 			thisLane.m_laneProps.m_props[propReference.propIndex].m_probability = replacement.probability;
+
+			// Repeat distance, if a valid value is set.
+			if (replacement.repeatDistance > 1)
+            {
+				thisLane.m_laneProps.m_props[propReference.propIndex].m_repeatDistance = replacement.repeatDistance;
+			}
 
 			// Update network prop references.
 			propReference.netInfo.CheckReferences();

@@ -28,23 +28,27 @@ namespace BOB
 		private const float ModeX = Margin + (ToggleSize * 4f);
 		protected const float ModeY = ToggleY;
 
-		// Layout constants - detail controls - align bottom with bottom of lists, and work up.
-		private const float SliderHeight = 38f;
+		// Layout constants - detail control sizes.
+		protected const float SliderHeight = 38f;
 		private const float FieldOffset = SliderHeight + Margin;
 		private const float OffsetLabelY = Margin;
 		private const float XOffsetY = OffsetLabelY + 20f;
 		private const float ZOffsetY = XOffsetY + SliderHeight;
 		private const float OffsetPanelHeight = ZOffsetY + SliderHeight;
+		protected const float HeightPanelFullHeight = YOffsetY + SliderHeight;
+		private const float HeightPanelShortHeight = FixedHeightY + SliderHeight;
+
+		// Layout constants - detail control locations - align bottom with bottom of lists, and work up.
+		protected const float RepeatSliderY = ListY + ListHeight - FieldOffset;
+		private const float HeightPanelY = RepeatSliderY - HeightPanelShortHeight;
 		private const float OffsetPanelY = HeightPanelY - OffsetPanelHeight - Margin;
 		private const float YOffsetY = FixedHeightY + 20f;
 		protected const float FixedHeightY = OffsetLabelY + 20f;
-		private const float HeightPanelBase = ListY + ListHeight;
-		protected const float HeightPanelFullHeight = YOffsetY + SliderHeight;
-		private const float HeightPanelShortHeight = FixedHeightY + SliderHeight;
-		private const float HeightPanelY = HeightPanelBase - HeightPanelFullHeight;
-		protected const float RandomButtonX = MiddleX + ToggleSize;
 		private const float AngleY = OffsetPanelY - FieldOffset;
 		private const float ProbabilityY = AngleY - FieldOffset;
+
+		// Layout constants - other controls.
+		protected const float RandomButtonX = MiddleX + ToggleSize;
 
 
 		// Panel components.
@@ -164,11 +168,11 @@ namespace BOB
 		/// <summary>
 		/// Current replacement mode.
 		/// </summary>
-		protected ReplacementModes CurrentMode
+		protected virtual ReplacementModes CurrentMode
 		{
 			get => _currentMode;
 
-			private set
+			set
 			{
 				if (_currentMode != value)
 				{
@@ -259,11 +263,11 @@ namespace BOB
 				heightLabel.relativePosition = new Vector2((heightPanel.width - heightLabel.width) / 2f, OffsetLabelY);
 
 				// Live application of position changes.
-				xSlider.eventValueChanged += (control, value) => SliderChange();
-				ySlider.eventValueChanged += (control, value) => SliderChange();
-				zSlider.eventValueChanged += (control, value) => SliderChange();
-				angleSlider.eventValueChanged += (control, value) => SliderChange();
-				probabilitySlider.eventValueChanged += (control, value) => SliderChange();
+				xSlider.eventValueChanged += SliderChange;
+				ySlider.eventValueChanged += SliderChange;
+				zSlider.eventValueChanged += SliderChange;
+				angleSlider.eventValueChanged += SliderChange;
+				probabilitySlider.eventValueChanged += SliderChange;
 
 				// Normal/random toggle.
 				randomCheck = UIControls.LabelledCheckBox((UIComponent)(object)this, hideVanilla.relativePosition.x, hideVanilla.relativePosition.y + hideVanilla.height + (Margin / 2f), Translations.Translate("BOB_PNL_RSW"), 12f, 0.7f);
@@ -446,10 +450,8 @@ namespace BOB
 		/// Sets the sliders to the values specified in the given replacement record.
 		/// </summary>
 		/// <param name="replacement">Replacement record to use</param>
-		protected void SetSliders(BOBReplacementBase replacement)
+		protected virtual void SetSliders(BOBReplacementBase replacement)
 		{
-			Logging.Message("Setting sliders");
-
 			// Disable events.
 			ignoreSliderValueChange = true;
 
@@ -475,6 +477,47 @@ namespace BOB
 
 			// Re-enable events.
 			ignoreSliderValueChange = false;
+		}
+
+
+		/// <summary>
+		/// Adds a slider panel to the specified component.
+		/// </summary>
+		/// <param name="parent">Parent component</param>
+		/// <param name="parent">Parent component</param>
+		/// <param name="xPos">Relative X position</param>
+		/// <param name="yPos">Relative Y position</param>
+		/// <param name="height">Panel height</param>
+		/// <returns>New UIPanel</returns>
+		protected UIPanel Sliderpanel(UIComponent parent, float xPos, float yPos, float height)
+		{
+			// Slider panel.
+			UIPanel sliderPanel = parent.AddUIComponent<UIPanel>();
+			sliderPanel.atlas = TextureUtils.InGameAtlas;
+			sliderPanel.backgroundSprite = "GenericPanel";
+			sliderPanel.color = new Color32(206, 206, 206, 255);
+			sliderPanel.size = new Vector2(MidControlWidth, height);
+			sliderPanel.relativePosition = new Vector2(xPos, yPos);
+
+			return sliderPanel;
+		}
+
+
+		/// <summary>
+		/// Event handler for applying live changes on slider value change.
+		/// </summary>
+		/// <param name="control">Calling component</param>
+		/// <param name="isChecked">New checked state</param>
+		protected void SliderChange(UIComponent control, float value)
+		{
+			// Don't do anything if already ignoring events.
+			if (!ignoreSliderValueChange)
+			{
+				// Disable events while applying changes.
+				ignoreSliderValueChange = true;
+				PreviewChange();
+				ignoreSliderValueChange = false;
+			}
 		}
 
 
@@ -584,22 +627,6 @@ namespace BOB
 
 
 		/// <summary>
-		/// Event handler for applying live changes on slider value change.
-		/// </summary>
-		private void SliderChange()
-		{
-			// Don't do anything if already ignoring events.
-			if (!ignoreSliderValueChange)
-			{
-				// Disable events while applying changes.
-				ignoreSliderValueChange = true;
-				PreviewChange();
-				ignoreSliderValueChange = false;
-			}
-		}
-
-
-		/// <summary>
 		/// Random check event handler.
 		/// </summary>
 		/// <param name="control">Calling component (unused)</param>
@@ -617,29 +644,6 @@ namespace BOB
 		/// <param name="clickEvent">Mouse click event (unused)</param>
 		/// </summary>
 		private void HideProp(UIComponent control, UIMouseEventParameter clickevent) => probabilitySlider.TrueValue = 0f;
-
-
-		/// <summary>
-		/// Adds a slider panel to the specified component.
-		/// </summary>
-		/// <param name="parent">Parent component</param>
-		/// <param name="parent">Parent component</param>
-		/// <param name="xPos">Relative X position</param>
-		/// <param name="yPos">Relative Y position</param>
-		/// <param name="height">Panel height</param>
-		/// <returns>New UIPanel</returns>
-		private UIPanel Sliderpanel(UIComponent parent, float xPos, float yPos, float height)
-		{
-			// Slider panel.
-			UIPanel sliderPanel = parent.AddUIComponent<UIPanel>();
-			sliderPanel.atlas = TextureUtils.InGameAtlas;
-			sliderPanel.backgroundSprite = "GenericPanel";
-			sliderPanel.color = new Color32(206, 206, 206, 255);
-			sliderPanel.size = new Vector2(MidControlWidth, height);
-			sliderPanel.relativePosition = new Vector2(xPos, yPos);
-
-			return sliderPanel;
-		}
 
 
 		/// <summary>

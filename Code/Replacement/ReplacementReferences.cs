@@ -40,5 +40,6 @@ namespace BOB
 		public NetInfo netInfo;
 		public int laneIndex;
 		public float angle;
+		public float repeatDistance;
 	}
 }

@@ -259,6 +259,9 @@ namespace BOB
 		[XmlAttribute("lane")]
 		public int laneIndex = -1;
 
+		[XmlAttribute("repeatDistance")]
+		public float repeatDistance = -1f;
+
 		[XmlIgnore]
 		public List<NetPropReference> references = new List<NetPropReference>();
 	}

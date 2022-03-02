@@ -67,5 +67,8 @@ namespace BOB
 
 		// Lane list.
 		public List<int> lanes = new List<int>();
+
+		// Repeat distance.
+		public float originalRepeat, individualRepeat;
 	}
 }

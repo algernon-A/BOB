@@ -476,6 +476,7 @@ namespace BOB
 			replacements[target].offsetY = offsetY;
 			replacements[target].offsetZ = offsetZ;
 			replacements[target].probability = probability;
+			replacements[target].repeatDistance = -1;
 
 			// Record replacement prop.
 			replacements[target].replacementInfo = replacement;

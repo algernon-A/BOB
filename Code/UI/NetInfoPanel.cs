@@ -22,6 +22,10 @@ namespace BOB
 		private NetPropReference[] originalValues;
 
 
+		// Panel components.
+		private BOBSlider repeatSlider;
+
+
 		/// <summary>
 		/// Returns the current individual lane number of the current selection.  This could be either the direct lane or in the lane array, depending on situation.
 		/// </summary>
@@ -138,6 +142,19 @@ namespace BOB
 
 
 		/// <summary>
+		/// Current replacement mode.
+		/// </summary>
+		protected override ReplacementModes CurrentMode
+		{
+			set
+			{
+				repeatSlider.parent.isVisible = value == ReplacementModes.Individual;
+				base.CurrentMode = value;
+			}
+		}
+
+
+		/// <summary>
 		/// Constructor.
 		/// </summary>
 		internal BOBNetInfoPanel()
@@ -147,6 +164,13 @@ namespace BOB
 				// Add pack button.
 				UIButton packButton = AddIconButton(this, PackButtonX, ToggleY, ToggleSize, "BOB_PNL_PKB", TextureUtils.LoadSpriteAtlas("BOB-PropPack"));
 				packButton.eventClicked += (component, clickEvent) => PackPanelManager.Create();
+
+				// Add repeat slider.
+				UIPanel repeatPanel = Sliderpanel(this, MidControlX, RepeatSliderY + Margin, SliderHeight);
+				repeatSlider = AddBOBSlider(repeatPanel, Margin, 0f, MidControlWidth - (Margin * 2f), "BOB_PNL_REP", 1.1f, 50f, 0.1f, "Repeat");
+				repeatSlider.tooltip = Translations.Translate("BOB_PNL_REP_TIP");
+				repeatSlider.parent.isVisible = CurrentMode == ReplacementModes.Individual;
+				repeatSlider.eventValueChanged += SliderChange;
 
 				// Populate loaded list.
 				LoadedList();
@@ -226,12 +250,13 @@ namespace BOB
 			}
 
 			// Don't do anything if no changes.
-			if (xSlider.value == 0f &&
-				ySlider.value == 0f &&
-				zSlider.value == 0f &&
-				angleSlider.value == 0f &&
-				probabilitySlider.value.RoundToNearest(1) == CurrentTargetItem.originalProb &&
-				ReplacementPrefab == CurrentTargetItem.CurrentPrefab)
+			if (xSlider.TrueValue == 0f &&
+				ySlider.TrueValue == 0f &&
+				zSlider.TrueValue == 0f &&
+				angleSlider.TrueValue == 0f &&
+				probabilitySlider.TrueValue.RoundToNearest(1) == CurrentTargetItem.originalProb &&
+				ReplacementPrefab == CurrentTargetItem.CurrentPrefab &&
+				repeatSlider.TrueValue == currentNetItem.originalRepeat)
 			{
 				// Reset apply button icon.
 				UnappliedChanges = false;
@@ -297,6 +322,7 @@ namespace BOB
 					thisProp.m_angle = originalValues[i].angle;
 					thisProp.m_position = originalValues[i].position;
 					thisProp.m_probability = originalValues[i].probability;
+					thisProp.m_repeatDistance = originalValues[i].repeatDistance;
 				}
 			}
 
@@ -327,16 +353,17 @@ namespace BOB
 					{
 						case ReplacementModes.Individual:
 							// Individual replacement.
-							IndividualNetworkReplacement.Instance.Replace(SelectedNet, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, netItem.lane, CurrentTargetItem.index, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+							IndividualNetworkReplacement.Instance.Replace(SelectedNet, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, netItem.lane, CurrentTargetItem.index, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, repeatSlider.TrueValue);
 
 							// Update current target.
 							CurrentTargetItem.individualPrefab = ReplacementPrefab;
 							CurrentTargetItem.individualProb = (int)probabilitySlider.TrueValue;
+							netItem.individualRepeat = repeatSlider.TrueValue;
 							break;
 
 						case ReplacementModes.Grouped:
 							// Grouped replacement.
-							NetworkReplacement.Instance.Replace(SelectedNet, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, -1, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+							NetworkReplacement.Instance.Replace(SelectedNet, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, -1, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, -1);
 
 							// Update current target.
 							CurrentTargetItem.replacementPrefab = ReplacementPrefab;
@@ -345,7 +372,7 @@ namespace BOB
 
 						case ReplacementModes.All:
 							// All- replacement.
-							AllNetworkReplacement.Instance.Replace(null, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, -1, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue);
+							AllNetworkReplacement.Instance.Replace(null, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, -1, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, -1);
 
 							// Update current target.
 							CurrentTargetItem.allPrefab = ReplacementPrefab;
@@ -515,6 +542,7 @@ namespace BOB
 				{
 					targetListItem.individualPrefab = individualReplacement.replacementInfo;
 					targetListItem.individualProb = individualReplacement.probability;
+					netItem.individualRepeat = individualReplacement.repeatDistance;
 				}
 				else
 				{
@@ -591,6 +619,7 @@ namespace BOB
 					targetListItem.originalPrefab = finalInfo;
 					targetListItem.originalProb = laneProps[propIndex].m_probability;
 					targetListItem.originalAngle = laneProps[propIndex].m_angle;
+					targetListItem.originalRepeat = laneProps[propIndex].m_repeatDistance;
 
 					// Grouped or individual?
 					if (CurrentMode == (int)ReplacementModes.Individual)
@@ -643,6 +672,7 @@ namespace BOB
 					{
 						targetListItem.individualPrefab = individualReplacement.replacementInfo;
 						targetListItem.individualProb = individualReplacement.probability;
+						targetListItem.individualRepeat = individualReplacement.repeatDistance;
 						targetListItem.originalPrefab = individualReplacement.targetInfo;
 					}
 
@@ -652,6 +682,7 @@ namespace BOB
 						//targetListItem.originalPrefab = propReference.OriginalInfo;
 						targetListItem.originalAngle = propReference.angle;
 						targetListItem.originalProb = propReference.probability;
+						targetListItem.originalRepeat = propReference.repeatDistance;
 					}
 
 					// Check for match with 'prop' mode - either original or replacement needs to be prop.
@@ -735,6 +766,44 @@ namespace BOB
 
 
 		/// <summary>
+		/// Sets the sliders to the values specified in the given replacement record.
+		/// </summary>
+		/// <param name="replacement">Replacement record to use</param>
+		protected override void SetSliders(BOBReplacementBase replacement)
+		{
+			// Disable events.
+			ignoreSliderValueChange = true;
+
+			// Are we eligible for repeat distance (eligibile target and in individual mode).
+			if (CurrentMode == ReplacementModes.Individual && currentNetItem != null && currentNetItem.originalRepeat > 1f)
+			{
+				// Yes - do we have a replacement?
+				if (replacement is BOBNetReplacement netReplacement && netReplacement.repeatDistance > 1f)
+				{
+					// Yes - set repeat distance slider value and show the slider.
+					repeatSlider.TrueValue = netReplacement.repeatDistance;
+				}
+				else
+				{
+					// No replacement; show original value.
+					repeatSlider.TrueValue = currentNetItem.originalRepeat;
+				}
+
+				// Show slider.
+				repeatSlider.parent.Show();
+			}
+			else
+			{
+				// Hide repeat slider if no value to show.
+				repeatSlider.TrueValue = 0f;
+				repeatSlider.parent.Hide();
+            }
+
+			base.SetSliders(replacement);
+		}
+
+
+		/// <summary>
 		/// Previews the change for the given prop index.
 		/// </summary>
 		/// <param name="lane">Lane index</param>
@@ -783,7 +852,13 @@ namespace BOB
 			// Preview new position and probability setting.
 			thisProp.m_position = basePosition + new Vector3(offsetX, ySlider.TrueValue, zSlider.TrueValue);
 			thisProp.m_probability = (int)probabilitySlider.TrueValue;
-			thisProp.m_angle =angle + ((int)angleSlider.TrueValue * angleMult);
+			thisProp.m_angle = angle + ((int)angleSlider.TrueValue * angleMult);
+
+			// Set repeat distance, if valid - individual mode only.
+			if (CurrentMode == ReplacementModes.Individual && originalValues[0].repeatDistance > 1f && repeatSlider.TrueValue > 1f)
+			{
+				thisProp.m_repeatDistance = repeatSlider.TrueValue;
+			}
 
 			// If a replacement prefab has been selected, then update it too.
 			if (ReplacementPrefab != null)
@@ -863,7 +938,8 @@ namespace BOB
 				angle = thisProp.m_angle,
 				position = thisProp.m_position,
 				adjustment = adjustment,
-				probability = thisProp.m_probability
+				probability = thisProp.m_probability,
+				repeatDistance = thisProp.m_repeatDistance
 			};
 		}
 	}

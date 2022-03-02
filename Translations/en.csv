@@ -54,6 +54,8 @@
 "BOB_PNL_XOF","X"
 "BOB_PNL_YOF","Y"
 "BOB_PNL_ZOF","Z"
+"BOB_PNL_REP","Spacing"
+"BOB_PNL_REP_TIP","Distance between instances"
 "BOB_PNL_SUB","Sub-buildings"
 "BOB_RND_TIT","configure random trees and props"
 "BOB_RND_NEW","New"

@@ -1,6 +1,7 @@
 ﻿Version 0.9.1 -
 
 - New feature: combined prop/tree mode - replace props (in buildings or networks) with trees, or vice-versa
+- The spacing of repeated network trees/props can now be adjusted (individual mode only)
 - BOB tool now recognises the underground (PageDown/PageUp to switch)
 - Effect renders now updated on prop/tree change (lights can now be added/removed in-game)
 - Prop/tree position highlighting is dimmed when shift is pressed and disabled while Alt is pressed
