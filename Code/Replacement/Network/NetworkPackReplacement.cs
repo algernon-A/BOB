@@ -395,30 +395,28 @@ namespace BOB
 						// Can we find both target and replacment?
 						PrefabInfo targetInfo = propReplacement.isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(propReplacement.targetName) : PrefabCollection<PropInfo>.FindLoaded(propReplacement.targetName);
 						propReplacement.replacementInfo = propReplacement.isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(propReplacement.replacementName) : PrefabCollection<PropInfo>.FindLoaded(propReplacement.replacementName);
-						if (targetInfo == null)
+						if (targetInfo != null)
 						{
-							// Target prop not found - log and continue.
-							Logging.Message("couldn't find pack target prop");
-						}
-						else if (propReplacement.replacementInfo == null)
-						{
-							// Replacement prop not found - flag that pack wasn't all loaded.
-							if (!packNotAllLoaded.ContainsKey(propPack.name))
+							if (propReplacement.replacementInfo == null)
 							{
-								packNotAllLoaded.Add(propPack.name, true);
-							}
-						}
-						else
-						{
-							// Target and replacment both found - add this replacmeent to our pack dictionary entry.
-							if (packRecords[propPack.name].ContainsKey(targetInfo))
-							{
-								// Skip any duplicates.
-								Logging.Error("duplicate replacement ", targetInfo.name, " in replacement pack ", propPack.name);
+								// Replacement prop not found - flag that pack wasn't all loaded.
+								if (!packNotAllLoaded.ContainsKey(propPack.name))
+								{
+									packNotAllLoaded.Add(propPack.name, true);
+								}
 							}
 							else
 							{
-								packRecords[propPack.name].Add(targetInfo, propReplacement);
+								// Target and replacment both found - add this replacmeent to our pack dictionary entry.
+								if (packRecords[propPack.name].ContainsKey(targetInfo))
+								{
+									// Skip any duplicates.
+									Logging.Error("duplicate replacement ", targetInfo.name, " in replacement pack ", propPack.name);
+								}
+								else
+								{
+									packRecords[propPack.name].Add(targetInfo, propReplacement);
+								}
 							}
 						}
 					}
