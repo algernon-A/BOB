@@ -929,7 +929,7 @@ namespace BOB
 
 			// Original position and angle.
 			Vector3 basePosition = new Vector3();
-			float angle = 0f;
+			float baseAngle = 0f;
 
 			// Find matching prop reference (by index match) in original values.
 			foreach (BuildingPropReference propReference in originalValues)
@@ -938,7 +938,7 @@ namespace BOB
 				{
 					// Found a match - retrieve original position and angle.
 					basePosition = propReference.position - propReference.adjustment;
-					angle = propReference.radAngle;
+					baseAngle = propReference.radAngle - propReference.radAngleAdjustment;
 					break;
 				}
 			}
@@ -954,7 +954,7 @@ namespace BOB
 			thisProp.m_position = basePosition + new Vector3(xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue);
 			thisProp.m_probability = (int)probabilitySlider.TrueValue;
 			thisProp.m_fixedHeight = customHeightCheck.isChecked;
-			thisProp.m_radAngle = angle + (angleSlider.TrueValue * Mathf.Deg2Rad);
+			thisProp.m_radAngle = baseAngle + (angleSlider.TrueValue * Mathf.Deg2Rad);
 
 			// If a replacement prefab has been selected, then update it too.
 			if (ReplacementPrefab != null)
@@ -991,14 +991,16 @@ namespace BOB
 			// Local reference.
 			BuildingInfo.Prop thisProp = currentBuilding.m_props[propIndex];
 
-			// Get any position adjustments from active replacements, checking in priority order.
+			// Get any position and angle adjustments from active replacements, checking in priority order.
 			Vector3 adjustment = Vector3.zero;
+			float angleAdjustment = 0f;
 			if (IndividualBuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex, out _) is BOBBuildingReplacement individualReplacement)
 			{
 				// Individual replacement.
 				adjustment.x = individualReplacement.offsetX;
 				adjustment.y = individualReplacement.offsetY;
 				adjustment.z = individualReplacement.offsetZ;
+				angleAdjustment = individualReplacement.angle;
 			}
 			else if (BuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex, out _) is BOBBuildingReplacement buildingReplacement)
 			{
@@ -1006,6 +1008,7 @@ namespace BOB
 				adjustment.x = buildingReplacement.offsetX;
 				adjustment.y = buildingReplacement.offsetY;
 				adjustment.z = buildingReplacement.offsetZ;
+				angleAdjustment = buildingReplacement.angle;
 			}
 			else if (AllBuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex, out _) is BOBBuildingReplacement allBuildingReplacement)
 			{
@@ -1013,6 +1016,7 @@ namespace BOB
 				adjustment.x = allBuildingReplacement.offsetX;
 				adjustment.y = allBuildingReplacement.offsetY;
 				adjustment.z = allBuildingReplacement.offsetZ;
+				angleAdjustment =	allBuildingReplacement.angle;
 			}
 
 			// Return original data.
@@ -1024,6 +1028,7 @@ namespace BOB
 				originalFinalProp = thisProp.m_finalProp,
 				originalFinalTree = thisProp.m_finalTree,
 				radAngle = thisProp.m_radAngle,
+				radAngleAdjustment = angleAdjustment * Mathf.Deg2Rad,
 				position = thisProp.m_position,
 				adjustment = adjustment,
 				probability = thisProp.m_probability,

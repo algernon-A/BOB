@@ -6,6 +6,7 @@
 - Effect renders now updated on prop/tree change (lights can now be added/removed in-game)
 - Prop/tree position highlighting is dimmed when shift is pressed and disabled while Alt is pressed
 - Random prop list now refreshes if displayed when random prop setup panel is closed
+- Fix preview rotation resetting if position changes are made immediately after applying a rotation change
 
 
 Version 0.9.0.4 -

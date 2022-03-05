@@ -406,7 +406,7 @@ namespace BOB
 
 
 		/// <summary>
-		/// Creates a new PropReference from the provided building prefab and prop index.
+		/// Reverts the specified prop to original values.
 		/// </summary>
 		/// <param name="reference">Referene to revert</param>
 		protected void RevertReference(BuildingPropReference reference)

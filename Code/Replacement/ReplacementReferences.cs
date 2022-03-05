@@ -27,7 +27,7 @@ namespace BOB
 	public class BuildingPropReference : PropReference
 	{
 		public BuildingInfo buildingInfo;
-		public float radAngle;
+		public float radAngle, radAngleAdjustment;
 		public bool fixedHeight;
 	}
 
@@ -39,7 +39,7 @@ namespace BOB
 	{
 		public NetInfo netInfo;
 		public int laneIndex;
-		public float angle;
+		public float angle, angleAdjustment;
 		public float repeatDistance;
 	}
 }
