@@ -8,6 +8,7 @@
 - Random prop list now refreshes if displayed when random prop setup panel is closed
 - Fix building sliders not resetting to original positions when building preview is reverted
 - Fix preview rotation resetting if position changes are made immediately after applying a rotation change
+- Update bundled UUI API (2.2.1)
 
 
 Version 0.9.0.4 -
