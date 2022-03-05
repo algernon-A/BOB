@@ -417,11 +417,8 @@ namespace BOB
 			// Revert any unapplied changes first.
 			if (UnappliedChanges)
 			{
-				RevertPreview();
-
-				// Reset slider values by reassigning the current target item.
+				// Reset slider values by reassigning the current target item - this will also revert any preview.
 				CurrentTargetItem = CurrentTargetItem;
-
 				return;
 			}
 
