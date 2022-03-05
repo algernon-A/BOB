@@ -15,6 +15,20 @@ namespace BOB
         {
             new WhatsNewMessage
             {
+                version = new Version("0.9.1.0"),
+                versionHeader = "",
+                messageKeys = true,
+                messages = new string[]
+                {
+                    "BOB_UPD_091_0",
+                    "BOB_UPD_091_1",
+                    "BOB_UPD_091_2",
+                    "BOB_UPD_091_3",
+                    "BOB_UPD_091_4"
+                }
+            },
+            new WhatsNewMessage
+            {
                 version = new Version("0.9.0.0"),
                 versionHeader = "",
                 messageKeys = true,
@@ -28,7 +42,8 @@ namespace BOB
                     "BOB_UPD_090_5",
                     "BOB_UPD_090_6"
                 }
-            },new WhatsNewMessage
+            }
+            ,new WhatsNewMessage
             {
                 version = new Version("0.8.6.0"),
                 versionHeader = "",
@@ -37,7 +52,8 @@ namespace BOB
                 {
                     "BOB_UPD_086_0"
                 }
-            },new WhatsNewMessage
+            },
+            new WhatsNewMessage
             {
                 version = new Version("0.8.0.0"),
                 versionHeader = "",

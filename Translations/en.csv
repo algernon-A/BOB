@@ -146,3 +146,9 @@
 "BOB_UPD_090_4","Trees no longer have an angle setting, as this will always be overridden by any mod implementing random tree rotation"
 "BOB_UPD_090_5","Improve handling of props with special attributes"
 "BOB_UPD_090_6","Other minor UI and functional improvements"
+"BOB_UPD_091_0","Combined prop/tree mode - replace props with trees, or vice-versa"
+"BOB_UPD_091_1","Adjust spacing betwen repeating network props (individual mode only)"
+"BOB_UPD_091_2","Underground mode to select tunnels (PageDown/PageUp to switch)"
+"BOB_UPD_091_3","Lights can now be added or removed in-game (restarting is no longer required to update lighting effects)"
+"BOB_UPD_091_4","Prop/tree position highlighting is dimmed while shift is pressed, and completely turned off while alt is pressed"
+
