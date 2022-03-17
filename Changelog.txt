@@ -1,4 +1,7 @@
-﻿Version 0.9.1 -
+﻿- New feature: option to disable vanilla tree tool network tree replacement (no more snapping to networks)
+
+
+Version 0.9.1 -
 
 - New feature: combined prop/tree mode - replace props (in buildings or networks) with trees, or vice-versa
 - The spacing of repeated network trees/props can now be adjusted (individual mode only)

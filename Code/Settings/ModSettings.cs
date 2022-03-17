@@ -70,6 +70,23 @@ namespace BOB
 
 
         /// <summary>
+        /// Disable/enable vanilla tree network replacement tool (true means disable).
+        /// </summary>
+        [XmlIgnore]
+        internal static bool DisableTreeTool
+        {
+            get => _disableTreeTool;
+
+            set
+            {
+                _disableTreeTool = value;
+                Patcher.DisableTreeTool(value);
+            }
+        }
+        private static bool _disableTreeTool = false;
+
+
+        /// <summary>
         /// Enable thinner electrical wires (true means wires are made thinner).
         /// </summary>
         [XmlIgnore]
@@ -175,6 +192,10 @@ namespace BOB
         // Thinner wires.
         [XmlElement("ThinnerWires")]
         public bool XMLThinnerWires { get => _thinnerWires; set => _thinnerWires = value; }
+
+        // Disable vanilla tree tool network replacement.
+        [XmlElement("DisableNetworkTreeTool")]
+        public bool XMLDisableTreeTool { get => DisableTreeTool; set => DisableTreeTool = value; }
 
 
         /// <summary>

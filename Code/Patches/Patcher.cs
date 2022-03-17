@@ -35,6 +35,7 @@ namespace BOB
         internal static bool Patched => patched;
         private static bool patched = false;
         private static bool buildingOverlaysPatched = false, netOverlaysPatched = false, treeOverlaysPatched = false;
+        private static bool treeToolPatched = false;
 
 
         /// <summary>
@@ -286,6 +287,40 @@ namespace BOB
             {
                 treeAnarchyTarget = AccessTools.Method(typeof(TreeManager), "EndRenderingImpl");
                 treeAnarchyPatch = AccessTools.Method(typeof(TreeAnarchyRender), nameof(TreeAnarchyRender.EndRenderingImplPrefix));
+            }
+        }
+
+
+        /// <summary>
+        /// Patches the game's tree tool to enable/disable network tree replacement.
+        /// </summary>
+        /// <param name="enabled">True to enable the patch (disable network tree replacement), false to revert patch</param>
+        internal static void DisableTreeTool(bool enabled)
+        {
+            // Target and patch.
+            MethodInfo treeToolTarget = typeof(TreeTool).GetMethod(nameof(TreeTool.SimulationStep));
+            MethodInfo treeToolPatch = typeof(TreeToolPatch).GetMethod(nameof(TreeToolPatch.Transpiler));
+            Harmony harmonyInstance = new Harmony(harmonyID);
+
+            if (enabled)
+            {
+                // Apply patch, if it isn't already.
+                if (!treeToolPatched)
+                {
+                    Logging.Message("applying TreeTool patch");
+                    harmonyInstance.Patch(treeToolTarget, transpiler: new HarmonyMethod(treeToolPatch));
+                    treeToolPatched = true;
+                }
+            }
+            else
+            {
+                // Unapply patch, if we haven't already.
+                if (treeToolPatched)
+                {
+                    Logging.Message("reverting TreeTool patch");
+                    harmonyInstance.Unpatch(treeToolTarget, treeToolPatch);
+                    treeToolPatched = false;
+                }
             }
         }
     }

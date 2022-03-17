@@ -107,6 +107,7 @@
 "BOB_PER_GRP","Always on"
 "BOB_PER_LST","Remember previous setting"
 "BOB_OPT_POS","Remember previous panel position"
+"BOB_OPT_DTT","Disable vanilla tree tool network tree replacement"
 "BOB_FIL_NAME","Search:"
 "MES_PAGE","Please refer to the mod's Steam Workshop page for further information."
 "BOB_ERR_FAT","This means that the mod is not able to operate and has shut down."

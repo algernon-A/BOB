@@ -76,6 +76,7 @@
     <Compile Include="Code\Patches\RenderOverlay.cs" />
     <Compile Include="Code\Patches\RuiningPatches.cs" />
     <Compile Include="Code\Patches\TreeAnarchy.cs" />
+    <Compile Include="Code\Patches\TreeToolPatch.cs" />
     <Compile Include="Code\PreviewRenderer\PreviewPanel.cs" />
     <Compile Include="Code\PreviewRenderer\PreviewRenderer.cs" />
     <Compile Include="Code\Replacement\Building\BuildingReplacementBase.cs" />

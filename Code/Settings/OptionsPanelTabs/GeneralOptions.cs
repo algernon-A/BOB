@@ -41,6 +41,11 @@ namespace BOB
             UICheckBox rememberPosCheck = UIControls.AddPlainCheckBox(panel, Translations.Translate("BOB_OPT_POS"));
             rememberPosCheck.isChecked = ModSettings.rememberPosition;
             rememberPosCheck.eventCheckChanged += (control, isChecked) => ModSettings.rememberPosition = isChecked;
+
+            // Disable vanilla tree tool network tree replacement.
+            UICheckBox disableTreeToolCheck = UIControls.AddPlainCheckBox(panel, Translations.Translate("BOB_OPT_DTT"));
+            disableTreeToolCheck.isChecked = ModSettings.DisableTreeTool;
+            disableTreeToolCheck.eventCheckChanged += (control, isChecked) => ModSettings.DisableTreeTool = isChecked;
         }
     }
 }
