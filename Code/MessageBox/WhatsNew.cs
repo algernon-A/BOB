@@ -15,6 +15,16 @@ namespace BOB
         {
             new WhatsNewMessage
             {
+                version = new Version("0.9.2.0"),
+                versionHeader = "",
+                messageKeys = true,
+                messages = new string[]
+                {
+                    "BOB_UPD_092_0"
+                }
+            },
+            new WhatsNewMessage
+            {
                 version = new Version("0.9.1.0"),
                 versionHeader = "",
                 messageKeys = true,
