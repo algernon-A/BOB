@@ -107,6 +107,7 @@
 "BOB_PER_GRP","Siempre encendido"
 "BOB_PER_LST","Recordar la configuración anterior"
 "BOB_OPT_POS","Recordar la posición anterior del panel"
+"BOB_OPT_DTT","Desactivar la herramienta de reemplazo de árboles del juego base"
 "BOB_FIL_NAME","Búsqueda:"
 "MES_PAGE","Consulta la página de Steam Workshop del mod para obtener más información."
 "BOB_ERR_FAT","Esto significa que el mod no puede funcionar y se ha deshabilitado."
@@ -151,4 +152,5 @@
 "BOB_UPD_091_2","Modo Subterráneo para seleccionar túneles (PageDown/PageUp para alternar)"
 "BOB_UPD_091_3","Ahora se pueden añadir o eliminar luces en el juego (ya no es necesario reiniciar para actualizar los efectos de iluminación)"
 "BOB_UPD_091_4","El resaltado de posición del árbol/decoracion se atenúa al presionar Shift, y se apaga completamente al presionar Alt"
+"BOB_UPD_092_0","Añadir opción para desactivar la herramienta base de reemplazo de árboles. Usando esta opción activa la función snap-to-network de la herramienta y permite la colocación manual de árboles cerca (o usando un mod Anarquico) de carreteras"
 

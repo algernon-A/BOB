@@ -107,6 +107,7 @@
 "BOB_PER_GRP","Immer an"
 "BOB_PER_LST","Vorherige Einstellung merken"
 "BOB_OPT_POS","Vorherige Position der Oberfläche merken"
+"BOB_OPT_DTT","Vanilla-Werkzeug zum Ersetzen von Bäumen auf Netzwerken ausschalten"
 "BOB_FIL_NAME","Suche:"
 "MES_PAGE","Weitere Informationen sind auf der Steam Workshop-Seite des Mods zu finden."
 "BOB_ERR_FAT","Dies bedeutet, dass der Mod nicht funktioniert und deaktiviert wurde."
@@ -151,4 +152,6 @@
 "BOB_UPD_091_2","Unterirdisch-Modus, um Tunnel auszuwählen (Bild hoch/Bild runter zum Umschalten)"
 "BOB_UPD_091_3","Lichter können jetzt im Spiel hinzugefügt oder entfernt werden (Neustart ist nicht mehr erforderlich, um Lichteffekte zu aktualisieren)"
 "BOB_UPD_091_4","Das Hervorheben von Requisiten/Bäumen wird gedämpft, während Shift gedrückt wird und vollständig ausgeschaltet während Alt gedrückt wird"
+"BOB_UPD_092_0","Option hinzugefügt um das Vanilla-Werkzeug zum Ersetzen von Bäumen auf Netzwerken zu deaktivieren. Mit dieser Option schaltet man die ""Snap-to-Network""-Funktion des Vanilla-Werkzeugs 
+aus und erlaubt so die manuelle Platzierung von Bäumen nahe Straßen (oder auf Straßen wenn man eine Anarchy-Mod nutzt)."
 

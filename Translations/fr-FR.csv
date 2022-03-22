@@ -107,6 +107,7 @@
 "BOB_PER_GRP","Toujours activé"
 "BOB_PER_LST","Mémoriser les paramètres précédents"
 "BOB_OPT_POS","Mémoriser la position du panneau précédent"
+"BOB_OPT_DTT","Désactiver l'outil de remplacement d'arbres sur routes du jeu de base"
 "BOB_FIL_NAME","Recherche :"
 "MES_PAGE","Veuillez vous référer à la description sur le Steam Workshop du mod pour plus d'informations."
 "BOB_ERR_FAT","Cela signifie que le mod n'est pas en mesure de fonctionner, et a arrêté."
@@ -151,4 +152,5 @@
 "BOB_UPD_091_2","Underground mode to select tunnels (PageDown/PageUp to switch)"
 "BOB_UPD_091_3","Lights can now be added or removed in-game (restarting is no longer required to update lighting effects)"
 "BOB_UPD_091_4","Prop/tree position highlighting is dimmed while shift is pressed, and completely turned off while alt is pressed"
+"BOB_UPD_092_0","Ajout: option pour désactiver le remplacement d'arbres sur routes du jeu de base. L'utilisation de cette option désactive la fonction snap-to-network de l'outil et permet le placement manuel des arbres près (ou sur, en utilisant un mod Anarchy) des routes."
 

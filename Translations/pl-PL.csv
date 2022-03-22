@@ -107,6 +107,7 @@
 "BOB_PER_GRP","Zawsze włączone"
 "BOB_PER_LST","Pamiętaj poprzednie ustawienia"
 "BOB_OPT_POS","Pamiętaj poprzednią pozycję panelu"
+"BOB_OPT_DTT","Disable vanilla tree tool network tree replacement"
 "BOB_FIL_NAME","Szukaj:"
 "MES_PAGE","Więcej informacji znajdziesz na stronie moda w Warsztacie Steam."
 "BOB_ERR_FAT","Oznacza to, że mod nie jest w stanie działać i się wyłączył."
@@ -151,4 +152,5 @@
 "BOB_UPD_091_2","Underground mode to select tunnels (PageDown/PageUp to switch)"
 "BOB_UPD_091_3","Lights can now be added or removed in-game (restarting is no longer required to update lighting effects)"
 "BOB_UPD_091_4","Prop/tree position highlighting is dimmed while shift is pressed, and completely turned off while alt is pressed"
+"BOB_UPD_092_0","Add option to disable the game's tree tool road tree replacement.  Using this option disables the tool's snap-to-network function and allows manual placement of trees near (or on, using an Anarchy mod) roads."
 
