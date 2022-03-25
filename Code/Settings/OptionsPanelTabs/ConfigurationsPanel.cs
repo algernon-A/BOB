@@ -332,8 +332,8 @@ namespace BOB
             bool validFile = !string.IsNullOrEmpty(fileNameField.text);
             bool validSelection = !string.IsNullOrEmpty(selectedConfig);
 
-            // Need a valid filename to enable creating new files.
-            activeCopyButton.isEnabled = validFile;
+            // Need a valid filename to enable creating new files, and 'current selction' is only valid when in-game.
+            activeCopyButton.isEnabled = validFile & Loading.isLoaded;
             newCleanButton.isEnabled = validFile;
 
             // Selected copy button requires both a valid filename and valid current selection.

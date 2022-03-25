@@ -1,4 +1,7 @@
-﻿Version 0.9.2 -
+﻿- Ensure 'copy current configuration' button is disabled when not in-game
+
+
+Version 0.9.2 -
 
 - New feature: option to disable vanilla tree tool network tree replacement (no more snapping to networks)
 

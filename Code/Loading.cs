@@ -11,6 +11,7 @@ namespace BOB
     {
         // Internal flags.
         internal static bool isModEnabled = false;
+        internal static bool isLoaded = false;
 
         /// <summary>
         /// Called by the game when the mod is initialised at the start of the loading process.
@@ -132,7 +133,18 @@ namespace BOB
             // Activate tool hotkey.
             UIThreading.Operating = true;
 
+            isLoaded = true;
             Logging.Message("loading complete");
+        }
+
+
+        /// <summary>
+        /// Called by the game when exiting loaded leve.
+        /// </summary>
+        public override void OnLevelUnloading()
+        {
+            base.OnLevelUnloading();
+            isLoaded = false;
         }
     }
 }
