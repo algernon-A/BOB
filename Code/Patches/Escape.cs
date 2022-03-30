@@ -10,12 +10,12 @@ namespace BOB
     public static class EscapePatch
     {
         /// <summary>
-        /// Harmony prefix patch to cancel the zoning tool when it's active and the escape key is pressed.
+        /// Harmony prefix patch to cancel the BOB tool when it's active and the escape key is pressed.
         /// </summary>
-        /// <returns>True (continue on to game method) if the zoning tool isn't already active, false (pre-empt game method) otherwise</returns>
+        /// <returns>True (continue on to game method) if the BOB tool isn't already active, false (pre-empt game method) otherwise</returns>
         public static bool Prefix()
         {
-            // Is the zoning tool active?
+            // Is the BOB tool active?
             if (BOBTool.IsActiveTool)
             {
                 // Yes; toggle tool status and return false (pre-empt original method).

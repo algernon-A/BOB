@@ -33,7 +33,7 @@ namespace BOB
 
 
 		/// <summary>
-		/// Returns true if the zoning tool is currently active, false otherwise.
+		/// Returns true if the BOB tool is currently active, false otherwise.
 		/// </summary>
 		public static bool IsActiveTool => Instance != null && ToolsModifierControl.toolController.CurrentTool == Instance;
 
