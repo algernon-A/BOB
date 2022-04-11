@@ -1,4 +1,5 @@
-﻿- Ensure 'copy current configuration' button is disabled when not in-game
+﻿- Add hotkey to toggle disabling of vanilla tree tool
+- Ensure 'copy current configuration' button is disabled when not in-game
 
 
 Version 0.9.2 -

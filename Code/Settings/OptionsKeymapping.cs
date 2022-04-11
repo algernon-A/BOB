@@ -5,24 +5,44 @@ using ColossalFramework.UI;
 
 namespace BOB
 {
+    /// <summary>
+    /// Keycode setting control for mod hotkey.
+    /// </summary>
     public class OptionsKeymapping : UICustomControl
     {
         // Components.
-        UILabel label;
-        UIButton button;
+        internal readonly UIPanel uIPanel;
+        private readonly UILabel label;
+        private readonly UIButton button;
 
         // State flag.
         private bool isPrimed = false;
 
 
         /// <summary>
-        /// Setup this control
-        /// Called by Unity immediately before the first update.
+        /// Link to game hotkey setting.
         /// </summary>
-        public void Start()
+        protected virtual InputKey KeySetting
+        {
+            get => ModSettings.CurrentHotkey;
+
+            set => ModSettings.CurrentHotkey = value;
+        }
+
+
+        /// <summary>
+        /// Control label.
+        /// </summary>
+        protected virtual string Label => Translations.Translate("BOB_OPT_KEY");
+
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public OptionsKeymapping()
         {
             // Get the template from the game and attach it here.
-            UIPanel uIPanel = component.AttachUIComponent(UITemplateManager.GetAsGameObject("KeyBindingTemplate")) as UIPanel;
+            uIPanel = component.AttachUIComponent(UITemplateManager.GetAsGameObject("KeyBindingTemplate")) as UIPanel;
 
             // Find our sub-components.
             label = uIPanel.Find<UILabel>("Name");
@@ -33,8 +53,8 @@ namespace BOB
             button.eventMouseDown += (control, mouseEvent) => OnMouseDown(mouseEvent);
 
             // Set label and button text.
-            label.text = Translations.Translate("BOB_OPT_KEY");
-            button.text = SavedInputKey.ToLocalizedString("KEYNAME", ModSettings.CurrentHotkey);
+            label.text = Label;
+            button.text = SavedInputKey.ToLocalizedString("KEYNAME", KeySetting);
         }
 
 
@@ -58,7 +78,7 @@ namespace BOB
                 // If escape was entered, we don't change the code.
                 if (keyEvent.keycode == KeyCode.Escape)
                 {
-                    inputKey = ModSettings.CurrentHotkey;
+                    inputKey = KeySetting;
                 }
                 else
                 {
@@ -145,7 +165,7 @@ namespace BOB
         private void ApplyKey(InputKey key)
         {
             // Apply key to current settings and save.
-            ModSettings.CurrentHotkey = key;
+            KeySetting = key;
             ModSettings.Save();
 
             // Set the label for the new hotkey.
@@ -164,7 +184,7 @@ namespace BOB
         /// <returns>True if the key is a modifier key, false otherwise</returns>
         private bool IsModifierKey(KeyCode keyCode)
         {
-            return (keyCode == KeyCode.LeftControl || keyCode == KeyCode.RightControl || keyCode == KeyCode.LeftShift || keyCode == KeyCode.RightShift || keyCode == KeyCode.LeftAlt || keyCode == KeyCode.RightAlt || keyCode == KeyCode.AltGr);
+            return keyCode == KeyCode.LeftControl || keyCode == KeyCode.RightControl || keyCode == KeyCode.LeftShift || keyCode == KeyCode.RightShift || keyCode == KeyCode.LeftAlt || keyCode == KeyCode.RightAlt || keyCode == KeyCode.AltGr;
         }
 
 

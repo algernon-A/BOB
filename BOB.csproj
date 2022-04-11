@@ -88,6 +88,7 @@
     <Compile Include="Code\Replacement\Scaling.cs" />
     <Compile Include="Code\Replacement\ElectricalWires.cs" />
     <Compile Include="Code\Settings\OptionsPanelTabs\VisualOptions.cs" />
+    <Compile Include="Code\Settings\TreeToolKeymapping.cs" />
     <Compile Include="Code\UI\BOBSlider.cs" />
     <Compile Include="Code\UI\MapPanel.cs" />
     <Compile Include="Code\UI\PanelBase.cs" />

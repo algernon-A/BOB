@@ -15,10 +15,17 @@ namespace BOB
 
         // Flags.
         private bool operating = false;
-        private bool processed = false;
+        private bool hotkeyProcessed = false, treeDisableProcessed = false;
 
         // Hotkey local reference.
         private readonly SavedInputKey savedKey;
+
+        // Tree tool disable mode key settings.
+        internal static KeyCode treeDisableKey = KeyCode.T;
+        internal static bool treeDisableCtrl = true;
+        internal static bool treeDisableAlt = false;
+        internal static bool treeDisableShift = true;
+
 
         /// <summary>
         /// Constructor - sets instance reference.
@@ -30,6 +37,8 @@ namespace BOB
 
             // Set hotkey reference.
             savedKey = ModSettings.PanelSavedKey;
+
+            // 
         }
 
 
@@ -58,14 +67,14 @@ namespace BOB
             // Don't do anything if not active.
             if (operating)
             {
+                // Check modifier keys according to settings.
+                bool altPressed = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt) || Input.GetKey(KeyCode.AltGr);
+                bool ctrlPressed = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+                bool shiftPressed = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+
                 // Has hotkey been pressed?
                 if (savedKey.Key != KeyCode.None && Input.GetKey(savedKey.Key))
                 {
-                    // Check modifier keys according to settings.
-                    bool altPressed = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt) || Input.GetKey(KeyCode.AltGr);
-                    bool ctrlPressed = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
-                    bool shiftPressed = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-
                     // Modifiers have to *exactly match* settings, e.g. "alt-E" should not trigger on "ctrl-alt-E".
                     bool altOkay = altPressed == savedKey.Alt;
                     bool ctrlOkay = ctrlPressed == savedKey.Control;
@@ -75,10 +84,10 @@ namespace BOB
                     if (altOkay && ctrlOkay && shiftOkay)
                     {
                         // Only process if we're not already doing so.
-                        if (!processed)
+                        if (!hotkeyProcessed)
                         {
                             // Set processed flag.
-                            processed = true;
+                            hotkeyProcessed = true;
 
                             // Toggle tool status.
                             BOBTool.ToggleTool();
@@ -87,13 +96,47 @@ namespace BOB
                     else
                     {
                         // Relevant keys aren't pressed anymore; this keystroke is over, so reset and continue.
-                        processed = false;
+                        hotkeyProcessed = false;
                     }
                 }
                 else
                 {
                     // Relevant keys aren't pressed anymore; this keystroke is over, so reset and continue.
-                    processed = false;
+                    hotkeyProcessed = false;
+                }
+
+
+                // Check for diable tree tool hotkey.
+                if (Input.GetKey(treeDisableKey))
+                {
+                    // Modifiers have to *exactly match* settings, e.g. "alt-E" should not trigger on "ctrl-alt-E".
+                    bool altOkay = altPressed == treeDisableAlt;
+                    bool ctrlOkay = ctrlPressed == treeDisableCtrl;
+                    bool shiftOkay = shiftPressed == treeDisableShift;
+
+                    // Process keystroke.
+                    if (altOkay && ctrlOkay && shiftOkay)
+                    {
+                        // Only process if we're not already doing so.
+                        if (!treeDisableProcessed)
+                        {
+                            // Set processed flag.
+                            treeDisableProcessed = true;
+
+                            // Toggle tree tool disablement.
+                            ModSettings.DisableTreeTool = !ModSettings.DisableTreeTool;
+                        }
+                    }
+                    else
+                    {
+                        // Relevant keys aren't pressed anymore; this keystroke is over, so reset and continue.
+                        treeDisableProcessed = false;
+                    }
+                }
+                else
+                {
+                    // Relevant keys aren't pressed anymore; this keystroke is over, so reset and continue.
+                    treeDisableProcessed = false;
                 }
             }
         }

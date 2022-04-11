@@ -46,6 +46,10 @@ namespace BOB
             UICheckBox disableTreeToolCheck = UIControls.AddPlainCheckBox(panel, Translations.Translate("BOB_OPT_DTT"));
             disableTreeToolCheck.isChecked = ModSettings.DisableTreeTool;
             disableTreeToolCheck.eventCheckChanged += (control, isChecked) => ModSettings.DisableTreeTool = isChecked;
+
+            // Tree tool control.
+            panel.gameObject.AddComponent<TreeToolKeymapping>();
+
         }
     }
 }

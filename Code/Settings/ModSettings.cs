@@ -41,7 +41,7 @@ namespace BOB
         [XmlIgnore]
         // Remember last panel position.
         internal static bool rememberPosition = false;
-
+        
         // What's new notification version.
         [XmlIgnore]
         internal static string whatsNewVersion = "0.0";
@@ -173,8 +173,33 @@ namespace BOB
             }
         }
 
-		// Grouping behaviour.
-		[XmlElement("GroupDefault")]
+
+        // Hotkey element.
+        [XmlElement("TreeToolKey")]
+        public KeyBinding TreeToolKey
+        {
+            get
+            {
+                return new KeyBinding
+                {
+                    keyCode = (int)UIThreading.treeDisableKey,
+                    control = UIThreading.treeDisableCtrl,
+                    shift = UIThreading.treeDisableShift,
+                    alt = UIThreading.treeDisableAlt
+                };
+            }
+            set
+            {
+                UIThreading.treeDisableKey = (KeyCode)value.keyCode;
+                UIThreading.treeDisableCtrl = value.control;
+                UIThreading.treeDisableShift = value.shift;
+                UIThreading.treeDisableAlt = value.alt;
+            }
+        }
+
+
+        // Grouping behaviour.
+        [XmlElement("GroupDefault")]
 		public int XMLGroupDefault { get => indDefault; set => indDefault = value; }
 
 		// Remember position.
