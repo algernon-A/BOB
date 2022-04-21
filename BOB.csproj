@@ -68,6 +68,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Code\AddedProps\AddedBuildingProps.cs" />
     <Compile Include="Code\Configuration\ConfigurationUtils.cs" />
     <Compile Include="Code\Configuration\ConfigurationXML.cs" />
     <Compile Include="Code\MessageBox\ExceptionMessageBox.cs" />

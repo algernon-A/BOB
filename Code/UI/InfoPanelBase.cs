@@ -24,7 +24,7 @@ namespace BOB
 
 		// Layout constants - Y.
 		protected const float ListY = FilterY + FilterHeight;
-		protected const float ListHeight = UIPropRow.RowHeight * 16f;
+		protected const float ListHeight = UIPropRow.RowHeight * 18f;
 		protected const float ActionsY = ListY;
 		protected const float ActionHeaderY = ActionsY - 15f;
 

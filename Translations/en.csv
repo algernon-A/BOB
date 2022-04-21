@@ -73,6 +73,7 @@
 "BOB_SPR_SNT","A replacement is currently applied for these networks"
 "BOB_SPR_ANT","A replacement is currently applied for all networks"
 "BOB_SPR_PCK","A replacement pack is currently applied"
+"BOB_SPR_ADD","This item is added by BOB and is not part of the original asset"
 "BOB_PCK_APP","Apply pack"
 "BOB_PCK_APP_A","Applies the selected replacement pack"
 "BOB_PCK_APP_C","Pack cannot be applied as it conflicts with an already-applied pack"
