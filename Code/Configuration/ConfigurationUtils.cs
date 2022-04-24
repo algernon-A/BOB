@@ -112,6 +112,9 @@ namespace BOB
 
 						// Deserialise active replacement packs.
 						NetworkPackReplacement.Instance.DeserializeActivePacks(CurrentConfig.activePacks);
+
+						// Deserialize added props.
+						AddedBuildingProps.Instance.Deserialize(CurrentConfig.addedBuildingProps);
 					}
 				}
 				else
@@ -374,11 +377,11 @@ namespace BOB
 		internal static void Cleanup()
         {
 			// Cleanup buildngs.
-
 			// Remove replacments referring to unloaded props/trees.
 			CleanReplacements(CurrentConfig.allBuildingProps);
 			CleanElements(CurrentConfig.buildings);
 			CleanElements(CurrentConfig.indBuildings);
+			CleanElements(CurrentConfig.addedBuildingProps);
 
 			// Cleanup networks.
 			CleanReplacements(CurrentConfig.allNetworkProps);

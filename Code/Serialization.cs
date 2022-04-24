@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Collections.Generic;
-using System.Runtime.Serialization.Formatters.Binary;
 using ICities;
 using ColossalFramework.IO;
 
