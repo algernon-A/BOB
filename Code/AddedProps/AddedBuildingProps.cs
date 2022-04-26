@@ -73,6 +73,12 @@ namespace BOB
             }
             replacementList.Add(data);
 
+            // Add building to changed buildings list, if it's not already there.
+            if (!changedBuildings.ContainsKey(data.BuildingInfo))
+            {
+                changedBuildings.Add(data.BuildingInfo, data.BuildingInfo.m_props);
+            }
+
             // Add prop to building.
             AddProp(data);
         }

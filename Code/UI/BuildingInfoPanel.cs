@@ -666,43 +666,52 @@ namespace BOB
 				propIndex = targetListItem.indexes[0];
 			}
 
-			// All-building replacement and original probability (if any).
-			BOBBuildingReplacement allBuildingReplacement = AllBuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex, out _);
-			if (allBuildingReplacement != null)
+			// Is this an added prop?
+			if (AddedBuildingProps.Instance.IsAdded(currentBuilding, propIndex))
 			{
-				targetListItem.allPrefab = allBuildingReplacement.replacementInfo;
-				targetListItem.allProb = allBuildingReplacement.probability;
+				targetListItem.index = propIndex;
+				targetListItem.isAdded = true;
 			}
 			else
 			{
-				// If no active current record, ensure that it's reset to null.
-				targetListItem.allPrefab = null;
-			}
+				// All-building replacement and original probability (if any).
+				BOBBuildingReplacement allBuildingReplacement = AllBuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex, out _);
+				if (allBuildingReplacement != null)
+				{
+					targetListItem.allPrefab = allBuildingReplacement.replacementInfo;
+					targetListItem.allProb = allBuildingReplacement.probability;
+				}
+				else
+				{
+					// If no active current record, ensure that it's reset to null.
+					targetListItem.allPrefab = null;
+				}
 
-			// Building replacement and original probability (if any).
-			BOBBuildingReplacement buildingReplacement = BuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex, out _);
-			if (buildingReplacement != null)
-			{
-				targetListItem.replacementPrefab = buildingReplacement.replacementInfo;
-				targetListItem.replacementProb = buildingReplacement.probability;
-			}
-			else
-			{
-				// If no active current record, ensure that it's reset to null.
-				targetListItem.replacementPrefab = null;
-			}
+				// Building replacement and original probability (if any).
+				BOBBuildingReplacement buildingReplacement = BuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex, out _);
+				if (buildingReplacement != null)
+				{
+					targetListItem.replacementPrefab = buildingReplacement.replacementInfo;
+					targetListItem.replacementProb = buildingReplacement.probability;
+				}
+				else
+				{
+					// If no active current record, ensure that it's reset to null.
+					targetListItem.replacementPrefab = null;
+				}
 
-			// Individual replacement and original probability (if any).
-			BOBBuildingReplacement individualReplacement = IndividualBuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex, out _);
-			if (individualReplacement != null)
-			{
-				targetListItem.individualPrefab = individualReplacement.replacementInfo;
-				targetListItem.individualProb = individualReplacement.probability;
-			}
-			else
-			{
-				// If no active current record, ensure that it's reset to null.
-				targetListItem.individualPrefab = null;
+				// Individual replacement and original probability (if any).
+				BOBBuildingReplacement individualReplacement = IndividualBuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex, out _);
+				if (individualReplacement != null)
+				{
+					targetListItem.individualPrefab = individualReplacement.replacementInfo;
+					targetListItem.individualProb = individualReplacement.probability;
+				}
+				else
+				{
+					// If no active current record, ensure that it's reset to null.
+					targetListItem.individualPrefab = null;
+				}
 			}
 		}
 
@@ -783,11 +792,14 @@ namespace BOB
 				// Is this an added prop?
 				if (AddedBuildingProps.Instance.IsAdded(currentBuilding, propIndex))
 				{
+					Logging.KeyMessage("index ", propIndex, " is added");
 					targetListItem.index = propIndex;
 					targetListItem.isAdded = true;
 				}
 				else
 				{
+					Logging.KeyMessage("index ", propIndex, " is not added");
+
 					// Grouped or individual?
 					if (CurrentMode == ReplacementModes.Individual)
 					{
