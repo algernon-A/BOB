@@ -102,7 +102,10 @@ namespace BOB
                         // Found a matching index - remove the prop from the list.
                         replacementList.Remove(targetEntry);
                     }
-                    
+
+                    // Add building to dirty list.
+                    BuildingData.DirtyList.Add(building);
+
                     // Check if any added props remaining for this building.
                     if (replacementList.Count > 0)
                     {
@@ -141,8 +144,7 @@ namespace BOB
         internal void Update(BuildingInfo buildingInfo, PrefabInfo targetInfo, PrefabInfo replacementInfo, int propIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability, bool customHeight)
         {
             // Null and valid target checks.
-            if (targetInfo?.name == null
-                || replacementInfo?.name == null
+            if (replacementInfo?.name == null
                 || !IsAdded(buildingInfo, propIndex)
                 || !changedBuildings.ContainsKey(buildingInfo))
             {
@@ -261,6 +263,9 @@ namespace BOB
                     m_position = new Vector3(replacement.offsetX, replacement.offsetY, replacement.offsetZ),
                     m_probability = replacement.probability
                 };
+
+                // Add building to dirty list.
+                BuildingData.DirtyList.Add(buildingInfo);
 
                 return newIndex;
             }

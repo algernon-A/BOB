@@ -246,6 +246,7 @@ namespace BOB
 			}
 		}
 
+
 		/// <summary>
 		/// Current replacement mode.
 		/// </summary>
@@ -256,9 +257,9 @@ namespace BOB
 				base.CurrentMode = value;
 
 				// Show/hide add new prop button based on mode.
-				bool individualMode = CurrentMode == ReplacementModes.Individual;
-				addButton.isVisible = individualMode;
-				removeButton.isVisible = individualMode;
+				bool eligibleMode = CurrentMode == ReplacementModes.Individual | CurrentMode == ReplacementModes.Grouped;
+				addButton.isVisible = eligibleMode;
+				removeButton.isVisible = eligibleMode;
 			}
 		}
 
@@ -282,12 +283,15 @@ namespace BOB
 				// Add button.
 				addButton = AddIconButton(this, MidControlX, ActionsY2, ActionSize, "BOB_PNL_ADD", TextureUtils.LoadSpriteAtlas("BOB-RoundPlus"));
 				addButton.eventClicked += (control, clickEvent) => AddNew();
-				addButton.isVisible = CurrentMode == ReplacementModes.Individual;
 
 				// Remove button.
 				removeButton = AddIconButton(this, MidControlX + ActionSize, ActionsY2, ActionSize, "BOB_PNL_REM", TextureUtils.LoadSpriteAtlas("BOB-RoundMinus"));
 				removeButton.eventClicked += (control, clickEvent) => RemoveProp();
-				removeButton.isVisible = CurrentMode == ReplacementModes.Individual;
+
+				// Add/remove button initial visibility.
+				bool eligibleMode = CurrentMode == ReplacementModes.Individual | CurrentMode == ReplacementModes.Grouped;
+				addButton.isVisible = eligibleMode;
+				removeButton.isVisible = eligibleMode;
 
 				// Populate loaded list.
 				LoadedList();
@@ -500,46 +504,51 @@ namespace BOB
 				// Make sure we have valid a target and replacement.
 				if (CurrentTargetItem != null && ReplacementPrefab != null)
 				{
-					switch (CurrentMode)
+					// Check for added prop - instead of replacing, we update the original added prop reference.
+					if (CurrentTargetItem.isAdded)
 					{
-						case ReplacementModes.Individual:
-							// Check for added prop - instead of replacing, we update the original added prop reference.
-							if (CurrentTargetItem.isAdded)
-							{
-								AddedBuildingProps.Instance.Update(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, CurrentTargetItem.index, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, customHeightCheck.isChecked);
-							}
-							else
-							{
+						AddedBuildingProps.Instance.Update(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, CurrentTargetItem.index, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, customHeightCheck.isChecked);
+
+						// Update current target.
+						CurrentTargetItem.originalPrefab = ReplacementPrefab;
+						CurrentTargetItem.originalProb = (int)probabilitySlider.TrueValue;
+					}
+					else
+					{
+						// Not an added prop.
+						switch (CurrentMode)
+						{
+							case ReplacementModes.Individual:
 								// Individual replacement.
 								IndividualBuildingReplacement.Instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, CurrentTargetItem.index, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, customHeightCheck.isChecked);
 
 								// Update current target.
 								CurrentTargetItem.individualPrefab = ReplacementPrefab;
 								CurrentTargetItem.individualProb = (int)probabilitySlider.TrueValue;
-							}
-							break;
+								break;
 
-						case ReplacementModes.Grouped:
-							// Grouped replacement.
-							BuildingReplacement.Instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, customHeightCheck.isChecked);
+							case ReplacementModes.Grouped:
+								// Grouped replacement.
+								BuildingReplacement.Instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, customHeightCheck.isChecked);
 
-							// Update current target.
-							CurrentTargetItem.replacementPrefab = ReplacementPrefab;
-							CurrentTargetItem.replacementProb = (int)probabilitySlider.TrueValue;
-							break;
+								// Update current target.
+								CurrentTargetItem.replacementPrefab = ReplacementPrefab;
+								CurrentTargetItem.replacementProb = (int)probabilitySlider.TrueValue;
+								break;
 
-						case ReplacementModes.All:
-							// All- replacement.
-							AllBuildingReplacement.Instance.Replace(null, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, customHeightCheck.isChecked);
+							case ReplacementModes.All:
+								// All- replacement.
+								AllBuildingReplacement.Instance.Replace(null, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, customHeightCheck.isChecked);
 
-							// Update current target.
-							CurrentTargetItem.allPrefab = ReplacementPrefab;
-							CurrentTargetItem.allProb = (int)probabilitySlider.TrueValue;
-							break;
+								// Update current target.
+								CurrentTargetItem.allPrefab = ReplacementPrefab;
+								CurrentTargetItem.allProb = (int)probabilitySlider.TrueValue;
+								break;
 
-						default:
-							Logging.Error("invalid replacement mode at BuildingInfoPanel.Apply");
-							return;
+							default:
+								Logging.Error("invalid replacement mode at BuildingInfoPanel.Apply");
+								return;
+						}
 					}
 
 					// Update any dirty building rendertafes.
@@ -989,13 +998,11 @@ namespace BOB
 			// Update building prop references.
 			currentBuilding.CheckReferences();
 
-			// Refresh render to recgonise new prop.
-			BuildingData.DirtyList.Add(currentBuilding);
-
 			// Clear current selection.
 			CurrentTargetItem = null;
 
 			// Perform regular post-processing.
+			FinishUpdate();
 			TargetList();
 		}
 
