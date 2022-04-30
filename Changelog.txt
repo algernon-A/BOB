@@ -1,4 +1,7 @@
-﻿- Add hotkey to toggle disabling of vanilla tree tool
+﻿Version 0.9.3 -
+
+- Major new feature: add props to building prefabs
+- Add hotkey to toggle disabling of vanilla tree tool
 - Ensure 'copy current configuration' button is disabled when not in-game
 
 
