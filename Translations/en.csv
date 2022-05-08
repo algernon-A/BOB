@@ -157,4 +157,5 @@
 "BOB_UPD_091_3","Lights can now be added or removed in-game (restarting is no longer required to update lighting effects)"
 "BOB_UPD_091_4","Prop/tree position highlighting is dimmed while shift is pressed, and completely turned off while alt is pressed"
 "BOB_UPD_092_0","Add option to disable the game's tree tool road tree replacement.  Using this option disables the tool's snap-to-network function and allows manual placement of trees near (or on, using an Anarchy mod) roads."
-
+"BOB_UPD_093_0","Major new feature: add props to building prefabs."
+"BOB_UPD_093_1","Add hotkey to toggle disabling of vanilla tree tool (default Ctrl-Shift-T)"
