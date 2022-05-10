@@ -178,8 +178,17 @@ namespace BOB
                 int replacementProb = 100;
                 PrefabInfo replacementPrefab = null;
 
-                // Check to see if there's a currently active individual replacement.
-                if (thisItem.individualPrefab != null)
+                // Check to see if this is an added prop.
+                if (thisItem.isAdded)
+                {
+                    // Show building replacement sprite.
+                    lineSprite.atlas = TextureUtils.LoadSpriteAtlas("BOB-RoundPlus");
+                    lineSprite.spriteName = "normal";
+                    lineSprite.tooltip = Translations.Translate("BOB_SPR_ADD");
+                    lineSprite.Show();
+                }
+                // Otherwise, check to see if there's a currently active individual replacement.
+                else if (thisItem.individualPrefab != null)
                 {
                     // A replacement is currently active.
                     replacementPrefab = thisItem.individualPrefab;

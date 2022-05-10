@@ -57,10 +57,10 @@ namespace BOB
 			// Iterate through each prop in building.
 			for (int propIndex = 0; propIndex < replacement.BuildingInfo.m_props.Length; ++propIndex)
 			{
-				// Check for any currently active individual building prop replacement.
-				if (IndividualBuildingReplacement.Instance.ActiveReplacement(replacement.BuildingInfo, propIndex, out _) != null)
+				// Check for any currently active individual building prop replacement, or if this is an added prop.
+				if (IndividualBuildingReplacement.Instance.ActiveReplacement(replacement.BuildingInfo, propIndex, out _) != null || AddedBuildingProps.Instance.IsAdded(replacement.BuildingInfo, propIndex))
 				{
-					// Active individual building prop replacement; skip this one.
+					// Active individual building prop replacement or added prop; skip this one.
 					continue;
 				}
 

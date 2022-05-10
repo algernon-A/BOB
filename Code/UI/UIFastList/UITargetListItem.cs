@@ -37,6 +37,9 @@ namespace BOB
 		// Whether or not to show probabilities.
 		public bool showProbs = false;
 
+		// Whether or not this is an added prop.
+		public bool isAdded = false;
+
 		/// <summary>
 		/// Currently effective prefab (active replacement prefab, if any, or original prefab if no replacement).
 		/// </summary>
@@ -53,7 +56,6 @@ namespace BOB
 		/// Returns true if there's a currently active replacement, false if no active replacement.
 		/// </summary>
 		public bool ActiveReplacement => individualPrefab != null || replacementPrefab != null || allPrefab != null;
-
 	}
 
 

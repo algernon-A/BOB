@@ -54,7 +54,13 @@ namespace BOB
                     // Update building instance.
                     renderManager.UpdateInstance(i);
 
-                    // Cakculate building render group.
+                    // Update parking spaces.
+                    if (buildings[i].Info.m_hasParkingSpaces != 0)
+                    {
+                        buildingManager.UpdateParkingSpaces(i, ref buildings[i]);
+                    }
+
+                    // Calculate building render group.
                     Vector3 position = buildings[i].m_position;
                     int num = Mathf.Clamp((int)(position.x / 64f + 135f), 0, 269);
                     int num2 = Mathf.Clamp((int)(position.z / 64f + 135f), 0, 269);

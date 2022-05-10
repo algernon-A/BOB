@@ -41,6 +41,8 @@
 "BOB_PNL_SCA","Dekorationen und Bäume global skalieren"
 "BOB_PNL_APP","Änderungen anwenden und speichern"
 "BOB_PNL_REV","Zurücksetzen"
+"BOB_PNL_ADD","Neue Dekoration hinzufügen"
+"BOB_PNL_REM","Hinzugefügte Dekoration entfernen"
 "BOB_PNL_REV_UND","Ausgewählten Austausch zurücksetzen"
 "BOB_PNL_REV_TIP","Zurücksetzen ist nicht verfügbar, da es keine aktive Ersetzung für dieses Element gibt"
 "BOB_PNL_HID","Verstecke dieses Element (setzt die Wahrscheinlichkeit auf Null)"
@@ -71,6 +73,7 @@
 "BOB_SPR_SNT","Ein Austausch ist für dieses Netwerk angewendet"
 "BOB_SPR_ANT","Ein Austausch ist für alle Netzwerke angewendet"
 "BOB_SPR_PCK","Ein Austausch-Paket ist angewendet"
+"BOB_SPR_ADD","Dieser Gegenstand wurde von BOB hinzugefügt und ist nicht Teil des ursprünglichen Assets"
 "BOB_PCK_APP","Paket anwenden"
 "BOB_PCK_APP_A","Wendet das ausgewählte Austausch-Paket an"
 "BOB_PCK_APP_C","Diese Paket kann nicht angewendet werden, da es mit einem bereits aktivierten Paket in Konflikt steht"
@@ -96,6 +99,7 @@
 "BOB_OPT_RUI","Zerstörung von Gras"
 "BOB_OPT_WIR","Elektrische Leitungen"
 "BOB_OPT_KEY","Tastenkürzel"
+"BOB_OPT_DTK","Tastenkürzel"
 "BOB_OPT_PRS","Drücke eine Taste"
 "BOB_OPT_RGL","Änderungen werden nach dem Neustart übernommen"
 "BOB_OPT_RRT","Verhindert die Zerstörung von Gras durch Bäume"
@@ -154,4 +158,5 @@
 "BOB_UPD_091_4","Das Hervorheben von Requisiten/Bäumen wird gedämpft, während Shift gedrückt wird und vollständig ausgeschaltet während Alt gedrückt wird"
 "BOB_UPD_092_0","Option hinzugefügt um das Vanilla-Werkzeug zum Ersetzen von Bäumen auf Netzwerken zu deaktivieren. Mit dieser Option schaltet man die ""Snap-to-Network""-Funktion des Vanilla-Werkzeugs 
 aus und erlaubt so die manuelle Platzierung von Bäumen nahe Straßen (oder auf Straßen wenn man eine Anarchy-Mod nutzt)."
-
+"BOB_UPD_093_0","Wichtiges neues Feature: Füge Dekorationen zu Gebäuden hinzu."
+"BOB_UPD_093_1","Tastenkürzel zum Deaktivieren des Vanilla-Baum-Ersetzung-Werkzeugs hinzufügt (Standard Strg+Shift+T)"

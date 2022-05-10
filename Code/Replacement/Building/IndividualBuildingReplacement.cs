@@ -56,7 +56,13 @@ namespace BOB
             {
 				Logging.Message("ignoring invalid individual building replacement index ", replacement.propIndex, " for building ", replacement.BuildingInfo.name);
 				return;
-            }
+			}
+
+			// Don't apply replacement if this is an added prop.
+			if (AddedBuildingProps.Instance.IsAdded(replacement.BuildingInfo, replacement.propIndex))
+			{
+				return;
+			}
 
 			// Check prop index.
 			BuildingInfo.Prop thisProp = replacement.BuildingInfo.m_props[replacement.propIndex];

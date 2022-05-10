@@ -56,6 +56,10 @@ namespace BOB
 		[XmlArray("activePacks")]
 		[XmlArrayItem("activePacks")]
 		public List<string> activePacks = new List<string>();
+
+		[XmlArray("addedBuildingProps")]
+		[XmlArrayItem("addedBuildingProp")]
+		public List<BOBBuildingElement> addedBuildingProps = new List<BOBBuildingElement>();
 	}
 
 

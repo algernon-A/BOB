@@ -23,7 +23,7 @@ namespace BOB
 		{
 			// Update currently selected target prefab.
 			if (InfoPanelManager.Panel is BOBBuildingInfoPanel buildingPanel)
-            {
+			{
 				buildingPanel.SetSubBuilding(subBuildingIndex);
 			}
 		}
@@ -69,6 +69,10 @@ namespace BOB
 	/// </summary>
 	internal class BOBBuildingInfoPanel : BOBInfoPanel
 	{
+		// Layout constants.
+		private const float ActionsY2 = ActionsY + ActionSize;
+
+
 		// Current selection reference.
 		private BuildingInfo currentBuilding;
 
@@ -83,6 +87,7 @@ namespace BOB
 		private UIPanel subBuildingPanel;
 		private UIFastList subBuildingList;
 		private UICheckBox customHeightCheck;
+		private UIButton addButton, removeButton;
 
 
 		/// <summary>
@@ -184,35 +189,77 @@ namespace BOB
 					// Set custom height checkbox.
 					customHeightCheck.isChecked = currentBuilding.m_props[IndividualIndex].m_fixedHeight;
 
-					// If we've got an individuial building prop replacement, update the offset fields with the replacement values.
-					if (CurrentTargetItem.individualPrefab != null)
+					// Is this an added prop?
+					if (CurrentTargetItem.isAdded)
 					{
-						// Use IndividualIndex to handle case of switching from individual to grouped props (index will be -1, actual index in relevant list).
-						SetSliders(IndividualBuildingReplacement.Instance.EligibileReplacement(currentBuilding, CurrentTargetItem.originalPrefab, IndividualIndex));
+						Logging.Message("setting sliders for added prop at index ", IndividualIndex);
+
+						// Yes - set sliders directly.
+						// Disable events.
+						ignoreSliderValueChange = true;
+
+						// Valid replacement - set slider values.
+						angleSlider.TrueValue = currentBuilding.m_props[IndividualIndex].m_radAngle * Mathf.Rad2Deg;
+						xSlider.TrueValue = currentBuilding.m_props[IndividualIndex].m_position.x;
+						ySlider.TrueValue = currentBuilding.m_props[IndividualIndex].m_position.y;
+						zSlider.TrueValue = currentBuilding.m_props[IndividualIndex].m_position.z;
+						probabilitySlider.TrueValue = currentBuilding.m_props[IndividualIndex].m_probability;
+
+						// Re-enable events.
+						ignoreSliderValueChange = false;
 
 						// All done here.
 						return;
 					}
-					// Ditto for any building replacement.
-					else if (CurrentTargetItem.replacementPrefab != null)
+					else
 					{
-						SetSliders(BuildingReplacement.Instance.EligibileReplacement(currentBuilding, CurrentTargetItem.originalPrefab, -1));
+						// If we've got an individuial building prop replacement, update the offset fields with the replacement values.
+						if (CurrentTargetItem.individualPrefab != null)
+						{
+							// Use IndividualIndex to handle case of switching from individual to grouped props (index will be -1, actual index in relevant list).
+							SetSliders(IndividualBuildingReplacement.Instance.EligibileReplacement(currentBuilding, CurrentTargetItem.originalPrefab, IndividualIndex));
 
-						// All done here.
-						return;
-					}
-					// Ditto for any all-building replacement.
-					else if (CurrentTargetItem.allPrefab != null)
-					{
-						SetSliders(AllBuildingReplacement.Instance.EligibileReplacement(null, CurrentTargetItem.originalPrefab, -1));
+							// All done here.
+							return;
+						}
+						// Ditto for any building replacement.
+						else if (CurrentTargetItem.replacementPrefab != null)
+						{
+							SetSliders(BuildingReplacement.Instance.EligibileReplacement(currentBuilding, CurrentTargetItem.originalPrefab, -1));
 
-						// All done here.
-						return;
+							// All done here.
+							return;
+						}
+						// Ditto for any all-building replacement.
+						else if (CurrentTargetItem.allPrefab != null)
+						{
+							SetSliders(AllBuildingReplacement.Instance.EligibileReplacement(null, CurrentTargetItem.originalPrefab, -1));
+
+							// All done here.
+							return;
+						}
 					}
 				}
 
 				// If we got here, there's no valid current selection; set all offset fields to defaults by passing null to SetSliders().
 				SetSliders(null);
+			}
+		}
+
+
+		/// <summary>
+		/// Current replacement mode.
+		/// </summary>
+		protected override ReplacementModes CurrentMode
+		{
+			set
+			{
+				base.CurrentMode = value;
+
+				// Show/hide add new prop button based on mode.
+				bool eligibleMode = CurrentMode == ReplacementModes.Individual | CurrentMode == ReplacementModes.Grouped;
+				addButton.isVisible = eligibleMode;
+				removeButton.isVisible = eligibleMode;
 			}
 		}
 
@@ -233,8 +280,24 @@ namespace BOB
 				ySlider.ValueField.relativePosition += new Vector3(0f, 20f);
 				heightPanel.height = HeightPanelFullHeight;
 
+				// Add button.
+				addButton = AddIconButton(this, MidControlX, ActionsY2, ActionSize, "BOB_PNL_ADD", TextureUtils.LoadSpriteAtlas("BOB-RoundPlus"));
+				addButton.eventClicked += (control, clickEvent) => AddNew();
+
+				// Remove button.
+				removeButton = AddIconButton(this, MidControlX + ActionSize, ActionsY2, ActionSize, "BOB_PNL_REM", TextureUtils.LoadSpriteAtlas("BOB-RoundMinus"));
+				removeButton.eventClicked += (control, clickEvent) => RemoveProp();
+
+				// Add/remove button initial visibility.
+				bool eligibleMode = CurrentMode == ReplacementModes.Individual | CurrentMode == ReplacementModes.Grouped;
+				addButton.isVisible = eligibleMode;
+				removeButton.isVisible = eligibleMode;
+
 				// Populate loaded list.
 				LoadedList();
+
+				// Update button states.
+				UpdateButtonStates();
 			}
 			catch (Exception e)
 			{
@@ -252,7 +315,7 @@ namespace BOB
 		{
 			// Don't do anything if invalid target, or target hasn't changed.
 			if (!(targetPrefabInfo is BuildingInfo) || selectedPrefab == targetPrefabInfo)
-            {
+			{
 				return;
 			}
 
@@ -277,7 +340,7 @@ namespace BOB
 				subBuildingIndexes[0] = 0;
 
 				for (int i = 0; i < numSubs; ++i)
-                {
+				{
 					SubBuildingNames[i + 1] = PrefabLists.GetDisplayName(currentBuilding.m_subBuildings[i].m_buildingInfo);
 					subBuildings[i + 1] = currentBuilding.m_subBuildings[i].m_buildingInfo;
 					subBuildingIndexes[i + 1] = i + 1;
@@ -324,16 +387,16 @@ namespace BOB
 					};
 				}
 				else
-                {
+				{
 					// If the sub-building panel has already been created. just make sure it's visible.
 					subBuildingPanel.Show();
-                }
+				}
 			}
 			else
-            {
+			{
 				// Otherwise, hide the sub-building panel (if it exists).
 				subBuildingPanel?.Hide();
-            }
+			}
 
 			// Populate target list and select target item.
 			TargetList();
@@ -351,9 +414,9 @@ namespace BOB
 		{
 			// Don't do anything if no current selection.
 			if (CurrentTargetItem == null)
-            {
+			{
 				return;
-            }
+			}
 
 			// Don't do anything if no changes.
 			if (xSlider.value == 0f &&
@@ -378,10 +441,10 @@ namespace BOB
 				}
 			}
 			else
-            {
+			{
 				// Individual; apply preview.
 				PreviewChange(CurrentTargetItem.index);
-            }
+			}
 		}
 
 
@@ -403,17 +466,18 @@ namespace BOB
 					}
 
 					// Local reference.
-					BuildingInfo.Prop thisProp = currentBuilding.m_props[originalValues[i].propIndex];
-
-					// Restore original values.
-					thisProp.m_prop = originalValues[i].originalProp;
-					thisProp.m_finalProp = originalValues[i].originalFinalProp;
-					thisProp.m_tree = originalValues[i].originalTree;
-					thisProp.m_finalTree = originalValues[i].originalFinalTree;
-					thisProp.m_radAngle = originalValues[i].radAngle;
-					thisProp.m_position = originalValues[i].position;
-					thisProp.m_probability = originalValues[i].probability;
-					thisProp.m_fixedHeight = originalValues[i].fixedHeight;
+					if (currentBuilding.m_props[originalValues[i].propIndex] is BuildingInfo.Prop thisProp)
+					{
+						// Restore original values.
+						thisProp.m_prop = originalValues[i].originalProp;
+						thisProp.m_finalProp = originalValues[i].originalFinalProp;
+						thisProp.m_tree = originalValues[i].originalTree;
+						thisProp.m_finalTree = originalValues[i].originalFinalTree;
+						thisProp.m_radAngle = originalValues[i].radAngle;
+						thisProp.m_position = originalValues[i].position;
+						thisProp.m_probability = originalValues[i].probability;
+						thisProp.m_fixedHeight = originalValues[i].fixedHeight;
+					}
 				}
 			}
 
@@ -440,41 +504,54 @@ namespace BOB
 				// Make sure we have valid a target and replacement.
 				if (CurrentTargetItem != null && ReplacementPrefab != null)
 				{
-					switch (CurrentMode)
+					// Check for added prop - instead of replacing, we update the original added prop reference.
+					if (CurrentTargetItem.isAdded)
 					{
-						case ReplacementModes.Individual:
-							// Individual replacement.
-							IndividualBuildingReplacement.Instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, CurrentTargetItem.index, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, customHeightCheck.isChecked);
+						AddedBuildingProps.Instance.Update(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, CurrentTargetItem.index, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, customHeightCheck.isChecked);
 
-							// Update current target.
-							CurrentTargetItem.individualPrefab = ReplacementPrefab;
-							CurrentTargetItem.individualProb = (int)probabilitySlider.TrueValue;
-							break;
+						// Update current target.
+						CurrentTargetItem.originalPrefab = ReplacementPrefab;
+						CurrentTargetItem.originalProb = (int)probabilitySlider.TrueValue;
+					}
+					else
+					{
+						// Not an added prop.
+						switch (CurrentMode)
+						{
+							case ReplacementModes.Individual:
+								// Individual replacement.
+								IndividualBuildingReplacement.Instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, CurrentTargetItem.index, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, customHeightCheck.isChecked);
 
-						case ReplacementModes.Grouped:
-							// Grouped replacement.
-							BuildingReplacement.Instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, customHeightCheck.isChecked);
+								// Update current target.
+								CurrentTargetItem.individualPrefab = ReplacementPrefab;
+								CurrentTargetItem.individualProb = (int)probabilitySlider.TrueValue;
+								break;
 
-							// Update current target.
-							CurrentTargetItem.replacementPrefab = ReplacementPrefab;
-							CurrentTargetItem.replacementProb = (int)probabilitySlider.TrueValue;
-							break;
+							case ReplacementModes.Grouped:
+								// Grouped replacement.
+								BuildingReplacement.Instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, customHeightCheck.isChecked);
 
-						case ReplacementModes.All:
-							// All- replacement.
-							AllBuildingReplacement.Instance.Replace(null, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, customHeightCheck.isChecked);
+								// Update current target.
+								CurrentTargetItem.replacementPrefab = ReplacementPrefab;
+								CurrentTargetItem.replacementProb = (int)probabilitySlider.TrueValue;
+								break;
 
-							// Update current target.
-							CurrentTargetItem.allPrefab = ReplacementPrefab;
-							CurrentTargetItem.allProb = (int)probabilitySlider.TrueValue;
-							break;
+							case ReplacementModes.All:
+								// All- replacement.
+								AllBuildingReplacement.Instance.Replace(null, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, customHeightCheck.isChecked);
 
-						default:
-							Logging.Error("invalid replacement mode at BuildingInfoPanel.Apply");
-							return;
+								// Update current target.
+								CurrentTargetItem.allPrefab = ReplacementPrefab;
+								CurrentTargetItem.allProb = (int)probabilitySlider.TrueValue;
+								break;
+
+							default:
+								Logging.Error("invalid replacement mode at BuildingInfoPanel.Apply");
+								return;
+						}
 					}
 
-					// Update any dirty building renders.
+					// Update any dirty building rendertafes.
 					BuildingData.Update();
 
 					// Update target list and buttons.
@@ -513,7 +590,7 @@ namespace BOB
 				// Reset slider values by reassigning the current target item - this will also revert any preview.
 				CurrentTargetItem = CurrentTargetItem;
 				return;
-            }
+			}
 
 			// First, undo any preview.
 			RevertPreview();
@@ -585,48 +662,78 @@ namespace BOB
 			// Determine index to test - if no individual index, just grab first one from list.
 			int propIndex = targetListItem.index;
 			if (propIndex < 0)
-            {
+			{
 				propIndex = targetListItem.indexes[0];
-            }
+			}
 
-			// All-building replacement and original probability (if any).
-			BOBBuildingReplacement allBuildingReplacement = AllBuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex, out _);
-			if (allBuildingReplacement != null)
+			// Is this an added prop?
+			if (AddedBuildingProps.Instance.IsAdded(currentBuilding, propIndex))
 			{
-				targetListItem.allPrefab = allBuildingReplacement.replacementInfo;
-				targetListItem.allProb = allBuildingReplacement.probability;
+				targetListItem.index = propIndex;
+				targetListItem.isAdded = true;
 			}
 			else
 			{
-				// If no active current record, ensure that it's reset to null.
-				targetListItem.allPrefab = null;
+				// All-building replacement and original probability (if any).
+				BOBBuildingReplacement allBuildingReplacement = AllBuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex, out _);
+				if (allBuildingReplacement != null)
+				{
+					targetListItem.allPrefab = allBuildingReplacement.replacementInfo;
+					targetListItem.allProb = allBuildingReplacement.probability;
+				}
+				else
+				{
+					// If no active current record, ensure that it's reset to null.
+					targetListItem.allPrefab = null;
+				}
+
+				// Building replacement and original probability (if any).
+				BOBBuildingReplacement buildingReplacement = BuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex, out _);
+				if (buildingReplacement != null)
+				{
+					targetListItem.replacementPrefab = buildingReplacement.replacementInfo;
+					targetListItem.replacementProb = buildingReplacement.probability;
+				}
+				else
+				{
+					// If no active current record, ensure that it's reset to null.
+					targetListItem.replacementPrefab = null;
+				}
+
+				// Individual replacement and original probability (if any).
+				BOBBuildingReplacement individualReplacement = IndividualBuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex, out _);
+				if (individualReplacement != null)
+				{
+					targetListItem.individualPrefab = individualReplacement.replacementInfo;
+					targetListItem.individualProb = individualReplacement.probability;
+				}
+				else
+				{
+					// If no active current record, ensure that it's reset to null.
+					targetListItem.individualPrefab = null;
+				}
+			}
+		}
+
+
+		/// <summary>
+		/// Updates button states (enabled/disabled) according to current control states.
+		/// </summary>
+		protected override void UpdateButtonStates()
+		{
+			base.UpdateButtonStates();
+
+			// Don't do anything if buttons haven't been created yet.
+			if (addButton == null || removeButton == null)
+			{
+				return;
 			}
 
-			// Building replacement and original probability (if any).
-			BOBBuildingReplacement buildingReplacement = BuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex, out _);
-			if (buildingReplacement != null)
-			{
-				targetListItem.replacementPrefab = buildingReplacement.replacementInfo;
-				targetListItem.replacementProb = buildingReplacement.probability;
-			}
-			else
-			{
-				// If no active current record, ensure that it's reset to null.
-				targetListItem.replacementPrefab = null;
-			}
+			// Disable/enable add new prop button.
+			addButton.isEnabled = ReplacementPrefab != null;
 
-			// Individual replacement and original probability (if any).
-			BOBBuildingReplacement individualReplacement = IndividualBuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex, out _);
-			if (individualReplacement != null)
-			{
-				targetListItem.individualPrefab = individualReplacement.replacementInfo;
-				targetListItem.individualProb = individualReplacement.probability;
-			}
-			else
-			{
-				// If no active current record, ensure that it's reset to null.
-				targetListItem.individualPrefab = null;
-			}
+			// Disable/enable remove new prop button.
+			removeButton.isEnabled = CurrentTargetItem != null && CurrentTargetItem.isAdded;
 		}
 
 
@@ -663,11 +770,11 @@ namespace BOB
 				// Try to get relevant prefab (prop/tree), falling back to the other type if null (to allow for tree-prop changes), using finalProp.
 				PrefabInfo finalInfo = null;
 				if (PropTreeMode == PropTreeModes.Tree)
-                {
+				{
 					finalInfo = (PrefabInfo)currentBuilding.m_props[propIndex]?.m_finalTree ?? currentBuilding.m_props[propIndex]?.m_finalProp;
 				}
 				else
-                {
+				{
 					finalInfo = (PrefabInfo)currentBuilding.m_props[propIndex]?.m_finalProp ?? currentBuilding.m_props[propIndex]?.m_finalTree;
 				}
 
@@ -677,60 +784,72 @@ namespace BOB
 					continue;
 				}
 
-				// Grouped or individual?
-				if (CurrentMode == ReplacementModes.Individual)
-				{
-					// Individual - set index to the current building prop indexes.
-					targetListItem.index = propIndex;
-				}
-				else
-				{
-					// Grouped - set index to -1 and add to our list of indexes.
-					targetListItem.index = -1;
-					targetListItem.indexes.Add(propIndex);
-				}
-
 				// Get original (pre-replacement) tree/prop prefab and current probability (as default original probability).
 				targetListItem.originalPrefab = finalInfo;
 				targetListItem.originalProb = currentBuilding.m_props[propIndex].m_probability;
 				targetListItem.originalAngle = currentBuilding.m_props[propIndex].m_radAngle * Mathf.Rad2Deg;
 
-				// To record original data if a replacement is in effect.
-				BuildingPropReference propReference = null;
-
-				// All-building replacement and original probability (if any).
-				BOBBuildingReplacement allBuildingReplacement = AllBuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex, out propReference);
-				if (allBuildingReplacement != null)
+				// Is this an added prop?
+				if (AddedBuildingProps.Instance.IsAdded(currentBuilding, propIndex))
 				{
-					targetListItem.allPrefab = allBuildingReplacement.replacementInfo;
-					targetListItem.allProb = allBuildingReplacement.probability;
-					targetListItem.originalPrefab = allBuildingReplacement.targetInfo;
+					Logging.KeyMessage("index ", propIndex, " is added");
+					targetListItem.index = propIndex;
+					targetListItem.isAdded = true;
 				}
-
-				// Building replacement and original probability (if any).
-				BOBBuildingReplacement buildingReplacement = BuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex, out propReference);
-				if (buildingReplacement != null)
+				else
 				{
-					targetListItem.replacementPrefab = buildingReplacement.replacementInfo;
-					targetListItem.replacementProb = buildingReplacement.probability;
-					targetListItem.originalPrefab = buildingReplacement.targetInfo;
-				}
+					Logging.KeyMessage("index ", propIndex, " is not added");
 
-				// Individual replacement and original probability (if any).
-				BOBBuildingReplacement individualReplacement = IndividualBuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex, out propReference);
-				if (individualReplacement != null)
-				{
-					targetListItem.individualPrefab = individualReplacement.replacementInfo;
-					targetListItem.individualProb = individualReplacement.probability;
-					targetListItem.originalPrefab = individualReplacement.targetInfo;
-				}
+					// Grouped or individual?
+					if (CurrentMode == ReplacementModes.Individual)
+					{
+						// Individual - set index to the current building prop indexes.
+						targetListItem.index = propIndex;
+					}
+					else
+					{
+						// Grouped - set index to -1 and add to our list of indexes.
+						targetListItem.index = -1;
+						targetListItem.indexes.Add(propIndex);
+					}
 
-				// If we found an active replacement, update original reference values.
-				if (propReference != null)
-				{
-					targetListItem.originalPrefab = propReference.OriginalInfo;
-					targetListItem.originalAngle = propReference.radAngle * Mathf.Rad2Deg;
-					targetListItem.originalProb = propReference.probability;
+					// To record original data if a replacement is in effect.
+					BuildingPropReference propReference = null;
+
+					// All-building replacement and original probability (if any).
+					BOBBuildingReplacement allBuildingReplacement = AllBuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex, out propReference);
+					if (allBuildingReplacement != null)
+					{
+						targetListItem.allPrefab = allBuildingReplacement.replacementInfo;
+						targetListItem.allProb = allBuildingReplacement.probability;
+						targetListItem.originalPrefab = allBuildingReplacement.targetInfo;
+					}
+
+					// Building replacement and original probability (if any).
+					BOBBuildingReplacement buildingReplacement = BuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex, out propReference);
+					if (buildingReplacement != null)
+					{
+						targetListItem.replacementPrefab = buildingReplacement.replacementInfo;
+						targetListItem.replacementProb = buildingReplacement.probability;
+						targetListItem.originalPrefab = buildingReplacement.targetInfo;
+					}
+
+					// Individual replacement and original probability (if any).
+					BOBBuildingReplacement individualReplacement = IndividualBuildingReplacement.Instance.ActiveReplacement(currentBuilding, propIndex, out propReference);
+					if (individualReplacement != null)
+					{
+						targetListItem.individualPrefab = individualReplacement.replacementInfo;
+						targetListItem.individualProb = individualReplacement.probability;
+						targetListItem.originalPrefab = individualReplacement.targetInfo;
+					}
+
+					// If we found an active replacement, update original reference values.
+					if (propReference != null)
+					{
+						targetListItem.originalPrefab = propReference.OriginalInfo;
+						targetListItem.originalAngle = propReference.radAngle * Mathf.Rad2Deg;
+						targetListItem.originalProb = propReference.probability;
+					}
 				}
 
 				// Check for match with 'prop' mode - either original or replacement needs to be prop.
@@ -755,7 +874,12 @@ namespace BOB
 					foreach (TargetListItem item in itemList)
 					{
 						// Check to see if we already have this in the list - matching original prefab, individual replacement prefab, building replacement prefab, all-building replacement prefab, and probability.
-						if (item.originalPrefab == targetListItem.originalPrefab && item.individualPrefab == targetListItem.individualPrefab && item.replacementPrefab == targetListItem.replacementPrefab && targetListItem.allPrefab == item.allPrefab)
+						if (item.originalPrefab == targetListItem.originalPrefab &&
+							item.individualPrefab == targetListItem.individualPrefab &&
+							item.replacementPrefab == targetListItem.replacementPrefab &&
+							item.allPrefab == targetListItem.allPrefab &&
+							item.originalProb == targetListItem.originalProb &&
+							item.replacementProb == targetListItem.replacementProb)
 						{
 							// We've already got an identical grouped instance of this item - add this index and lane to the lists of indexes and lanes under that item and set the flag to indicate that we've done so.
 							item.indexes.Add(propIndex);
@@ -827,59 +951,71 @@ namespace BOB
 		/// </summary>
 		private void AddNew()
 		{
-			// Make sure a valid replacement prefab is set, and that we've got space for another prop.
+			// Make sure a valid replacement prefab is set.
 			if (ReplacementPrefab != null)
 			{
-				// New prop index.
-				int newIndex = 0;
-				
-				// Check to see if we've got a current prop array.
-				if (currentBuilding.m_props != null)
-				{
-					// Existing m_props array - check that we've got space for another entry.
-					newIndex = currentBuilding.m_props.Length;
-					if (newIndex > 63)
-					{
-						// Props maxed out - exit.
-						return;
-					}
-
-					// Get old props reference.
-					BuildingInfo.Prop[] oldBuildingProps = currentBuilding.m_props;
-
-					// Create new props array with one extra entry, and copy the old props to it.
-					currentBuilding.m_props = new BuildingInfo.Prop[newIndex + 1];
-					for (int i = 0; i < newIndex; ++i)
-					{
-						currentBuilding.m_props[i] = oldBuildingProps[i];
-					}
-				}
-				else
-				{
-					// No m_props array already; create one.
-					currentBuilding.m_props = new BuildingInfo.Prop[1];
-				}
+				// Revert any preview.
+				RevertPreview();
 
 				// Add new prop.
-				currentBuilding.m_props[newIndex] = new BuildingInfo.Prop
+				BOBBuildingReplacement newProp = new BOBBuildingReplacement
 				{
-					m_angle = angleSlider.TrueValue,
-					m_prop = ReplacementPrefab as PropInfo,
-					m_tree = ReplacementPrefab as TreeInfo,
-					m_finalProp = ReplacementPrefab as PropInfo,
-					m_finalTree = ReplacementPrefab as TreeInfo,
-					m_fixedHeight = true,
-					m_position = new Vector3(xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue),
-					m_probability = (int)probabilitySlider.TrueValue
+					isTree = ReplacementPrefab is TreeInfo,
+					Replacement = ReplacementPrefab.name,
+					angle = angleSlider.TrueValue,
+					offsetX = xSlider.TrueValue,
+					offsetY = ySlider.TrueValue,
+					offsetZ = zSlider.TrueValue,
+					probability = (int)probabilitySlider.TrueValue,
+					parentInfo = currentBuilding,
+					replacementInfo = ReplacementPrefab,
+					customHeight = customHeightCheck.isChecked
 				};
+				AddedBuildingProps.Instance.AddNew(newProp);
 
-				// Refresh render to recgonise new prop.
-				BuildingData.DirtyList.Add(currentBuilding);
-				BuildingData.Update();
-
-				// Regenerate target list.
-				TargetList();
+				// Post-action cleanup.
+				UpdateAddedPops();
 			}
+		}
+
+
+		/// <summary>
+		/// Removes an added tree or prop.
+		/// </summary>
+		private void RemoveProp()
+		{
+			// Safety first - need an individual index that's an added prop.
+			if (CurrentTargetItem == null || CurrentTargetItem.index < 0 || !AddedBuildingProps.Instance.IsAdded(currentBuilding, CurrentTargetItem.index))
+			{
+				return;
+			}
+
+			// First, revert any preview (to prevent any clobbering when preview is reverted).
+			RevertPreview();
+
+			// Create new props array with one fewer entry, and copy the old props to it.
+			// Remove prop reference and update other references as appropriate.
+			AddedBuildingProps.Instance.RemoveNew(currentBuilding, CurrentTargetItem.index);
+
+			// Post-action cleanup.
+			UpdateAddedPops();
+		}
+
+
+		/// <summary>
+		/// Called after any added prop manipulations (addition or removal) to perform cleanup.
+		/// </summary>
+		private void UpdateAddedPops()
+		{
+			// Update building prop references.
+			currentBuilding.CheckReferences();
+
+			// Clear current selection.
+			CurrentTargetItem = null;
+
+			// Perform regular post-processing.
+			FinishUpdate();
+			TargetList();
 		}
 
 
@@ -924,7 +1060,7 @@ namespace BOB
 		{
 			// Ensure that original values have been recorded before proceeding.
 			if (originalValues == null)
-            {
+			{
 				return;
 			}
 
@@ -932,25 +1068,28 @@ namespace BOB
 			Vector3 basePosition = new Vector3();
 			float baseAngle = 0f;
 
-			// Find matching prop reference (by index match) in original values.
-			foreach (BuildingPropReference propReference in originalValues)
+			if (!CurrentTargetItem.isAdded)
 			{
-				if (propReference != null && propReference.propIndex == index)
+				// Find matching prop reference (by index match) in original values.
+				foreach (BuildingPropReference propReference in originalValues)
 				{
-					// Found a match - retrieve original position and angle.
-					basePosition = propReference.position - propReference.adjustment;
-					baseAngle = propReference.radAngle - propReference.radAngleAdjustment;
-					break;
+					if (propReference != null && propReference.propIndex == index)
+					{
+						// Found a match - retrieve original position and angle.
+						basePosition = propReference.position - propReference.adjustment;
+						baseAngle = propReference.radAngle - propReference.radAngleAdjustment;
+						break;
+					}
 				}
 			}
 
 			// Null check.
 			BuildingInfo.Prop thisProp = currentBuilding?.m_props?[index];
 			if (thisProp == null)
-            {
+			{
 				return;
-            }
-			
+			}
+
 			// Preview new position, probability, rotation, and fixed height setting.
 			thisProp.m_position = basePosition + new Vector3(xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue);
 			thisProp.m_probability = (int)probabilitySlider.TrueValue;
@@ -984,10 +1123,10 @@ namespace BOB
 		{
 			// Ensure that the index is valid before proceeding.
 			if (currentBuilding?.m_props == null || currentBuilding.m_props.Length <= propIndex)
-            {
+			{
 				Logging.Error("invalid prop index reference of ", propIndex, " for selected building ", currentBuilding?.name ?? "null");
 				return null;
-            }
+			}
 
 			// Local reference.
 			BuildingInfo.Prop thisProp = currentBuilding.m_props[propIndex];
@@ -1017,7 +1156,7 @@ namespace BOB
 				adjustment.x = allBuildingReplacement.offsetX;
 				adjustment.y = allBuildingReplacement.offsetY;
 				adjustment.z = allBuildingReplacement.offsetZ;
-				angleAdjustment =	allBuildingReplacement.angle;
+				angleAdjustment = allBuildingReplacement.angle;
 			}
 
 			// Return original data.

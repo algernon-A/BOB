@@ -88,7 +88,6 @@ namespace BOB
         /// <param name="active">True to enable patches; false to disable</param>
         internal static void PatchBuildingOverlays(bool active)
         {
- 
             // Don't do anything if we're already at the current state.
             if (buildingOverlaysPatched != active)
             {
