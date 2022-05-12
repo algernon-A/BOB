@@ -1,4 +1,6 @@
-﻿- Fix bNullReferenceException with added prop detection for buildings with no intial props
+﻿Version 0.9.3.1 -
+
+- Fix NullReferenceException with added prop detection for buildings with no intial props
 
 
 Version 0.9.3 -
