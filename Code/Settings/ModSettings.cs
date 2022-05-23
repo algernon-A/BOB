@@ -50,9 +50,9 @@ namespace BOB
         [XmlIgnore]
         internal static int whatsNewBetaVersion = 0;
 
-        // SavedInputKey reference for communicating with UUI.
+        // UUI hotkey.
         [XmlIgnore]
-        private static readonly SavedInputKey uuiSavedKey = new SavedInputKey("BOB hotkey", "BOB hotkey", key: KeyCode.B, control: false, shift: false, alt: true, false);
+        private static readonly UnsavedInputKey uuiKey = new UnsavedInputKey("BOB hotkey", keyCode: KeyCode.B, control: false, shift: false, alt: true);
 
 
         /// <summary>
@@ -118,21 +118,21 @@ namespace BOB
 
 
         /// <summary>
-        /// Panel hotkey as ColossalFramework SavedInputKey.
+        /// Current hotkey as UUI UnsavedInputKey.
         /// </summary>
         [XmlIgnore]
-        internal static SavedInputKey PanelSavedKey => uuiSavedKey;
+        internal static UnsavedInputKey UUIKey => uuiKey;
 
 
         /// <summary>
-        /// The current hotkey settings as ColossalFramework InputKey.
+        /// Tool hotkey as ColossalFramework SavedInputKey.
         /// </summary>
         [XmlIgnore]
-        internal static InputKey CurrentHotkey
+        internal static InputKey ToolKey
         {
-            get => uuiSavedKey.value;
+            get => uuiKey.value;
 
-            set => uuiSavedKey.value = value;
+            set => uuiKey.value = value;
         }
 
 
@@ -154,23 +154,9 @@ namespace BOB
         [XmlElement("PanelKey")]
         public KeyBinding XMLPanelKey
         {
-            get
-            {
-                return new KeyBinding
-                {
-                    keyCode = (int)PanelSavedKey.Key,
-                    control = PanelSavedKey.Control,
-                    shift = PanelSavedKey.Shift,
-                    alt = PanelSavedKey.Alt
-                };
-            }
-            set
-            {
-                uuiSavedKey.Key = (KeyCode)value.keyCode;
-                uuiSavedKey.Control = value.control;
-                uuiSavedKey.Shift = value.shift;
-                uuiSavedKey.Alt = value.alt;
-            }
+            get => uuiKey.KeyBinding;
+
+            set => uuiKey.KeyBinding = value;
         }
 
 
@@ -316,5 +302,49 @@ namespace BOB
 
         [XmlAttribute("Alt")]
         public bool alt;
+
+
+        /// <summary>
+        /// Encode keybinding as saved input key for UUI.
+        /// </summary>
+        /// <returns></returns>
+        internal InputKey Encode() => SavedInputKey.Encode((KeyCode)keyCode, control, shift, alt);
+    }
+
+
+    /// <summary>
+    /// UUI unsaved input key.
+    /// </summary>
+    public class UnsavedInputKey : UnifiedUI.Helpers.UnsavedInputKey
+    {
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="name">Reference name</param>
+        /// <param name="keyCode">Keycode</param>
+        /// <param name="control">Control modifier key status</param>
+        /// <param name="shift">Shift modifier key status</param>
+        /// <param name="alt">Alt modifier key status</param>
+        public UnsavedInputKey(string name, KeyCode keyCode, bool control, bool shift, bool alt) :
+            base(keyName: name, modName: "Repaint", Encode(keyCode, control: control, shift: shift, alt: alt))
+        {
+        }
+
+
+        /// <summary>
+        /// Called by UUI when a key conflict is resolved.
+        /// Used here to save the new key setting.
+        /// </summary>
+        public override void OnConflictResolved() => ModSettings.Save();
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public KeyBinding KeyBinding
+        {
+            get => new KeyBinding { keyCode = (int)Key, control = Control, shift = Shift, alt = Alt };
+            set => this.value = value.Encode();
+        }
     }
 }

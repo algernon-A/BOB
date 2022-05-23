@@ -60,9 +60,8 @@ namespace BOB
 				groupName: null, // default group
 				tooltip: Translations.Translate("BOB_NAM"),
 				tool: this,
-				icon: UUIHelpers.LoadTexture(UUIHelpers.GetFullPath<BOBMod>("Resources", "BOB-UUI.png"))
-				//hotkeys: new UUIHotKeys { ActivationKey = ModSettings.PanelSavedKey }
-				);
+				icon: UUIHelpers.LoadTexture(UUIHelpers.GetFullPath<BOBMod>("Resources", "BOB-UUI.png")),
+				hotkeys: new UUIHotKeys { ActivationKey = ModSettings.UUIKey });
 		}
 
 		// Ignore nodes, citizens, disasters, districts, transport lines, and vehicles.

@@ -24,9 +24,9 @@ namespace BOB
         /// </summary>
         protected virtual InputKey KeySetting
         {
-            get => ModSettings.CurrentHotkey;
+            get => ModSettings.ToolKey;
 
-            set => ModSettings.CurrentHotkey = value;
+            set => ModSettings.ToolKey = value;
         }
 
 
@@ -108,7 +108,7 @@ namespace BOB
                 if (mouseEvent.buttons == UIMouseButton.Left || mouseEvent.buttons == UIMouseButton.Right)
                 {
                     // Not a bindable mouse button - set the button text and cancel priming.
-                    button.text = SavedInputKey.ToLocalizedString("KEYNAME", ModSettings.CurrentHotkey);
+                    button.text = SavedInputKey.ToLocalizedString("KEYNAME", ModSettings.ToolKey);
                     UIView.PopModal();
                     isPrimed = false;
                 }
