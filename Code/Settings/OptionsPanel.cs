@@ -87,6 +87,9 @@ namespace BOB
                 basePanel.width = optionsPanel.width;
                 basePanel.height = 725f;
 
+                // Needed to ensure position is consistent if we regenerate after initial opening (e.g. on language change).
+                basePanel.relativePosition = new Vector2(10f, 10f);
+
                 // Add tabstrip.
                 UITabstrip tabStrip = basePanel.AddUIComponent<UITabstrip>();
                 tabStrip.relativePosition = new Vector3(0, 0);

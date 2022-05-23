@@ -22,7 +22,11 @@ namespace BOB
 
             // Language dropdown.
             UIDropDown languageDrop = UIControls.AddPlainDropDown(panel, Translations.Translate("TRN_CHOICE"), Translations.LanguageList, Translations.Index);
-            languageDrop.eventSelectedIndexChanged += (control, index) => Translations.Index = index;
+            languageDrop.eventSelectedIndexChanged += (control, index) =>
+            {
+                Translations.Index = index;
+                OptionsPanel.LocaleChanged();
+            };
 
             // Hotkey control.
             panel.gameObject.AddComponent<OptionsKeymapping>();
