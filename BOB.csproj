@@ -69,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Code\AddedProps\AddedBuildingProps.cs" />
+    <Compile Include="Code\AddedProps\AddedNetworkProps.cs" />
     <Compile Include="Code\Configuration\ConfigurationUtils.cs" />
     <Compile Include="Code\Configuration\ConfigurationXML.cs" />
     <Compile Include="Code\MessageBox\ExceptionMessageBox.cs" />
@@ -192,6 +193,7 @@
     <Content Include="Resources\BOB-InvisibleTree.png" />
     <Content Include="Resources\BOB-OkSmallWarn.png" />
     <Content Include="Resources\BOB-PropTreeSmall.png" />
+    <Content Include="Resources\BOB-UUI.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

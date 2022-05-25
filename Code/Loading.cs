@@ -46,6 +46,7 @@ namespace BOB
             new MapPropReplacement();
             new Scaling();
             new AddedBuildingProps();
+            new AddedNetworkProps();
 
             // Reflect overlay methods.
             Patcher.ReflectOverlays();

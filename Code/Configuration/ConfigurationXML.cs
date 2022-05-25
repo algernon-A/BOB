@@ -60,6 +60,10 @@ namespace BOB
 		[XmlArray("addedBuildingProps")]
 		[XmlArrayItem("addedBuildingProp")]
 		public List<BOBBuildingElement> addedBuildingProps = new List<BOBBuildingElement>();
+
+		[XmlArray("addedNetworkProps")]
+		[XmlArrayItem("addedNetworkProp")]
+		public List<BOBNetworkElement> addedNetworkProps = new List<BOBNetworkElement>();
 	}
 
 

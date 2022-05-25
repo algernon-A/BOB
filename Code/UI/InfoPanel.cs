@@ -49,11 +49,12 @@ namespace BOB
 
 		// Layout constants - other controls.
 		protected const float RandomButtonX = MiddleX + ToggleSize;
+		private const float ActionsY2 = ActionsY + ActionSize;
 
 
 		// Panel components.
 		protected BOBSlider probabilitySlider, angleSlider, xSlider, ySlider, zSlider;
-		protected UIButton hideButton;
+		protected UIButton hideButton, addButton, removeButton;
 		private readonly UICheckBox randomCheck;
 		private readonly UICheckBox[] modeChecks;
 		protected UIPanel heightPanel;
@@ -280,6 +281,19 @@ namespace BOB
 				// Set initial button states.
 				UpdateButtonStates();
 				UpdateModeIcons();
+
+				// Add button.
+				addButton = AddIconButton(this, MidControlX, ActionsY2, ActionSize, "BOB_PNL_ADD", TextureUtils.LoadSpriteAtlas("BOB-RoundPlus"));
+				addButton.eventClicked += (control, clickEvent) => AddNew();
+
+				// Remove button.
+				removeButton = AddIconButton(this, MidControlX + ActionSize, ActionsY2, ActionSize, "BOB_PNL_REM", TextureUtils.LoadSpriteAtlas("BOB-RoundMinus"));
+				removeButton.eventClicked += (control, clickEvent) => RemoveProp();
+
+				// Add/remove button initial visibility.
+				bool eligibleMode = CurrentMode == ReplacementModes.Individual | CurrentMode == ReplacementModes.Grouped;
+				addButton.isVisible = eligibleMode;
+				removeButton.isVisible = eligibleMode;
 			}
 			catch (Exception e)
 			{
@@ -340,6 +354,18 @@ namespace BOB
 
 
 		/// <summary>
+		/// Adds a new tree or prop.
+		/// </summary>
+		protected abstract void AddNew();
+
+
+		/// <summary>
+		/// Removes an added tree or prop.
+		/// </summary>
+		protected abstract void RemoveProp();
+
+
+		/// <summary>
 		/// Event handler for ptop/tree checkbox changes.
 		/// </summary>
 		/// <param name="control">Calling component</param>
@@ -397,6 +423,18 @@ namespace BOB
 				revertButton.Enable();
 				revertButton.tooltip = Translations.Translate("BOB_PNL_REV_UND");
 			}
+
+			// Don't do anything to add/remove buttons if buttons haven't been created yet.
+			if (addButton == null || removeButton == null)
+			{
+				return;
+			}
+
+			// Disable/enable add new prop button.
+			addButton.isEnabled = ReplacementPrefab != null;
+
+			// Disable/enable remove new prop button.
+			removeButton.isEnabled = CurrentTargetItem != null && CurrentTargetItem.isAdded;
 		}
 
 

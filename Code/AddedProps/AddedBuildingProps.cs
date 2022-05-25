@@ -153,7 +153,7 @@ namespace BOB
         /// <param name="buildingInfo">Targeted building prefab</param>
         /// <param name="targetInfo">Targeted (original) prop prefab</param>
         /// <param name="replacementInfo">Replacment prop prefab</param>
-        /// <param name="propIndex">Prop index to apply replacement to (ignored)</param>
+        /// <param name="propIndex">Prop index to apply replacement to</param>
         /// <param name="angle">Replacment prop angle adjustment</param>
         /// <param name="offsetX">Replacment X position offset</param>
         /// <param name="offsetY">Replacment Y position offset</param>
@@ -331,7 +331,10 @@ namespace BOB
         private void Deserialize(BuildingInfo buildingInfo, List<BOBBuildingReplacement> replacementList)
         {
             // Creeate record for building info.
-            changedBuildings.Add(buildingInfo, buildingInfo.m_props);
+            if (!changedBuildings.ContainsKey(buildingInfo))
+            {
+                changedBuildings.Add(buildingInfo, buildingInfo.m_props);
+            }
 
             // Iterate through each element in the provided list.
             foreach (BOBBuildingReplacement replacement in replacementList)

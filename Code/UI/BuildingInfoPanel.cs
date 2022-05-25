@@ -69,10 +69,6 @@ namespace BOB
 	/// </summary>
 	internal class BOBBuildingInfoPanel : BOBInfoPanel
 	{
-		// Layout constants.
-		private const float ActionsY2 = ActionsY + ActionSize;
-
-
 		// Current selection reference.
 		private BuildingInfo currentBuilding;
 
@@ -87,7 +83,6 @@ namespace BOB
 		private UIPanel subBuildingPanel;
 		private UIFastList subBuildingList;
 		private UICheckBox customHeightCheck;
-		private UIButton addButton, removeButton;
 
 
 		/// <summary>
@@ -197,13 +192,14 @@ namespace BOB
 						// Yes - set sliders directly.
 						// Disable events.
 						ignoreSliderValueChange = true;
-
-						// Valid replacement - set slider values.
-						angleSlider.TrueValue = currentBuilding.m_props[IndividualIndex].m_radAngle * Mathf.Rad2Deg;
-						xSlider.TrueValue = currentBuilding.m_props[IndividualIndex].m_position.x;
-						ySlider.TrueValue = currentBuilding.m_props[IndividualIndex].m_position.y;
-						zSlider.TrueValue = currentBuilding.m_props[IndividualIndex].m_position.z;
-						probabilitySlider.TrueValue = currentBuilding.m_props[IndividualIndex].m_probability;
+						
+						// Set slider values.
+						BuildingInfo.Prop buildingProp = currentBuilding.m_props[IndividualIndex];
+						angleSlider.TrueValue = buildingProp.m_radAngle * Mathf.Rad2Deg;
+						xSlider.TrueValue = buildingProp.m_position.x;
+						ySlider.TrueValue = buildingProp.m_position.y;
+						zSlider.TrueValue = buildingProp.m_position.z;
+						probabilitySlider.TrueValue = buildingProp.m_probability;
 
 						// Re-enable events.
 						ignoreSliderValueChange = false;
@@ -279,19 +275,6 @@ namespace BOB
 				ySlider.relativePosition += new Vector3(0f, 20f);
 				ySlider.ValueField.relativePosition += new Vector3(0f, 20f);
 				heightPanel.height = HeightPanelFullHeight;
-
-				// Add button.
-				addButton = AddIconButton(this, MidControlX, ActionsY2, ActionSize, "BOB_PNL_ADD", TextureUtils.LoadSpriteAtlas("BOB-RoundPlus"));
-				addButton.eventClicked += (control, clickEvent) => AddNew();
-
-				// Remove button.
-				removeButton = AddIconButton(this, MidControlX + ActionSize, ActionsY2, ActionSize, "BOB_PNL_REM", TextureUtils.LoadSpriteAtlas("BOB-RoundMinus"));
-				removeButton.eventClicked += (control, clickEvent) => RemoveProp();
-
-				// Add/remove button initial visibility.
-				bool eligibleMode = CurrentMode == ReplacementModes.Individual | CurrentMode == ReplacementModes.Grouped;
-				addButton.isVisible = eligibleMode;
-				removeButton.isVisible = eligibleMode;
 
 				// Populate loaded list.
 				LoadedList();
@@ -374,8 +357,6 @@ namespace BOB
 					subBuildingListPanel.relativePosition = new Vector2(Margin, TitleHeight);
 					subBuildingListPanel.width = subBuildingPanel.width - (Margin * 2f);
 					subBuildingListPanel.height = subBuildingPanel.height - TitleHeight - (Margin * 2f);
-
-
 					subBuildingList = UIFastList.Create<UISubBuildingRow>(subBuildingListPanel);
 					ListSetup(subBuildingList);
 
@@ -717,27 +698,6 @@ namespace BOB
 
 
 		/// <summary>
-		/// Updates button states (enabled/disabled) according to current control states.
-		/// </summary>
-		protected override void UpdateButtonStates()
-		{
-			base.UpdateButtonStates();
-
-			// Don't do anything if buttons haven't been created yet.
-			if (addButton == null || removeButton == null)
-			{
-				return;
-			}
-
-			// Disable/enable add new prop button.
-			addButton.isEnabled = ReplacementPrefab != null;
-
-			// Disable/enable remove new prop button.
-			removeButton.isEnabled = CurrentTargetItem != null && CurrentTargetItem.isAdded;
-		}
-
-
-		/// <summary>
 		/// Populates the target fastlist with a list of target-specific trees or props.
 		/// </summary>
 		protected override void TargetList()
@@ -792,14 +752,11 @@ namespace BOB
 				// Is this an added prop?
 				if (AddedBuildingProps.Instance.IsAdded(currentBuilding, propIndex))
 				{
-					Logging.KeyMessage("index ", propIndex, " is added");
 					targetListItem.index = propIndex;
 					targetListItem.isAdded = true;
 				}
 				else
 				{
-					Logging.KeyMessage("index ", propIndex, " is not added");
-
 					// Grouped or individual?
 					if (CurrentMode == ReplacementModes.Individual)
 					{
@@ -934,22 +891,9 @@ namespace BOB
 
 
 		/// <summary>
-		/// Custom height checkbox event handler.
-		/// </summary>
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="isChecked">New checked state</param>
-		private void CustomHeightChange(UIComponent control, bool isChecked)
-		{
-			// Show/hide Y position slider based on value.
-			ySlider.isVisible = isChecked;
-			ySlider.ValueField.isVisible = isChecked;
-		}
-
-
-		/// <summary>
 		/// Adds a new tree or prop.
 		/// </summary>
-		private void AddNew()
+		protected override void AddNew()
 		{
 			// Make sure a valid replacement prefab is set.
 			if (ReplacementPrefab != null)
@@ -982,7 +926,7 @@ namespace BOB
 		/// <summary>
 		/// Removes an added tree or prop.
 		/// </summary>
-		private void RemoveProp()
+		protected override void RemoveProp()
 		{
 			// Safety first - need an individual index that's an added prop.
 			if (CurrentTargetItem == null || CurrentTargetItem.index < 0 || !AddedBuildingProps.Instance.IsAdded(currentBuilding, CurrentTargetItem.index))
@@ -999,6 +943,19 @@ namespace BOB
 
 			// Post-action cleanup.
 			UpdateAddedPops();
+		}
+
+
+		/// <summary>
+		/// Custom height checkbox event handler.
+		/// </summary>
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="isChecked">New checked state</param>
+		private void CustomHeightChange(UIComponent control, bool isChecked)
+		{
+			// Show/hide Y position slider based on value.
+			ySlider.isVisible = isChecked;
+			ySlider.ValueField.isVisible = isChecked;
 		}
 
 
