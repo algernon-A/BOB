@@ -60,9 +60,8 @@ namespace BOB
 				groupName: null, // default group
 				tooltip: Translations.Translate("BOB_NAM"),
 				tool: this,
-				icon: UUIHelpers.LoadTexture(UUIHelpers.GetFullPath<BOBMod>("Resources", "BOB-UUI.png"))
-				//hotkeys: new UUIHotKeys { ActivationKey = ModSettings.PanelSavedKey }
-				);
+				icon: UUIHelpers.LoadTexture(UUIHelpers.GetFullPath<BOBMod>("Resources", "BOB-UUI.png")),
+				hotkeys: new UUIHotKeys { ActivationKey = ModSettings.UUIKey });
 		}
 
 		// Ignore nodes, citizens, disasters, districts, transport lines, and vehicles.
@@ -132,8 +131,7 @@ namespace BOB
 			ToolErrors errors = ToolErrors.None;
 			EToolBase.RaycastOutput output;
 
-			// Cursor is dark by default.
-			m_cursor = darkCursor;
+			bool validHover = false;
 
 			// Is the base mouse ray valid?
 			if (m_mouseRayValid)
@@ -159,7 +157,7 @@ namespace BOB
 						// Network - record hit position, set hover, and set cursor to light.
 						output.m_hitPos = Singleton<NetManager>.instance.m_segments.m_buffer[output.m_netSegment].GetClosestPosition(output.m_hitPos);
 						hoverInstance.NetSegment = (ushort)output.m_netSegment;
-						m_cursor = lightCursor;
+						validHover = true;
 
 						// Set hover.
 					}
@@ -168,23 +166,21 @@ namespace BOB
 						// Building - record hit position, set hover, and set cursor to light.
 						output.m_hitPos = Singleton<BuildingManager>.instance.m_buildings.m_buffer[output.m_building].m_position;
 						hoverInstance.Building = (ushort)output.m_building;
-						m_cursor = lightCursor;
-
-						// Set hover.
+						validHover = true;
 					}
 					else if (output.m_propInstance != 0)
 					{
 						// Prop - record hit position, set hover, and set cursor to light.
 						output.m_hitPos = PropAPI.Wrapper.GetPosition(output.m_propInstance);
 						hoverInstance.Prop = output.m_propInstance;
-						m_cursor = lightCursor;
+						validHover = true;
 					}
 					else if (output.m_treeInstance != 0)
 					{
 						// Map tree - record hit position, set hover, and set cursor to light.
 						output.m_hitPos = Singleton<TreeManager>.instance.m_trees.m_buffer[output.m_treeInstance].Position;
 						hoverInstance.Tree = output.m_treeInstance;
-						m_cursor = lightCursor;
+						validHover = true;
 					}
 
 					// Has the hovered instance changed since last time?
@@ -240,6 +236,9 @@ namespace BOB
 				output = default;
 				errors = ToolErrors.RaycastFailed;
 			}
+
+			// Set cursor.
+			m_cursor = validHover ? lightCursor : darkCursor;
 
 			// Set mouse position and record errors.
 			m_mousePosition = output.m_hitPos;

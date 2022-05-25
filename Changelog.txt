@@ -1,4 +1,13 @@
-﻿Version 0.9.3 -
+﻿- Options panel now automatically refreshes on language change
+- Return hotkey handling to UUI
+
+
+Version 0.9.3.1 -
+
+- Fix NullReferenceException with added prop detection for buildings with no intial props
+
+
+Version 0.9.3 -
 
 - Major new feature: add props to building prefabs
 - Add hotkey to toggle disabling of vanilla tree tool

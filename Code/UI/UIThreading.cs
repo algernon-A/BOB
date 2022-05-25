@@ -15,10 +15,8 @@ namespace BOB
 
         // Flags.
         private bool operating = false;
-        private bool hotkeyProcessed = false, treeDisableProcessed = false;
+        private bool treeDisableProcessed = false;
 
-        // Hotkey local reference.
-        private readonly SavedInputKey savedKey;
 
         // Tree tool disable mode key settings.
         internal static KeyCode treeDisableKey = KeyCode.T;
@@ -34,11 +32,6 @@ namespace BOB
         {
             // Set instance reference.
             instance = this;
-
-            // Set hotkey reference.
-            savedKey = ModSettings.PanelSavedKey;
-
-            // 
         }
 
 
@@ -71,39 +64,6 @@ namespace BOB
                 bool altPressed = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt) || Input.GetKey(KeyCode.AltGr);
                 bool ctrlPressed = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
                 bool shiftPressed = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-
-                // Has hotkey been pressed?
-                if (savedKey.Key != KeyCode.None && Input.GetKey(savedKey.Key))
-                {
-                    // Modifiers have to *exactly match* settings, e.g. "alt-E" should not trigger on "ctrl-alt-E".
-                    bool altOkay = altPressed == savedKey.Alt;
-                    bool ctrlOkay = ctrlPressed == savedKey.Control;
-                    bool shiftOkay = shiftPressed == savedKey.Shift;
-
-                    // Process keystroke.
-                    if (altOkay && ctrlOkay && shiftOkay)
-                    {
-                        // Only process if we're not already doing so.
-                        if (!hotkeyProcessed)
-                        {
-                            // Set processed flag.
-                            hotkeyProcessed = true;
-
-                            // Toggle tool status.
-                            BOBTool.ToggleTool();
-                        }
-                    }
-                    else
-                    {
-                        // Relevant keys aren't pressed anymore; this keystroke is over, so reset and continue.
-                        hotkeyProcessed = false;
-                    }
-                }
-                else
-                {
-                    // Relevant keys aren't pressed anymore; this keystroke is over, so reset and continue.
-                    hotkeyProcessed = false;
-                }
 
 
                 // Check for diable tree tool hotkey.

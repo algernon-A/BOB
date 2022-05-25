@@ -11,7 +11,7 @@ namespace BOB
     internal class AddedBuildingProps
     {
         // Dictionary of active additional props.
-        private readonly Dictionary<BuildingInfo, BuildingInfo.Prop[]> changedBuildings;
+        private Dictionary<BuildingInfo, BuildingInfo.Prop[]> changedBuildings;
 
 
         /// <summary>
@@ -47,9 +47,22 @@ namespace BOB
         /// <returns>True if the prop is added, false if not.</returns>
         internal bool IsAdded(BuildingInfo building, int index)
         {
+            // Null check.
+            if (building == null)
+            {
+                Logging.Error("null building passed to AddedBuildingProps.IsAdded");
+                return false;
+            }
+
             // Return value depends on the dictionary containing an entry.
             if (changedBuildings.TryGetValue(building, out BuildingInfo.Prop[] originalProps))
             {
+                // If there's no original props array,there were no original props; therefore anything here is added.
+                if (originalProps == null)
+                {
+                    return true;
+                }
+
                 return index >= originalProps.Length;
             }
 
