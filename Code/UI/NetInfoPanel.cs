@@ -116,9 +116,10 @@ namespace BOB
 						ignoreSliderValueChange = true;
 
 						// Valid replacement - set slider values.
-						NetLaneProps.Prop laneProp = SelectedNet.m_lanes[IndividualLane].m_laneProps.m_props[IndividualIndex];
+						NetInfo.Lane lane = SelectedNet.m_lanes[IndividualLane];
+						NetLaneProps.Prop laneProp = lane.m_laneProps.m_props[IndividualIndex];
 						angleSlider.TrueValue = laneProp.m_angle;
-						xSlider.TrueValue = laneProp.m_position.x;
+						xSlider.TrueValue = lane.m_position < 0 ? -laneProp.m_position.x : laneProp.m_position.x;
 						ySlider.TrueValue = laneProp.m_position.y;
 						zSlider.TrueValue = laneProp.m_position.z;
 						probabilitySlider.TrueValue = laneProp.m_probability;

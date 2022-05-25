@@ -139,7 +139,7 @@ namespace BOB
                         replacementList.Remove(targetEntry);
                     }
 
-                    // Add network to dirty li
+                    // Add network to dirty list.
                     NetData.DirtyList.Add(network);
 
                     // Check if any added props remaining for this lane.
@@ -180,18 +180,18 @@ namespace BOB
         /// <param name="repeatDistance">Replacement repeat distance</param>
         internal void Update(NetInfo netInfo, PrefabInfo targetInfo, PrefabInfo replacementInfo, int laneIndex, int propIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability, float repeatDistance)
         {
-            // Check for valid lane.
-            if (laneIndex < 0 || netInfo?.m_lanes == null || laneIndex >= netInfo.m_lanes.Length)
+            // Check for valid daa.
+            if (replacementInfo?.name == null || laneIndex < 0 || netInfo?.m_lanes == null || laneIndex >= netInfo.m_lanes.Length || propIndex < 0)
             {
+                Logging.Error("invalid data passed to AddedNetworkProps.Update");
                 return;
             }
-            NetInfo.Lane lane = netInfo.m_lanes[laneIndex];
 
-            // Null and valid target checks.
-            if (replacementInfo?.name == null
-                || !IsAdded(lane, propIndex)
-                || !changedNetLanes.ContainsKey(lane))
+            // Existing reference checks.
+            NetInfo.Lane lane = netInfo.m_lanes[laneIndex];
+            if (!IsAdded(lane, propIndex) || !changedNetLanes.ContainsKey(lane))
             {
+                Logging.Error("unrecorded reference passed to AddedNetworkProps.Update");
                 return;
             }
 
@@ -217,7 +217,7 @@ namespace BOB
                 thisReplacement.propIndex = propIndex;
                 thisReplacement.isTree = targetInfo is TreeInfo;
                 thisReplacement.angle = angle * angleMult;
-                thisReplacement.offsetX = xOffset;
+                thisReplacement.offsetX = offsetX;  // Use unmirrored X to save.
                 thisReplacement.offsetY = offsetY;
                 thisReplacement.offsetZ = offsetZ;
                 thisReplacement.probability = probability;
@@ -234,7 +234,7 @@ namespace BOB
                 thisProp.m_finalProp = replacementInfo as PropInfo;
                 thisProp.m_finalTree = replacementInfo as TreeInfo;
                 thisProp.m_angle = angle * angleMult;
-                thisProp.m_position = new Vector3(xOffset, offsetY, offsetZ);
+                thisProp.m_position = new Vector3(xOffset, offsetY, offsetZ);   // Use mirrored X to apply.
                 thisProp.m_probability = probability;
                 thisReplacement.repeatDistance = repeatDistance;
             }
