@@ -300,6 +300,13 @@ namespace BOB
                         return -1;
                     }
 
+                    // If this is a vanilla network, then we've probably got shared NetLaneProp references, so need to copy to a new instance.
+                    // If the name doesn't contain a period (c.f. 12345.MyNetwok_Data), then assume it's vanilla - may be a mod or not shared, but better safe than sorry.
+                    if (!netInfo.name.Contains("."))
+                    {
+                        NetData.CloneLanePropInstance(netInfo, replacement.laneIndex);
+                    }
+
                     // Get old props reference.
                     NetLaneProps.Prop[] oldNetLaneProps = lane.m_laneProps.m_props;
 
