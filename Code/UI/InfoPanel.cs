@@ -25,7 +25,7 @@ namespace BOB
 
 
 		// Layout constants - mode buttons.
-		private const float ModeX = Margin + (ToggleSize * 4f);
+		protected const float ModeX = Margin + (ToggleSize * 4f);
 		protected const float ModeY = ToggleY;
 
 		// Layout constants - detail control sizes.

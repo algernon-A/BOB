@@ -1,4 +1,6 @@
-﻿- Options panel now automatically refreshes on language change
+﻿- Major new feature: add props to network prefabs
+- Add lane selection when using individual replacement mode on networks
+- Options panel now automatically refreshes on language change
 - Return hotkey handling to UUI
 
 

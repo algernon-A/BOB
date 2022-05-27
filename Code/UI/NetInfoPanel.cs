@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using ColossalFramework;
 using ColossalFramework.UI;
 using UnityEngine;
 
@@ -14,6 +15,8 @@ namespace BOB
 	{
 		// Layout constants.
 		private const float PackButtonX = RandomButtonX + ToggleSize;
+		protected const float LaneX = ModeX + (ToggleSize * 3f) + Margin;
+
 
 		// Current selection reference.
 		private NetTargetListItem currentNetItem;
@@ -21,15 +24,24 @@ namespace BOB
 		// Original selection values.
 		private NetPropReference[] originalValues;
 
-
 		// Panel components.
+		private UIDropDown laneMenu;
 		private BOBSlider repeatSlider;
+
+		// Event suppression.
+		private bool ignoreIndexChange = false;
 
 
 		/// <summary>
 		/// Returns the current individual lane number of the current selection.  This could be either the direct lane or in the lane array, depending on situation.
 		/// </summary>
 		private int IndividualLane => currentNetItem.lane < 0 ? currentNetItem.lanes[0] : currentNetItem.lane;
+
+
+		/// <summary>
+		/// Currently selected lane.
+		/// </summary>
+		private int SelectedLane => laneMenu.selectedIndex - 1;
 
 
 		/// <summary>
@@ -80,7 +92,7 @@ namespace BOB
 		/// Handles changes to the currently selected target prefab.
 		/// </summary>
 		internal override TargetListItem CurrentTargetItem
-        {
+		{
 			set
 			{
 				// First, undo any preview.
@@ -176,7 +188,13 @@ namespace BOB
 		{
 			set
 			{
-				repeatSlider.parent.isVisible = value == ReplacementModes.Individual;
+				// Add and remove buttons, lane menu, and repeat distance slider are only valid in individual mode.
+				bool isIndividual = value == ReplacementModes.Individual;
+				repeatSlider.parent.isVisible = isIndividual;
+				addButton.isVisible = isIndividual;
+				removeButton.isVisible = isIndividual;
+				laneMenu.isVisible = isIndividual;
+
 				base.CurrentMode = value;
 			}
 		}
@@ -186,9 +204,18 @@ namespace BOB
 		/// Constructor.
 		/// </summary>
 		internal BOBNetInfoPanel()
-        {
+		{
 			try
 			{
+				// Add lane menu.
+				// Mode label.
+				laneMenu = UIControls.AddDropDown(this, LaneX, ToggleY + 3f, MiddleX - LaneX);
+				UIControls.AddLabel(laneMenu, 0f, -ToggleHeaderHeight - 3f, Translations.Translate("BOB_PNL_LAN"), textScale: 0.8f);
+				laneMenu.tooltipBox = TooltipUtils.TooltipBox;
+				laneMenu.tooltip = Translations.Translate("BOB_PNL_LAN_TIP");
+				laneMenu.eventSelectedIndexChanged += LaneIndexChanged;
+				laneMenu.isVisible = CurrentMode == ReplacementModes.Individual;
+
 				// Add pack button.
 				UIButton packButton = AddIconButton(this, PackButtonX, ToggleY, ToggleSize, "BOB_PNL_PKB", TextureUtils.LoadSpriteAtlas("BOB-PropPack"));
 				packButton.eventClicked += (component, clickEvent) => PackPanelManager.Create();
@@ -226,6 +253,21 @@ namespace BOB
 			// Base setup.
 			base.SetTarget(targetPrefabInfo);
 
+			// Build lane menu selection list, with 'all lanes' at index 0, selected by default.
+			ignoreIndexChange = true; ;
+			string[] laneMenuItems = new string[SelectedNet.m_lanes.Length + 1];
+			laneMenuItems[0] = Translations.Translate("BOB_PNL_LAN_ALL");
+			for (int i = 1; i < laneMenuItems.Length; ++i)
+			{
+				// Offset by one to allow for 'all' selection at index zero.
+				laneMenuItems[i] = (i - 1).ToString();
+			}
+			laneMenu.items = laneMenuItems;
+
+			// Set selection to default 'all' and resume lane selection event handling.
+			laneMenu.selectedIndex = 0;
+			ignoreIndexChange = false;
+
 			// Populate target list and select target item.
 			TargetList();
 
@@ -240,8 +282,8 @@ namespace BOB
 		/// </summary>
 		protected override void AddNew()
 		{
-			// Make sure a valid replacement prefab is set.
-			if (ReplacementPrefab != null)
+			// Make sure a valid replacement prefab is set and we have a valid lane selection.
+			if (ReplacementPrefab != null && laneMenu.selectedIndex > 0)
 			{
 				// Revert any preview.
 				RevertPreview();
@@ -249,7 +291,7 @@ namespace BOB
 				// Add new prop.
 				BOBNetReplacement newProp = new BOBNetReplacement
 				{
-					laneIndex = IndividualLane,
+					laneIndex = SelectedLane,
 					isTree = ReplacementPrefab is TreeInfo,
 					Replacement = ReplacementPrefab.name,
 					angle = angleSlider.TrueValue,
@@ -406,9 +448,9 @@ namespace BOB
 					if (laneIndex >= selectedNetLanes.Length ||
 						selectedNetLanes[laneIndex].m_laneProps == null ||
 						propIndex >= selectedNetLanes[laneIndex].m_laneProps.m_props.Length)
-                    {
+					{
 						continue;
-                    }
+					}
 
 
 					// Local reference.
@@ -701,12 +743,21 @@ namespace BOB
 			// Iterate through each lane.
 			for (int lane = 0; lane < lanes.Length; ++lane)
 			{
+				if (CurrentMode == (int)ReplacementModes.Individual)
+				{
+					// If individual mode and a lane has been selected, skip any lanes not selected.
+					if (CurrentMode == (int)ReplacementModes.Individual && laneMenu.selectedIndex > 0 && lane != SelectedLane)
+					{
+						continue;
+					}
+				}
+				
 				// Local reference.
 				NetLaneProps.Prop[] laneProps = lanes[lane].m_laneProps?.m_props;
 
 				// If no props in this lane, skip it and go to the next one.
 				if (laneProps == null)
-                {
+				{
 					continue;
 				}
 
@@ -742,14 +793,12 @@ namespace BOB
 					// Is this an added prop?
 					if (AddedNetworkProps.Instance.IsAdded(lanes[lane], propIndex))
 					{
-						Logging.KeyMessage("lane ", lane, " and index ", propIndex, " is added");
 						targetListItem.index = propIndex;
 						targetListItem.lane = lane;
 						targetListItem.isAdded = true;
 					}
 					else
 					{
-
 						// Grouped or individual?
 						if (CurrentMode == (int)ReplacementModes.Individual)
 						{
@@ -887,11 +936,28 @@ namespace BOB
 		/// Performs actions to be taken once an update (application or reversion) has been applied, including saving data, updating button states, and refreshing renders.
 		/// </summary>
 		protected override void FinishUpdate()
-        {
+		{
 			base.FinishUpdate();
 
 			// Update any dirty net renders.
 			NetData.Update();
+		}
+
+
+		/// <summary>
+		/// Updates button states (enabled/disabled) according to current control states.
+		/// </summary>
+		protected override void UpdateButtonStates()
+		{
+			base.UpdateButtonStates();
+
+			// Make sure add button is only enabled if the lane menu is visible and has a valid lane selection.
+			if (addButton != null)
+			{
+				addButton.isVisible &= laneMenu.isVisible;
+				removeButton.isVisible &= laneMenu.isVisible;
+				addButton.isEnabled &= laneMenu.selectedIndex > 0;
+			}
 		}
 
 
@@ -927,7 +993,7 @@ namespace BOB
 				// Hide repeat slider if no value to show.
 				repeatSlider.TrueValue = 0f;
 				repeatSlider.parent.Hide();
-            }
+			}
 
 			base.SetSliders(replacement);
 		}
@@ -1027,7 +1093,7 @@ namespace BOB
 			}
 			NetLaneProps.Prop[] propBuffer = SelectedNet.m_lanes[lane]?.m_laneProps?.m_props;
 			if (propBuffer == null || propBuffer.Length <= propIndex)
-            {
+			{
 				Logging.Error("invalid prop index reference of ", propIndex, " for lane ", lane, " of selected network ", SelectedNet?.name ?? "null");
 				return null;
 			}
@@ -1079,6 +1145,67 @@ namespace BOB
 				probability = thisProp.m_probability,
 				repeatDistance = thisProp.m_repeatDistance
 			};
+		}
+
+
+		/// <summary>
+		/// Lane menu index changed event handler.
+		/// <param name="control">Calling component (unused)</param>
+		/// <param name="index">New index</param>
+		/// </summary>
+		private void LaneIndexChanged(UIComponent control, int index)
+		{
+			// Clear the tool's list of lanes to render.
+			BOBTool tool = BOBTool.Instance;
+			tool.renderLanes.Clear();
+
+			// If the index is greater, there's a lane selection to highlight.
+			if (index > 0)
+			{
+				// Local references.
+				NetManager netManager = Singleton<NetManager>.instance;
+				NetSegment[] segments = netManager.m_segments.m_buffer;
+				NetLane[] lanes = netManager.m_lanes.m_buffer;
+
+				// Lane index is offset for menu index by 1 to allow for the 'All' item at menu index 0.
+				int laneIndex = index - 1;
+
+				// Iterate through all segments on map.
+				for (int i = 0; i < segments.Length; ++i)
+				{
+					// Check for valid segments that match the selected NetInfo.
+					if ((segments[i].m_flags & NetSegment.Flags.Created) == 0 || segments[i].Info != SelectedNet)
+					{
+						continue;
+					}
+
+					// Iterate through segment lanes until we reach the one we need.
+					uint laneID = segments[i].m_lanes;
+					for (int j = 0; j < laneIndex; ++j)
+					{
+						// Safety check.
+						if (laneID == 0)
+						{
+							break;
+						}
+
+						// Get ID of next lane in segment.
+						laneID = lanes[laneID].m_nextLane;
+					}
+
+					// If we ended up with a valid lane ID, add the bezier to the list of lane overlays to be rendered.
+					if (laneID != 0)
+					{
+						tool.renderLanes.Add(lanes[laneID].m_bezier);
+					}
+				}
+			}
+
+			// Regenerate target list if events aren't suspended.
+			if (!ignoreIndexChange)
+			{
+				TargetList();
+			}
 		}
 	}
 }
