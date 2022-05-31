@@ -153,7 +153,7 @@ namespace BOB
         /// <param name="buildingInfo">Targeted building prefab</param>
         /// <param name="targetInfo">Targeted (original) prop prefab</param>
         /// <param name="replacementInfo">Replacment prop prefab</param>
-        /// <param name="propIndex">Prop index to apply replacement to (ignored)</param>
+        /// <param name="propIndex">Prop index to apply replacement to</param>
         /// <param name="angle">Replacment prop angle adjustment</param>
         /// <param name="offsetX">Replacment X position offset</param>
         /// <param name="offsetY">Replacment Y position offset</param>
@@ -162,11 +162,17 @@ namespace BOB
         /// <param name="customHeight">Replacement custom height flag</param>
         internal void Update(BuildingInfo buildingInfo, PrefabInfo targetInfo, PrefabInfo replacementInfo, int propIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability, bool customHeight)
         {
-            // Null and valid target checks.
-            if (replacementInfo?.name == null
-                || !IsAdded(buildingInfo, propIndex)
-                || !changedBuildings.ContainsKey(buildingInfo))
+            // Check for valid daa.
+            if (replacementInfo?.name == null || propIndex < 0 || buildingInfo?.m_props == null || propIndex >= buildingInfo.m_props.Length)
             {
+                Logging.Error("invalid data passed to AddedBuildingProps.Update");
+                return;
+            }
+
+            // Existing reference checks.
+            if (!IsAdded(buildingInfo, propIndex) || !changedBuildings.ContainsKey(buildingInfo))
+            {
+                Logging.Error("unrecorded reference passed to AddedBuildingProps.Update");
                 return;
             }
 
@@ -331,7 +337,10 @@ namespace BOB
         private void Deserialize(BuildingInfo buildingInfo, List<BOBBuildingReplacement> replacementList)
         {
             // Creeate record for building info.
-            changedBuildings.Add(buildingInfo, buildingInfo.m_props);
+            if (!changedBuildings.ContainsKey(buildingInfo))
+            {
+                changedBuildings.Add(buildingInfo, buildingInfo.m_props);
+            }
 
             // Iterate through each element in the provided list.
             foreach (BOBBuildingReplacement replacement in replacementList)

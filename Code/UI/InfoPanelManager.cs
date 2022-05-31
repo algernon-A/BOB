@@ -102,6 +102,9 @@ namespace BOB
 				Patcher.PatchNetworkOverlays(false);
 				Patcher.PatchMapOverlays(false);
 
+				// Clear tool lane overlay list.
+				BOBTool.Instance.renderLanes.Clear();
+
 				// Store previous position.
 				lastX = Panel.relativePosition.x;
 				lastY = Panel.relativePosition.y;

@@ -13,7 +13,17 @@ namespace BOB
         // List of versions and associated update message lines (as translation keys).
         private readonly static WhatsNewMessage[] WhatsNewMessages = new WhatsNewMessage[]
         {
-             new WhatsNewMessage
+            new WhatsNewMessage
+            {
+                version = new Version("0.9.4.0"),
+                versionHeader = "",
+                messageKeys = true,
+                messages = new string[]
+                {
+                    "BOB_UPD_094_0"
+                }
+            },
+            new WhatsNewMessage
             {
                 version = new Version("0.9.3.0"),
                 versionHeader = "",

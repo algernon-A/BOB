@@ -115,6 +115,9 @@ namespace BOB
 
 						// Deserialize added props.
 						AddedBuildingProps.Instance.Deserialize(CurrentConfig.addedBuildingProps);
+
+						// Deserialize added props.
+						AddedNetworkProps.Instance.Deserialize(CurrentConfig.addedNetworkProps);
 					}
 				}
 				else

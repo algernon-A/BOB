@@ -1,6 +1,8 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using ColossalFramework;
 using ColossalFramework.UI;
+using ColossalFramework.Math;
 using UnifiedUI.Helpers;
 using EManagersLib.API;
 
@@ -15,6 +17,10 @@ namespace BOB
 		// Cursor textures.
 		protected CursorInfo lightCursor;
 		protected CursorInfo darkCursor;
+
+		// List of lane overlays to render.
+		internal List<Bezier3> renderLanes = new List<Bezier3>();
+
 
 
 		public enum Mode
@@ -243,6 +249,39 @@ namespace BOB
 			// Set mouse position and record errors.
 			m_mousePosition = output.m_hitPos;
 			m_selectErrors = errors;
+		}
+
+
+		/// <summary>
+		/// Called by game when overlay is to be rendered.
+		/// </summary>
+		/// <param name="cameraInfo">Current camera instance</param>
+		public override void RenderOverlay(RenderManager.CameraInfo cameraInfo)
+		{
+			// 5m vertical offset in each direction to allow for terrain changes.
+			const float verticalOffset = 5f;
+
+			// Local references.
+			ToolManager toolManager = Singleton<ToolManager>.instance;
+			OverlayEffect overlay = Singleton<RenderManager>.instance.OverlayEffect;
+
+			base.RenderOverlay(cameraInfo);
+
+			// If any lane overlays are ready to be rendered, render them.
+			if (renderLanes.Count != 0)
+			{
+				// Iterate through list.
+				foreach (Bezier3 bezier in renderLanes)
+				{
+					// Calculate minimum and maximum y-values.
+					float minY = Mathf.Min(bezier.a.y, bezier.d.y) - verticalOffset;
+					float maxY = Mathf.Max(bezier.a.y, bezier.d.y) + verticalOffset;
+
+					// Draw bezier overlay in magenta.
+					overlay.DrawBezier(cameraInfo, Color.magenta, bezier, 1.1f, 0f, 0f, minY, maxY, false, alphaBlend: false);
+					++toolManager.m_drawCallData.m_overlayCalls;
+				}
+			}
 		}
 
 
