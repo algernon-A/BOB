@@ -242,6 +242,29 @@ namespace BOB
 
 
         /// <summary>
+        /// Reverts all added network props.
+        /// </summary>
+        internal void RevertAll()
+        {
+            // Iterate through each building in dictionary of added props.
+            foreach (KeyValuePair<NetInfo.Lane, NetLaneProps.Prop[]> entry in changedNetLanes)
+            {
+                // Restore original props.
+                entry.Key.m_laneProps.m_props = entry.Value;
+            }
+
+            // Mark all entries in element list as dierty
+            foreach (BOBNetworkElement element in NetworkElementList)
+            {
+                NetData.DirtyList.Add(element.NetInfo);
+            }
+
+            // Clear element list.
+            NetworkElementList.Clear();
+        }
+
+
+        /// <summary>
         /// Deserialises and applies added props.
         /// </summary>
         /// <param name="elementList">Element list to deserialise</param>

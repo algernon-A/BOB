@@ -69,7 +69,7 @@ namespace BOB
 				// Don't let a single failure stop us.
 				Logging.LogException(e, "exception reverting all-network replacements");
 			}
-			
+
 			// Revert network replacements.
 			try
 			{
@@ -91,7 +91,7 @@ namespace BOB
 				// Don't let a single failure stop us.
 				Logging.LogException(e, "exception reverting individual network replacements");
 			}
-			
+
 			// Revert scaling.
 			try
 			{
@@ -102,6 +102,29 @@ namespace BOB
 				// Don't let a single failure stop us.
 				Logging.LogException(e, "exception reverting scaling elemennts");
 			}
+
+			// Revert added building props.
+			try
+			{
+				AddedBuildingProps.Instance?.RevertAll();
+			}
+			catch (Exception e)
+			{
+				// Don't let a single failure stop us.
+				Logging.LogException(e, "exception reverting added building props");
+			}
+
+			// Revert added network props.
+			try
+			{
+				AddedNetworkProps.Instance?.RevertAll();
+			}
+			catch (Exception e)
+			{
+				// Don't let a single failure stop us.
+				Logging.LogException(e, "exception reverting added building props");
+			}
+
 
 			// Regenerate dirty renders.
 			NetData.Update();

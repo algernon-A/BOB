@@ -213,6 +213,26 @@ namespace BOB
 
 
         /// <summary>
+        /// Reverts all added building props.
+        /// </summary>
+        internal void RevertAll()
+        {
+            // Iterate through each building in dictionary of added props.
+            foreach (KeyValuePair<BuildingInfo, BuildingInfo.Prop[]> entry in changedBuildings)
+            {
+                // Restore original props.
+                entry.Key.m_props = entry.Value;
+
+                // Mark as dirty.
+                BuildingData.DirtyList.Add(entry.Key);
+            }
+
+            // Clear element list.
+            BuildingElementList.Clear();
+        }
+
+
+        /// <summary>
         /// Deserialises and applies added props.
         /// </summary>
         /// <param name="elementList">Element list to deserialise</param>

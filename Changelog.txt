@@ -1,4 +1,7 @@
-﻿Version 0.9.4 -
+﻿- Fix exception when loading replacement config file with conflicting added prop references
+
+
+Version 0.9.4 -
 
 - Major new feature: add props to network prefabs
 - Add lane selection when using individual replacement mode on networks
