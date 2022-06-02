@@ -1,4 +1,6 @@
-﻿- Fix map tree replacement sometimes displaying prop lists
+﻿Version 0.9.4.2 -
+
+- Fix map tree replacement sometimes displaying prop lists
 
 
 Version 0.9.4.1 -
