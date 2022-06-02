@@ -42,6 +42,12 @@ namespace BOB
 		/// <param name="replacement">Replacement tree</param>
 		internal void Apply(TreeInfo target, TreeInfo replacement)
 		{
+			// Null checks.
+			if (target == null || replacement == null)
+			{
+				Logging.Error("null parameter passet to MapPropReplacement.Apply");
+			}
+
 			// Check to see if we already have a replacement entry for this tree - if so, revert the replacement first.
 			if (replacements.ContainsKey(target))
 			{

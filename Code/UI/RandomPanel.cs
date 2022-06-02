@@ -68,12 +68,6 @@ namespace BOB
 
 
 		/// <summary>
-		/// Initial prop-tree mode.
-		/// </summary>
-		protected override PropTreeModes InitialPropTreeMode => PropTreeModes.Prop;
-
-
-		/// <summary>
 		/// Creates the panel object in-game and displays it.
 		/// </summary>
 		internal static void Create()

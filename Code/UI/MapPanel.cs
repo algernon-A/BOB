@@ -14,24 +14,6 @@ namespace BOB
 	internal class BOBMapInfoPanel : BOBInfoPanelBase
 	{
 		/// <summary>
-		/// Initial prop-tree mode.
-		/// </summary>
-		protected override PropTreeModes InitialPropTreeMode
-        {
-			get
-            {
-				// Set initial mode based on initial selection.
-				if (selectedPrefab is TreeInfo)
-                {
-					return PropTreeModes.Tree;
-                }
-
-				return PropTreeModes.Prop;
-            }
-        }
-
-
-		/// <summary>
 		/// Sets the target prefab.
 		/// </summary>
 		/// <param name="targetPrefabInfo">Target prefab to set</param>
@@ -54,6 +36,9 @@ namespace BOB
 			TargetList();
 			targetList.FindTargetItem(targetPrefabInfo);
 
+			// Populate loaded list.
+			LoadedList();
+
 			// Apply Harmony rendering patches.
 			Patcher.PatchMapOverlays(true);
 		}
@@ -69,9 +54,6 @@ namespace BOB
 				// Disable 'both' check.
 				propTreeChecks[(int)PropTreeModes.Both].Disable();
 				propTreeChecks[(int)PropTreeModes.Both].Hide();
-
-				// Populate loaded list.
-				LoadedList();
 
 				// Set initial button states.
 				UpdateButtonStates();
@@ -94,11 +76,11 @@ namespace BOB
 			try
 			{
 				// Apply replacement.
-				if (ReplacementPrefab is TreeInfo replacementTree)
+				if (!propTreeChecks[(int)PropTreeModes.Prop].isChecked && ReplacementPrefab is TreeInfo replacementTree)
 				{
 					MapTreeReplacement.instance.Apply((CurrentTargetItem.replacementPrefab ?? CurrentTargetItem.originalPrefab) as TreeInfo, replacementTree);
 				}
-				else if (ReplacementPrefab is PropInfo replacementProp)
+				else if (!propTreeChecks[(int)PropTreeModes.Tree].isChecked && ReplacementPrefab is PropInfo replacementProp)
 				{
 					MapPropReplacement.instance.Apply((CurrentTargetItem.replacementPrefab ?? CurrentTargetItem.originalPrefab) as PropInfo, replacementProp);
 				}

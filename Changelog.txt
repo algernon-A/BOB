@@ -1,4 +1,7 @@
-﻿Version 0.9.4.1 -
+﻿- Fix map tree replacement sometimes displaying prop lists
+
+
+Version 0.9.4.1 -
 
 - Fix exception when loading replacement config file with conflicting added prop references
 

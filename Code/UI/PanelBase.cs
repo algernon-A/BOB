@@ -190,7 +190,7 @@ namespace BOB
 		/// <summary>
 		/// Initial prop-tree mode.
 		/// </summary>
-		protected abstract PropTreeModes InitialPropTreeMode { get; }
+		protected virtual PropTreeModes InitialPropTreeMode => PropTreeModes.Prop;
 
 
 		/// <summary>

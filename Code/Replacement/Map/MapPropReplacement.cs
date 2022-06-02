@@ -40,9 +40,15 @@ namespace BOB
 		/// Applies a new (or updated) map prop replacement.
 		/// </summary>
 		/// <param name="target">Prop to replace</param>
-		/// <param name="replacement">Replacement tree</param>
+		/// <param name="replacement">Replacement prop</param>
 		internal void Apply(PropInfo target, PropInfo replacement)
 		{
+			// Null checks.
+			if (target == null || replacement == null)
+			{
+				Logging.Error("null parameter passet to MapPropReplacement.Apply");
+			}
+
 			// Check to see if we already have a replacement entry for this prop - if so, revert the replacement first.
 			if (replacements.ContainsKey(target))
 			{
