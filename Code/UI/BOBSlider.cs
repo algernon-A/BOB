@@ -21,10 +21,8 @@ namespace BOB
 		// Limit to visible range?
 		public bool LimitToVisible { get; set; } = false;
 
-
 		// Sub-components.
 		public UITextField ValueField { get; set; }
-
 
 
 		/// <summary>
@@ -39,31 +37,15 @@ namespace BOB
 				// Clamp value to visible slider range.
 				float visibleValue = Mathf.Clamp(value, minValue, maxValue);
 
-				// Are we limiting to visible range?
-				if (LimitToVisible)
-				{
-					// Yes; use clamped value.
-					trueValue = visibleValue;
+				// Set value according to 'limit to visible' setting
+				trueValue = LimitToVisible ? visibleValue : value;
 
-					OnValueChanged();
-				}
-				else
-				{
-					// No - use raw (unclamped) value.
-					trueValue = value;
-				}
-
-				// If slider visible value isn't going to change, then make sure we manually invoke OnValueChanged.
-				if (this.value != visibleValue)
-				{
-					OnValueChanged();
-				}
-
-				// Set slider display value - clamped to slider extents.
+				// Set slider and textfield values (visble and true values accordingly), suppressing events if they aren't already suppressed.
+				bool oldSuppressEvents = suppressEvents;
+				suppressEvents = true;
 				this.value = visibleValue;
-
-				// Forcibly set text.
-				//ValueField.text = IsInt ? Mathf.RoundToInt(TrueValue).ToString() : TrueValue.ToString();
+				SetText();
+				suppressEvents = oldSuppressEvents;
 			}
 		}
 
@@ -91,84 +73,6 @@ namespace BOB
 
 
 		/// <summary>
-		/// Handles textfield value change; should be added as eventTextSubmitted event handler.
-		/// </summary>
-		/// <param name="control">Calling component(unused)</param>
-		/// <param name="text">New text</param>
-		public void OnTextSubmitted(UIComponent _, string text)
-		{
-			// Don't do anything is events are suppressed.
-			if (!suppressEvents)
-			{
-				// Suppress events while we change things, to avoid infinite recursive update loops.
-				suppressEvents = true;
-
-				// Attempt to parse textfield value.
-				if (float.TryParse(text, out float result))
-				{
-					// Successful parse - set slider value.
-					TrueValue = IsInt ? Mathf.RoundToInt(result) : result;
-				}
-
-				// Set textfield to active value.
-				ValueField.text = IsInt ? Mathf.RoundToInt(TrueValue).ToString() : TrueValue.ToString();
-
-				// Restore event handling.
-				suppressEvents = false;
-			}
-		}
-
-
-		/// <summary>
-		/// Called by game when slider value is changed.
-		/// </summary>
-		protected override void OnValueChanged()
-		{
-			// Don't do anything special if events are suppressed.
-			if (!suppressEvents)
-			{
-				// Suppress events while we change things, to avoid infinite recursive update loops.
-				suppressEvents = true;
-
-				// Apply current multiplier.
-				float multiplier = Multiplier;
-				value = value.RoundToNearest(multiplier);
-
-				// Update displayed textfield value to current slider value (need to round again for display to avoid ocassional off-by-0.001).
-				TrueValue = value;
-				ValueField.text = TrueValue.RoundToNearest(multiplier).ToString();
-
-				// Restore event handling.
-				suppressEvents = false;
-			}
-
-			// Complete normal slider value change processing (update thumb position, invoke events, etc.).
-			base.OnValueChanged();
-		}
-
-
-		/// <summary>
-		/// Called by game when mousewheel is scrolled.
-		/// </summary>
-		/// <param name="mouseEvent">Mouse event parameter</param>
-		protected override void OnMouseWheel(UIMouseEventParameter mouseEvent)
-		{
-			// Get current multiplier.
-			float multiplier = Multiplier;
-
-			// Set current value according to multiplier state, suppressing events first to avoid value clamping, and manually updating textfield.
-			suppressEvents = true;
-			TrueValue = trueValue.RoundToNearest(multiplier) + (mouseEvent.wheelDelta * multiplier);
-			ValueField.text = TrueValue.RoundToNearest(multiplier).ToString();
-			suppressEvents = false;
-
-			// Use event and invoke any handlers.
-			mouseEvent.Use();
-			Invoke("OnMouseWheel", mouseEvent);
-		}
-
-
-		/// <summary>
 		/// Returns the current step multiplier based on modifier key states.
 		/// For float 0.1/0.01 for none/Ctrl, for Int just 1
 		/// </summary>
@@ -191,6 +95,79 @@ namespace BOB
 
 				// Default multiplier.
 				return 1;
+			}
+		}
+
+
+		/// <summary>
+		/// Handles textfield value change; should be added as eventTextSubmitted event handler.
+		/// </summary>
+		/// <param name="control">Calling component(unused)</param>
+		/// <param name="text">New text</param>
+		public void OnTextSubmitted(UIComponent _, string text)
+		{
+			// Don't do anything is events are suppressed.
+			if (!suppressEvents)
+			{
+				// Suppress events while we change things, to avoid infinite recursive update loops.
+				suppressEvents = true;
+
+				// Attempt to parse textfield value.
+				if (float.TryParse(text, out float result))
+				{
+					// Successful parse - set slider value.
+					TrueValue = result.RoundToNearest(Multiplier);
+				}
+
+				// Restore event handling.
+				suppressEvents = false;
+			}
+		}
+
+
+		/// <summary>
+		/// Called by game when slider value is changed.
+		/// </summary>
+		protected override void OnValueChanged()
+		{
+			// Don't do anything special if events are suppressed.
+			if (!suppressEvents)
+			{
+				// Apply current multiplier and update TrueValue.
+				TrueValue = value.RoundToNearest(Multiplier);
+			}
+
+			// Complete normal slider value change processing (update thumb position, invoke events, etc.).
+			base.OnValueChanged();
+		}
+
+
+		/// <summary>
+		/// Called by game when mousewheel is scrolled.
+		/// </summary>
+		/// <param name="mouseEvent">Mouse event parameter</param>
+		protected override void OnMouseWheel(UIMouseEventParameter mouseEvent)
+		{
+			// Get current multiplier.
+			float multiplier = Multiplier;
+
+			// Set current value according to multiplier state.
+			TrueValue = trueValue.RoundToNearest(multiplier) + (mouseEvent.wheelDelta * multiplier);
+
+			// Use event and invoke any handlers.
+			mouseEvent.Use();
+			Invoke("OnMouseWheel", mouseEvent);
+		}
+
+
+		/// <summary>
+		/// Updates the displayed textfield values.
+		/// </summary>
+		private void SetText()
+		{
+			if (ValueField != null)
+			{
+				ValueField.text = TrueValue.RoundToNearest(Multiplier).ToString();
 			}
 		}
 	}

@@ -1,4 +1,7 @@
-﻿Version 0.9.4.2 -
+﻿- Sliders now correctly display out-of-range values
+
+
+Version 0.9.4.2 -
 
 - Fix map tree replacement sometimes displaying prop lists
 
