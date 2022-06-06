@@ -136,6 +136,7 @@ namespace BOB
 						zSlider.TrueValue = laneProp.m_position.z;
 						probabilitySlider.TrueValue = laneProp.m_probability;
 						repeatSlider.TrueValue = laneProp.m_repeatDistance;
+						repeatSlider.parent.Show();
 
 						// Re-enable events.
 						ignoreSliderValueChange = false;
@@ -499,6 +500,7 @@ namespace BOB
 						// Update current target.
 						CurrentTargetItem.originalPrefab = ReplacementPrefab;
 						CurrentTargetItem.originalProb = (int)probabilitySlider.TrueValue;
+						netItem.originalRepeat = repeatSlider.TrueValue;
 					}
 					else
 					{
@@ -971,7 +973,7 @@ namespace BOB
 			ignoreSliderValueChange = true;
 
 			// Are we eligible for repeat distance (eligibile target and in individual mode).
-			if (CurrentMode == ReplacementModes.Individual && currentNetItem != null && currentNetItem.originalRepeat > 1f)
+			if (CurrentMode == ReplacementModes.Individual && currentNetItem != null && (currentNetItem.originalRepeat > 1f || currentNetItem.isAdded))
 			{
 				// Yes - do we have a replacement?
 				if (replacement is BOBNetReplacement netReplacement && netReplacement.repeatDistance > 1f)
@@ -1053,8 +1055,8 @@ namespace BOB
 			thisProp.m_probability = (int)probabilitySlider.TrueValue;
 			thisProp.m_angle = baseAngle + (angleSlider.TrueValue * angleMult);
 
-			// Set repeat distance, if valid - individual mode only.
-			if (CurrentMode == ReplacementModes.Individual && originalValues[0].repeatDistance > 1f && repeatSlider.TrueValue > 1f)
+			// Set repeat distance, if valid.
+			if (repeatSlider.parent.isVisible)
 			{
 				thisProp.m_repeatDistance = repeatSlider.TrueValue;
 			}

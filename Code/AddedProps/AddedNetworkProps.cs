@@ -236,7 +236,7 @@ namespace BOB
                 thisProp.m_angle = angle * angleMult;
                 thisProp.m_position = new Vector3(xOffset, offsetY, offsetZ);   // Use mirrored X to apply.
                 thisProp.m_probability = probability;
-                thisReplacement.repeatDistance = repeatDistance;
+                thisProp.m_repeatDistance = repeatDistance;
             }
         }
 
