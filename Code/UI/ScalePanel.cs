@@ -213,10 +213,10 @@ namespace BOB
 
 			// Minimum scale slider.
 			minScaleSlider = AddBOBSlider(this, ControlX, MinOffsetY, ControlWidth - (Margin * 2f), "BOB_SCA_MIN", 0.5f, 2f, 0.5f, "MinScale");
-			minScaleSlider.eventValueChanged += MinScaleValue;
+			minScaleSlider.eventTrueValueChanged += MinScaleValue;
 			minScaleSlider.value = 1f;
 			maxScaleSlider = AddBOBSlider(this, ControlX, MaxOffsetY + 40f, ControlWidth - (Margin * 2f), "BOB_SCA_MAX", 0.5f, 2f, 0.5f, "MaxScale");
-			maxScaleSlider.eventValueChanged += MaxScaleValue;
+			maxScaleSlider.eventTrueValueChanged += MaxScaleValue;
 			maxScaleSlider.value = 1f;
 
 			// Revert button.

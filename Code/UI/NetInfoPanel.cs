@@ -226,7 +226,7 @@ namespace BOB
 				repeatSlider = AddBOBSlider(repeatPanel, Margin, 0f, MidControlWidth - (Margin * 2f), "BOB_PNL_REP", 1.1f, 50f, 0.1f, "Repeat");
 				repeatSlider.tooltip = Translations.Translate("BOB_PNL_REP_TIP");
 				repeatSlider.parent.isVisible = CurrentMode == ReplacementModes.Individual;
-				repeatSlider.eventValueChanged += SliderChange;
+				repeatSlider.eventTrueValueChanged += SliderChange;
 
 				// Populate loaded list.
 				LoadedList();
@@ -1043,6 +1043,7 @@ namespace BOB
 
 			// Calculate preview X position and angle, taking into account mirrored trees/props, inverting x offset to match original prop x position.
 			float offsetX = xSlider.TrueValue;
+			Logging.Message("xSlsider TrueValue is ", offsetX);
 			float angleMult = 1;
 			if (thisLane.m_position + basePosition.x < 0)
 			{

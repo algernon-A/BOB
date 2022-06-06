@@ -1,4 +1,7 @@
-﻿Version 0.9.4.3 -
+﻿- Fix preview updates not triggering when slider values are out-of-range
+
+
+Version 0.9.4.3 -
 
 - Implement customizable repeat distances for added network props
 - Sliders now correctly display out-of-range values

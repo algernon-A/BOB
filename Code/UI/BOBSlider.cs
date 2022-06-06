@@ -24,6 +24,9 @@ namespace BOB
 		// Sub-components.
 		public UITextField ValueField { get; set; }
 
+		// Value changed event.
+		public event PropertyChangedEventHandler<float> eventTrueValueChanged;
+
 
 		/// <summary>
 		/// 'True' (not just displayed) slider value; use this instead of value to ensure proper operation.
@@ -45,6 +48,15 @@ namespace BOB
 				suppressEvents = true;
 				this.value = visibleValue;
 				SetText();
+
+				// Trigger value changed events, if any.
+				if (this.eventTrueValueChanged != null)
+				{
+					Logging.KeyMessage("Invoking eventTrueValueChanged");
+					this.eventTrueValueChanged(this, trueValue);
+				}
+
+				// Restore previous event state.
 				suppressEvents = oldSuppressEvents;
 			}
 		}

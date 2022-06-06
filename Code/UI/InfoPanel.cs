@@ -264,11 +264,11 @@ namespace BOB
 				heightLabel.relativePosition = new Vector2((heightPanel.width - heightLabel.width) / 2f, OffsetLabelY);
 
 				// Live application of position changes.
-				xSlider.eventValueChanged += SliderChange;
-				ySlider.eventValueChanged += SliderChange;
-				zSlider.eventValueChanged += SliderChange;
-				angleSlider.eventValueChanged += SliderChange;
-				probabilitySlider.eventValueChanged += SliderChange;
+				xSlider.eventTrueValueChanged += SliderChange;
+				ySlider.eventTrueValueChanged += SliderChange;
+				zSlider.eventTrueValueChanged += SliderChange;
+				angleSlider.eventTrueValueChanged += SliderChange;
+				probabilitySlider.eventTrueValueChanged += SliderChange;
 
 				// Normal/random toggle.
 				randomCheck = UIControls.LabelledCheckBox((UIComponent)(object)this, hideVanilla.relativePosition.x, hideVanilla.relativePosition.y + hideVanilla.height + (Margin / 2f), Translations.Translate("BOB_PNL_RSW"), 12f, 0.7f);
