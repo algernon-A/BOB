@@ -1,4 +1,6 @@
-﻿- Implement customizable repeat distances for added network props
+﻿Version 0.9.4.3 -
+
+- Implement customizable repeat distances for added network props
 - Sliders now correctly display out-of-range values
 
 
