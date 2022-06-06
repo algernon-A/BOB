@@ -918,7 +918,7 @@ namespace BOB
 				AddedBuildingProps.Instance.AddNew(newProp);
 
 				// Post-action cleanup.
-				UpdateAddedPops();
+				UpdateAddedProps();
 			}
 		}
 
@@ -942,7 +942,7 @@ namespace BOB
 			AddedBuildingProps.Instance.RemoveNew(currentBuilding, CurrentTargetItem.index);
 
 			// Post-action cleanup.
-			UpdateAddedPops();
+			UpdateAddedProps();
 		}
 
 
@@ -962,7 +962,7 @@ namespace BOB
 		/// <summary>
 		/// Called after any added prop manipulations (addition or removal) to perform cleanup.
 		/// </summary>
-		private void UpdateAddedPops()
+		private void UpdateAddedProps()
 		{
 			// Update building prop references.
 			currentBuilding.CheckReferences();
