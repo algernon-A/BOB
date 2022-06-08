@@ -52,7 +52,6 @@ namespace BOB
 				// Trigger value changed events, if any.
 				if (this.eventTrueValueChanged != null)
 				{
-					Logging.KeyMessage("Invoking eventTrueValueChanged");
 					this.eventTrueValueChanged(this, trueValue);
 				}
 
