@@ -1204,10 +1204,11 @@ namespace BOB
 				}
 			}
 
-			// Regenerate target list if events aren't suspended.
+			// Regenerate target list and update controls if events aren't suspended.
 			if (!ignoreIndexChange)
 			{
 				TargetList();
+				UpdateButtonStates();
 			}
 		}
 	}

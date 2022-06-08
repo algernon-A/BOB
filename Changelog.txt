@@ -1,4 +1,6 @@
-﻿- Fix preview updates not triggering when slider values are out-of-range
+﻿
+- Fix preview updates not triggering when slider values are out-of-range
+- Fix network 'add prop' button not updating state on selected lange change
 
 
 Version 0.9.4.3 -
