@@ -270,6 +270,9 @@ namespace BOB
 			// If any lane overlays are ready to be rendered, render them.
 			if (renderLanes.Count != 0)
 			{
+				// Set color.
+				Color renderColor = Color.magenta* RenderOverlays.intensity;
+
 				// Iterate through list.
 				foreach (Bezier3 bezier in renderLanes)
 				{
@@ -278,7 +281,7 @@ namespace BOB
 					float maxY = Mathf.Max(bezier.a.y, bezier.d.y) + verticalOffset;
 
 					// Draw bezier overlay in magenta.
-					overlay.DrawBezier(cameraInfo, Color.magenta, bezier, 1.1f, 0f, 0f, minY, maxY, false, alphaBlend: false);
+					overlay.DrawBezier(cameraInfo, renderColor, bezier, 1.1f, 0f, 0f, minY, maxY, false, alphaBlend: false);
 					++toolManager.m_drawCallData.m_overlayCalls;
 				}
 			}
