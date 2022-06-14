@@ -82,6 +82,16 @@ namespace BOB
 
 
         /// <summary>
+        /// Retrieves a currently-applied replacement entry for the given network, lane and prop index.
+        /// </summary>
+        /// <param name="networkInfo">Network prefab</param>
+        /// <param name="laneIndex">Lane number</param>
+        /// <param name="propIndex">Prop index number</param>
+        /// <returns>Currently-applied individual network replacement (null if none)</returns>
+        internal BOBNetReplacement ReplacementRecord(NetInfo netInfo, int laneIndex, int propIndex) => ReplacementEntry(netInfo)?.Find(x => x.laneIndex == laneIndex && x.propIndex == propIndex);
+
+
+        /// <summary>
         /// Adds a new prop to a network after updating the config file with the new entry.
         /// </summary>
         /// <param name="data">Network replacement data record</param>
@@ -216,7 +226,7 @@ namespace BOB
                 thisReplacement.laneIndex = laneIndex;
                 thisReplacement.propIndex = propIndex;
                 thisReplacement.isTree = targetInfo is TreeInfo;
-                thisReplacement.angle = angle * angleMult;
+                thisReplacement.angle = angle;
                 thisReplacement.offsetX = offsetX;  // Use unmirrored X to save.
                 thisReplacement.offsetY = offsetY;
                 thisReplacement.offsetZ = offsetZ;

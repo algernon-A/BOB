@@ -121,58 +121,38 @@ namespace BOB
 					// Is this an added prop?
 					if (CurrentTargetItem.isAdded)
 					{
-						Logging.Message("setting sliders for added prop at index ", IndividualIndex);
-
-						// Yes - set sliders directly.
-						// Disable events.
-						ignoreSliderValueChange = true;
-
-						// Valid replacement - set slider values.
-						NetInfo.Lane lane = SelectedNet.m_lanes[IndividualLane];
-						NetLaneProps.Prop laneProp = lane.m_laneProps.m_props[IndividualIndex];
-						angleSlider.TrueValue = laneProp.m_angle;
-						xSlider.TrueValue = lane.m_position < 0 ? -laneProp.m_position.x : laneProp.m_position.x;
-						ySlider.TrueValue = laneProp.m_position.y;
-						zSlider.TrueValue = laneProp.m_position.z;
-						probabilitySlider.TrueValue = laneProp.m_probability;
-						repeatSlider.TrueValue = laneProp.m_repeatDistance;
-						repeatSlider.parent.Show();
-
-						// Re-enable events.
-						ignoreSliderValueChange = false;
+						// Yes - set sliders from replacement record.
+						SetSliders(AddedNetworkProps.Instance.ReplacementRecord(SelectedNet, IndividualLane, IndividualIndex));
 
 						// All done here.
 						return;
 					}
-					else
+					// If we've got an individual replacement, update the offset fields with the replacement values.
+					else if (CurrentTargetItem.individualPrefab != null)
 					{
-						// If we've got an individual replacement, update the offset fields with the replacement values.
-						if (CurrentTargetItem.individualPrefab != null)
-						{
-							// Use IndividualIndex and IndividualLane to handle case of switching from individual to grouped props (values will be -1, actual values in relevant lists).
-							SetSliders(IndividualNetworkReplacement.Instance.EligibileReplacement(SelectedNet, CurrentTargetItem.originalPrefab, IndividualLane, IndividualIndex));
+						// Use IndividualIndex and IndividualLane to handle case of switching from individual to grouped props (values will be -1, actual values in relevant lists).
+						SetSliders(IndividualNetworkReplacement.Instance.EligibileReplacement(SelectedNet, CurrentTargetItem.originalPrefab, IndividualLane, IndividualIndex));
 
-							// All done here.
-							return;
-						}
-						// Ditto for any network replacement.
-						else if (CurrentTargetItem.replacementPrefab != null)
-						{
-							// Get replacement and update control values.
-							SetSliders(NetworkReplacement.Instance.EligibileReplacement(SelectedNet, CurrentTargetItem.originalPrefab, -1, -1));
+						// All done here.
+						return;
+					}
+					// Ditto for any network replacement.
+					else if (CurrentTargetItem.replacementPrefab != null)
+					{
+						// Get replacement and update control values.
+						SetSliders(NetworkReplacement.Instance.EligibileReplacement(SelectedNet, CurrentTargetItem.originalPrefab, -1, -1));
 
-							// All done here.
-							return;
-						}
-						// Ditto for any all-network replacement.
-						else if (CurrentTargetItem.allPrefab != null)
-						{
-							// Get replacement and update control values.
-							SetSliders(AllNetworkReplacement.Instance.EligibileReplacement(SelectedNet, CurrentTargetItem.originalPrefab, -1, -1));
+						// All done here.
+						return;
+					}
+					// Ditto for any all-network replacement.
+					else if (CurrentTargetItem.allPrefab != null)
+					{
+						// Get replacement and update control values.
+						SetSliders(AllNetworkReplacement.Instance.EligibileReplacement(SelectedNet, CurrentTargetItem.originalPrefab, -1, -1));
 
-							// All done here.
-							return;
-						}
+						// All done here.
+						return;
 					}
 				}
 
