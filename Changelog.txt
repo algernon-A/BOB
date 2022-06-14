@@ -1,6 +1,7 @@
 ﻿- Lane highlighting now follows same modifier key rules as prop/tree highlighting
 - Fix preview updates not triggering when slider values are out-of-range
 - Fix network 'add prop' button not updating state on selected lange change
+- Fix added netowrk props sometimes rotating 180 degrees on load in some networks
 
 
 Version 0.9.4.3 -

@@ -152,7 +152,6 @@ namespace BOB
 
 					// Create new panel instance and add it to GameObject.
 					panel = uiGameObject.AddComponent<BOBScalePanel>();
-					panel.transform.parent = uiGameObject.transform.parent;
 
 					// Select previously selected prefab, if any.
 					if (selectedPrefab != null)

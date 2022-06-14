@@ -83,7 +83,6 @@ namespace BOB
 
 					// Create new panel instance and add it to GameObject.
 					panel = uiGameObject.AddComponent<BOBRandomPanel>();
-					panel.transform.parent = uiGameObject.transform.parent;
 
 					// Hide previous window, if any.
 					InfoPanelManager.Panel?.Hide();

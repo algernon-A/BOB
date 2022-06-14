@@ -196,7 +196,6 @@ namespace BOB
 					}
 
 					// Set up panel with selected prefab.
-					Panel.transform.parent = uiGameObject.transform.parent;
 					Panel.SetTarget(selectedPrefab);
 				}
 			}
