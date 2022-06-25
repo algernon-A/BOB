@@ -142,6 +142,36 @@ namespace BOB
 		}
 
 
+		/// <summary>
+		/// Creates a blank BOB configuration file.
+		/// </summary>
+		/// <param name="configName">New configuration file name</param>
+		internal static void BlankConfig(string configName)
+		{
+			if (!configName.IsNullOrWhiteSpace())
+			{
+				// Get full pathname for new config file.
+				string fileName = GetConfigPath(configName);
+
+				try
+				{
+					using (StreamWriter textWriter = new StreamWriter(fileName, append: false))
+					{
+						XmlSerializer xmlSerializer = new XmlSerializer(typeof(BOBConfigurationFile));
+
+						BOBConfigurationFile blankFile = new BOBConfigurationFile();
+
+						// Write to file.
+						xmlSerializer.Serialize(textWriter, blankFile);
+					}
+				}
+				catch (Exception e)
+				{
+					Logging.LogException(e, "exception saving XML configuration file ", fileName ?? "null");
+				}
+			}
+		}
+
 
 		/// <summary>
 		/// Saves current configuration to the current configuration file; will default to general configuration file if CurrentSavedConfigName is null.
@@ -153,8 +183,7 @@ namespace BOB
 		/// Save current configuration to the specified config file.
 		/// </summary>
 		/// <param name="config">Configuration file name; null for default file (default null)</param>
-		/// <param name="clean">Set to true to generate a blank file (default false)</param>
-		internal static void SaveConfig(string config = null, bool clean = false)
+		internal static void SaveConfig(string config = null)
 		{
 			// Default file location is the general config file.
 			string fileName = GeneralConfigFile;
@@ -164,12 +193,8 @@ namespace BOB
 				// Check if we've got an assigned custom config.
 				if (config != null)
 				{
-					// Custom config assigned - use this filename in the configuration settings directory (creating directory if it doesn't already exist).
-					if (!Directory.Exists(ConfigDirectory))
-					{
-						Directory.CreateDirectory(ConfigDirectory);
-					}
-					fileName = FullConfigPath(config);
+					// Get full filepath.
+					fileName = GetConfigPath(config);
 				}
 
 				// Open specified file.
@@ -180,48 +205,34 @@ namespace BOB
 					// Create new config if there isn't one.
 					if (CurrentConfig == null)
 					{
-						CurrentConfig = new BOBConfigurationFile
-						{
-							// Version 1.
-							version = 1
-						};
+						CurrentConfig = new BOBConfigurationFile();
 					}
 
-					// Don't populate file if we're doing a clean save.
-					if (!clean)
+					// Serialise scales.
+					try
 					{
-						// Serialise scales.
-						try
-						{
-							CurrentConfig.propScales = Scaling.Instance.propScales.Values.ToList();
-							CurrentConfig.treeScales = Scaling.Instance.treeScales.Values.ToList();
-						}
-						catch (Exception e)
-						{
-							// Don't let a single failure stop us.
-							Logging.LogException(e, "exception serializing scaling elements");
-						}
+						CurrentConfig.propScales = Scaling.Instance.propScales.Values.ToList();
+						CurrentConfig.treeScales = Scaling.Instance.treeScales.Values.ToList();
+					}
+					catch (Exception e)
+					{
+						// Don't let a single failure stop us.
+						Logging.LogException(e, "exception serializing scaling elements");
+					}
 
-						// Serialise active replacement packs.
-						try
-						{
-							CurrentConfig.activePacks = NetworkPackReplacement.Instance.SerializeActivePacks();
-						}
-						catch (Exception e)
-						{
-							// Don't let a single failure stop us.
-							Logging.LogException(e, "exception serializing active replacement packs");
-						}
+					// Serialise active replacement packs.
+					try
+					{
+						CurrentConfig.activePacks = NetworkPackReplacement.Instance.SerializeActivePacks();
+					}
+					catch (Exception e)
+					{
+						// Don't let a single failure stop us.
+						Logging.LogException(e, "exception serializing active replacement packs");
 					}
 
 					// Write to file.
 					xmlSerializer.Serialize(textWriter, CurrentConfig);
-
-					// Delete any old config.
-					if (File.Exists(GeneralConfigName))
-                    {
-						File.Delete(GeneralConfigName);
-                    }
 				}
 			}
 			catch (Exception e)
@@ -474,10 +485,28 @@ namespace BOB
 
 
 		/// <summary>
+		/// Returns the full filepath to the given config file, creating the config directory if it doesn't already exist.
+		/// </summary>
+		/// <param name="configName"></param>
+		/// <returns></returns>
+		private static string GetConfigPath(string configName)
+		{
+			// Check if config directory exists, 
+			if (!Directory.Exists(ConfigDirectory))
+			{
+				// Doesn't exist - create it.
+				Directory.CreateDirectory(ConfigDirectory);
+			}
+
+			return Path.Combine(ConfigDirectory, configName + ".xml");
+		}
+
+
+		/// <summary>
 		/// Returns the absolute filepath of the config file for the given config name.
 		/// </summary>
 		/// <param name="configName">Config filepath</param>
-		/// <returns></returns>
+		/// <returns>Absolute config filepath</returns>
 		private static string FullConfigPath(string configName) => Path.Combine(ConfigDirectory, configName + ".xml");
 	}
 }

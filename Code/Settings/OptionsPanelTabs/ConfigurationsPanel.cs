@@ -221,7 +221,7 @@ namespace BOB
             // Ensure valid current selection and new filename before proceeding.
             if (!string.IsNullOrEmpty(fileNameField.text))
             {
-                ConfigurationUtils.SaveConfig(fileNameField.text, true);
+                ConfigurationUtils.BlankConfig(fileNameField.text);
                 RefreshList();
             }
         }
@@ -237,7 +237,7 @@ namespace BOB
             // Ensure valid current selection and new filename before proceeding.
             if (!string.IsNullOrEmpty(fileNameField.text))
             {
-                ConfigurationUtils.SaveConfig(fileNameField.text, false);
+                ConfigurationUtils.SaveConfig(fileNameField.text);
                 RefreshList();
             }
         }
