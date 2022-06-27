@@ -1,4 +1,5 @@
-﻿- Update generation of blank config files
+﻿- Enable adding props to network lanes with no existing laneprop array
+- Update generation of blank config files
 
 
 Version 0.9.4.4 -

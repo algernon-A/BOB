@@ -100,6 +100,12 @@ namespace BOB
             // Local reference.
             NetInfo.Lane lane = data.NetInfo.m_lanes[data.laneIndex];
 
+            // Make sure lane isn't null.
+            if (lane == null)
+            {
+                return;
+            }
+
             // Add entry to configuration file.
             List<BOBNetReplacement> replacementList = ReplacementEntry(data.NetInfo);
             BOBNetReplacement replacementEntry = replacementList.Find(x => x.propIndex == data.propIndex);
@@ -108,12 +114,6 @@ namespace BOB
                 replacementList.Remove(replacementEntry);
             }
             replacementList.Add(data);
-
-            // Add lane to changed lanes list, if it's not already there.
-            if (!changedNetLanes.ContainsKey(lane))
-            {
-                changedNetLanes.Add(lane, lane.m_laneProps.m_props);
-            }
 
             // Add prop to lane.
             AddProp(data);
@@ -316,14 +316,27 @@ namespace BOB
                 // Lane reference.
                 NetInfo.Lane lane = replacement.NetInfo.m_lanes[replacement.laneIndex];
 
-                // Make sure lane and landeProps isn't null.
-                if (lane?.m_laneProps == null)
+                // Make sure lane isn't null.
+                if (lane == null)
                 {
                     return -1;
                 }
 
+                // Create laneprops array if we need to.
+                if (lane.m_laneProps == null)
+                {
+                    Logging.KeyMessage("creating new NetLaneProps for network ", replacement.NetInfo.name);
+                    lane.m_laneProps = new NetLaneProps();
+                }
+
+                // Add lane to changed lanes list, if it's not already there, recording original values..
+                if (!changedNetLanes.ContainsKey(lane))
+                {
+                    changedNetLanes.Add(lane, lane.m_laneProps.m_props);
+                }
+
                 // Check to see if we've got a current prop array.
-                if (lane?.m_laneProps?.m_props != null)
+                if (lane.m_laneProps.m_props != null)
                 {
                     // Existing m_props array - check that we've got space for another entry.
                     newIndex = lane.m_laneProps.m_props.Length;
@@ -400,6 +413,7 @@ namespace BOB
                 return newIndex;
             }
 
+            // If we got here, it didn't work; return -1.
             return -1;
         }
 
@@ -448,13 +462,6 @@ namespace BOB
 
                 try
                 {
-                    // Creeate record for lane info.
-                    NetInfo.Lane lane = netInfo.m_lanes[replacement.laneIndex];
-                    if (!changedNetLanes.ContainsKey(lane))
-                    {
-                        changedNetLanes.Add(lane, lane.m_laneProps.m_props);
-                    }
-
                     // Assign network info.
                     replacement.parentInfo = netInfo;
 
