@@ -326,7 +326,7 @@ namespace BOB
                 if (lane.m_laneProps == null)
                 {
                     Logging.KeyMessage("creating new NetLaneProps for network ", replacement.NetInfo.name);
-                    lane.m_laneProps = new NetLaneProps();
+                    lane.m_laneProps = ScriptableObject.CreateInstance<NetLaneProps>();
                 }
 
                 // Add lane to changed lanes list, if it's not already there, recording original values..
