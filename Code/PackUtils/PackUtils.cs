@@ -62,54 +62,63 @@ namespace BOB
         /// <returns>Loaded XML configuration file instance (null if failed)</returns>
         internal static List<BOBPackFile> LoadPackFiles()
         {
-            // Return list.
-            List<BOBPackFile> fileList = new List<BOBPackFile>();
-
-            // Hashlist for parsed directories.
-            HashSet<string> parsedDirectories = new HashSet<string>();
-
-            // Iterate through each xml file in directory.
-            string[] fileNames = Directory.GetFiles(AssemblyPath, "*.xml", SearchOption.AllDirectories);
-
-            foreach (string fileName in fileNames)
+            try
             {
-                ReadPackFile(fileName, fileList);
-            }
+                // Return list.
+                List<BOBPackFile> fileList = new List<BOBPackFile>();
 
-            // Iterate through prop asset directories looking for BOB config files.
-            for (uint i = 0; i < PrefabCollection<PropInfo>.LoadedCount(); ++i)
-            {
-                // Get prefab.
-                PropInfo prop = PrefabCollection<PropInfo>.GetLoaded(i);
+                // Hashlist for parsed directories.
+                HashSet<string> parsedDirectories = new HashSet<string>();
 
-                // Skip invalid prefabs.
-                if (prop == null)
+                // Iterate through each xml file in directory.
+                string[] fileNames = Directory.GetFiles(AssemblyPath, "*.xml", SearchOption.AllDirectories);
+
+                foreach (string fileName in fileNames)
                 {
-                    continue;
+                    ReadPackFile(fileName, fileList);
                 }
 
-                // Try to find filesystem path for this asset.
-                Package.Asset asset = PackageManager.FindAssetByName(prop.name);
-
-                // Local reference.
-                string directory = asset?.package?.packagePath;
-
-                // Don't do anything if invalid directory.
-                if (directory != null)
+                // Iterate through prop asset directories looking for BOB config files.
+                for (uint i = 0; i < PrefabCollection<PropInfo>.LoadedCount(); ++i)
                 {
-                    // Skip directories we've already parsed.
-                    if (!parsedDirectories.Contains(directory))
-                    {
-                        // Look for BOB pack file attached to asset.
-                        ReadPackFile(Path.Combine(Path.GetDirectoryName(asset.package.packagePath), "BOBPack.xml"), fileList);
+                    // Get prefab.
+                    PropInfo prop = PrefabCollection<PropInfo>.GetLoaded(i);
 
-                        // Record package path in Hashset.
-                        parsedDirectories.Add(directory);
+                    // Skip invalid prefabs.
+                    if (prop == null)
+                    {
+                        continue;
+                    }
+
+                    // Try to find filesystem path for this asset.
+                    Package.Asset asset = PackageManager.FindAssetByName(prop.name);
+
+                    // Local reference.
+                    string directory = asset?.package?.packagePath;
+
+                    // Don't do anything if invalid directory.
+                    if (directory != null)
+                    {
+                        // Skip directories we've already parsed.
+                        if (!parsedDirectories.Contains(directory))
+                        {
+                            // Look for BOB pack file attached to asset.
+                            ReadPackFile(Path.Combine(Path.GetDirectoryName(asset.package.packagePath), "BOBPack.xml"), fileList);
+
+                            // Record package path in Hashset.
+                            parsedDirectories.Add(directory);
+                        }
                     }
                 }
-            }
 
-            return fileList;
+                return fileList;
+            }
+            catch (Exception e)
+            {
+                // If an exception occured, we'll return a new empty list rather than null.
+                Logging.LogException(e, "exception reading replacement pack files");
+                return new List<BOBPackFile>();
+            }
         }
 
 

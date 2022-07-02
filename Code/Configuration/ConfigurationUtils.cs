@@ -74,12 +74,13 @@ namespace BOB
 					// Read it.
 					using (StreamReader reader = new StreamReader(fileName))
 					{
+						Logging.KeyMessage("loading configuration file ", fileName);
 						CurrentConfig = (BOBConfigurationFile)new XmlSerializer(typeof(BOBConfigurationFile)).Deserialize(reader);
 
 						// If we couldn't read it, log error and create new empty config.
 						if (CurrentConfig == null)
 						{
-							Logging.Error("couldn't deserialize settings file");
+							Logging.Error("couldn't deserialize XML configuration file");
 							CurrentConfig = new BOBConfigurationFile();
 							return;
 						}
@@ -200,11 +201,13 @@ namespace BOB
 				// Open specified file.
 				using (StreamWriter textWriter = new StreamWriter(fileName, append: false))
 				{
+					Logging.KeyMessage("saving configuration file ", fileName);
 					XmlSerializer xmlSerializer = new XmlSerializer(typeof(BOBConfigurationFile));
 
 					// Create new config if there isn't one.
 					if (CurrentConfig == null)
 					{
+						Logging.Message("CurrentConfig was null; generating new configuration");
 						CurrentConfig = new BOBConfigurationFile();
 					}
 
