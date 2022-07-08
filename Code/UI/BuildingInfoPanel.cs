@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using ColossalFramework;
 using ColossalFramework.UI;
 
 
@@ -460,6 +461,14 @@ namespace BOB
 						thisProp.m_fixedHeight = originalValues[i].fixedHeight;
 					}
 				}
+
+				// Update prefab via simulation thread.
+				BuildingInfo thisBuilding = currentBuilding;
+				Singleton<SimulationManager>.instance.AddAction(() =>
+				{
+					// Update building.
+					BuildingData.UpdateBuilding(thisBuilding);
+				});
 			}
 
 			// Clear recorded values.
@@ -1047,24 +1056,37 @@ namespace BOB
 				return;
 			}
 
-			// Preview new position, probability, rotation, and fixed height setting.
-			thisProp.m_position = basePosition + new Vector3(xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue);
-			thisProp.m_probability = (int)probabilitySlider.TrueValue;
-			thisProp.m_fixedHeight = customHeightCheck.isChecked;
-			thisProp.m_radAngle = baseAngle + (angleSlider.TrueValue * Mathf.Deg2Rad);
-
-			// If a replacement prefab has been selected, then update it too.
-			if (ReplacementPrefab != null)
+			// Update prefab via simulation thread.
+			BuildingInfo thisBuilding = currentBuilding;
+			PrefabInfo thisReplacement = ReplacementPrefab;
+			Vector3 thisPosition = basePosition + new Vector3(xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue);
+			int thisProbability = (int)probabilitySlider.TrueValue;
+			bool thisFixedHeight = customHeightCheck.isChecked;
+			float thisRadAngle = baseAngle + (angleSlider.TrueValue * Mathf.Deg2Rad);
+			Singleton<SimulationManager>.instance.AddAction(() =>
 			{
-				thisProp.m_prop = ReplacementPrefab as PropInfo;
-				thisProp.m_tree = ReplacementPrefab as TreeInfo;
-				thisProp.m_finalProp = ReplacementPrefab as PropInfo;
-				thisProp.m_finalTree = ReplacementPrefab as TreeInfo;
+				// Preview new position, probability, rotation, and fixed height setting.
+				thisProp.m_position = thisPosition;
+				thisProp.m_probability = thisProbability;
+				thisProp.m_fixedHeight = thisFixedHeight;
+				thisProp.m_radAngle = thisRadAngle;
 
-				// Update highlighting target.
-				RenderOverlays.CurrentProp = ReplacementPrefab as PropInfo;
-				RenderOverlays.CurrentTree = ReplacementPrefab as TreeInfo;
-			}
+				// If a replacement prefab has been selected, then update it too.
+				if (thisReplacement != null)
+				{
+					thisProp.m_prop = thisReplacement as PropInfo;
+					thisProp.m_tree = thisReplacement as TreeInfo;
+					thisProp.m_finalProp = thisReplacement as PropInfo;
+					thisProp.m_finalTree = thisReplacement as TreeInfo;
+				}
+
+				// Update renders.
+				BuildingData.UpdateBuilding(thisBuilding);
+			});
+
+			// Update highlighting target.
+			RenderOverlays.CurrentProp = thisReplacement as PropInfo;
+			RenderOverlays.CurrentTree = thisReplacement as TreeInfo;
 
 			// Update apply button icon to indicate change.
 			UnappliedChanges = true;

@@ -39,6 +39,59 @@ namespace BOB
 
 
         /// <summary>
+        /// Refreshes building prefabs and renders for the specified building prefab.
+        /// Should only be called via simulation thread.
+        /// </summary>
+        /// <param name="prefab">Building prefab to update</param>
+        internal static void UpdateBuilding(BuildingInfo prefab)
+        {
+            // Hashset of render group coordinates to update.
+            HashSet<KeyValuePair<int, int>> groupHash = new HashSet<KeyValuePair<int, int>>();
+
+            // Local references.
+            BuildingManager buildingManager = Singleton<BuildingManager>.instance;
+            RenderManager renderManager = Singleton<RenderManager>.instance;
+            Building[] buildings = buildingManager.m_buildings.m_buffer;
+
+            // Need to do this for each building instance, so iterate through all buildings.
+            for (ushort i = 0; i < buildings.Length; ++i)
+            {
+                // Check that this is a valid building in the dirty list.
+                if (buildings[i].m_flags != Building.Flags.None && buildings[i].Info == prefab)
+                {
+                    // Update building instance.
+                    renderManager.UpdateInstance(i);
+
+                    // Update parking spaces.
+                    if (buildings[i].Info.m_hasParkingSpaces != 0)
+                    {
+                        buildingManager.UpdateParkingSpaces(i, ref buildings[i]);
+                    }
+
+                    // Calculate building render group.
+                    Vector3 position = buildings[i].m_position;
+                    int num = Mathf.Clamp((int)(position.x / 64f + 135f), 0, 269);
+                    int num2 = Mathf.Clamp((int)(position.z / 64f + 135f), 0, 269);
+                    int x = num * 45 / 270;
+                    int z = num2 * 45 / 270;
+
+                    // Add render group coordinates to hashlist (ignore if already there).
+                    groupHash.Add(new KeyValuePair<int, int>(x, z));
+                }
+            }
+            // Iterate through each key in group.
+            foreach (KeyValuePair<int, int> keyPair in groupHash)
+            {
+                // Update group render (all 31 layers, since we've got all kinds of mismatches with replacements).
+                for (int i = 0; i < 31; ++i)
+                {
+                    Singleton<RenderManager>.instance.UpdateGroup(keyPair.Key, keyPair.Value, i);
+                }
+            }
+        }
+
+
+        /// <summary>
         /// Refreshes building prefabs and renders for all 'dirty' buildings.
         /// Should only be called via simulation thread.
         /// </summary>
