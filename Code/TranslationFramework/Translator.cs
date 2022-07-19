@@ -1,90 +1,13 @@
-﻿using System;
+﻿using ColossalFramework;
+using ColossalFramework.Globalization;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Collections.Generic;
-using ColossalFramework;
-using ColossalFramework.Globalization;
 
 
 namespace BOB
 {
-    /// <summary>
-    /// Static class to provide translation interface.
-    /// </summary>
-    public static class Translations
-    {
-        // Instance reference.
-        private static Translator _translator;
-
-
-        /// <summary>
-        /// Static interface to instance's translate method.
-        /// </summary>
-        /// <param name="text">Key to translate</param>
-        /// <returns>Translation (or key if translation failed)</returns>
-        public static string Translate(string key) => Instance.Translate(key);
-
-        public static string CurrentLanguage
-        {
-            get
-            {
-                return Instance.CurrentLanguage;
-            }
-            set
-            {
-                Instance.SetLanguage(value);
-            }
-        }
-
-        /// <summary>
-        /// Static interface to instance's language list property.
-        /// Returns an alphabetically-sorted (by unique name) string array of language display names, with an additional "system settings" item as the first item.
-        /// Useful for automatically populating drop-down language selection menus; works in conjunction with Index.
-        /// </summary>
-        public static string[] LanguageList => Instance.LanguageList;
-
-
-        /// <summary>
-        /// The current language index number (equals the index number of the language names list provied by LanguageList).
-        /// Useful for easy automatic drop-down language selection menus, working in conjunction with LanguageList:
-        /// Set to set the language to the equivalent LanguageList index.
-        /// Get to return the LanguageList index of the current languge.
-        /// </summary>
-        public static int Index
-        {
-            // Internal index is one less than here.
-            // I.e. internal index is -1 for system and 0 for first language, here we want 0 for system and 1 for first language.
-            // So we add one when getting and subtract one when setting.
-            get
-            {
-                return Instance.Index + 1;
-            }
-            set
-            {
-                Instance.SetLanguage(value - 1);
-            }
-        }
-
-
-        /// <summary>
-        /// On-demand initialisation of translator.
-        /// </summary>
-        /// <returns>Translator instance</returns>
-        private static Translator Instance
-        {
-            get
-            {
-                if (_translator == null)
-                {
-                    _translator = new Translator();
-                }
-
-                return _translator;
-            }
-        }
-    }
-
-
     /// <summary>
     /// Handles translations.  Framework by algernon, based off BloodyPenguin's framework.
     /// </summary>
@@ -92,8 +15,11 @@ namespace BOB
     {
         private Language systemLanguage = null;
         private readonly SortedList<string, Language> languages;
-        private readonly string defaultLanguage = "en";
+        private readonly string defaultLanguage = "en-EN";
         private int currentIndex = -1;
+
+        // Last recorded system language.
+        private string systemLangaugeCode;
 
 
         /// <summary>
@@ -106,7 +32,7 @@ namespace BOB
         /// <summary>
         /// Returns the current language code if one has specifically been set; otherwise, return "default".
         /// </summary>
-        public string CurrentLanguage => currentIndex < 0 ? "default" : languages.Values[currentIndex].uniqueName;
+        public string CurrentLanguage => currentIndex < 0 ? "default" : languages.Values[currentIndex].code;
 
 
         /// <summary>
@@ -114,8 +40,6 @@ namespace BOB
         /// </summary>
         public void UpdateUILanguage()
         {
-            Logging.Message("setting language to ", currentIndex < 0 ? "system" : languages.Values[currentIndex].uniqueName);
-
             // UI update code goes here.
 
             // TOOO:  Add dynamic UI update.
@@ -153,8 +77,8 @@ namespace BOB
             // Load translation files.
             LoadLanguages();
 
-            // Event handler to update the current language when system locale changes.
-            LocaleManager.eventLocaleChanged += SetSystemLanguage;
+            // Set initial system language reference.
+            systemLangaugeCode = string.Empty;
         }
 
 
@@ -167,16 +91,14 @@ namespace BOB
         {
             Language currentLanguage;
 
-
             // Check to see if we're using system settings.
             if (currentIndex < 0)
             {
-                // Using system settings - initialise system language if we haven't already.
-                if (systemLanguage == null)
+                // Using system settings - initialise system language if we haven't already, or if the system language has changed since last time.
+                if (LocaleManager.exists & (LocaleManager.instance.language != systemLangaugeCode | systemLanguage == null))
                 {
                     SetSystemLanguage();
                 }
-
                 currentLanguage = systemLanguage;
             }
             else
@@ -195,10 +117,9 @@ namespace BOB
                 }
                 else
                 {
-                    Logging.Message("no translation for language ", currentLanguage.uniqueName, " found for key " + key);
-
-                    // Attempt fallack translation.
-                    return FallbackTranslation(currentLanguage.uniqueName, key);
+                    // Lookup failed - fallack translation.
+                    Logging.Message("no translation for language ", currentLanguage.code, " found for key " + key);
+                    return FallbackTranslation(currentLanguage.code, key);
                 }
             }
             else
@@ -225,20 +146,16 @@ namespace BOB
                     // Get new locale id.
                     string newLanguageCode = LocaleManager.instance.language;
 
-                    // Check to see if we have a translation for this language code; if not, we revert to default.
-                    if (!languages.ContainsKey(newLanguageCode))
-                    {
-                        newLanguageCode = defaultLanguage;
-                    }
-
                     // If we've already been set to this locale, do nothing.
-                    if (systemLanguage != null && systemLanguage.uniqueName == newLanguageCode)
+                    if (systemLanguage != null & systemLangaugeCode == newLanguageCode)
                     {
                         return;
                     }
 
                     // Set the new system language,
-                    systemLanguage = languages[newLanguageCode];
+                    Logging.Message("game language is ", newLanguageCode);
+                    systemLangaugeCode = newLanguageCode;
+                    systemLanguage = FindLanguage(newLanguageCode);
 
                     // If we're using system language, update the UI.
                     if (currentIndex < 0)
@@ -263,10 +180,44 @@ namespace BOB
 
         /// <summary>
         /// Sets the current language to the provided language code.
-        /// If the key isn't in the list of loaded translations, then the system default is assigned instead(IndexOfKey returns -1 if key not found).
+        /// If the key isn't in the list of loaded translations, then the system default is assigned instead.
         /// </summary>
-        /// <param name="uniqueName">Language unique name (code)</param>
-        public void SetLanguage(string uniqueName) => SetLanguage(languages.IndexOfKey(uniqueName));
+        /// <param name="languageCode">Language code</param>
+        public void SetLanguage(string languageCode)
+        {
+            Logging.Message("setting language to ", languageCode);
+
+            // Default (game) language.
+            if (languageCode == "default")
+            {
+                SetLanguage(-1);
+                return;
+            }
+
+            // Try for direct match.
+            if (languages.ContainsKey(languageCode))
+            {
+                SetLanguage(languages.IndexOfKey(languageCode));
+                return;
+            }
+
+            // No direct match found - attempt to find any other suitable translation file (code matches first two letters).
+            string shortCode = languageCode.Substring(0, 2);
+            foreach (KeyValuePair<string, Language> entry in languages)
+            {
+                if (entry.Key.StartsWith(shortCode))
+                {
+                    // Found an alternative.
+                    Logging.Message("using language ", entry.Key, " as replacement for unknown language code ", languageCode);
+                    SetLanguage(languages.IndexOfKey(entry.Key));
+                    return;
+                }
+            }
+
+            // If we got here, no match was found; revert to system language.
+            Logging.Message("no suitable translation file for language ", languageCode, " was found; reverting to game default");
+            SetLanguage(-1);
+        }
 
 
         /// <summary>
@@ -295,45 +246,60 @@ namespace BOB
 
 
         /// <summary>
+        /// Attempts to find the most appropriate translation file for the specified language code.
+        /// An exact match is attempted first; then a match with the first available language with the same two intial characters.
+        /// e.g. 'zh' will match to 'zh', 'zh-CN' or 'zh-TW' (in that order), or 'zh-CN' will match to 'zh-CN', 'zh' or 'zh-TW' (in that order).
+        /// If no match is made,the default language will be returned.
+        /// </summary>
+        /// <param name="languageCode">Language code to match</param>
+        /// <returns>Matched language code correspondign to a loaded translation file</returns>
+        private Language FindLanguage(string languageCode)
+        {
+            // First attempt to find the language code as-is.
+            if (languages.TryGetValue(languageCode, out Language language))
+            {
+                return language;
+            }
+
+            // If that fails, take the first two characters of the provided code and match with the first language code we have starting with those two letters.
+            // This will automatically prioritise any translations with only two letters (e.g. 'en' takes priority over 'en-US'),
+            KeyValuePair<string, Language> firstMatch = languages.FirstOrDefault(x => x.Key.StartsWith(languageCode.Substring(0, 2)));
+            if (!string.IsNullOrEmpty(firstMatch.Key))
+            {
+                // Found one - return translation.
+                Logging.KeyMessage("using translation file ", firstMatch.Key, " for language ", languageCode);
+                return firstMatch.Value;
+            }
+
+            // Fall back to default language.
+            Logging.Error("no translation file found for language ", languageCode, "; reverting to ", defaultLanguage);
+            return languages[defaultLanguage];
+        }
+
+
+        /// <summary>
         /// Attempts to find a fallback language translation in case the primary one fails (for whatever reason).
-        /// First tries a shortened version of the current reference (e.g. zh-tw -> zh), then system language, then default language.
-        /// If all that fails, it just returns the raw key.
         /// </summary>
         /// <param name="attemptedLanguage">Language code that was previously attempted</param>
         /// <returns>Fallback translation if successful, or raw key if failed</returns>
         private string FallbackTranslation(string attemptedLanguage, string key)
         {
-            // First check to see if there is a shortened version of this language id (e.g. zh-tw -> zh).
-            if (attemptedLanguage.Length > 2)
-            {
-                string newName = attemptedLanguage.Substring(0, 2);
-
-                if (languages.ContainsKey(newName))
-                {
-                    Language fallbackLanguage = languages[newName];
-                    if (fallbackLanguage.translationDictionary.ContainsKey(key))
-                    {
-                        // All good!  Return translation.
-                        return fallbackLanguage.translationDictionary[key];
-                    }
-                }
-            }
-
-            // Secondly, try to use system language if we're not already doing so.
-            if (currentIndex > 0 && systemLanguage != null && attemptedLanguage != systemLanguage.uniqueName)
-            {
-                if (systemLanguage.translationDictionary.ContainsKey(key))
-                {
-                    // All good!  Return translation.
-                    return systemLanguage.translationDictionary[key];
-                }
-            }
-
-            // Final attempt - try default language.
             try
             {
-                Language fallbackLanguage = languages[defaultLanguage];
-                return fallbackLanguage.translationDictionary[key];
+                // Attempt to find any other suitable translation file (code matches first two letters).
+                string shortCode = attemptedLanguage.Substring(0, 2);
+                foreach (KeyValuePair<string, Language> entry in languages)
+                {
+                    if (entry.Key.StartsWith(shortCode) && entry.Value.translationDictionary.TryGetValue(key, out string result))
+                    {
+                        // Found an alternative.
+                        return result;
+                    }
+                }
+
+                // No alternative was found - return default language.
+                return languages[defaultLanguage].translationDictionary[key];
+
             }
             catch (Exception e)
             {
@@ -355,7 +321,7 @@ namespace BOB
             languages.Clear();
 
             // Get the current assembly path and append our locale directory name.
-            string assemblyPath = ModUtils.GetAssemblyPath();
+            string assemblyPath = ModUtils.AssemblyPath;
             if (!assemblyPath.IsNullOrWhiteSpace())
             {
                 string localePath = Path.Combine(assemblyPath, "Translations");
@@ -378,7 +344,11 @@ namespace BOB
                         using (StreamReader reader = new StreamReader(fileStream))
                         {
                             // Create new language instance for this file.
-                            Language thisLanguage = new Language();
+                            Language thisLanguage = new Language
+                            {
+                                // Language code is filename.
+                                code = Path.GetFileNameWithoutExtension(translationFile),
+                            };
                             string key = null;
                             bool quoting = false;
 
@@ -436,27 +406,26 @@ namespace BOB
                                             // Does this value start with a quotation mark?
                                             if (value.StartsWith("\""))
                                             {
-                                                // Starts with quotation mark - if it also ends in a quotation mark, strip both quotation marks.
-                                                if (value.EndsWith("\""))
+                                                // Yes - trim starting quotation mark.
+                                                value = value.Substring(1);
+
+                                                // Find closing quote, if any.
+                                                int quotePos = value.IndexOf("\"");
+                                                if (quotePos > 0)
                                                 {
-                                                    value = value.Substring(1, value.Length - 2);
+                                                    // Closing quote found - trim off remainder of string.
+                                                    value = value.Substring(0, quotePos);
                                                 }
                                                 else
                                                 {
-                                                    // Doesn't end in a quotation mark, so we've (presumably) got a multi-line quoted entry
+                                                    // Doesn't have a quotation mark, so we've (presumably) got a multi-line quoted entry.
                                                     // Flag quoting mode and set initial value to start of quoted string (less leading quotation mark), plus trailing newline.
                                                     quoting = true;
-                                                    value = value.Substring(1) + Environment.NewLine;
+                                                    value = value + Environment.NewLine;
                                                 }
                                             }
 
-                                            // Check for reserved keywords.
-                                            if (key.Equals(Language.CodeKey))
-                                            {
-                                                // Language code.
-                                                thisLanguage.uniqueName = value;
-                                            }
-                                            else if (key.Equals(Language.NameKey))
+                                            if (key.Equals(Language.NameKey))
                                             {
                                                 // Language readable name.
                                                 thisLanguage.readableName = value;
@@ -494,16 +463,25 @@ namespace BOB
                             }
 
                             // Did we get a valid dictionary from this?
-                            if (thisLanguage.uniqueName != null && thisLanguage.readableName != null && thisLanguage.translationDictionary.Count > 0)
+                            if (thisLanguage.code != null && thisLanguage.translationDictionary.Count > 0)
                             {
                                 // Yes - add to languages dictionary.
-                                if (!languages.ContainsKey(thisLanguage.uniqueName))
+
+                                // If we didn't get a readable name, use the key instead.
+                                if (thisLanguage.readableName.IsNullOrWhiteSpace())
                                 {
-                                    languages.Add(thisLanguage.uniqueName, thisLanguage);
+                                    thisLanguage.readableName = thisLanguage.code;
+                                }
+
+                                // Check for duplicates.
+                                if (!languages.ContainsKey(thisLanguage.code))
+                                {
+                                    Logging.Message("found translation file ", translationFile, " with language ", thisLanguage.code, " (", thisLanguage.readableName, ")");
+                                    languages.Add(thisLanguage.code, thisLanguage);
                                 }
                                 else
                                 {
-                                    Logging.Error("duplicate translation file for language ", thisLanguage.uniqueName);
+                                    Logging.Error("duplicate translation file for language ", thisLanguage.code);
                                 }
                             }
                             else

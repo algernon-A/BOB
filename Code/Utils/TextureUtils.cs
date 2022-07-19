@@ -156,7 +156,7 @@ namespace BOB
 		/// <returns>Read-only file stream</returns>
 		private static Stream OpenResourceFile(string fileName)
 		{
-			string path = Path.Combine(ModUtils.GetAssemblyPath(), "Resources");
+			string path = Path.Combine(ModUtils.AssemblyPath, "Resources");
 			return File.OpenRead(Path.Combine(path, fileName));
 		}
 	}
