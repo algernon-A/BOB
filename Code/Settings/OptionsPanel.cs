@@ -1,7 +1,8 @@
-﻿using System;
-using UnityEngine;
+﻿using ColossalFramework.Globalization;
 using ColossalFramework.UI;
-using ColossalFramework.Globalization;
+using ICities;
+using System;
+using UnityEngine;
 
 
 namespace BOB
@@ -18,6 +19,18 @@ namespace BOB
         // Instance reference.
         private static GameObject optionsGameObject;
         internal static bool IsOpen => optionsGameObject != null;
+
+
+        /// <summary>
+        /// Options panel setup.
+        /// </summary>
+        /// <param name="helper">UIHelperBase parent</param>
+        internal static void Setup(UIHelperBase helper)
+        {
+            // Set up tab strip and containers.
+            optionsPanel = ((UIHelper)helper).self as UIScrollablePanel;
+            optionsPanel.autoLayout = false;
+        }
 
 
         /// <summary>

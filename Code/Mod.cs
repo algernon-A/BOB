@@ -61,9 +61,8 @@ namespace BOB
         /// </summary>
         public void OnSettingsUI(UIHelperBase helper)
         {
-            // Setup options panel reference.
-            OptionsPanel.optionsPanel = ((UIHelper)helper).self as UIScrollablePanel;
-            OptionsPanel.optionsPanel.autoLayout = false;
+            // Create options panel.
+            OptionsPanel.Setup(helper);
         }
     }
 }
