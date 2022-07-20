@@ -1,8 +1,8 @@
 "LANGUAGE","English"
 "BOB_NAM","BOB: the tree and prop replacer"
 "BOB_DESC","UNDER DEVELOPMENT: Replaces trees and props."
-"TRN_CHOICE","Set language"
-"TRN_SYS","Use game language"
+"TRN_CHOICE","Set language","This should be ignored"
+TRN_SYS,Use game language, So Should THis
 "MES_CLS","Close"
 "MES_DSA","Don't show again"
 "BOB_MBX_OK","OK"
