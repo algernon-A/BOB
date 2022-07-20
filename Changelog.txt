@@ -1,5 +1,6 @@
 ﻿- Enable adding props to network lanes with no existing laneprop array
 - Update generation of blank config files
+- Update translation framework
 
 
 Version 0.9.4.4 -
