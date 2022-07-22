@@ -39,7 +39,7 @@ namespace BOB
 		/// <param name="targetInfo">Target prop/tree prefab</param>
 		/// <param name="propIndex">Target prop/tree index (unused)</param>
 		/// <returns>Currently-applied replacement (null if none)</returns>
-		internal override BOBBuildingReplacement EligibileReplacement(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex) => ReplacementList(buildingInfo)?.Find(x => x.target.Equals(targetInfo.name));
+		internal override BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex) => ReplacementList(buildingInfo)?.Find(x => x.target.Equals(targetInfo.name));
 
 
 		/// <summary>
@@ -113,7 +113,7 @@ namespace BOB
 						{
 							// Match!  Find and return the replacement record.
 							propReference = propRef;
-							return EligibileReplacement(buildingInfo, key.Key, propRef.propIndex);
+							return ActiveReplacement(buildingInfo, key.Key, propRef.propIndex);
 						}
 					}
 				}

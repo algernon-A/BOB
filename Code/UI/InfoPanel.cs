@@ -162,6 +162,9 @@ namespace BOB
 
 				// Don't show angle slider for trees.
 				anglePanel.isVisible = !(value?.CurrentPrefab is TreeInfo);
+
+				// Record original stats for preview.
+				RecordOriginal();
 			}
 		}
 
@@ -192,6 +195,9 @@ namespace BOB
 						RenderOverlays.CurrentBuilding = null;
 						RenderOverlays.CurrentNet = null;
 					}
+
+					// Record original stats for preview.
+					RecordOriginal();
 				}
 			}
 		}
@@ -363,6 +369,12 @@ namespace BOB
 		/// Removes an added tree or prop.
 		/// </summary>
 		protected abstract void RemoveProp();
+
+
+		/// <summary>
+		/// Record original prop values before previewing.
+		/// </summary>
+		protected abstract void RecordOriginal();
 
 
 		/// <summary>

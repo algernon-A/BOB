@@ -42,7 +42,7 @@ namespace BOB
 		/// <param name="laneIndex">Lane number</param>
 		/// <param name="propIndex">Prop index number</param>
 		/// <returns>Currently-applied individual network replacement (null if none)</returns>
-		internal override BOBNetReplacement EligibileReplacement(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex) => ReplacementList(netInfo)?.Find(x => x.targetInfo == targetInfo);
+		internal override BOBNetReplacement ActiveReplacement(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex) => ReplacementList(netInfo)?.Find(x => x.targetInfo == targetInfo);
 
 
 		/// <summary>
@@ -117,7 +117,7 @@ namespace BOB
 						{
 							// Match!  Find and return the replacement record.
 							propReference = propRef;
-							return EligibileReplacement(netInfo, key.Key, propRef.laneIndex, propRef.propIndex);
+							return ActiveReplacement(netInfo, key.Key, propRef.laneIndex, propRef.propIndex);
 						}
 					}
 				}

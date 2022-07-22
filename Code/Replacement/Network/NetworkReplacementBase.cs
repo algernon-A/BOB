@@ -24,7 +24,7 @@ namespace BOB
 		/// <param name="laneIndex">Lane number</param>
 		/// <param name="propIndex">Prop index number</param>
 		/// <returns>Currently-applied feplacement (null if none)</returns>
-		internal abstract BOBNetReplacement EligibileReplacement(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex);
+		internal abstract BOBNetReplacement ActiveReplacement(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex);
 
 
 		/// <summary>
@@ -35,7 +35,7 @@ namespace BOB
 		/// <param name="laneIndex">Targeted lane index (in parent network)</param>
 		/// <param name="propIndex">Targeted prop index (in lanme)</param>
 		/// <returns>List of active prop references for the given replacment values (null if none)</returns>
-		internal virtual List<NetPropReference> ReferenceList(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex) => EligibileReplacement(netInfo, targetInfo, laneIndex, propIndex)?.references;
+		internal virtual List<NetPropReference> ReferenceList(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex) => ActiveReplacement(netInfo, targetInfo, laneIndex, propIndex)?.references;
 
 
 		/// <summary>
@@ -124,7 +124,7 @@ namespace BOB
 			List<BOBNetReplacement> replacementsList = ReplacementEntry(netInfo);
 
 			// Get current replacement after reversion above.
-			BOBNetReplacement thisReplacement = EligibileReplacement(netInfo, targetInfo, laneIndex, propIndex);
+			BOBNetReplacement thisReplacement = ActiveReplacement(netInfo, targetInfo, laneIndex, propIndex);
 
 			// Create new replacement list entry if none already exists.
 			if (thisReplacement == null)
@@ -166,7 +166,7 @@ namespace BOB
 		/// <param name="laneIndex">Targeted (original) tree/prop lane index</param>
 		/// <param name="propIndex">Targeted (original) tree/prop prop index</param>
 		/// <param name="removeEntries">True to remove the reverted entries from the list of replacements, false to leave the list unchanged</param>
-		internal void Revert(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex, bool removeEntries) => Revert(EligibileReplacement(netInfo, targetInfo, laneIndex, propIndex), removeEntries);
+		internal void Revert(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex, bool removeEntries) => Revert(ActiveReplacement(netInfo, targetInfo, laneIndex, propIndex), removeEntries);
 
 
 		/// <summary>
@@ -180,7 +180,7 @@ namespace BOB
 		internal bool Restore(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex)
 		{
 			// See if we have a relevant replacement record.
-			BOBNetReplacement thisReplacement = EligibileReplacement(netInfo, targetInfo, laneIndex, propIndex);
+			BOBNetReplacement thisReplacement = ActiveReplacement(netInfo, targetInfo, laneIndex, propIndex);
 			if (thisReplacement != null)
 			{
 				// Yes - add reference data to the list.

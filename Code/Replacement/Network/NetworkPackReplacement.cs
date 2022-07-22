@@ -50,7 +50,7 @@ namespace BOB
 		/// <param name="laneIndex">Lane number</param>
 		/// <param name="propIndex">Prop index number</param>
 		/// <returns>Currently-applied individual network replacement (null if none)</returns>
-		internal override BOBNetReplacement EligibileReplacement(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex) => ActiveReplacement(netInfo, laneIndex, propIndex, out _);
+		internal override BOBNetReplacement ActiveReplacement(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex) => ActiveReplacement(netInfo, laneIndex, propIndex, out _);
 
 
 		/// <summary>

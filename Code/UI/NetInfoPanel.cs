@@ -22,7 +22,7 @@ namespace BOB
 		private NetTargetListItem currentNetItem;
 
 		// Original selection values.
-		private NetPropReference[] originalValues;
+		private List<NetPropReference> originalValues = new List<NetPropReference>();
 
 		// Panel components.
 		private UIDropDown laneMenu;
@@ -98,16 +98,13 @@ namespace BOB
 				// First, undo any preview.
 				RevertPreview();
 
+				// Set net item reference.
+				currentNetItem = value as NetTargetListItem;
+
 				// Call base, while ignoring replacement prefab change live application.
 				ignoreSelectedPrefabChange = true;
 				base.CurrentTargetItem = value;
 				ignoreSelectedPrefabChange = false;
-
-				// Set net item reference.
-				currentNetItem = value as NetTargetListItem;
-
-				// Record original stats for preview.
-				RecordOriginal();
 
 				// Ensure valid selections before proceeding.
 				if (currentNetItem != null && SelectedNet != null)
@@ -131,7 +128,7 @@ namespace BOB
 					else if (CurrentTargetItem.individualPrefab != null)
 					{
 						// Use IndividualIndex and IndividualLane to handle case of switching from individual to grouped props (values will be -1, actual values in relevant lists).
-						SetSliders(IndividualNetworkReplacement.Instance.EligibileReplacement(SelectedNet, CurrentTargetItem.originalPrefab, IndividualLane, IndividualIndex));
+						SetSliders(IndividualNetworkReplacement.Instance.ActiveReplacement(SelectedNet, CurrentTargetItem.originalPrefab, IndividualLane, IndividualIndex));
 
 						// All done here.
 						return;
@@ -140,7 +137,7 @@ namespace BOB
 					else if (CurrentTargetItem.replacementPrefab != null)
 					{
 						// Get replacement and update control values.
-						SetSliders(NetworkReplacement.Instance.EligibileReplacement(SelectedNet, CurrentTargetItem.originalPrefab, -1, -1));
+						SetSliders(NetworkReplacement.Instance.ActiveReplacement(SelectedNet, CurrentTargetItem.originalPrefab, -1, -1));
 
 						// All done here.
 						return;
@@ -149,7 +146,7 @@ namespace BOB
 					else if (CurrentTargetItem.allPrefab != null)
 					{
 						// Get replacement and update control values.
-						SetSliders(AllNetworkReplacement.Instance.EligibileReplacement(SelectedNet, CurrentTargetItem.originalPrefab, -1, -1));
+						SetSliders(AllNetworkReplacement.Instance.ActiveReplacement(SelectedNet, CurrentTargetItem.originalPrefab, -1, -1));
 
 						// All done here.
 						return;
@@ -252,6 +249,9 @@ namespace BOB
 			// Populate target list and select target item.
 			TargetList();
 
+			// Record original stats for preview.
+			RecordOriginal();
+
 			// Apply Harmony rendering patches.
 			RenderOverlays.CurrentNet = SelectedNet;
 			Patcher.PatchNetworkOverlays(true);
@@ -316,47 +316,59 @@ namespace BOB
 
 
 		/// <summary>
-		/// Called after any added prop manipulations (addition or removal) to perform cleanup.
-		/// </summary>
-		private void UpdateAddedPops()
-		{
-			// Clear current selection.
-			CurrentTargetItem = null;
-
-			// Perform regular post-processing.
-			FinishUpdate();
-			TargetList();
-		}
-
-
-		/// <summary>
 		/// Record original prop values before previewing.
 		/// </summary>
-		private void RecordOriginal()
+		protected override void RecordOriginal()
 		{
-			// Do we have a valid selection?
-			if (currentNetItem?.originalPrefab != null)
-			{
-				// Create new array of original values.
-				originalValues = new NetPropReference[currentNetItem.index < 0 ? currentNetItem.indexes.Count() : 1];
+			// Clear existing list.
+			originalValues.Clear();
 
-				if (currentNetItem.index < 0)
+			// Don't do anything if no valid selection.
+			if (currentNetItem?.originalPrefab == null || SelectedNet == null)
+			{
+				return;
+			}
+			// Check current mode.
+			if (CurrentMode == ReplacementModes.All)
+			{
+				// All-network replacement; iterate through all prefabs and find matching prop references.
+				for (uint i = 0; i < PrefabCollection<NetInfo>.LoadedCount(); ++i)
 				{
-					// Grouped replacement - iterate through each instance and record values.
-					for (int i = 0; i < originalValues.Length; ++i)
+					NetInfo prefab = PrefabCollection<NetInfo>.GetLoaded(i);
+					NetInfo.Lane[] lanes = prefab?.m_lanes;
+					if (lanes != null)
 					{
-						originalValues[i] = GetOriginalData(currentNetItem.lanes[i], currentNetItem.indexes[i]);
+						for (int j = 0; j < prefab.m_lanes.Length; ++j)
+						{
+							NetLaneProps.Prop[] laneProps = lanes[j]?.m_laneProps?.m_props;
+							if (laneProps != null)
+							{
+								for (int k = 0; k < laneProps.Length; ++k)
+								{
+									if (laneProps[k].m_prop == CurrentTargetItem.originalPrefab | laneProps[k].m_tree == CurrentTargetItem.originalPrefab)
+									{
+										originalValues.Add(GetOriginalData(prefab, j, k));
+									}
+								}
+							}
+						}
 					}
 				}
-				else
+			}
+			else if (currentNetItem.index < 0)
+			{
+				Logging.Message("current net item index < 0 and count is ", currentNetItem.indexes.Count);
+
+				// Grouped replacement - iterate through each instance and record values.
+				for (int i = 0; i < currentNetItem.indexes.Count; ++i)
 				{
-					// Individual replacement - record original values.
-					originalValues[0] = GetOriginalData(currentNetItem.lane, currentNetItem.index);
+					originalValues.Add(GetOriginalData(SelectedNet, currentNetItem.lanes[i], currentNetItem.indexes[i]));
 				}
 			}
 			else
 			{
-				originalValues = null;
+				// Individual replacement - record original values.
+				originalValues.Add(GetOriginalData(SelectedNet, currentNetItem.lane, currentNetItem.index));
 			}
 		}
 
@@ -387,20 +399,23 @@ namespace BOB
 				return;
 			}
 
-			// Grouped or individual replacement?
-			if (CurrentTargetItem.index < 0)
+			Logging.Message("commencing iteration");
+
+			// Update preview for each recorded reference.
+			foreach (NetPropReference reference in originalValues)
 			{
-				// Grouped; iterate through each index and apply preview.
-				for (int i = 0; i < CurrentTargetItem.indexes.Count; ++i)
-				{
-					PreviewChange(currentNetItem.lanes[i], currentNetItem.indexes[i]);
-				}
+				PreviewChange(reference);
 			}
-			else
-			{
-				// Individual; apply preview.
-				PreviewChange(currentNetItem.lane, currentNetItem.index);
-			}
+
+			// Update renders.
+			NetData.Update();
+
+			// Update highlighting target.
+			RenderOverlays.CurrentProp = ReplacementPrefab as PropInfo;
+			RenderOverlays.CurrentTree = ReplacementPrefab as TreeInfo;
+
+			// Update apply button icon to indicate change.
+			UnappliedChanges = true;
 		}
 
 
@@ -409,22 +424,16 @@ namespace BOB
 		/// </summary>
 		protected override void RevertPreview()
 		{
-			// Make sure that we've got valid original values to revert to.
-			NetInfo.Lane[] selectedNetLanes = SelectedNet?.m_lanes;
-			if (originalValues != null && originalValues.Length > 0 && selectedNetLanes != null)
+			// Iterate through each original value.
+			foreach (NetPropReference reference in originalValues)
 			{
-				// Iterate through each original value.
-				for (int i = 0; i < originalValues.Length; ++i)
+				// Make sure that we've got valid original values to revert to.
+				NetInfo.Lane[] selectedNetLanes = reference.netInfo?.m_lanes;
+				if (selectedNetLanes != null)
 				{
-					// Null check in case any original values failed.
-					if (originalValues[i] == null)
-					{
-						continue;
-					}
-
 					// Sanity check indexes.
-					int laneIndex = originalValues[i].laneIndex;
-					int propIndex = originalValues[i].propIndex;
+					int laneIndex = reference.laneIndex;
+					int propIndex = reference.propIndex;
 
 					if (laneIndex >= selectedNetLanes.Length ||
 						selectedNetLanes[laneIndex].m_laneProps == null ||
@@ -433,24 +442,26 @@ namespace BOB
 						continue;
 					}
 
-
 					// Local reference.
-					NetLaneProps.Prop thisProp = SelectedNet.m_lanes[laneIndex].m_laneProps.m_props[propIndex];
+					NetLaneProps.Prop thisProp = reference.netInfo.m_lanes[laneIndex].m_laneProps.m_props[propIndex];
 
 					// Restore original values.
-					thisProp.m_prop = originalValues[i].originalProp;
-					thisProp.m_finalProp = originalValues[i].originalFinalProp;
-					thisProp.m_tree = originalValues[i].originalTree;
-					thisProp.m_finalTree = originalValues[i].originalFinalTree;
-					thisProp.m_angle = originalValues[i].angle;
-					thisProp.m_position = originalValues[i].position;
-					thisProp.m_probability = originalValues[i].probability;
-					thisProp.m_repeatDistance = originalValues[i].repeatDistance;
-				}
-			}
+					thisProp.m_prop = reference.originalProp;
+					thisProp.m_finalProp = reference.originalFinalProp;
+					thisProp.m_tree = reference.originalTree;
+					thisProp.m_finalTree = reference.originalFinalTree;
+					thisProp.m_angle = reference.angle;
+					thisProp.m_position = reference.position;
+					thisProp.m_probability = reference.probability;
+					thisProp.m_repeatDistance = reference.repeatDistance;
 
-			// Clear recorded values.
-			originalValues = null;
+					// Add network to dirty list.
+					NetData.DirtyList.Add(reference.netInfo);
+				}
+
+				// Update prefabs.
+				NetData.Update();
+			}
 
 			// Reset apply button icon
 			UnappliedChanges = false;
@@ -520,6 +531,9 @@ namespace BOB
 						}
 					}
 
+					// Record updated original data.
+					RecordOriginal();
+
 					// Update target list and buttons.
 					targetList.Refresh();
 					UpdateButtonStates();
@@ -588,6 +602,9 @@ namespace BOB
 					// All-network reversion.
 					AllNetworkReplacement.Instance.Revert(SelectedNet, currentNetItem.originalPrefab, -1, -1, true);
 				}
+
+				// Re-record originals (need to do this before updating controls).
+				RecordOriginal();
 
 				// Update current item.
 				UpdateTargetItem(currentNetItem);
@@ -982,40 +999,45 @@ namespace BOB
 
 
 		/// <summary>
+		/// Called after any added prop manipulations (addition or removal) to perform cleanup.
+		/// </summary>
+		private void UpdateAddedPops()
+		{
+			// Clear current selection.
+			CurrentTargetItem = null;
+
+			// Perform regular post-processing.
+			FinishUpdate();
+			TargetList();
+
+			// Rebuild recorded originals list.
+			RecordOriginal();
+		}
+
+
+		/// <summary>
 		/// Previews the change for the given prop index.
 		/// </summary>
-		/// <param name="lane">Lane index</param>
-		/// <param name="index">Prop index</param>
-		private void PreviewChange(int lane, int index)
+		/// <param name="propReference">Prop reference</param>
+		private void PreviewChange(NetPropReference propReference)
 		{
-			// Ensure that original values have been recorded before proceeding.
-			if (originalValues == null)
-			{
-				return;
-			}
+
+			Logging.Message("PreviewChangeReference");
 
 			// Original position and angle adjustment.
-			Vector3 basePosition = new Vector3();
+			Vector3 basePosition = Vector3.zero;
 			float baseAngle = 0f;
 
 			if (!CurrentTargetItem.isAdded)
 			{
-				// Find matching prop reference (by lane and index match) in original values.
-				foreach (NetPropReference propReference in originalValues)
-				{
-					if (propReference != null && propReference.laneIndex == lane && propReference.propIndex == index)
-					{
-						// Found a match - retrieve original position and angle.
-						basePosition = propReference.position - propReference.adjustment;
-						baseAngle = propReference.angle - propReference.angleAdjustment;
-						break;
-					}
-				}
+				// Found a match - retrieve original position and angle.
+				basePosition = propReference.position - propReference.adjustment;
+				baseAngle = propReference.angle - propReference.angleAdjustment;
 			}
 
 			// Null check.
-			NetInfo.Lane thisLane = SelectedNet?.m_lanes?[lane];
-			NetLaneProps.Prop thisProp = thisLane?.m_laneProps?.m_props?[index];
+			NetInfo.Lane thisLane = propReference.netInfo?.m_lanes?[propReference.laneIndex];
+			NetLaneProps.Prop thisProp = thisLane?.m_laneProps?.m_props?[propReference.propIndex];
 			if (thisProp == null)
 			{
 				return;
@@ -1023,7 +1045,6 @@ namespace BOB
 
 			// Calculate preview X position and angle, taking into account mirrored trees/props, inverting x offset to match original prop x position.
 			float offsetX = xSlider.TrueValue;
-			Logging.Message("xSlsider TrueValue is ", offsetX);
 			float angleMult = 1;
 			if (thisLane.m_position + basePosition.x < 0)
 			{
@@ -1049,11 +1070,10 @@ namespace BOB
 				thisProp.m_tree = ReplacementPrefab as TreeInfo;
 				thisProp.m_finalProp = ReplacementPrefab as PropInfo;
 				thisProp.m_finalTree = ReplacementPrefab as TreeInfo;
-
-				// Update highlighting target.
-				RenderOverlays.CurrentProp = ReplacementPrefab as PropInfo;
-				RenderOverlays.CurrentTree = ReplacementPrefab as TreeInfo;
 			}
+
+			// Add network to dirty list.
+			NetData.DirtyList.Add(propReference.netInfo);
 
 			// Update apply button icon to indicate change.
 			UnappliedChanges = true;
@@ -1063,18 +1083,19 @@ namespace BOB
 		/// <summary>
 		/// Gets original (current) prop data.
 		/// </summary>
+		/// <param name="netInfo">Network prefab</param>
 		/// <param name="lane">Lane index</param>
 		/// <param name="propIndex">Prop index</param>
 		/// <returns>Original prop data</returns>
-		private NetPropReference GetOriginalData(int lane, int propIndex)
+		private NetPropReference GetOriginalData(NetInfo netInfo, int lane, int propIndex)
 		{
 			// Ensure that the indexes are valid before proceeding.
-			if (SelectedNet?.m_lanes == null || SelectedNet.m_lanes.Length <= lane)
+			if (netInfo?.m_lanes == null || netInfo.m_lanes.Length <= lane)
 			{
 				Logging.Error("invalid lane index reference of ", lane, " for selected network ", SelectedNet?.name ?? "null");
 				return null;
 			}
-			NetLaneProps.Prop[] propBuffer = SelectedNet.m_lanes[lane]?.m_laneProps?.m_props;
+			NetLaneProps.Prop[] propBuffer = netInfo.m_lanes[lane]?.m_laneProps?.m_props;
 			if (propBuffer == null || propBuffer.Length <= propIndex)
 			{
 				Logging.Error("invalid prop index reference of ", propIndex, " for lane ", lane, " of selected network ", SelectedNet?.name ?? "null");
@@ -1115,6 +1136,7 @@ namespace BOB
 			// Return original data.
 			return new NetPropReference
 			{
+				netInfo = netInfo,
 				laneIndex = lane,
 				propIndex = propIndex,
 				originalProp = thisProp.m_prop,

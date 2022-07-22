@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
-using ColossalFramework;
 using ColossalFramework.UI;
 
 
@@ -74,7 +73,7 @@ namespace BOB
 		private BuildingInfo currentBuilding;
 
 		// Original selection values.
-		private BuildingPropReference[] originalValues;
+		private List<BuildingPropReference> originalValues = new List<BuildingPropReference>();
 
 		// Sub-buildings.
 		private BuildingInfo[] subBuildings;
@@ -176,9 +175,6 @@ namespace BOB
 				base.CurrentTargetItem = value;
 				ignoreSelectedPrefabChange = false;
 
-				// Record original stats for preview.
-				RecordOriginal();
-
 				// Ensure valid selections before proceeding.
 				if (CurrentTargetItem != null && currentBuilding != null)
 				{
@@ -193,7 +189,7 @@ namespace BOB
 						// Yes - set sliders directly.
 						// Disable events.
 						ignoreSliderValueChange = true;
-						
+
 						// Set slider values.
 						BuildingInfo.Prop buildingProp = currentBuilding.m_props[IndividualIndex];
 						angleSlider.TrueValue = buildingProp.m_radAngle * Mathf.Rad2Deg;
@@ -214,7 +210,7 @@ namespace BOB
 						if (CurrentTargetItem.individualPrefab != null)
 						{
 							// Use IndividualIndex to handle case of switching from individual to grouped props (index will be -1, actual index in relevant list).
-							SetSliders(IndividualBuildingReplacement.Instance.EligibileReplacement(currentBuilding, CurrentTargetItem.originalPrefab, IndividualIndex));
+							SetSliders(IndividualBuildingReplacement.Instance.ActiveReplacement(currentBuilding, CurrentTargetItem.originalPrefab, IndividualIndex));
 
 							// All done here.
 							return;
@@ -222,7 +218,7 @@ namespace BOB
 						// Ditto for any building replacement.
 						else if (CurrentTargetItem.replacementPrefab != null)
 						{
-							SetSliders(BuildingReplacement.Instance.EligibileReplacement(currentBuilding, CurrentTargetItem.originalPrefab, -1));
+							SetSliders(BuildingReplacement.Instance.ActiveReplacement(currentBuilding, CurrentTargetItem.originalPrefab, -1));
 
 							// All done here.
 							return;
@@ -230,7 +226,7 @@ namespace BOB
 						// Ditto for any all-building replacement.
 						else if (CurrentTargetItem.allPrefab != null)
 						{
-							SetSliders(AllBuildingReplacement.Instance.EligibileReplacement(null, CurrentTargetItem.originalPrefab, -1));
+							SetSliders(AllBuildingReplacement.Instance.ActiveReplacement(null, CurrentTargetItem.originalPrefab, -1));
 
 							// All done here.
 							return;
@@ -382,6 +378,9 @@ namespace BOB
 
 			// Populate target list and select target item.
 			TargetList();
+			
+			// Record original stats for preview.
+			RecordOriginal();
 
 			// Apply Harmony rendering patches.
 			RenderOverlays.CurrentBuilding = currentBuilding;
@@ -413,20 +412,22 @@ namespace BOB
 
 				return;
 			}
-			// Grouped or individual replacement?
-			if (CurrentTargetItem.index < 0)
+
+			// Update preview for each recorded reference.
+			foreach (BuildingPropReference reference in originalValues)
 			{
-				// Grouped; iterate through each index and apply preview.
-				for (int i = 0; i < CurrentTargetItem.indexes.Count; ++i)
-				{
-					PreviewChange(CurrentTargetItem.indexes[i]);
-				}
+				PreviewChange(reference);
 			}
-			else
-			{
-				// Individual; apply preview.
-				PreviewChange(CurrentTargetItem.index);
-			}
+
+			// Update renders.
+			BuildingData.Update();
+
+			// Update highlighting target.
+			RenderOverlays.CurrentProp = ReplacementPrefab as PropInfo;
+			RenderOverlays.CurrentTree = ReplacementPrefab as TreeInfo;
+
+			// Update apply button icon to indicate change.
+			UnappliedChanges = true;
 		}
 
 
@@ -435,39 +436,35 @@ namespace BOB
 		/// </summary>
 		protected override void RevertPreview()
 		{
-			// Make sure that we've got valid original values to revert to.
-			if (originalValues != null && originalValues.Length > 0 && currentBuilding?.m_props != null)
+			// Iterate through each original value.
+			foreach (BuildingPropReference reference in originalValues)
 			{
-				// Iterate through each original value.
-				for (int i = 0; i < originalValues.Length; ++i)
+				// Sanity check index.
+				int propIndex = reference.propIndex;
+				if (propIndex >= reference.buildingInfo.m_props.Length)
 				{
-					// Null check in case any original values failed, or number of props has changed.
-					if (originalValues[i] == null || originalValues[i].propIndex >= currentBuilding.m_props.Length)
-					{
-						continue;
-					}
-
-					// Local reference.
-					if (currentBuilding.m_props[originalValues[i].propIndex] is BuildingInfo.Prop thisProp)
-					{
-						// Restore original values.
-						thisProp.m_prop = originalValues[i].originalProp;
-						thisProp.m_finalProp = originalValues[i].originalFinalProp;
-						thisProp.m_tree = originalValues[i].originalTree;
-						thisProp.m_finalTree = originalValues[i].originalFinalTree;
-						thisProp.m_radAngle = originalValues[i].radAngle;
-						thisProp.m_position = originalValues[i].position;
-						thisProp.m_probability = originalValues[i].probability;
-						thisProp.m_fixedHeight = originalValues[i].fixedHeight;
-					}
+					continue;
 				}
 
-				// Update prefab.
-				BuildingData.UpdateBuilding(currentBuilding);
+				// Restore original values.
+				if (reference.buildingInfo.m_props[propIndex] is BuildingInfo.Prop thisProp)
+				{
+					thisProp.m_prop = reference.originalProp;
+					thisProp.m_finalProp = reference.originalFinalProp;
+					thisProp.m_tree = reference.originalTree;
+					thisProp.m_finalTree = reference.originalFinalTree;
+					thisProp.m_radAngle = reference.radAngle;
+					thisProp.m_position = reference.position;
+					thisProp.m_probability = reference.probability;
+					thisProp.m_fixedHeight = reference.fixedHeight;
+
+					// Add building to dirty list.
+					BuildingData.DirtyList.Add(reference.buildingInfo);
+				}
 			}
 
-			// Clear recorded values.
-			originalValues = null;
+			// Update prefabs.
+			BuildingData.Update();
 
 			// Reset apply button icon.
 			UnappliedChanges = false;
@@ -536,8 +533,11 @@ namespace BOB
 						}
 					}
 
-					// Update any dirty building rendertafes.
+					// Update any dirty building renders.
 					BuildingData.Update();
+
+					// Record updated original data.
+					RecordOriginal();
 
 					// Update target list and buttons.
 					targetList.Refresh();
@@ -546,9 +546,6 @@ namespace BOB
 					// Update highlighting target.
 					RenderOverlays.CurrentProp = ReplacementPrefab as PropInfo;
 					RenderOverlays.CurrentTree = ReplacementPrefab as TreeInfo;
-
-					// Record updated original data.
-					RecordOriginal();
 
 					// Perform post-replacement processing.
 					FinishUpdate();
@@ -617,6 +614,9 @@ namespace BOB
 						CurrentTargetItem.allPrefab = null;
 					}
 				}
+
+				// Re-record originals (need to do this before updating controls).
+				RecordOriginal();
 
 				// Update current item.
 				UpdateTargetItem(CurrentTargetItem);
@@ -951,6 +951,55 @@ namespace BOB
 
 
 		/// <summary>
+		/// Record original prop values before previewing.
+		/// </summary>
+		protected override void RecordOriginal()
+		{
+			// Clear existing list.
+			originalValues.Clear();
+
+			// Don't do anything if no valid selection.
+			if (CurrentTargetItem?.originalPrefab == null || currentBuilding == null)
+			{
+				return;
+			}
+
+			// Check current mode.
+			if (CurrentMode == ReplacementModes.All)
+			{
+				// All-building replacement; iterate through all prefabs and find matching prop references.
+				for (uint i = 0; i < PrefabCollection<BuildingInfo>.LoadedCount(); ++i)
+				{
+					BuildingInfo prefab = PrefabCollection<BuildingInfo>.GetLoaded(i);
+					if (prefab?.m_props != null)
+					{
+						for (int j = 0; j < prefab.m_props.Length; ++j)
+						{
+							if (prefab.m_props[j].m_prop == CurrentTargetItem.originalPrefab | prefab.m_props[j].m_tree == CurrentTargetItem.originalPrefab)
+							{
+								originalValues.Add(GetOriginalData(prefab, j));
+							}
+						}
+					}
+				}
+			}
+			else if (CurrentTargetItem.index < 0)
+			{
+				// Grouped replacement - iterate through each instance and record values.
+				for (int i = 0; i < CurrentTargetItem.indexes.Count; ++i)
+				{
+					originalValues.Add(GetOriginalData(currentBuilding, CurrentTargetItem.indexes[i]));
+				}
+			}
+			else
+			{
+				// Individual replacement - record original values.
+				originalValues.Add(GetOriginalData(currentBuilding, CurrentTargetItem.index));
+			}
+		}
+
+
+		/// <summary>
 		/// Custom height checkbox event handler.
 		/// </summary>
 		/// <param name="control">Calling component (unused)</param>
@@ -977,75 +1026,30 @@ namespace BOB
 			// Perform regular post-processing.
 			FinishUpdate();
 			TargetList();
-		}
 
-
-		/// <summary>
-		/// Record original prop values before previewing.
-		/// </summary>
-		private void RecordOriginal()
-		{
-			// Do we have a valid selection?
-			if (CurrentTargetItem?.originalPrefab != null)
-			{
-				// Create new array of original values.
-				originalValues = new BuildingPropReference[CurrentTargetItem.index < 0 ? CurrentTargetItem.indexes.Count() : 1];
-
-				if (CurrentTargetItem.index < 0)
-				{
-					// Grouped replacement - iterate through each instance and record values.
-					for (int i = 0; i < originalValues.Length; ++i)
-					{
-						originalValues[i] = GetOriginalData(CurrentTargetItem.indexes[i]);
-					}
-				}
-				else
-				{
-					// Individual replacement - record original values.
-					originalValues[0] = GetOriginalData(CurrentTargetItem.index);
-				}
-			}
-			else
-			{
-				// No valid selection - clear any stored original values.
-				originalValues = null;
-			}
+			// Rebuild recorded originals list.
+			RecordOriginal();
 		}
 
 
 		/// <summary>
 		/// Previews the change for the given prop index.
 		/// </summary>
-		/// <param name="index">Prop index</param>
-		private void PreviewChange(int index)
+		/// <param name="propReference">Prop reference</param>
+		private void PreviewChange(BuildingPropReference propReference)
 		{
-			// Ensure that original values have been recorded before proceeding.
-			if (originalValues == null)
-			{
-				return;
-			}
-
 			// Original position and angle.
-			Vector3 basePosition = new Vector3();
+			Vector3 basePosition = Vector3.zero;
 			float baseAngle = 0f;
 
 			if (!CurrentTargetItem.isAdded)
 			{
-				// Find matching prop reference (by index match) in original values.
-				foreach (BuildingPropReference propReference in originalValues)
-				{
-					if (propReference != null && propReference.propIndex == index)
-					{
-						// Found a match - retrieve original position and angle.
-						basePosition = propReference.position - propReference.adjustment;
-						baseAngle = propReference.radAngle - propReference.radAngleAdjustment;
-						break;
-					}
-				}
+				basePosition = propReference.position - propReference.adjustment;
+				baseAngle = propReference.radAngle - propReference.radAngleAdjustment;
 			}
 
 			// Null check.
-			BuildingInfo.Prop thisProp = currentBuilding?.m_props?[index];
+			BuildingInfo.Prop thisProp = propReference.buildingInfo?.m_props?[propReference.propIndex];
 			if (thisProp == null)
 			{
 				return;
@@ -1066,34 +1070,28 @@ namespace BOB
 				thisProp.m_finalTree = ReplacementPrefab as TreeInfo;
 			}
 
-			// Update renders.
-			BuildingData.UpdateBuilding(currentBuilding);
-
-			// Update highlighting target.
-			RenderOverlays.CurrentProp = ReplacementPrefab as PropInfo;
-			RenderOverlays.CurrentTree = ReplacementPrefab as TreeInfo;
-
-			// Update apply button icon to indicate change.
-			UnappliedChanges = true;
+			// Add building to dirty list.
+			BuildingData.DirtyList.Add(propReference.buildingInfo);
 		}
 
 
 		/// <summary>
 		/// Gets original (current) prop data.
 		/// </summary>
+		/// <param name="buildingInfo">Building prefab</param>
 		/// <param name="propIndex">Prop index</param>
 		/// <returns>Original prop data</returns>
-		private BuildingPropReference GetOriginalData(int propIndex)
+		private BuildingPropReference GetOriginalData(BuildingInfo buildingInfo, int propIndex)
 		{
 			// Ensure that the index is valid before proceeding.
-			if (currentBuilding?.m_props == null || currentBuilding.m_props.Length <= propIndex)
+			if (buildingInfo?.m_props == null || buildingInfo.m_props.Length <= propIndex)
 			{
-				Logging.Error("invalid prop index reference of ", propIndex, " for selected building ", currentBuilding?.name ?? "null");
+				Logging.Error("invalid prop index reference of ", propIndex, " for selected building ", buildingInfo?.name ?? "null");
 				return null;
 			}
 
 			// Local reference.
-			BuildingInfo.Prop thisProp = currentBuilding.m_props[propIndex];
+			BuildingInfo.Prop thisProp = buildingInfo.m_props[propIndex];
 
 			// Get any position and angle adjustments from active replacements, checking in priority order.
 			Vector3 adjustment = Vector3.zero;
@@ -1126,6 +1124,7 @@ namespace BOB
 			// Return original data.
 			return new BuildingPropReference
 			{
+				buildingInfo = buildingInfo,
 				propIndex = propIndex,
 				originalProp = thisProp.m_prop,
 				originalTree = thisProp.m_tree,

@@ -23,7 +23,7 @@ namespace BOB
 		/// <param name="targetInfo">Target prop/tree prefab</param>
 		/// <param name="propIndex">Target prop/tree index</param>
 		/// <returns>Currently-applied replacement (null if none)</returns>
-		internal abstract BOBBuildingReplacement EligibileReplacement(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex);
+		internal abstract BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex);
 
 
 		/// <summary>
@@ -33,7 +33,7 @@ namespace BOB
 		/// <param name="targetInfo">Targeted (original) prop prefab</param>
 		/// <param name="propIndex">Targeted prop index (in lanme)</param>
 		/// <returns>List of active prop references for the given replacment values (null if none)</returns>
-		internal virtual List<BuildingPropReference> ReferenceList(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex) => EligibileReplacement(buildingInfo, targetInfo, propIndex)?.references;
+		internal virtual List<BuildingPropReference> ReferenceList(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex) => ActiveReplacement(buildingInfo, targetInfo, propIndex)?.references;
 
 
 		/// <summary>
@@ -120,7 +120,7 @@ namespace BOB
 			List<BOBBuildingReplacement> replacementsList = ReplacementEntry(buildingInfo);
 
 			// Get current replacement after reversion above.
-			BOBBuildingReplacement thisReplacement = EligibileReplacement(buildingInfo, targetInfo, propIndex);
+			BOBBuildingReplacement thisReplacement = ActiveReplacement(buildingInfo, targetInfo, propIndex);
 
 			// Create new replacement list entry if none already exists.
 			if (thisReplacement == null)
@@ -160,7 +160,7 @@ namespace BOB
 		/// <param name="targetInfo">Targeted (original) tree/prop prefab</param>
 		/// <param name="propIndex">Targeted (original) tree/prop index</param>
 		/// <param name="removeEntries">True to remove the reverted entries from the list of replacements, false to leave the list unchanged</param>
-		internal void Revert(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex, bool removeEntries) => Revert(EligibileReplacement(buildingInfo, targetInfo, propIndex), removeEntries);
+		internal void Revert(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex, bool removeEntries) => Revert(ActiveReplacement(buildingInfo, targetInfo, propIndex), removeEntries);
 
 
 		/// <summary>
@@ -173,7 +173,7 @@ namespace BOB
 		internal bool Restore(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex)
 		{
 			// See if we have a relevant replacement record.
-			BOBBuildingReplacement thisReplacement = EligibileReplacement(buildingInfo, targetInfo, propIndex);
+			BOBBuildingReplacement thisReplacement = ActiveReplacement(buildingInfo, targetInfo, propIndex);
 			if (thisReplacement != null)
 			{
 				// Yes - add reference data to the list.
