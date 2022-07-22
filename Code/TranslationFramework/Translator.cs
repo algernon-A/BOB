@@ -392,7 +392,7 @@ namespace BOB
                                             continue;
                                         }
 
-                                        // Yes - stop quoting here.
+                                        // It's a single quote - stop quoting here.
                                         quoting = false;
 
                                         // If we're parsing a value, this is also the end of parsing this line (discard everything else).
@@ -435,8 +435,6 @@ namespace BOB
                                     }
                                 }
                             }
-
-                            Logging.Message(line);
 
                             // Finished looping through chars - are we still parsing quoted text?
                             if (quoting)
