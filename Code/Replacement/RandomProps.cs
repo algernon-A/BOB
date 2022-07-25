@@ -105,7 +105,6 @@ namespace BOB
 			return null;
 		}
 
-
 		/// <summary>
 		/// 
 		/// Deserializes the list of random props from XML.
@@ -113,6 +112,9 @@ namespace BOB
 		/// <param name="randomPrefabList">List of random props to deserialize</param>
 		internal static void DeserializeRandomProps(List<BOBRandomPrefab> randomPrefabList)
 		{
+			// Shader reference.
+			Shader shader = Shader.Find("Custom/Props/Prop/Default");
+
 			// Iterate through each item and setup prefab.
 			foreach (BOBRandomPrefab randomProp in randomPrefabList)
 			{
@@ -145,6 +147,18 @@ namespace BOB
 						if (thisProp == null)
 						{
 							randomProp.missingVariant = true;
+						}
+
+						// Set shader.
+						if (randomProp.prop.m_material != null)
+						{
+							randomProp.prop.m_material.shader = shader;
+						}
+
+						// Set shader.
+						if (randomProp.prop.m_lodMaterial != null)
+						{
+							randomProp.prop.m_lodMaterial.shader = shader;
 						}
 					}
 				}
