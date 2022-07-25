@@ -8,10 +8,10 @@ namespace BOB
     /// <summary>
     /// The base mod class for instantiation by the game.
     /// </summary>
-    public class BOBMod : IUserMod
+    public class Mod : IUserMod
     {
         public static string ModName => "BOB - the tree and prop replacer";
-        public static string Version => "0.9.4.4";
+        public static string Version => AssemblyUtils.CurrentVersion;
 
         public string Name => ModName + " " + Version;
         public string Description => Translations.Translate("BOB_DESC");

@@ -94,7 +94,7 @@ namespace BOB
             });
 
             // Recalculate any Network Skins 2 applied skins.
-            ModUtils.NS2Recalculate();
+            AssemblyUtils.NS2Recalculate();
 
             // Clear dirty prefabs list.
             DirtyList.Clear();

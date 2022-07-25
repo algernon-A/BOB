@@ -35,7 +35,7 @@ namespace BOB
                     {
                         IUserMod[] instances = plugin.GetInstances<IUserMod>();
 
-                        if (!(instances.FirstOrDefault() is BOBMod))
+                        if (!(instances.FirstOrDefault() is Mod))
                         {
                             continue;
                         }

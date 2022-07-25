@@ -22,7 +22,7 @@ namespace BOB.MessageBox
         public ListMessageBox()
         {
             // Set title.
-            Title = BOBMod.ModName;
+            Title = Mod.ModName;
 
             // Add buttons.
             AddButtons();

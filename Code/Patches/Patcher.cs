@@ -281,7 +281,7 @@ namespace BOB
             propRenderTranspiler = typeof(OverlayTranspilers).GetMethod(nameof(OverlayTranspilers.PropTranspiler));
 
             // Tree anarchy patch.
-            treeAnarchyMethod = ModUtils.TreeAnarchyReflection();
+            treeAnarchyMethod = AssemblyUtils.TreeAnarchyReflection();
             if (treeAnarchyMethod != null)
             {
                 treeAnarchyTarget = AccessTools.Method(typeof(TreeManager), "EndRenderingImpl");

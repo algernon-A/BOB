@@ -10,9 +10,9 @@ using ColossalFramework.Plugins;
 namespace BOB
 {
     /// <summary>
-    /// Class that manages interactions with other mods, including compatibility and functionality checks.
+    /// Class that manages interactions with assemblies, including compatibility and functionality checks.
     /// </summary>
-    internal static class ModUtils
+    internal static class AssemblyUtils
     {
         // NS2 reflection records.
         internal static MethodInfo ns2Recalculate;
@@ -21,6 +21,31 @@ namespace BOB
 
         // Mod assembly path cache.
         private static string assemblyPath = null;
+
+
+        /// <summary>
+        /// Returns the current mod version as a string, leaving off any trailing zero versions for build and revision.
+        /// </summary>
+        internal static string CurrentVersion
+        {
+            get
+            {
+                Version currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+
+                if (currentVersion.Revision != 0)
+                {
+                    return currentVersion.ToString(4);
+                }
+                else if (currentVersion.Build != 0)
+                {
+                    return currentVersion.ToString(3);
+                }
+                else
+                {
+                    return currentVersion.ToString(2);
+                }
+            }
+        }
 
 
         /// <summary>
@@ -49,7 +74,7 @@ namespace BOB
                         IUserMod[] mods = plugin.GetInstances<IUserMod>();
 
                         // Check to see if the primary instance is this mod.
-                        if (mods.FirstOrDefault() is BOBMod)
+                        if (mods.FirstOrDefault() is Mod)
                         {
                             // Found it! Return path.
                             return plugin.modPath;
@@ -63,7 +88,7 @@ namespace BOB
 
                 // If we got here, then we didn't find the assembly.
                 Logging.Error("assembly path not found");
-                throw new FileNotFoundException(BOBMod.ModName + ": assembly path not found!");
+                throw new FileNotFoundException(Mod.ModName + ": assembly path not found!");
             }
         }
 
@@ -281,7 +306,7 @@ namespace BOB
             Logging.KeyMessage("Attempting to find Tree Anarchy");
 
             // Get assembly.
-            Assembly taAssembly = ModUtils.GetEnabledAssembly("TreeAnarchy");
+            Assembly taAssembly = AssemblyUtils.GetEnabledAssembly("TreeAnarchy");
 
             if (taAssembly == null)
             {

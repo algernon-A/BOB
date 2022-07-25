@@ -19,7 +19,7 @@ namespace BOB
         /// <param name="loading">Loading mode (e.g. game, editor, scenario, etc.)</param>
         public override void OnCreated(ILoading loading)
         {
-            Logging.KeyMessage("version ", BOBMod.Version, " loading");
+            Logging.KeyMessage("version ", Mod.Version, " loading");
 
             // Don't do anything if not in game (e.g. if we're going into an editor).
             if (loading.currentMode != AppMode.Game && loading.currentMode != AppMode.MapEditor)
@@ -113,7 +113,7 @@ namespace BOB
             WhatsNew.ShowWhatsNew();
 
             // Set up Network Skins 2 reflection.
-            ModUtils.NS2Reflection();
+            AssemblyUtils.NS2Reflection();
 
             // Enable thin wires, if applicable.
             if (ModSettings.ThinnerWires)

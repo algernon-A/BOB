@@ -238,7 +238,7 @@ namespace BOB
 
                 // Show messagebox.
                 WhatsNewMessageBox messageBox = MessageBoxBase.ShowModal<WhatsNewMessageBox>();
-                messageBox.Title = BOBMod.ModName + " " + BOBMod.Version;
+                messageBox.Title = Mod.ModName + " " + Mod.Version;
                 messageBox.DSAButton.eventClicked += (component, clickEvent) => DontShowAgain();
                 messageBox.SetMessages(whatsNewVersion, WhatsNewMessages);
             }

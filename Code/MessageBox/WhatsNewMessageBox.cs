@@ -91,7 +91,7 @@ namespace BOB.MessageBox
             public void SetText(WhatsNewMessage message)
             {
                 // Set version header and message text.
-                versionTitle = BOBMod.ModName + " " + message.version.ToString(message.version.Minor > 0 ? 3 : 2) + message.versionHeader;
+                versionTitle = Mod.ModName + " " + message.version.ToString(message.version.Minor > 0 ? 3 : 2) + message.versionHeader;
 
                 // Add message elements as separate list items.
                 for (int i = 0; i < message.messages.Length; ++i)
