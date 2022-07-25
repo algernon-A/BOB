@@ -96,7 +96,6 @@ namespace BOB
 
                 // Create a base panel attached to our game object, perfectly overlaying the game options panel.
                 UIPanel basePanel = optionsGameObject.AddComponent<UIPanel>();
-                basePanel.absolutePosition = optionsPanel.absolutePosition;
                 basePanel.width = optionsPanel.width;
                 basePanel.height = 725f;
 

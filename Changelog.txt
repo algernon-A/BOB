@@ -1,4 +1,5 @@
 ﻿- Enable adding props to network lanes with no existing laneprop array
+- Fix added random building props always showing the same variations if more than one is added to the same prefab
 - Update generation of blank config files
 - Update translation framework
 

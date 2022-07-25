@@ -202,8 +202,6 @@ namespace BOB
                 BuildingInfo.Prop thisProp = buildingInfo.m_props[propIndex];
                 thisProp.m_prop = replacementInfo as PropInfo;
                 thisProp.m_tree = replacementInfo as TreeInfo;
-                thisProp.m_finalProp = replacementInfo as PropInfo;
-                thisProp.m_finalTree = replacementInfo as TreeInfo;
                 thisProp.m_radAngle = angle * Mathf.Deg2Rad;
                 thisProp.m_position = new Vector3(offsetX, offsetY, offsetZ);
                 thisProp.m_probability = probability;
@@ -306,7 +304,8 @@ namespace BOB
                     m_finalTree = replacement.replacementInfo as TreeInfo,
                     m_fixedHeight = replacement.customHeight,
                     m_position = new Vector3(replacement.offsetX, replacement.offsetY, replacement.offsetZ),
-                    m_probability = replacement.probability
+                    m_probability = replacement.probability,
+                    m_index = newIndex
                 };
 
                 // Add building to dirty list.
