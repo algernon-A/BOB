@@ -62,13 +62,14 @@ namespace BOB.MessageBox
             messageBox.Focus();
 
             // Apply modal view effects.
-            if (view.panelsLibraryModalEffect != null)
+            if (view.panelsLibraryModalEffect is UIComponent modalEffect)
             {
-                view.panelsLibraryModalEffect.FitTo(null);
-                if (!view.panelsLibraryModalEffect.isVisible || view.panelsLibraryModalEffect.opacity != 1f)
+                modalEffect.FitTo(null);
+                if (!modalEffect.isVisible || modalEffect.opacity != 1f)
                 {
-                    view.panelsLibraryModalEffect.Show(false);
-                    ValueAnimator.Animate("ModalEffect67419", (value) => view.panelsLibraryModalEffect.opacity = value, new AnimatedFloat(0f, 1f, 0.7f, EasingType.CubicEaseOut));
+                    modalEffect.Show(false);
+                    ValueAnimator.Cancel("ModalEffect67419");
+                    ValueAnimator.Animate("ModalEffect67419", (value) => modalEffect.opacity = value, new AnimatedFloat(0f, 1f, 0.7f, EasingType.CubicEaseOut));
                 }
             }
 
@@ -77,7 +78,7 @@ namespace BOB.MessageBox
 
 
         /// <summary>
-        ///  Closes the message box.
+        /// Closes the message box.
         /// </summary>
         public static void CloseModal(MessageBoxBase messageBox)
         {
@@ -86,11 +87,12 @@ namespace BOB.MessageBox
 
             // Clear modal view effects.
             UIView view = UIView.GetAView();
-            if (view.panelsLibraryModalEffect != null)
+            if (view.panelsLibraryModalEffect is UIComponent modalEffect)
             {
                 if (!UIView.HasModalInput())
                 {
-                    ValueAnimator.Animate("ModalEffect67419", (value) => view.panelsLibraryModalEffect.opacity = value, new AnimatedFloat(1f, 0f, 0.7f, EasingType.CubicEaseOut), () => view.panelsLibraryModalEffect.Hide());
+                    ValueAnimator.Cancel("ModalEffect67419");
+                    ValueAnimator.Animate("ModalEffect67419", (value) => modalEffect.opacity = value, new AnimatedFloat(1f, 0f, 0.7f, EasingType.CubicEaseOut), () => modalEffect.Hide());
                 }
                 else
                 {

@@ -24,6 +24,7 @@ namespace BOB.MessageBox
                 VersionMessage versionMessage = ScrollableContent.AddUIComponent<VersionMessage>();
                 versionMessage.width = ContentWidth;
                 versionMessage.SetText(message);
+
                 // Add spacer below.
                 AddSpacer();
 
