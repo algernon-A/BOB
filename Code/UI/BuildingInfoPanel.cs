@@ -975,7 +975,7 @@ namespace BOB
 					{
 						for (int j = 0; j < prefab.m_props.Length; ++j)
 						{
-							if (prefab.m_props[j].m_prop == CurrentTargetItem.originalPrefab | prefab.m_props[j].m_tree == CurrentTargetItem.originalPrefab)
+							if (prefab.m_props[j].m_prop == CurrentTargetItem.CurrentPrefab | prefab.m_props[j].m_tree == CurrentTargetItem.CurrentPrefab)
 							{
 								originalValues.Add(GetOriginalData(prefab, j));
 							}

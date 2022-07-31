@@ -345,7 +345,7 @@ namespace BOB
 							{
 								for (int k = 0; k < laneProps.Length; ++k)
 								{
-									if (laneProps[k].m_prop == CurrentTargetItem.originalPrefab | laneProps[k].m_tree == CurrentTargetItem.originalPrefab)
+									if (laneProps[k].m_prop == CurrentTargetItem.CurrentPrefab | laneProps[k].m_tree == CurrentTargetItem.CurrentPrefab)
 									{
 										originalValues.Add(GetOriginalData(prefab, j, k));
 									}
