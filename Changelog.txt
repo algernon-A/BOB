@@ -1,4 +1,6 @@
-﻿- Fix preview for all- replacements not showing when adjusting existing all- replacments
+﻿Verion 0.9.5.1 -
+
+- Fix preview for all- replacements not showing when adjusting existing all- replacments
 
 
 Version 0.9.5 -
