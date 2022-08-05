@@ -1,4 +1,8 @@
-﻿Verion 0.9.5.1 -
+﻿- Increase offset slider displayed maximum to 32
+- Adjust debugging logging
+
+
+Version 0.9.5.1 -
 
 - Fix preview for all- replacements not showing when adjusting existing all- replacments
 

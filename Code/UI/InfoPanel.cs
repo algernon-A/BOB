@@ -255,13 +255,13 @@ namespace BOB
 				offsetLabel.relativePosition = new Vector2((offsetPanel.width - offsetLabel.width) / 2f, OffsetLabelY);
 
 				// Offset sliders.
-				xSlider = AddBOBSlider(offsetPanel, Margin, XOffsetY, MidControlWidth - (Margin * 2f), "BOB_PNL_XOF", -16f, 16f, 0.01f, "X offset");
-				zSlider = AddBOBSlider(offsetPanel, Margin, ZOffsetY, MidControlWidth - (Margin * 2f), "BOB_PNL_ZOF", -16f, 16f, 0.01f, "Z offset");
+				xSlider = AddBOBSlider(offsetPanel, Margin, XOffsetY, MidControlWidth - (Margin * 2f), "BOB_PNL_XOF", -32f, 32f, 0.01f, "X offset");
+				zSlider = AddBOBSlider(offsetPanel, Margin, ZOffsetY, MidControlWidth - (Margin * 2f), "BOB_PNL_ZOF", -32f, 32f, 0.01f, "Z offset");
 
 				// Height panel.
 				heightPanel = Sliderpanel(this, MidControlX, HeightPanelY, HeightPanelShortHeight);
 				UILabel heightLabel = UIControls.AddLabel(heightPanel, 0f, OffsetLabelY, Translations.Translate("BOB_PNL_HEI"));
-				ySlider = AddBOBSlider(heightPanel, Margin, YOffsetY - 20f, MidControlWidth - (Margin * 2f), "BOB_PNL_YOF", -16f, 16f, 0.01f, "Y offset");
+				ySlider = AddBOBSlider(heightPanel, Margin, YOffsetY - 20f, MidControlWidth - (Margin * 2f), "BOB_PNL_YOF", -32f, 32f, 0.01f, "Y offset");
 				while (heightLabel.width > MidControlWidth)
 				{
 					heightLabel.textScale -= 0.05f;
