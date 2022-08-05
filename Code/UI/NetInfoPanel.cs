@@ -398,12 +398,11 @@ namespace BOB
 
 				return;
 			}
-
-			Logging.Message("commencing iteration");
-
 			// Update preview for each recorded reference.
 			foreach (NetPropReference reference in originalValues)
 			{
+				Logging.Message("previewing change for index ", reference.propIndex, " with original prop ", reference.originalProp?.name ?? "null", " and tree ", reference.originalTree?.name ?? "null");
+
 				PreviewChange(reference);
 			}
 
@@ -427,6 +426,8 @@ namespace BOB
 			// Iterate through each original value.
 			foreach (NetPropReference reference in originalValues)
 			{
+				Logging.Message("reverting preview for index ", reference.propIndex, " with original prop ", reference.originalProp?.name ?? "null", " and tree ", reference.originalTree?.name ?? "null");
+
 				// Make sure that we've got valid original values to revert to.
 				NetInfo.Lane[] selectedNetLanes = reference.netInfo?.m_lanes;
 				if (selectedNetLanes != null)
