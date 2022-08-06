@@ -72,21 +72,14 @@ namespace BOB
 				if (thisProp == null)
 				{
 					// No active replacement; use current PropInfo.
-					if (replacement.targetInfo is PropInfo)
-					{
-						thisProp = thisBuildingProp.m_finalProp;
-					}
-					else
-					{
-						thisProp = thisBuildingProp.m_finalTree;
-					}
+					thisProp = replacement.isTree ? (PrefabInfo)thisBuildingProp.m_tree : thisBuildingProp.m_prop;
 				}
 
 				// See if this prop matches our replacement.
 				if (thisProp != null && thisProp == replacement.targetInfo)
 				{
 					// Match!  Add reference data to the list.
-					replacement.references.Add(CreateReference(replacement.BuildingInfo, thisProp, propIndex, replacement.isTree));
+					replacement.references.Add(CreateReference(replacement.BuildingInfo, propIndex, replacement.isTree));
 				}
 			}
 

@@ -177,7 +177,7 @@ namespace BOB
 			if (thisReplacement != null)
 			{
 				// Yes - add reference data to the list.
-				BuildingPropReference newReference = CreateReference(buildingInfo, targetInfo, propIndex, thisReplacement.isTree);
+				BuildingPropReference newReference = CreateReference(buildingInfo, propIndex, thisReplacement.isTree);
 				AddReference(thisReplacement, newReference);
 
 				// Apply replacement and return true to indicate restoration.
@@ -376,7 +376,7 @@ namespace BOB
 		/// <param name="propIndex">Prop index</param>
 		/// <param name="isTree">True if this is a tree reference, false if this is a prop reference</param>
 		/// <returns>Newly-created reference (null if creation failed)</returns>
-		protected BuildingPropReference CreateReference(BuildingInfo buildingInfo, PrefabInfo originalPrefab, int propIndex, bool isTree)
+		protected BuildingPropReference CreateReference(BuildingInfo buildingInfo, int propIndex, bool isTree)
 		{
 			// Safety checks.
 			if (buildingInfo?.m_props != null && propIndex >= 0)
@@ -390,8 +390,10 @@ namespace BOB
 					buildingInfo = buildingInfo,
 					propIndex = propIndex,
 					isTree = isTree,
-					originalProp = isTree ? thisProp.m_finalProp : originalPrefab as PropInfo,
-					originalTree = isTree ? originalPrefab as TreeInfo : thisProp.m_finalTree,
+					originalProp = thisProp.m_prop,
+					originalFinalProp = thisProp.m_finalProp,
+					originalTree = thisProp.m_tree,
+					originalFinalTree = thisProp.m_finalTree,
 					radAngle = thisProp.m_radAngle,
 					fixedHeight = thisProp.m_fixedHeight,
 					position = thisProp.m_position,
@@ -416,9 +418,9 @@ namespace BOB
 			if (thisProp != null)
 			{
 				thisProp.m_prop = reference.originalProp;
-				thisProp.m_finalProp = reference.originalProp;
+				thisProp.m_finalProp = reference.originalFinalProp;
 				thisProp.m_tree = reference.originalTree;
-				thisProp.m_finalTree = reference.originalTree;
+				thisProp.m_finalTree = reference.originalFinalTree;
 				thisProp.m_radAngle = reference.radAngle;
 				thisProp.m_fixedHeight = reference.fixedHeight;
 				thisProp.m_position = reference.position;

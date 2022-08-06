@@ -1133,9 +1133,9 @@ namespace BOB
 				radAngle = thisProp.m_radAngle,
 				radAngleAdjustment = angleAdjustment * Mathf.Deg2Rad,
 				position = thisProp.m_position,
-				adjustment = adjustment,
 				probability = thisProp.m_probability,
-				fixedHeight = thisProp.m_fixedHeight
+				fixedHeight = thisProp.m_fixedHeight,
+				adjustment = adjustment,
 			};
 		}
 	}

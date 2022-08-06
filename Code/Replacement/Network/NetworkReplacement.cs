@@ -95,21 +95,14 @@ namespace BOB
 					if (thisProp == null)
 					{
 						// No active replacement; use current PropInfo.
-						if (replacement.targetInfo is PropInfo)
-						{
-							thisProp = thisLaneProp.m_finalProp;
-						}
-						else
-						{
-							thisProp = thisLaneProp.m_finalTree;
-						}
+						thisProp = replacement.isTree ? (PrefabInfo)thisLaneProp.m_tree : thisLaneProp.m_prop;
 					}
 
 					// See if this prop matches our replacement.
 					if (thisProp != null && thisProp == replacement.targetInfo)
 					{
 						// Match!  Add reference data to the list.
-						replacement.references.Add(CreateReference(replacement.NetInfo, thisProp, laneIndex, propIndex, replacement.isTree));
+						replacement.references.Add(CreateReference(replacement.NetInfo, laneIndex, propIndex, replacement.isTree));
 					}
 				}
 			}

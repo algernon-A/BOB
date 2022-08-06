@@ -184,7 +184,7 @@ namespace BOB
 			if (thisReplacement != null)
 			{
 				// Yes - add reference data to the list.
-				NetPropReference newReference = CreateReference(netInfo, targetInfo, laneIndex, propIndex, thisReplacement.isTree);
+				NetPropReference newReference = CreateReference(netInfo, laneIndex, propIndex, thisReplacement.isTree);
 				AddReference(thisReplacement, newReference);
 
 				// Apply replacement and return true to indicate restoration.
@@ -381,12 +381,11 @@ namespace BOB
 		/// Creates a new PropReference from the provided network prefab, lane and prop index.
 		/// </summary>
 		/// <param name="netInfo">Network prefab</param>
-		/// <param name="originalPrefab">Original prop/tree prefab (for later restoration if needed)</param>
 		/// <param name="laneIndex">Lane index</param>
 		/// <param name="propIndex">Prop index</param>
 		/// <param name="isTree">True if this is a tree reference, false if this is a prop reference</param>
 		/// <returns>Newly-created reference (null if creation failed)</returns>
-		protected NetPropReference CreateReference(NetInfo netInfo, PrefabInfo originalPrefab, int laneIndex, int propIndex, bool isTree)
+		protected NetPropReference CreateReference(NetInfo netInfo, int laneIndex, int propIndex, bool isTree)
 		{
 			// Safety checks.
 			if (netInfo != null && laneIndex >= 0 && propIndex >= 0)
@@ -401,12 +400,14 @@ namespace BOB
 					laneIndex = laneIndex,
 					propIndex = propIndex,
 					isTree = isTree,
-					originalProp = isTree ? thisProp.m_finalProp : originalPrefab as PropInfo,
-					originalTree = isTree ? originalPrefab as TreeInfo : thisProp.m_finalTree,
+					originalProp = thisProp.m_prop,
+					originalFinalProp = thisProp.m_finalProp,
+					originalTree = thisProp.m_tree,
+					originalFinalTree = thisProp.m_finalTree,
 					angle = thisProp.m_angle,
 					position = thisProp.m_position,
 					probability = thisProp.m_probability,
-					repeatDistance = thisProp.m_repeatDistance
+					repeatDistance = thisProp.m_repeatDistance,
 				};
 			}
 
@@ -427,9 +428,9 @@ namespace BOB
 			if (thisProp != null)
 			{
 				thisProp.m_prop = reference.originalProp;
-				thisProp.m_finalProp = reference.originalProp;
+				thisProp.m_finalProp = reference.originalFinalProp;
 				thisProp.m_tree = reference.originalTree;
-				thisProp.m_finalTree = reference.originalTree;
+				thisProp.m_finalTree = reference.originalFinalTree;
 				thisProp.m_angle = reference.angle;
 				thisProp.m_position = reference.position;
 				thisProp.m_probability = reference.probability;
