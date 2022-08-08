@@ -8,17 +8,12 @@ namespace BOB
 	/// </summary>
 	internal class AllBuildingReplacement : BuildingReplacementBase
 	{
-		// Dictionary of active replacment entries.
-		private readonly Dictionary<BuildingInfo, Dictionary<PrefabInfo, List<BuildingPropReference>>> propReferences;
-
-
 		/// <summary>
 		/// Constructor - initializes instance reference and replacement dictionary.
 		/// </summary>
 		internal AllBuildingReplacement()
 		{
 			Instance = this;
-			propReferences = new Dictionary<BuildingInfo, Dictionary<PrefabInfo, List<BuildingPropReference>>>();
 		}
 
 		/// <summary>
@@ -33,38 +28,20 @@ namespace BOB
 
 
 		/// <summary>
-		/// Retrieves any currently-applied replacement entry that affects the given building and target prefab and prop index.
+		/// The priority level of this replacmeent type.
 		/// </summary>
-		/// <param name="buildingInfo">Targeted building prefab</param>
-		/// <param name="targetInfo">Target prop/tree prefab</param>
-		/// <param name="propIndex">Target prop/tree index (unused)</param>
-		/// <returns>Currently-applied replacement (null if none)</returns>
-		internal override BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex) => ReplacementList(buildingInfo)?.Find(x => x.target.Equals(targetInfo.name));
+		protected override ReplacementPriority ThisPriority => ReplacementPriority.AllReplacement;
 
 
 		/// <summary>
-		/// Retuns the list of active prop references for the given replacement value(s).
+		/// Finds any existing replacement relevant to the provided arguments.
 		/// </summary>
-		/// <param name="buildingInfo">Targeted building prefab</param>
-		/// <param name="targetInfo">Targeted (original) prop prefab</param>
-		/// <param name="propIndex">Targeted prop index (in lanme)</param>
-		/// <returns>List of active prop references for the given replacment values (null if none)</returns>
-		internal override List<BuildingPropReference> ReferenceList(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex)
-		{
-			// See if we've got any active references for this net prefab.
-			if (propReferences.TryGetValue(buildingInfo, out Dictionary<PrefabInfo, List<BuildingPropReference>> referenceDict))
-			{
-				// See if we've got any active references for this target prefab.
-				if (referenceDict.TryGetValue(targetInfo, out List<BuildingPropReference> referenceList))
-				{
-					// Got it - return the list.
-					return referenceList;
-				}
-			}
-
-			// If we got here, we didn't get anything; return null.
-			return null;
-		}
+		/// <param name="buildingInfo">Building prefab (ignored)</param>
+		/// <param name="propIndex">Prop index (ignored)</param>
+		/// <param name="targetInfo">Target prop/tree prefab</param>
+		/// <returns>Existing replacement entry, if one was found, otherwise null</returns>
+		protected override BOBBuildingReplacement FindReplacement(BuildingInfo buildingInfo, int propIndex, PrefabInfo targetInfo) =>
+			ReplacementList(buildingInfo)?.Find(x => x.targetInfo == targetInfo);
 
 
 		/// <summary>
@@ -72,56 +49,14 @@ namespace BOB
 		/// </summary>
 		internal override void RevertAll()
 		{
-			// Revert all active references in dictionary.
-			foreach (BuildingInfo buildingPrefab in propReferences.Keys)
+			foreach (BOBBuildingReplacement replacement in ReplacementList(null))
 			{
-				foreach (PrefabInfo targetPrefab in propReferences[buildingPrefab].Keys)
-				{
-					RevertReferences(targetPrefab, propReferences[buildingPrefab][targetPrefab]);
-				}
+				// Remove any references to this replacement from all building handlers.
+				BuildingHandlers.RemoveReplacement(replacement);
 			}
 
 			// Clear configuration file.
 			ReplacementList(null).Clear();
-
-			// Clear the active replacements dictionary.
-			propReferences.Clear();
-		}
-
-
-		/// <summary>
-		/// Checks if there's a currently active replacement applied to the given building and prop index, and if so, returns the replacement record.
-		/// </summary>
-		/// <param name="buildingInfo">Building prefab to check</param>
-		/// <param name="propIndex">Prop index to check</param>
-		/// <param name="propReference">Original prop reference record (null if none)</param>
-		/// <returns>Replacement record if a replacement is currently applied, null if no replacement is currently applied</returns>
-		internal override BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingInfo, int propIndex, out BuildingPropReference propReference)
-		{
-			// See if we've got any active references for this net prefab.
-			if (propReferences.TryGetValue(buildingInfo, out Dictionary<PrefabInfo, List<BuildingPropReference>> referenceDict))
-			{
-
-				// Iterate through entry for each prefab under this network.
-				foreach (KeyValuePair<PrefabInfo, List<BuildingPropReference>> key in referenceDict)
-				{
-					// Iterate through each entry in list.
-					foreach (BuildingPropReference propRef in key.Value)
-					{
-						// Check for a a network(due to all- replacement), lane and prop index match.
-						if (propRef.buildingInfo == buildingInfo && propRef.propIndex == propIndex)
-						{
-							// Match!  Find and return the replacement record.
-							propReference = propRef;
-							return ActiveReplacement(buildingInfo, key.Key, propRef.propIndex);
-						}
-					}
-				}
-			}
-
-			// If we got here, no entry was found - return null to indicate no active replacement.
-			propReference = null;
-			return null;
 		}
 
 
@@ -144,9 +79,6 @@ namespace BOB
 				return;
             }
 
-			// Create new reference list.
-			List<BuildingPropReference> referenceList = new List<BuildingPropReference>();
-
 			// Iterate through each loaded building and record props to be replaced.
 			for (int i = 0; i < PrefabCollection<BuildingInfo>.LoadedCount(); ++i)
 			{
@@ -162,44 +94,37 @@ namespace BOB
 				// Iterate through each prop in building.
 				for (int propIndex = 0; propIndex < buildingInfo.m_props.Length; ++propIndex)
 				{
-					// Check for any currently active building or individual building prop replacement, or if this is an added prop.
-					if (BuildingReplacement.Instance.ActiveReplacement(buildingInfo, propIndex, out _) != null || IndividualBuildingReplacement.Instance.ActiveReplacement(buildingInfo, propIndex, out _) != null || AddedBuildingProps.Instance.IsAdded(buildingInfo, propIndex))
+					// Local reference.
+					BuildingInfo.Prop thisBuildingProp = buildingInfo.m_props[propIndex];
+					TreeInfo thisTree = thisBuildingProp.m_tree;
+					PropInfo thisProp = thisBuildingProp.m_prop;
+
+					// Get any active handler.
+					BuildingPropHandler handler = BuildingHandlers.GetHandler(buildingInfo, propIndex);
+					if (handler != null)
 					{
-						// Active building replacement or added prop; skip this one.
-						continue;
+						// Active reference found - use original values for checking eligibility (instead of currently active values).
+						thisTree = handler.OriginalTree;
+						thisProp = handler.OriginalProp;
 					}
 
-					// Get this prop from building.
-					PrefabInfo thisProp = replacement.isTree ? (PrefabInfo)buildingInfo.m_props[propIndex].m_tree : (PrefabInfo)buildingInfo.m_props[propIndex].m_prop;
-
 					// See if this prop matches our replacement.
-					if (thisProp != null && thisProp == replacement.targetInfo)
+					bool treeMatch = replacement.isTree && thisTree != null && thisTree == replacement.targetInfo;
+					bool propMatch = !replacement.isTree && thisProp != null && thisProp == replacement.targetInfo;
+					if (treeMatch | propMatch)
 					{
-						// Match!  Add reference data to the list.
-						referenceList.Add(CreateReference(buildingInfo, propIndex, replacement.isTree));
+						// Match!  Create new handler if there wasn't an existing one.
+						if (handler == null)
+						{
+							handler = BuildingHandlers.GetOrAddHandler(buildingInfo, propIndex);
+						}
+
+						// Set the new replacement.
+						handler.SetReplacement(replacement, ThisPriority);
 					}
 				}
 			}
-
-			// Now, iterate through each entry found (if any) and apply the replacement to each one.
-			foreach (BuildingPropReference propReference in referenceList)
-			{
-				// Add entry to dictionary.
-				AddReference(replacement, propReference);
-
-				// Apply the replacement.
-				ReplaceProp(replacement, propReference);
-			}
 		}
-
-
-		/// <summary>
-		/// Restores any replacements from lower-priority replacements after a reversion.
-		/// </summary>
-		/// <param name="buildingInfo">Building prefab</param>
-		/// <param name="targetInfo">Target prop info</param>
-		/// <param name="propIndex">Prop index</param>
-		protected override void RestoreLower(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex) { }
 
 
 		/// <summary>
@@ -219,54 +144,22 @@ namespace BOB
 
 
 		/// <summary>
-		/// Reverts a replacement.
+		/// Removes a replacement.
 		/// </summary>
 		/// <param name="replacement">Replacement record to revert</param>
 		/// <param name="removeEntries">True to remove the reverted entries from the list of replacements, false to leave the list unchanged</param>
 		/// <returns>Always false (all-building entries never remove parent network elements)</returns>
-		protected override bool Revert(BOBBuildingReplacement replacement, bool removeEntries)
+		internal override bool RemoveReplacement(BOBBuildingReplacement replacement, bool removeEntries = true)
 		{
-			// Safety check for calls without any current replacement.
-			if (replacement?.targetInfo == null)
+			// Safety check.
+			if (replacement == null)
 			{
+				Logging.Error("null replacement passed to AllBuildingReplacement.RemoveReplacement");
 				return false;
 			}
 
-			// List of prefabs where references need to be removed.
-			List<BuildingInfo> removeList = new List<BuildingInfo>();
-
-			// Iterate through each entry in prop reference dictionary.
-			foreach (KeyValuePair<BuildingInfo, Dictionary<PrefabInfo, List<BuildingPropReference>>> keyPair in propReferences)
-			{
-				// Attempt to get a replacement list for this entry.
-				if (keyPair.Value.TryGetValue(replacement.targetInfo, out List<BuildingPropReference> referenceList))
-				{
-					// Got a list - revert all entries.
-					RevertReferences(replacement.targetInfo, referenceList);
-
-					// Add dictionary to list to be cleared.
-					removeList.Add(keyPair.Key);
-				}
-			}
-
-			// Remove references from dictionary.
-			foreach (BuildingInfo removeEntry in removeList)
-			{
-				if (propReferences.ContainsKey(removeEntry))
-				{
-					if (propReferences[removeEntry].ContainsKey(replacement.targetInfo))
-					{
-						// Remove target info entries from this building entry.
-						propReferences[removeEntry].Remove(replacement.targetInfo);
-					}
-
-					// If no entries left for this building, remove entire building entry.
-					if (propReferences[removeEntry].Count == 0)
-					{
-						propReferences.Remove(removeEntry);
-					}
-				}
-			}
+			// Remove any references to this replacement from all prop handlers.
+			BuildingHandlers.RemoveReplacement(replacement);
 
 			// Remove replacement entry from list of replacements, if we're doing so.
 			if (removeEntries)
@@ -277,30 +170,6 @@ namespace BOB
 
 			// If we got here, we didn't remove any network entries from the list; return false.
 			return false;
-		}
-
-
-		/// <summary>
-		/// Adds the given prop reference to the record for the given replacement.
-		/// </summary>
-		/// <param name="replacement">Replacement reference</param>
-		/// <param name="propReference">Pop reference to store</param>
-		protected override void AddReference(BOBBuildingReplacement replacement, BuildingPropReference propReference)
-		{
-			// Check to see if we've got an entry for this target prefab in our dictionary, and if not, create one.
-			if (!propReferences.ContainsKey(propReference.buildingInfo))
-			{
-				propReferences.Add(propReference.buildingInfo, new Dictionary<PrefabInfo, List<BuildingPropReference>>());
-			}
-
-			// Check to see if we've got an entry for this network prefab in our dictionary entry for this target prefab, and if not, create one.
-			if (!propReferences[propReference.buildingInfo].ContainsKey(replacement.targetInfo))
-			{
-				propReferences[propReference.buildingInfo].Add(replacement.targetInfo, new List<BuildingPropReference>());
-			}
-
-			// Add this prop reference to the dictioanry.
-			propReferences[propReference.buildingInfo][replacement.targetInfo].Add(propReference);
 		}
 	}
 }

@@ -30,13 +30,20 @@ namespace BOB
 
 
 		/// <summary>
-		/// Retrieves any currently-applied replacement entry for the given building prefab, target prefab and prop index.
+		/// The priority level of this replacmeent type.
+		/// </summary>
+		protected override ReplacementPriority ThisPriority => ReplacementPriority.IndividualReplacement;
+
+
+		/// <summary>
+		/// Finds any existing replacement relevant to the provided arguments.
 		/// </summary>
 		/// <param name="buildingInfo">Building prefab</param>
-		/// <param name="targetInfo">Target prop/tree prefab</param>
-		/// <param name="propIndex">Target prop/tree index</param>
-		/// <returns>Currently-applied replacement (null if none)</returns>
-		internal override BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex) => ReplacementList(buildingInfo)?.Find(x => x.propIndex == propIndex);
+		/// <param name="propIndex">Prop index</param>
+		/// <param name="targetInfo">Target prop/tree prefab (ignored)</param>
+		/// <returns>Existing replacement entry, if one was found, otherwise null</returns>
+		protected override BOBBuildingReplacement FindReplacement(BuildingInfo buildingInfo, int propIndex, PrefabInfo targetInfo) => 
+			ReplacementList(buildingInfo)?.Find(x => x.propIndex == propIndex);
 
 
 		/// <summary>
@@ -71,35 +78,8 @@ namespace BOB
 				return;
 			}
 
-			// Reset any building or all-building replacements first.
-			BuildingReplacement.Instance.RemoveEntry(replacement.BuildingInfo, replacement.targetInfo, replacement.propIndex);
-			AllBuildingReplacement.Instance.RemoveEntry(replacement.BuildingInfo, replacement.targetInfo, replacement.propIndex);
-
-			// Create replacment entry.
-			BuildingPropReference newPropReference = CreateReference(replacement.BuildingInfo, replacement.propIndex, replacement.isTree);
-
-			// Reset replacement list to be only our new replacement entry.
-			replacement.references = new List<BuildingPropReference> { newPropReference };
-
-			// Apply the replacement.
-			ReplaceProp(replacement, newPropReference);
-		}
-
-
-		/// <summary>
-		/// Restores any replacements from lower-priority replacements after a reversion.
-		/// </summary>
-		/// <param name="buildingInfo">Building prefab</param>
-		/// <param name="targetInfo">Target prop info</param>
-		/// <param name="propIndex">Prop index</param>
-		protected override void RestoreLower(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex)
-		{
-			// Restore any building replacement.
-			if (!BuildingReplacement.Instance.Restore(buildingInfo, targetInfo, propIndex))
-			{
-				// No building restoration occured - restore any all-building replacement.
-				AllBuildingReplacement.Instance.Restore(buildingInfo, targetInfo, propIndex);
-			}
+			// Set the new replacement.
+			BuildingHandlers.GetOrAddHandler(replacement.BuildingInfo, replacement.propIndex).SetReplacement(replacement, ThisPriority);
 		}
 	}
 }

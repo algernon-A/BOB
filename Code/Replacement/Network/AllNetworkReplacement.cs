@@ -113,11 +113,11 @@ namespace BOB
 					foreach (NetPropReference propRef in key.Value)
 					{
 						// Check for a a network(due to all- replacement), lane and prop index match.
-						if (propRef.netInfo == netInfo && propRef.laneIndex == laneIndex && propRef.propIndex == propIndex)
+						if (propRef.netInfo == netInfo && propRef.laneIndex == laneIndex && propRef.PropIndex == propIndex)
 						{
 							// Match!  Find and return the replacement record.
 							propReference = propRef;
-							return ActiveReplacement(netInfo, key.Key, propRef.laneIndex, propRef.propIndex);
+							return ActiveReplacement(netInfo, key.Key, propRef.laneIndex, propRef.PropIndex);
 						}
 					}
 				}
@@ -216,7 +216,7 @@ namespace BOB
 			foreach (NetPropReference propReference in referenceList)
 			{
 				// Remove any pack replacements first.
-				NetworkPackReplacement.Instance.RemoveEntry(propReference.netInfo, replacement.targetInfo, propReference.laneIndex, propReference.propIndex);
+				NetworkPackReplacement.Instance.RemoveEntry(propReference.netInfo, replacement.targetInfo, propReference.laneIndex, propReference.PropIndex);
 
 				// Add entry to dictionary.
 				AddReference(replacement, propReference);

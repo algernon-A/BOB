@@ -79,7 +79,7 @@ namespace BOB
 					foreach (NetPropReference propRef in netReplacement.references)
 					{
 						// Check for a a network(due to all- replacement), lane and prop index match.
-						if (propRef.netInfo == netInfo && propRef.laneIndex == laneIndex && propRef.propIndex == propIndex)
+						if (propRef.netInfo == netInfo && propRef.laneIndex == laneIndex && propRef.PropIndex == propIndex)
 						{
 							// Match!  Return the replacement record.
 							propReference = propRef;
@@ -218,7 +218,7 @@ namespace BOB
 				foreach (NetPropReference propReference in referenceList)
 				{
 					// Look for a network, lane and index match.
-					if (propReference.netInfo == netInfo && propReference.laneIndex == laneIndex && propReference.propIndex == propIndex)
+					if (propReference.netInfo == netInfo && propReference.laneIndex == laneIndex && propReference.PropIndex == propIndex)
 					{
 						// Got a match!  Revert instance.
 						RevertReference(propReference);
@@ -369,7 +369,7 @@ namespace BOB
 				RevertReference(propReference);
 
 				// Restore any lower-priority replacements.
-				RestoreLower(propReference.netInfo, originalPrefab, propReference.laneIndex, propReference.propIndex);
+				RestoreLower(propReference.netInfo, originalPrefab, propReference.laneIndex, propReference.PropIndex);
 
 				// Add network to dirty list.
 				NetData.DirtyList.Add(propReference.netInfo);
@@ -394,19 +394,18 @@ namespace BOB
 				NetLaneProps.Prop thisProp = netInfo.m_lanes[laneIndex].m_laneProps.m_props[propIndex];
 
 				// Create and return new reference.
-				return new NetPropReference
+				return new NetPropReference(
+					propIndex,
+					thisProp.m_prop,
+					thisProp.m_finalProp,
+					thisProp.m_tree,
+					thisProp.m_finalTree,
+					thisProp.m_position,
+					thisProp.m_probability)
 				{
 					netInfo = netInfo,
 					laneIndex = laneIndex,
-					propIndex = propIndex,
-					isTree = isTree,
-					originalProp = thisProp.m_prop,
-					originalFinalProp = thisProp.m_finalProp,
-					originalTree = thisProp.m_tree,
-					originalFinalTree = thisProp.m_finalTree,
 					angle = thisProp.m_angle,
-					position = thisProp.m_position,
-					probability = thisProp.m_probability,
 					repeatDistance = thisProp.m_repeatDistance,
 				};
 			}
@@ -424,16 +423,16 @@ namespace BOB
 		protected void RevertReference(NetPropReference reference)
 		{
 			// Local reference.
-			NetLaneProps.Prop thisProp = reference.netInfo.m_lanes[reference.laneIndex].m_laneProps.m_props?[reference.propIndex];
+			NetLaneProps.Prop thisProp = reference.netInfo.m_lanes[reference.laneIndex].m_laneProps.m_props?[reference.PropIndex];
 			if (thisProp != null)
 			{
-				thisProp.m_prop = reference.originalProp;
-				thisProp.m_finalProp = reference.originalFinalProp;
-				thisProp.m_tree = reference.originalTree;
-				thisProp.m_finalTree = reference.originalFinalTree;
+				thisProp.m_prop = reference.OriginalProp;
+				thisProp.m_finalProp = reference.OriginalFinalProp;
+				thisProp.m_tree = reference.OriginalTree;
+				thisProp.m_finalTree = reference.OriginalFinalTree;
 				thisProp.m_angle = reference.angle;
-				thisProp.m_position = reference.position;
-				thisProp.m_probability = reference.probability;
+				thisProp.m_position = reference.OriginalPosition;
+				thisProp.m_probability = reference.OriginalProbability;
 				thisProp.m_repeatDistance = reference.repeatDistance;
 
 				// Update network.
@@ -468,30 +467,30 @@ namespace BOB
 			NetInfo.Lane thisLane = propReference.netInfo.m_lanes[propReference.laneIndex];
 
 			// Apply replacement.
-			thisLane.m_laneProps.m_props[propReference.propIndex].m_prop = replacement.ReplacementProp;
-			thisLane.m_laneProps.m_props[propReference.propIndex].m_finalProp = replacement.ReplacementProp;
-			thisLane.m_laneProps.m_props[propReference.propIndex].m_tree = replacement.ReplacementTree;
-			thisLane.m_laneProps.m_props[propReference.propIndex].m_finalTree = replacement.ReplacementTree;
+			thisLane.m_laneProps.m_props[propReference.PropIndex].m_prop = replacement.ReplacementProp;
+			thisLane.m_laneProps.m_props[propReference.PropIndex].m_finalProp = replacement.ReplacementProp;
+			thisLane.m_laneProps.m_props[propReference.PropIndex].m_tree = replacement.ReplacementTree;
+			thisLane.m_laneProps.m_props[propReference.PropIndex].m_finalTree = replacement.ReplacementTree;
 
 			// Invert x offset and angle to match original prop x position.
 			float angleMult = 1f;
-			if (thisLane.m_position + propReference.position.x < 0)
+			if (thisLane.m_position + propReference.OriginalPosition.x < 0)
 			{
 				offset.x = 0 - offset.x;
 				angleMult = -1;
 			}
 
 			// Angle and offset.
-			thisLane.m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle + (replacement.angle * angleMult);
-			thisLane.m_laneProps.m_props[propReference.propIndex].m_position = propReference.position + offset;
+			thisLane.m_laneProps.m_props[propReference.PropIndex].m_angle = propReference.angle + (replacement.angle * angleMult);
+			thisLane.m_laneProps.m_props[propReference.PropIndex].m_position = propReference.OriginalPosition + offset;
 
 			// Probability.
-			thisLane.m_laneProps.m_props[propReference.propIndex].m_probability = replacement.probability;
+			thisLane.m_laneProps.m_props[propReference.PropIndex].m_probability = replacement.probability;
 
 			// Repeat distance, if a valid value is set.
 			if (replacement.repeatDistance > 1)
 			{
-				thisLane.m_laneProps.m_props[propReference.propIndex].m_repeatDistance = replacement.repeatDistance;
+				thisLane.m_laneProps.m_props[propReference.PropIndex].m_repeatDistance = replacement.repeatDistance;
 			}
 
 			// Update network prop references.

@@ -250,9 +250,6 @@ namespace BOB
 
 		[XmlIgnore]
 		public BuildingInfo BuildingInfo => parentInfo as BuildingInfo;
-
-		[XmlIgnore]
-		public List<BuildingPropReference> references = new List<BuildingPropReference>();
     }
 
 

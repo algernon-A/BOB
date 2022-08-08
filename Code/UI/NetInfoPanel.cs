@@ -91,8 +91,10 @@ namespace BOB
 		/// <summary>
 		/// Handles changes to the currently selected target prefab.
 		/// </summary>
-		internal override TargetListItem CurrentTargetItem
+		internal new NetTargetListItem CurrentTargetItem
 		{
+			get => base.CurrentTargetItem as NetTargetListItem;
+
 			set
 			{
 				// First, undo any preview.
@@ -401,7 +403,7 @@ namespace BOB
 			// Update preview for each recorded reference.
 			foreach (NetPropReference reference in originalValues)
 			{
-				Logging.Message("previewing change for index ", reference.propIndex, " with original prop ", reference.originalProp?.name ?? "null", " and tree ", reference.originalTree?.name ?? "null");
+				Logging.Message("previewing change for index ", reference.PropIndex, " with original prop ", reference.OriginalProp?.name ?? "null", " and tree ", reference.OriginalTree?.name ?? "null");
 
 				PreviewChange(reference);
 			}
@@ -426,7 +428,7 @@ namespace BOB
 			// Iterate through each original value.
 			foreach (NetPropReference reference in originalValues)
 			{
-				Logging.Message("reverting preview for index ", reference.propIndex, " with original prop ", reference.originalProp?.name ?? "null", " and tree ", reference.originalTree?.name ?? "null");
+				Logging.Message("reverting preview for index ", reference.PropIndex, " with original prop ", reference.OriginalProp?.name ?? "null", " and tree ", reference.OriginalTree?.name ?? "null");
 
 				// Make sure that we've got valid original values to revert to.
 				NetInfo.Lane[] selectedNetLanes = reference.netInfo?.m_lanes;
@@ -434,7 +436,7 @@ namespace BOB
 				{
 					// Sanity check indexes.
 					int laneIndex = reference.laneIndex;
-					int propIndex = reference.propIndex;
+					int propIndex = reference.PropIndex;
 
 					if (laneIndex >= selectedNetLanes.Length ||
 						selectedNetLanes[laneIndex].m_laneProps == null ||
@@ -447,13 +449,13 @@ namespace BOB
 					NetLaneProps.Prop thisProp = reference.netInfo.m_lanes[laneIndex].m_laneProps.m_props[propIndex];
 
 					// Restore original values.
-					thisProp.m_prop = reference.originalProp;
-					thisProp.m_finalProp = reference.originalFinalProp;
-					thisProp.m_tree = reference.originalTree;
-					thisProp.m_finalTree = reference.originalFinalTree;
+					thisProp.m_prop = reference.OriginalProp;
+					thisProp.m_finalProp = reference.OriginalFinalProp;
+					thisProp.m_tree = reference.OriginalTree;
+					thisProp.m_finalTree = reference.OriginalFinalTree;
 					thisProp.m_angle = reference.angle;
-					thisProp.m_position = reference.position;
-					thisProp.m_probability = reference.probability;
+					thisProp.m_position = reference.OriginalPosition;
+					thisProp.m_probability = reference.OriginalProbability;
 					thisProp.m_repeatDistance = reference.repeatDistance;
 
 					// Add network to dirty list.
@@ -859,7 +861,7 @@ namespace BOB
 						{
 							//targetListItem.originalPrefab = propReference.OriginalInfo;
 							targetListItem.originalAngle = propReference.angle;
-							targetListItem.originalProb = propReference.probability;
+							targetListItem.originalProb = propReference.OriginalProbability;
 							targetListItem.originalRepeat = propReference.repeatDistance;
 						}
 					}
@@ -1032,13 +1034,13 @@ namespace BOB
 			if (!CurrentTargetItem.isAdded)
 			{
 				// Found a match - retrieve original position and angle.
-				basePosition = propReference.position - propReference.adjustment;
+				basePosition = propReference.OriginalPosition - propReference.Adjustment;
 				baseAngle = propReference.angle - propReference.angleAdjustment;
 			}
 
 			// Null check.
 			NetInfo.Lane thisLane = propReference.netInfo?.m_lanes?[propReference.laneIndex];
-			NetLaneProps.Prop thisProp = thisLane?.m_laneProps?.m_props?[propReference.propIndex];
+			NetLaneProps.Prop thisProp = thisLane?.m_laneProps?.m_props?[propReference.PropIndex];
 			if (thisProp == null)
 			{
 				return;
@@ -1135,20 +1137,19 @@ namespace BOB
 			}
 
 			// Return original data.
-			return new NetPropReference
+			return new NetPropReference(
+					propIndex,
+					thisProp.m_prop,
+					thisProp.m_finalProp,
+					thisProp.m_tree,
+					thisProp.m_finalTree,
+					thisProp.m_position,
+					thisProp.m_probability)
 			{
 				netInfo = netInfo,
 				laneIndex = lane,
-				propIndex = propIndex,
-				originalProp = thisProp.m_prop,
-				originalTree = thisProp.m_tree,
-				originalFinalProp = thisProp.m_finalProp,
-				originalFinalTree = thisProp.m_finalTree,
 				angle = thisProp.m_angle,
 				angleAdjustment = angleAdjustment,
-				position = thisProp.m_position,
-				adjustment = adjustment,
-				probability = thisProp.m_probability,
 				repeatDistance = thisProp.m_repeatDistance
 			};
 		}

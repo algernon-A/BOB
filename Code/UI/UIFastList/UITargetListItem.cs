@@ -8,6 +8,53 @@ namespace BOB
 	/// </summary>
 	public class TargetListItem
 	{
+		// TODO: added here.
+		private BOBBuildingReplacement _individualReplacement;
+		private BOBBuildingReplacement _groupedReplacement;
+		private BOBBuildingReplacement _allReplacement;
+
+		/// <summary>
+		/// Gets or sets the active individual building replacement.
+		/// </summary>
+		public BOBBuildingReplacement IndividualReplacement
+		{
+			get => _individualReplacement;
+
+			set
+			{
+				_individualReplacement = value;
+				individualPrefab = value?.replacementInfo;
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets the active grouped building replacement.
+		/// </summary>
+		public BOBBuildingReplacement GroupedReplacement
+		{
+			get => _groupedReplacement;
+
+			set
+			{
+				_groupedReplacement = value;
+				replacementPrefab = value?.replacementInfo;
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets the active all- building replacement.
+		/// </summary>
+		public BOBBuildingReplacement AllReplacement
+		{
+			get => _allReplacement;
+
+			set
+			{
+				_allReplacement = value;
+				allPrefab = value?.replacementInfo;
+			}
+		}
+
 		// Original prefab.
 		public PrefabInfo originalPrefab;
 		public int originalProb;
@@ -39,6 +86,7 @@ namespace BOB
 
 		// Whether or not this is an added prop.
 		public bool isAdded = false;
+
 
 		/// <summary>
 		/// Currently effective prefab (active replacement prefab, if any, or original prefab if no replacement).

@@ -30,13 +30,20 @@ namespace BOB
 
 
 		/// <summary>
-		/// Retrieves any currently-applied replacement entry that affects the given building and target prefab and prop index.
+		/// The priority level of this replacmeent type.
+		/// </summary>
+		protected override ReplacementPriority ThisPriority => ReplacementPriority.GroupedReplacement;
+
+
+		/// <summary>
+		/// Finds any existing replacement relevant to the provided arguments.
 		/// </summary>
 		/// <param name="buildingInfo">Building prefab</param>
+		/// <param name="propIndex">Prop index (ignored)</param>
 		/// <param name="targetInfo">Target prop/tree prefab</param>
-		/// <param name="propIndex">Target prop/tree index (unused)</param>
-		/// <returns>Currently-applied replacement (null if none)</returns>
-		internal override BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex) => BuildingElement(buildingInfo)?.replacements.Find(x => x.targetInfo == targetInfo);
+		/// <returns>Existing replacement entry, if one was found, otherwise null</returns>
+		protected override BOBBuildingReplacement FindReplacement(BuildingInfo buildingInfo, int propIndex, PrefabInfo targetInfo) =>
+			ReplacementList(buildingInfo)?.Find(x => x.targetInfo == targetInfo);
 
 
 		/// <summary>
@@ -48,59 +55,42 @@ namespace BOB
 			// Don't do anything if prefabs can't be found, or if building prefab has no prop array.
 			if (replacement?.targetInfo == null || replacement.replacementInfo == null || replacement.BuildingInfo?.m_props == null)
 			{
+				Logging.Error("null value passed to BuildingReplacement.ApplyReplacement");
 				return;
 			}
-
-			// (Re)set replacement list.
-			replacement.references = new List<BuildingPropReference>();
 
 			// Iterate through each prop in building.
 			for (int propIndex = 0; propIndex < replacement.BuildingInfo.m_props.Length; ++propIndex)
 			{
-				// Check for any currently active individual building prop replacement, or if this is an added prop.
-				if (IndividualBuildingReplacement.Instance.ActiveReplacement(replacement.BuildingInfo, propIndex, out _) != null || AddedBuildingProps.Instance.IsAdded(replacement.BuildingInfo, propIndex))
-				{
-					// Active individual building prop replacement or added prop; skip this one.
-					continue;
-				}
-
 				// Local reference.
 				BuildingInfo.Prop thisBuildingProp = replacement.BuildingInfo.m_props[propIndex];
+				TreeInfo thisTree = thisBuildingProp.m_tree;
+				PropInfo thisProp = thisBuildingProp.m_prop;
 
-				// Check for any existing all-building replacement.
-				PrefabInfo thisProp = AllBuildingReplacement.Instance.ActiveReplacement(replacement.BuildingInfo, propIndex, out _)?.targetInfo;
-				if (thisProp == null)
+				// Get any active hanlder.
+				BuildingPropHandler handler = BuildingHandlers.GetHandler(replacement.BuildingInfo, propIndex);
+				if (handler != null)
 				{
-					// No active replacement; use current PropInfo.
-					thisProp = replacement.isTree ? (PrefabInfo)thisBuildingProp.m_tree : thisBuildingProp.m_prop;
+					// Active handler found - use original values for checking eligibility (instead of currently active values).
+					thisTree = handler.OriginalTree;
+					thisProp = handler.OriginalProp;
 				}
 
 				// See if this prop matches our replacement.
-				if (thisProp != null && thisProp == replacement.targetInfo)
+				bool treeMatch = replacement.isTree && thisTree != null && thisTree == replacement.targetInfo;
+				bool propMatch = !replacement.isTree && thisProp != null && thisProp == replacement.targetInfo;
+				if (treeMatch | propMatch)
 				{
-					// Match!  Add reference data to the list.
-					replacement.references.Add(CreateReference(replacement.BuildingInfo, propIndex, replacement.isTree));
+					// Match!  Create new handler if there wasn't an existing one.
+					if (handler == null)
+					{
+						handler = BuildingHandlers.GetOrAddHandler(replacement.BuildingInfo, propIndex);
+					}
+
+					// Set the new replacement.
+					handler.SetReplacement(replacement, ThisPriority);
 				}
 			}
-
-			// Now, iterate through each entry found.
-			foreach (BuildingPropReference propReference in replacement.references)
-			{
-				// Reset any all-building replacements first.
-				AllBuildingReplacement.Instance.RemoveEntry(propReference.buildingInfo, replacement.targetInfo, propReference.propIndex);
-
-				// Apply the replacement.
-				ReplaceProp(replacement, propReference);
-			}
 		}
-
-
-		/// <summary>
-		/// Restores any replacements from lower-priority replacements after a reversion.
-		/// </summary>
-		/// <param name="buildingInfo">Building prefab</param>
-		/// <param name="targetInfo">Target prop info</param>
-		/// <param name="propIndex">Prop index</param>
-		protected override void RestoreLower(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex) => AllBuildingReplacement.Instance.Restore(buildingInfo, targetInfo, propIndex);
 	}
 }

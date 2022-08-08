@@ -293,15 +293,15 @@ namespace BOB
 					// Revert entry.
 					if (target is PropInfo propTarget)
 					{
-						propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = propTarget;
+						propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.PropIndex].m_finalProp = propTarget;
 					}
 					else
 					{
-						propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = (TreeInfo)target;
+						propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.PropIndex].m_finalTree = (TreeInfo)target;
 					}
-					propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle;
-					propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.position;
-					propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_probability = propReference.probability;
+					propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.PropIndex].m_angle = propReference.angle;
+					propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.PropIndex].m_position = propReference.OriginalPosition;
+					propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.PropIndex].m_probability = propReference.OriginalProbability;
 
 					// Add network to dirty list.
 					NetData.DirtyList.Add(propReference.netInfo);
@@ -330,20 +330,20 @@ namespace BOB
 				{
 					// Look for a network, lane and index match.
 					NetPropReference propReference = replacements[target].references[i];
-					if (propReference.netInfo == netPrefab && propReference.laneIndex == laneIndex && propReference.propIndex == propIndex)
+					if (propReference.netInfo == netPrefab && propReference.laneIndex == laneIndex && propReference.PropIndex == propIndex)
 					{
 						// Got a match!  Revert instance.
 						if (target is PropInfo propTarget)
 						{
-							propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = propTarget;
+							propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.PropIndex].m_finalProp = propTarget;
 						}
 						else
 						{
-							propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = (TreeInfo)target;
+							propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.PropIndex].m_finalTree = (TreeInfo)target;
 						}
 						netPrefab.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_angle = propReference.angle;
-						netPrefab.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position = propReference.position;
-						netPrefab.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_probability = propReference.probability;
+						netPrefab.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position = propReference.OriginalPosition;
+						netPrefab.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_probability = propReference.OriginalProbability;
 
 						// Remove this reference and return.
 						replacements[target].references.Remove(replacements[target].references[i]);
@@ -569,7 +569,7 @@ namespace BOB
 				foreach (NetPropReference propRef in reference.references)
 				{
 					// Check for a network, lane, and prop index match.
-					if (propRef.netInfo == netPrefab && propRef.laneIndex == laneIndex && propRef.propIndex == propIndex)
+					if (propRef.netInfo == netPrefab && propRef.laneIndex == laneIndex && propRef.PropIndex == propIndex)
 					{
 						// Match!  Return the original prefab.
 						return target;
@@ -600,7 +600,7 @@ namespace BOB
 				foreach (NetPropReference propRef in reference.references)
 				{
 					// Check for a network, lane, and prop index match.
-					if (propRef.netInfo == netPrefab && propRef.laneIndex == laneIndex && propRef.propIndex == propIndex)
+					if (propRef.netInfo == netPrefab && propRef.laneIndex == laneIndex && propRef.PropIndex == propIndex)
 					{
 						// Match!  Return the replacement record.
 						propReference = propRef;
