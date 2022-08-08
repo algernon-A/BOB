@@ -532,9 +532,6 @@ namespace BOB
 				return;
 			}
 
-			// First, undo any preview.
-			RevertPreview();
-
 			try
 			{
 				// Make sure we've got a valid selection.
@@ -988,8 +985,8 @@ namespace BOB
 				return null;
 			}
 
-			// Get create prop handler.
-			BuildingPropHandler handler = BuildingHandlers.GetOrAddHandler(buildingInfo, propIndex);
+			// Create a new prop handler based on the current prop state (not the original).
+			BuildingPropHandler handler = BuildingHandlers.CreateHandler(buildingInfo, propIndex);
 
 			// Get any position and angle adjustments from active replacements, checking in priority order.
 			Vector3 adjustment = Vector3.zero;

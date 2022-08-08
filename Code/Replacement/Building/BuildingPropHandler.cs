@@ -30,37 +30,21 @@
 		/// </summary>
 		/// <param name="buildingInfo">Building prefab containing this prop (must not be null).</param>
 		/// <param name="propIndex">Prop index.</param>
-		/// <param name="prop">Original m_prop value.</param>
-		/// <param name="finalProp">Original m_finalProp value.</param>
-		/// <param name="tree">Original m_tree value.</param>
-		/// <param name="finalTree">Original m_finalTree value.</param>
-		/// <param name="position">Original prop position</param>
-		/// <param name="probability">Original prop probability.</param>
-		/// <param name="radAngle">Original prop m_radAngle.</param>
-		/// <param name="fixedHeight">Original prop m_fixedHeight.</param>
-		public BuildingPropHandler(BuildingInfo buildingInfo, int propIndex, PropInfo prop, PropInfo finalProp, TreeInfo tree, TreeInfo finalTree, Vector3 position, int probability, float radAngle, bool fixedHeight)
-			: base(propIndex, prop, finalProp, tree, finalTree, position, probability)
+		/// <param name="buildingProp">Building prop instance (must not be null).</param>
+		public BuildingPropHandler(BuildingInfo buildingInfo, int propIndex, BuildingInfo.Prop buildingProp)
+			: base(
+				  propIndex,
+				  buildingProp.m_prop,
+				  buildingProp.m_finalProp,
+				  buildingProp.m_tree,
+				  buildingProp.m_finalTree,
+				  buildingProp.m_position,
+				  buildingProp.m_probability)
 		{
-			// Null check.
-			if (buildingInfo == null)
-			{
-				string message = "attempted to create BuildingPropReference with null BuildingPropReference";
-				Logging.Error(message);
-				throw new NullReferenceException(message);
-			}
-
-			// Index check.
-			if (propIndex < 0 | propIndex >= buildingInfo.m_props.Length)
-			{
-				string message = "attempted to create BuildingPropReference with invalid index";
-				Logging.Error(message);
-				throw new IndexOutOfRangeException(message);
-			}
-
 			// Set original data.
 			_buildingInfo = buildingInfo;
-			_originalRadAngle = radAngle;
-			_originalFixedHeight = fixedHeight;
+			_originalRadAngle = buildingProp.m_radAngle;
+			_originalFixedHeight = buildingProp.m_fixedHeight;
 		}
 
 		/// <summary>

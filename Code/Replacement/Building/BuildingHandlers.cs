@@ -102,24 +102,17 @@
 		/// <returns>Newly-created reference (null if creation failed).</returns>
 		internal static BuildingPropHandler CreateHandler(BuildingInfo buildingInfo, int propIndex)
 		{
-			// Safety checks.
-			if (buildingInfo?.m_props != null && propIndex >= 0)
+			// Safety checks to ensure prop reference is valid.
+			BuildingInfo.Prop[] props = buildingInfo?.m_props;
+			if (props != null && propIndex >= 0 && propIndex < props.Length)
 			{
-				// Local reference.
-				BuildingInfo.Prop thisProp = buildingInfo.m_props[propIndex];
-
-				// Create and return new reference, recording original values.
-				return new BuildingPropHandler(
-					buildingInfo,
-					propIndex,
-					thisProp.m_prop,
-					thisProp.m_finalProp,
-					thisProp.m_tree,
-					thisProp.m_finalTree,
-					thisProp.m_position,
-					thisProp.m_probability,
-					thisProp.m_radAngle,
-					thisProp.m_fixedHeight);
+				// Check that actual prop value isn't null.
+				BuildingInfo.Prop prop = props[propIndex];
+				if (prop != null)
+				{
+					// Create and return new reference, recording original values.
+					return new BuildingPropHandler(buildingInfo, propIndex, prop);
+				}
 			}
 
 			// If we got here, something went wrong; return null.
