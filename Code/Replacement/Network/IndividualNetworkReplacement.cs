@@ -31,14 +31,21 @@ namespace BOB
 
 
 		/// <summary>
-		/// Retrieves a currently-applied replacement entry for the given network, lane and prop index.
+		/// The priority level of this replacmeent type.
 		/// </summary>
-		/// <param name="networkInfo">Network prefab</param>
+		protected override ReplacementPriority ThisPriority => ReplacementPriority.IndividualReplacement;
+
+
+		/// <summary>
+		/// Finds any existing replacement relevant to the provided arguments.
+		/// </summary>
+		/// <param name="netInfo">Network ifno</param>
+		/// <param name="laneIndex">Lane index</param>
+		/// <param name="propIndex">Prop index</param>
 		/// <param name="targetInfo">Target prop/tree prefab</param>
-		/// <param name="laneIndex">Lane number</param>
-		/// <param name="propIndex">Prop index number</param>
-		/// <returns>Currently-applied individual network replacement (null if none)</returns>
-		internal override BOBNetReplacement ActiveReplacement(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex) => ReplacementList(netInfo)?.Find(x => x.laneIndex == laneIndex && x.propIndex == propIndex);
+		/// <returns>Existing replacement entry, if one was found, otherwise null</returns>
+		protected override BOBNetReplacement FindReplacement(NetInfo netInfo, int laneIndex, int propIndex, PrefabInfo targetInfo) =>
+			ReplacementList(netInfo)?.Find(x => x.laneIndex == laneIndex && x.propIndex == propIndex);
 
 
 		/// <summary>
@@ -48,60 +55,48 @@ namespace BOB
 		protected override void ApplyReplacement(BOBNetReplacement replacement)
 		{
 			// Don't do anything if prefabs can't be found.
-			if (replacement?.targetInfo == null || replacement.replacementInfo == null || replacement.NetInfo == null)
+			if (replacement?.targetInfo == null || replacement.replacementInfo == null || replacement.NetInfo?.m_lanes == null)
 			{
 				return;
 			}
 
 			// Check lane index.
+			if (replacement.laneIndex < 0 || replacement.laneIndex >= replacement.NetInfo.m_lanes.Length)
+			{
+				Logging.Message("ignoring invalid individual network replacement lane index ", replacement.laneIndex, " for network ", replacement.NetInfo.name);
+				return;
+			}
+
+			// Check lane record.
 			NetInfo.Lane thisLane = replacement.NetInfo.m_lanes[replacement.laneIndex];
 			if (thisLane == null)
 			{
+				Logging.Message("ignoring invalid individual network replacement lane index ", replacement.laneIndex, " for network ", replacement.NetInfo.name);
 				return;
 			}
 
 			// Check prop index.
+			if (thisLane.m_laneProps?.m_props == null || replacement.propIndex < 0 || replacement.propIndex >= thisLane.m_laneProps.m_props.Length)
+			{
+				Logging.Message("ignoring invalid individual network replacement prop index ", replacement.propIndex, " for network ", replacement.NetInfo.name);
+				return;
+			}
+
+			// Don't apply replacement if this is an added prop.
+			if (AddedNetworkProps.Instance.IsAdded(replacement.NetInfo, replacement.laneIndex, replacement.propIndex))
+			{
+				return;
+			}
+
+			// Check prop.
 			NetLaneProps.Prop thisLaneProp = thisLane.m_laneProps.m_props[replacement.propIndex];
 			if (thisLaneProp == null)
 			{
 				return;
 			}
 
-			// Reset any pack, network, or all-network replacements first.
-			NetworkReplacement.Instance.RemoveEntry(replacement.NetInfo, replacement.targetInfo, replacement.laneIndex, replacement.propIndex);
-			AllNetworkReplacement.Instance.RemoveEntry(replacement.NetInfo, replacement.targetInfo, replacement.laneIndex, replacement.propIndex);
-			NetworkPackReplacement.Instance.RemoveEntry(replacement.NetInfo, replacement.targetInfo, replacement.laneIndex, replacement.propIndex);
-
-			// Create replacment entry.
-			NetPropReference newPropReference = CreateReference(replacement.NetInfo, replacement.laneIndex, replacement.propIndex, replacement.isTree);
-
-			// Reset replacement list to be only our new replacement entry.
-			replacement.references = new List<NetPropReference> { newPropReference };
-
-			// Apply the replacement.
-			ReplaceProp(replacement, newPropReference);
-		}
-
-
-		/// <summary>
-		/// Restores any replacements from lower-priority replacements after a reversion.
-		/// </summary>
-		/// <param name="netInfo">Network prefab</param>
-		/// <param name="targetInfo">Target prop info</param>
-		/// <param name="laneIndex">Lane index</param>
-		/// <param name="propIndex">Prop index</param>
-		protected override void RestoreLower(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex)
-		{
-			// Restore any network replacement.
-			if (!NetworkReplacement.Instance.Restore(netInfo, targetInfo, laneIndex, propIndex))
-			{
-				// No network restoration occured - restore any all-network replacement.
-				if (!AllNetworkReplacement.Instance.Restore(netInfo, targetInfo, laneIndex, propIndex))
-				{
-					// No all-network restoration occured - restore any pack replacement.
-					NetworkPackReplacement.Instance.Restore(netInfo, targetInfo, laneIndex, propIndex);
-				}
-			}
+			// Set the new replacement.
+			NetHandlers.GetOrAddHandler(replacement.NetInfo, thisLane, replacement.propIndex).SetReplacement(replacement, ThisPriority);
 		}
 	}
 }

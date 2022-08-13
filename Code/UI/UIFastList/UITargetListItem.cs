@@ -8,52 +8,6 @@ namespace BOB
 	/// </summary>
 	public class TargetListItem
 	{
-		// TODO: added here.
-		private BOBBuildingReplacement _individualReplacement;
-		private BOBBuildingReplacement _groupedReplacement;
-		private BOBBuildingReplacement _allReplacement;
-
-		/// <summary>
-		/// Gets or sets the active individual building replacement.
-		/// </summary>
-		public BOBBuildingReplacement IndividualReplacement
-		{
-			get => _individualReplacement;
-
-			set
-			{
-				_individualReplacement = value;
-				individualPrefab = value?.replacementInfo;
-			}
-		}
-
-		/// <summary>
-		/// Gets or sets the active grouped building replacement.
-		/// </summary>
-		public BOBBuildingReplacement GroupedReplacement
-		{
-			get => _groupedReplacement;
-
-			set
-			{
-				_groupedReplacement = value;
-				replacementPrefab = value?.replacementInfo;
-			}
-		}
-
-		/// <summary>
-		/// Gets or sets the active all- building replacement.
-		/// </summary>
-		public BOBBuildingReplacement AllReplacement
-		{
-			get => _allReplacement;
-
-			set
-			{
-				_allReplacement = value;
-				allPrefab = value?.replacementInfo;
-			}
-		}
 
 		// Original prefab.
 		public PrefabInfo originalPrefab;
@@ -106,6 +60,72 @@ namespace BOB
 		public bool ActiveReplacement => individualPrefab != null || replacementPrefab != null || allPrefab != null;
 	}
 
+	public class BuildingTargetListItem : TargetListItem
+	{
+
+		// TODO: added here.
+		private BOBBuildingReplacement _individualReplacement;
+		private BOBBuildingReplacement _groupedReplacement;
+		private BOBBuildingReplacement _allReplacement;
+		private BOBBuildingReplacement _packReplacement;
+
+		/// <summary>
+		/// Gets or sets the active individual replacement.
+		/// </summary>
+		public BOBBuildingReplacement IndividualReplacement
+		{
+			get => _individualReplacement;
+
+			set
+			{
+				_individualReplacement = value;
+				individualPrefab = value?.replacementInfo;
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets the active grouped replacement.
+		/// </summary>
+		public BOBBuildingReplacement GroupedReplacement
+		{
+			get => _groupedReplacement;
+
+			set
+			{
+				_groupedReplacement = value;
+				replacementPrefab = value?.replacementInfo;
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets the active all-  replacement.
+		/// </summary>
+		public BOBBuildingReplacement AllReplacement
+		{
+			get => _allReplacement;
+
+			set
+			{
+				_allReplacement = value;
+				allPrefab = value?.replacementInfo;
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets the active pack replacement.
+		/// </summary>
+		public BOBBuildingReplacement PackReplacement
+		{
+			get => _packReplacement;
+
+			set
+			{
+				_packReplacement = value;
+				allPrefab = value?.replacementInfo;
+			}
+		}
+	}
+
 
 	/// <summary>
 	/// Data record for UI prop list item for network props.
@@ -120,5 +140,69 @@ namespace BOB
 
 		// Repeat distance.
 		public float originalRepeat, individualRepeat;
+
+
+
+		// TODO: added here.
+		private BOBNetReplacement _individualReplacement;
+		private BOBNetReplacement _groupedReplacement;
+		private BOBNetReplacement _allReplacement;
+		private BOBNetReplacement _packReplacement;
+
+		/// <summary>
+		/// Gets or sets the active individual replacement.
+		/// </summary>
+		public BOBNetReplacement IndividualReplacement
+		{
+			get => _individualReplacement;
+
+			set
+			{
+				_individualReplacement = value;
+				individualPrefab = value?.replacementInfo;
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets the active grouped replacement.
+		/// </summary>
+		public BOBNetReplacement GroupedReplacement
+		{
+			get => _groupedReplacement;
+
+			set
+			{
+				_groupedReplacement = value;
+				replacementPrefab = value?.replacementInfo;
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets the active all-  replacement.
+		/// </summary>
+		public BOBNetReplacement AllReplacement
+		{
+			get => _allReplacement;
+
+			set
+			{
+				_allReplacement = value;
+				allPrefab = value?.replacementInfo;
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets the active pack replacement.
+		/// </summary>
+		public BOBNetReplacement PackReplacement
+		{
+			get => _packReplacement;
+
+			set
+			{
+				_packReplacement = value;
+				packagePrefab = value?.replacementInfo;
+			}
+		}
 	}
 }

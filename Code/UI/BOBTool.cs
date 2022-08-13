@@ -306,6 +306,23 @@ namespace BOB
 			}
 		}
 
+		/// <summary>
+		/// Called by game when tool is enabled.
+		/// Used to open the replacer panel.
+		/// </summary>
+		protected override void OnEnable()
+		{
+			// Call base even before loaded checks to properly initialize tool.
+			base.OnEnable();
+
+			// Make sure that game is loaded before activating tool.
+			if (!Loading.isLoaded)
+			{
+				// Loading not complete - deactivate tool by seting default tool.
+				ToolsModifierControl.SetTool<DefaultTool>();
+			}
+		}
+
 
 		/// <summary>
 		/// Called by game when tool is disabled.

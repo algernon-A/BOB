@@ -54,6 +54,7 @@ namespace BOB
 		/// <param name="offsetZ">Replacment Z position offset</param>
 		/// <param name="probability">Replacement probability</param>
 		/// <param name="customHeight">Replacement custom height flag</param>
+		/// <param name="existingReplacement">Existing replacement record (null if none)</param>
 		internal void Replace(BuildingInfo buildingInfo, PrefabInfo targetInfo, PrefabInfo replacementInfo, int propIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability, bool customHeight, BOBBuildingReplacement existingReplacement)
 		{
 			// Null checks.
@@ -205,7 +206,6 @@ namespace BOB
 			// If we got here, we didn't remove any building entries from the list; return false.
 			return false;
 		}
-
 
 
 		/// <summary>

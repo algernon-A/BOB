@@ -14,7 +14,7 @@
 		/// <summary>
 		/// Replacement packs.
 		/// </summary>
-		PackReplacmeent,
+		PackReplacement,
 
 		/// <summary>
 		/// All- replacements.

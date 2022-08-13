@@ -64,10 +64,18 @@ namespace BOB
 			{
 				// Local reference.
 				BuildingInfo.Prop thisBuildingProp = replacement.BuildingInfo.m_props[propIndex];
+				
+				// If invalid entry, skip this one.
+				if (thisBuildingProp == null)
+				{
+					continue;
+				}
+				
+				// Note current props.
 				TreeInfo thisTree = thisBuildingProp.m_tree;
 				PropInfo thisProp = thisBuildingProp.m_prop;
 
-				// Get any active hanlder.
+				// Get any active handler.
 				BuildingPropHandler handler = BuildingHandlers.GetHandler(replacement.BuildingInfo, propIndex);
 				if (handler != null)
 				{

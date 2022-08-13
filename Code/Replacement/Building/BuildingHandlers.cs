@@ -1,7 +1,6 @@
 ﻿namespace BOB
 {
     using System.Collections.Generic;
-	using UnityEngine;
 
 	/// <summary>
 	/// Central coordination and tracking of active building replacmenets.
@@ -20,7 +19,7 @@
 		/// <summary>
 		/// Gets any existing prop handler for the given parameters, creating a new one if one doesn't already exist.
 		/// </summary>
-		/// <param name="buildingInfo">Building prefab for this reference.</param>
+		/// <param name="buildingInfo">Building prefab for this prop.</param>
 		/// <param name="propIndex">BuildingProp prop index.</param>
 		/// <returns>Prop handler for this prop (creating a new handler if required).</returns>
 		internal static BuildingPropHandler GetOrAddHandler(BuildingInfo buildingInfo, int propIndex)
@@ -47,7 +46,7 @@
 		/// <summary>
 		/// Gets any existing prop handler for the given parameters, returning null if one doesn't already exist.
 		/// </summary>
-		/// <param name="buildingInfo">Building prefab for this reference.</param>
+		/// <param name="buildingInfo">Building prefab for this prop.</param>
 		/// <param name="propIndex">BuildingProp prop index.</param>
 		/// <returns>Prop handler (null if none).</returns>
 		internal static BuildingPropHandler GetHandler(BuildingInfo buildingInfo, int propIndex)
@@ -97,7 +96,7 @@
 		/// <summary>
 		/// Creates a new BuildingPropHandler from the provided building prefab and prop index.
 		/// </summary>
-		/// <param name="buildingInfo">Building prefab for this reference.</param>
+		/// <param name="buildingInfo">Building prefab for this prop.</param>
 		/// <param name="propIndex">BuildingProp prop index.</param>
 		/// <returns>Newly-created reference (null if creation failed).</returns>
 		internal static BuildingPropHandler CreateHandler(BuildingInfo buildingInfo, int propIndex)

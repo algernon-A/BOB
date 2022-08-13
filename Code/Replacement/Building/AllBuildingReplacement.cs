@@ -96,6 +96,14 @@ namespace BOB
 				{
 					// Local reference.
 					BuildingInfo.Prop thisBuildingProp = buildingInfo.m_props[propIndex];
+
+					// If invalid entry, skip this one.
+					if (thisBuildingProp == null)
+					{
+						continue;
+					}
+
+					// Note current props.
 					TreeInfo thisTree = thisBuildingProp.m_tree;
 					PropInfo thisProp = thisBuildingProp.m_prop;
 

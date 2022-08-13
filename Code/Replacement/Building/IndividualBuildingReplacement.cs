@@ -59,7 +59,7 @@ namespace BOB
 			}
 			
 			// Check index bounds.
-			if (replacement.BuildingInfo.m_props == null || replacement.propIndex >= replacement.BuildingInfo.m_props.Length)
+			if (replacement.BuildingInfo.m_props == null || replacement.propIndex < 0 || replacement.propIndex >= replacement.BuildingInfo.m_props.Length)
             {
 				Logging.Message("ignoring invalid individual building replacement index ", replacement.propIndex, " for building ", replacement.BuildingInfo.name);
 				return;
@@ -71,7 +71,7 @@ namespace BOB
 				return;
 			}
 
-			// Check prop index.
+			// Check prop for null.
 			BuildingInfo.Prop thisProp = replacement.BuildingInfo.m_props[replacement.propIndex];
 			if (thisProp == null)
             {
