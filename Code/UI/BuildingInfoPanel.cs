@@ -182,14 +182,14 @@ namespace BOB
 					base.CurrentTargetItem = value;
 					ignoreSelectedPrefabChange = false;
 
-					// Ensure valid selections before proceeding.
-					if (CurrentTargetItem != null && currentBuilding != null)
+					// Ensure valid selection before proceeding.
+					if (currentBuilding != null)
 					{
 						// Set custom height checkbox.
 						customHeightCheck.isChecked = currentBuilding.m_props[IndividualIndex].m_fixedHeight;
 
 						// Is this an added prop?
-						if (CurrentTargetItem.isAdded)
+						if (buildingTargetListItem.isAdded)
 						{
 							Logging.Message("setting sliders for added prop at index ", IndividualIndex);
 
@@ -559,7 +559,7 @@ namespace BOB
 					else if (buildingTargetListItem.AllReplacement != null)
 					{
 						// All-building reversion - make sure we've got a currently active replacement before doing anything.
-						if (CurrentTargetItem.originalPrefab)
+						if (buildingTargetListItem.originalPrefab)
 						{
 							// All-building reversion.
 							AllBuildingReplacement.Instance.RemoveReplacement(buildingTargetListItem.AllReplacement);
