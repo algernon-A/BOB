@@ -153,5 +153,50 @@ namespace BOB
 				}
 			}
 		}
+
+		/// <summary>
+		/// Gets the relevant replacement list entry from the active configuration file, if any.
+		/// </summary>
+		/// <param name="netInfo">Network prefab</param>
+		/// <returns>Replacement list for the specified network prefab (null if none)</returns>
+		protected override List<BOBNetReplacement> ReplacementList(NetInfo netInfo) => ConfigurationUtils.CurrentConfig.allNetworkProps;
+
+
+		/// <summary>
+		/// Gets the relevant network replacement list entry from the active configuration file, creating a new network entry if none already exists.
+		/// </summary>
+		/// <param name="netInfo">Network prefab</param>
+		/// <returns>Replacement list for the specified network prefab</returns>
+		protected override List<BOBNetReplacement> ReplacementEntry(NetInfo netInfo) => ReplacementList(netInfo);
+
+
+		/// <summary>
+		/// Removes a replacement.
+		/// </summary>
+		/// <param name="replacement">Replacement record to remove</param>
+		/// <param name="removeEntries">True to remove the reverted entries from the list of replacements, false to leave the list unchanged</param>
+		/// <returns>True if the entire network record was removed from the list (due to no remaining replacements for that prefab), false if the prefab remains in the list (has other active replacements)</returns>
+		internal override bool RemoveReplacement(BOBNetReplacement replacement, bool removeEntries = true)
+		{
+			// Safety check.
+			if (replacement == null)
+			{
+				Logging.Error("null replacement passed to AllNetworkReplacement.RemoveReplacement");
+				return false;
+			}
+
+			// Remove any references to this replacement from all prop handlers.
+			NetHandlers.RemoveReplacement(replacement);
+
+			// Remove replacement entry from list of replacements, if we're doing so.
+			if (removeEntries)
+			{
+				// Remove from replacement list.
+				ReplacementList(replacement.NetInfo).Remove(replacement);
+			}
+
+			// If we got here, we didn't remove any network entries from the list; return false.
+			return false;
+		}
 	}
 }

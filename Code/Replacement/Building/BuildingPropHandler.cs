@@ -7,11 +7,6 @@
 	/// </summary>
 	public class BuildingPropHandler : PropHandler
 	{
-		/// <summary>
-		/// Stores any rotation adjustment (in radians) required for previewing.
-		/// </summary>
-		public float RadAngleAdjustment;
-
 		// Parent building prefab.
 		private BuildingInfo _buildingInfo;
 
@@ -243,6 +238,17 @@
 				BuildingData.DirtyList.Add(_buildingInfo);
 			}
 		}
+
+		/// <summary>
+		/// Applies the specified replacement as a temporary preview.
+		/// </summary>
+		/// <param name="previewReplacement">Replacement to preview.</param>
+		public void PreviewReplacement(BOBBuildingReplacement previewReplacement) => ReplaceProp(previewReplacement);
+
+		/// <summary>
+		/// Clears any temporary preview, restoring the permanent underlying state.
+		/// </summary>
+		public void ClearPreview() => UpdateProp();
 
 		/// <summary>
 		/// Updates the target prop according current active replacement status.

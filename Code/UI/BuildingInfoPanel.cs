@@ -399,10 +399,22 @@ namespace BOB
 				return;
 			}
 
-			// Update preview for each handler.
-			foreach (BuildingPropHandler reference in originalValues)
+			// Generate prevew record entry.
+			BOBBuildingReplacement previewReplacement = new BOBBuildingReplacement
 			{
-				PreviewChange(reference);
+				replacementInfo = ReplacementPrefab ?? CurrentTargetItem.originalPrefab,
+				offsetX = xSlider.TrueValue,
+				offsetY = ySlider.TrueValue,
+				offsetZ = zSlider.TrueValue,
+				angle = angleSlider.TrueValue,
+				probability = (int)probabilitySlider.TrueValue.RoundToNearest(1),
+				customHeight = customHeightCheck.isChecked,
+			};
+
+			// Update preview for each handler.
+			foreach (BuildingPropHandler handler in originalValues)
+			{
+				PreviewChange(handler, previewReplacement);
 			}
 
 			// Update renders.
@@ -425,15 +437,8 @@ namespace BOB
 			// Iterate through each original value.
 			foreach (BuildingPropHandler handler in originalValues)
 			{
-				// Sanity check index.
-				int propIndex = handler.PropIndex;
-				if (propIndex >= handler.BuildingInfo.m_props.Length)
-				{
-					continue;
-				}
-
 				// Restore original values.
-				handler.RevertToOriginal();
+				handler.ClearPreview();
 			}
 
 			// Update prefabs.
@@ -475,7 +480,7 @@ namespace BOB
 						{
 							case ReplacementModes.Individual:
 								// Individual replacement.
-								IndividualBuildingReplacement.Instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, CurrentTargetItem.index, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, customHeightCheck.isChecked, buildingTargetListItem.IndividualReplacement);
+								IndividualBuildingReplacement.Instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, IndividualIndex, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, customHeightCheck.isChecked, buildingTargetListItem.IndividualReplacement);
 								break;
 
 							case ReplacementModes.Grouped:
@@ -935,41 +940,10 @@ namespace BOB
 		/// Previews the change for the current target item.
 		/// </summary>
 		/// <param name="handler">Prop handler</param>
-		private void PreviewChange(BuildingPropHandler handler)
+		/// <param name="previewReplacement">Replacement to preview</param>
+		private void PreviewChange(BuildingPropHandler handler, BOBBuildingReplacement previewReplacement)
 		{
-			// Original position and angle.
-			Vector3 basePosition = Vector3.zero;
-			float baseAngle = 0f;
-
-			// Is this an added item?
-			if (!CurrentTargetItem.isAdded)
-			{
-				// Not added - adjust for any active replacements.
-				basePosition = handler.OriginalPosition - handler.Adjustment;
-				baseAngle = handler.OriginalRadAngle - handler.RadAngleAdjustment;
-			}
-
-			// Null check.
-			BuildingInfo.Prop thisProp = handler.BuildingInfo?.m_props?[handler.PropIndex];
-			if (thisProp == null)
-			{
-				return;
-			}
-
-			// Preview new position, probability, rotation, and fixed height setting.
-			thisProp.m_position = basePosition + new Vector3(xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue); ;
-			thisProp.m_probability = (int)probabilitySlider.TrueValue;
-			thisProp.m_fixedHeight = customHeightCheck.isChecked;
-			thisProp.m_radAngle = baseAngle + (angleSlider.TrueValue * Mathf.Deg2Rad);
-
-			// If a replacement prefab has been selected, then update it too.
-			if (ReplacementPrefab != null)
-			{
-				thisProp.m_prop = ReplacementPrefab as PropInfo;
-				thisProp.m_tree = ReplacementPrefab as TreeInfo;
-				thisProp.m_finalProp = ReplacementPrefab as PropInfo;
-				thisProp.m_finalTree = ReplacementPrefab as TreeInfo;
-			}
+			handler.PreviewReplacement(previewReplacement);
 
 			// Add building to dirty list.
 			BuildingData.DirtyList.Add(handler.BuildingInfo);
@@ -992,24 +966,7 @@ namespace BOB
 			}
 
 			// Create a new prop handler based on the current prop state (not the original).
-			BuildingPropHandler handler = BuildingHandlers.CreateHandler(buildingInfo, propIndex);
-
-			// Get any position and angle adjustments from active replacements.
-			Vector3 adjustment = Vector3.zero;
-			float angleAdjustment = 0f;
-			if (BuildingHandlers.GetHandler(buildingInfo, propIndex)?.ActiveReplacement is BOBBuildingReplacement activeReplacement)
-			{
-				adjustment.x = activeReplacement.offsetX;
-				adjustment.y = activeReplacement.offsetY;
-				adjustment.z = activeReplacement.offsetZ;
-				angleAdjustment = activeReplacement.angle;
-			}
-
-			// Set handler adjustments.
-			handler.RadAngleAdjustment = angleAdjustment * Mathf.Deg2Rad;
-			handler.Adjustment = adjustment;
-
-			return handler;
+			return BuildingHandlers.GetOrAddHandler(buildingInfo, propIndex);
 		}
 	}
 }

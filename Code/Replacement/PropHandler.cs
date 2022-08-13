@@ -7,11 +7,6 @@
 	/// </summary>
 	public abstract class PropHandler
 	{
-		/// <summary>
-		/// Stores any position adjustment required for previewing.
-		/// </summary>
-		public Vector3 Adjustment;
-
 		// The prop index number.
 		private int _propIndex;
 

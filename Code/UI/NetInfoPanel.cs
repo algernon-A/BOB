@@ -266,10 +266,22 @@ namespace BOB
 				return;
 			}
 
-			// Update preview for each handler.
-			foreach (LanePropHandler reference in originalValues)
+			// Generate prevew record entry.
+			BOBNetReplacement previewReplacement = new BOBNetReplacement
 			{
-				PreviewChange(reference);
+				replacementInfo = ReplacementPrefab ?? CurrentTargetItem.originalPrefab,
+				offsetX = xSlider.TrueValue,
+				offsetY = ySlider.TrueValue,
+				offsetZ = zSlider.TrueValue,
+				angle = angleSlider.TrueValue,
+				probability = (int)probabilitySlider.TrueValue.RoundToNearest(1),
+				repeatDistance = repeatSlider.TrueValue,
+			};
+
+			// Update preview for each handler.
+			foreach (LanePropHandler handler in originalValues)
+			{
+				PreviewChange(handler, previewReplacement);
 			}
 
 			// Update renders.
@@ -292,15 +304,8 @@ namespace BOB
 			// Iterate through each original value.
 			foreach (LanePropHandler handler in originalValues)
 			{
-				// Sanity check index.
-				int propIndex = handler.PropIndex;
-				if (propIndex >= handler.LaneInfo.m_laneProps.m_props.Length)
-				{
-					continue;
-				}
-
 				// Restore original values.
-				handler.RevertToOriginal();
+				handler.ClearPreview();
 			}
 
 			// Reset apply button icon
@@ -339,7 +344,7 @@ namespace BOB
 						switch (CurrentMode)
 						{
 							case ReplacementModes.Individual:
-								IndividualNetworkReplacement.Instance.Replace(SelectedNet, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, netTargetListItem.lane, netTargetListItem.index, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, repeatSlider.TrueValue, netTargetListItem.IndividualReplacement);
+								IndividualNetworkReplacement.Instance.Replace(SelectedNet, CurrentTargetItem.originalPrefab ?? CurrentTargetItem.replacementPrefab, ReplacementPrefab, IndividualLane, IndividualIndex, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, repeatSlider.TrueValue, netTargetListItem.IndividualReplacement);
 								break;
 
 							case ReplacementModes.Grouped:
@@ -725,7 +730,7 @@ namespace BOB
 					probability = (int)probabilitySlider.TrueValue,
 					parentInfo = SelectedNet,
 					replacementInfo = ReplacementPrefab,
-					repeatDistance = repeatSlider.TrueValue
+					repeatDistance = repeatSlider.parent.isVisible ? repeatSlider.TrueValue : 0,
 				};
 				AddedNetworkProps.Instance.AddNew(newProp);
 
@@ -891,56 +896,10 @@ namespace BOB
 		/// Previews the change for the current target item.
 		/// </summary>
 		/// <param name="handler">Prop handler</param>
-		private void PreviewChange(LanePropHandler handler)
+		/// <param name="previewReplacement">Replacement to preview</param>
+		private void PreviewChange(LanePropHandler handler, BOBNetReplacement previewReplacement)
 		{
-			// Original position and angle.
-			Vector3 basePosition = Vector3.zero;
-			float baseAngle = 0f;
-
-			// Is this an added item?
-			if (!CurrentTargetItem.isAdded)
-			{
-				// Not added - adjust for any active replacements.
-				basePosition = handler.OriginalPosition - handler.Adjustment;
-				baseAngle = handler.OriginalAngle - handler.AngleAdjustment;
-			}
-
-			// Null check.
-			NetInfo.Lane thisLane = handler.LaneInfo;
-			NetLaneProps.Prop thisProp = handler.LaneInfo.m_laneProps?.m_props?[handler.PropIndex];
-			if (thisProp == null)
-			{
-				return;
-			}
-
-			// Calculate preview X position and angle, taking into account mirrored trees/props, inverting x offset to match original prop x position.
-			float offsetX = xSlider.TrueValue;
-			float angleMult = 1;
-			if (thisLane.m_position + basePosition.x < 0)
-			{
-				offsetX = 0 - offsetX;
-				angleMult = -1;
-			}
-
-			// Preview new position, probability, and rotation setting.
-			thisProp.m_position = basePosition + new Vector3(offsetX, ySlider.TrueValue, zSlider.TrueValue);
-			thisProp.m_probability = (int)probabilitySlider.TrueValue;
-			thisProp.m_angle = baseAngle + (angleSlider.TrueValue * angleMult);
-
-			// Set repeat distance, if valid.
-			if (repeatSlider.parent.isVisible)
-			{
-				thisProp.m_repeatDistance = repeatSlider.TrueValue;
-			}
-
-			// If a replacement prefab has been selected, then update it too.
-			if (ReplacementPrefab != null)
-			{
-				thisProp.m_prop = ReplacementPrefab as PropInfo;
-				thisProp.m_tree = ReplacementPrefab as TreeInfo;
-				thisProp.m_finalProp = ReplacementPrefab as PropInfo;
-				thisProp.m_finalTree = ReplacementPrefab as TreeInfo;
-			}
+			handler.PreviewReplacement(previewReplacement);
 
 			// Add network to dirty list.
 			NetData.DirtyList.Add(handler.NetInfo);
@@ -971,24 +930,7 @@ namespace BOB
 			}
 
 			// Create a new prop handler based on the current prop state (not the original).
-			LanePropHandler handler = NetHandlers.CreateHandler(netInfo, thisLane, propIndex);
-
-			// Get any position and angle adjustments from active replacements.
-			Vector3 adjustment = Vector3.zero;
-			float angleAdjustment = 0f;
-			if (NetHandlers.GetHandler(thisLane, propIndex)?.ActiveReplacement is BOBNetReplacement activeReplacement)
-			{
-				adjustment.x = activeReplacement.offsetX;
-				adjustment.y = activeReplacement.offsetY;
-				adjustment.z = activeReplacement.offsetZ;
-				angleAdjustment = activeReplacement.angle;
-			}
-
-			// Set handler adjustments.
-			handler.AngleAdjustment = angleAdjustment;
-			handler.Adjustment = adjustment;
-
-			return handler;
+			return NetHandlers.GetOrAddHandler(netInfo, thisLane, propIndex);
 		}
 
 

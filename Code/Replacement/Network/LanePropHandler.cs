@@ -7,11 +7,6 @@
 	/// </summary>
 	public class LanePropHandler : PropHandler
 	{
-		/// <summary>
-		/// Stores any rotation adjustment (in degrees) required for previewing.
-		/// </summary>
-		public float AngleAdjustment;
-
 		// Parent network prefab.
 		private NetInfo _netInfo;
 
@@ -272,6 +267,17 @@
 				NetData.DirtyList.Add(_netInfo);
 			}
 		}
+
+		/// <summary>
+		/// Applies the specified replacement as a temporary preview.
+		/// </summary>
+		/// <param name="previewReplacement">Replacement to preview.</param>
+		public void PreviewReplacement(BOBNetReplacement previewReplacement) => ReplaceProp(previewReplacement);
+
+		/// <summary>
+		/// Clears any temporary preview, restoring the permanent underlying state.
+		/// </summary>
+		public void ClearPreview() => UpdateProp();
 
 		/// <summary>
 		/// Updates the target prop according current active replacement status.

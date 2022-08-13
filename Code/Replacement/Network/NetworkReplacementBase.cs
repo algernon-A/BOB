@@ -80,7 +80,8 @@ namespace BOB
 						parentInfo = netInfo,
 						target = targetInfo.name,
 						targetInfo = targetInfo,
-						propIndex = propIndex
+						propIndex = propIndex,
+						laneIndex = laneIndex,
 					};
 					ReplacementEntry(netInfo).Add(thisReplacement);
 				}
