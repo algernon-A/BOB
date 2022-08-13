@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using ColossalFramework;
-
-
-namespace BOB
+﻿namespace BOB
 {
+    using System.Collections.Generic;
+    using AlgernonCommons;
+    using ColossalFramework;
+    using UnityEngine;
+
     /// <summary>
     /// 'Dummy' class for new NetLaneProps.Prop instances to overcome network NetLaneProps sharing.
     /// </summary>
@@ -94,7 +94,7 @@ namespace BOB
             });
 
             // Recalculate any Network Skins 2 applied skins.
-            AssemblyUtils.NS2Recalculate();
+            ModUtils.NS2Recalculate();
 
             // Clear dirty prefabs list.
             DirtyList.Clear();

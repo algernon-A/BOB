@@ -1,13 +1,14 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using ColossalFramework;
-using ColossalFramework.UI;
-using UnityEngine;
-
-
-namespace BOB
+﻿namespace BOB
 {
+	using System;
+	using System.Linq;
+	using System.Collections.Generic;
+	using AlgernonCommons;
+	using AlgernonCommons.Translation;
+	using AlgernonCommons.UI;
+	using ColossalFramework;
+	using ColossalFramework.UI;
+
 	/// <summary>
 	/// BOB network tree/prop replacement panel.
 	/// </summary>
@@ -174,15 +175,15 @@ namespace BOB
 			{
 				// Add lane menu.
 				// Mode label.
-				laneMenu = UIControls.AddDropDown(this, LaneX, ToggleY + 3f, MiddleX - LaneX);
-				UIControls.AddLabel(laneMenu, 0f, -ToggleHeaderHeight - 3f, Translations.Translate("BOB_PNL_LAN"), textScale: 0.8f);
-				laneMenu.tooltipBox = TooltipUtils.TooltipBox;
+				laneMenu = UIDropDowns.AddDropDown(this, LaneX, ToggleY + 3f, MiddleX - LaneX);
+				UILabels.AddLabel(laneMenu, 0f, -ToggleHeaderHeight - 3f, Translations.Translate("BOB_PNL_LAN"), textScale: 0.8f);
+				laneMenu.tooltipBox = UIToolTips.WordWrapToolTip;
 				laneMenu.tooltip = Translations.Translate("BOB_PNL_LAN_TIP");
 				laneMenu.eventSelectedIndexChanged += LaneIndexChanged;
 				laneMenu.isVisible = CurrentMode == ReplacementModes.Individual;
 
 				// Add pack button.
-				UIButton packButton = AddIconButton(this, PackButtonX, ToggleY, ToggleSize, "BOB_PNL_PKB", TextureUtils.LoadSpriteAtlas("BOB-PropPack"));
+				UIButton packButton = AddIconButton(this, PackButtonX, ToggleY, ToggleSize, "BOB_PNL_PKB", UITextures.LoadQuadSpriteAtlas("BOB-PropPack"));
 				packButton.eventClicked += (component, clickEvent) => PackPanelManager.Create();
 
 				// Add repeat slider.
@@ -241,7 +242,7 @@ namespace BOB
 
 			// Apply Harmony rendering patches.
 			RenderOverlays.CurrentNet = SelectedNet;
-			Patcher.PatchNetworkOverlays(true);
+			Patcher.Instance.PatchNetworkOverlays(true);
 		}
 
 

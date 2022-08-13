@@ -1,13 +1,15 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using UnityEngine;
-using ColossalFramework;
-using ColossalFramework.UI;
-
-
-namespace BOB
+﻿namespace BOB
 {
+	using System;
+	using System.Linq;
+	using System.Collections.Generic;
+	using AlgernonCommons;
+	using AlgernonCommons.Translation;
+	using AlgernonCommons.UI;
+	using ColossalFramework;
+	using ColossalFramework.UI;
+	using UnityEngine;
+
 	/// <summary>
 	/// Abstract base class for all BOB tree/prop replacement panels.
 	/// </summary>
@@ -235,21 +237,21 @@ namespace BOB
 				noPropsLabel.Hide();
 
 				// Actions text label.
-				UILabel actionsLabel = UIControls.AddLabel(this, MidControlX, ActionHeaderY, Translations.Translate("BOB_PNL_ACT"), textScale: 0.8f);
+				UILabel actionsLabel = UILabels.AddLabel(this, MidControlX, ActionHeaderY, Translations.Translate("BOB_PNL_ACT"), textScale: 0.8f);
 
 				// Apply button.
-				applyButton = AddIconButton(this, MidControlX, ActionsY, ActionSize, "BOB_PNL_APP", TextureUtils.LoadSpriteAtlas("BOB-OkSmall"));
+				applyButton = AddIconButton(this, MidControlX, ActionsY, ActionSize, "BOB_PNL_APP", UITextures.LoadQuadSpriteAtlas("BOB-OkSmall"));
 				applyButton.eventClicked += Apply;
 
 				// Revert button.
-				revertButton = AddIconButton(this, MidControlX + ActionSize, ActionsY, ActionSize, "BOB_PNL_REV", TextureUtils.LoadSpriteAtlas("BOB-Revert"));
+				revertButton = AddIconButton(this, MidControlX + ActionSize, ActionsY, ActionSize, "BOB_PNL_REV", UITextures.LoadQuadSpriteAtlas("BOB-Revert"));
 				revertButton.eventClicked += Revert;
 
 				// Extra functions label.
-				UILabel functionsLabel = UIControls.AddLabel(this, MiddleX, ToggleHeaderY, Translations.Translate("BOB_PNL_FUN"), textScale: 0.8f);
+				UILabel functionsLabel = UILabels.AddLabel(this, MiddleX, ToggleHeaderY, Translations.Translate("BOB_PNL_FUN"), textScale: 0.8f);
 
 				// Scale button.
-				UIButton scaleButton = AddIconButton(this, MiddleX, ToggleY, ToggleSize, "BOB_PNL_SCA", TextureUtils.LoadSpriteAtlas("BOB-Scale"));
+				UIButton scaleButton = AddIconButton(this, MiddleX, ToggleY, ToggleSize, "BOB_PNL_SCA", UITextures.LoadQuadSpriteAtlas("BOB-Scale"));
 				scaleButton.eventClicked += (control, clickEvent) => BOBScalePanel.Create(PropTreeMode, replacementPrefab);
 
 				// Preview image.

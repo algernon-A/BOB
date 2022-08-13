@@ -1,9 +1,9 @@
-﻿using ICities;
-using ColossalFramework.UI;
-
-
-namespace BOB
+﻿namespace BOB
 {
+    using AlgernonCommons.Translation;
+    using ColossalFramework.UI;
+    using ICities;
+
     /// <summary>
     /// Options panel for setting options regarding tree and prop ruining.
     /// </summary>

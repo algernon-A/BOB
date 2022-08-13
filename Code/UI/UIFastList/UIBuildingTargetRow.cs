@@ -1,10 +1,11 @@
-﻿using System.Text;
-using UnityEngine;
-using ColossalFramework.UI;
-
-
-namespace BOB
+﻿namespace BOB
 {
+    using System.Text;
+    using AlgernonCommons.Translation;
+    using AlgernonCommons.UI;
+    using ColossalFramework.UI;
+    using UnityEngine;
+
     /// <summary>
     /// An individual prop row.
     /// </summary>
@@ -182,7 +183,7 @@ namespace BOB
                 if (thisItem.isAdded)
                 {
                     // Show building replacement sprite.
-                    lineSprite.atlas = TextureUtils.LoadSpriteAtlas("BOB-RoundPlus");
+                    lineSprite.atlas = UITextures.LoadQuadSpriteAtlas("BOB-RoundPlus");
                     lineSprite.spriteName = "normal";
                     lineSprite.tooltip = Translations.Translate("BOB_SPR_ADD");
                     lineSprite.Show();
@@ -195,7 +196,7 @@ namespace BOB
                     replacementProb = thisItem.individualProb;
 
                     // Show building replacement sprite.
-                    lineSprite.atlas = TextureUtils.LoadSpriteAtlas(thisNetItem == null ? "BOB-BuildingSmall" : "BOB-RoadSmall");
+                    lineSprite.atlas = UITextures.LoadQuadSpriteAtlas(thisNetItem == null ? "BOB-BuildingSmall" : "BOB-RoadSmall");
                     lineSprite.spriteName = "normal";
                     lineSprite.tooltip = Translations.Translate(thisNetItem == null ? "BOB_SPR_SBL" : "BOB_SPR_SNT");
                     lineSprite.Show();
@@ -208,7 +209,7 @@ namespace BOB
                     replacementProb = thisItem.replacementProb;
 
                     // Show building replacement sprite.
-                    lineSprite.atlas = TextureUtils.LoadSpriteAtlas(thisNetItem == null ? "BOB-BuildingSmall" : "BOB-RoadSmall");
+                    lineSprite.atlas = UITextures.LoadQuadSpriteAtlas(thisNetItem == null ? "BOB-BuildingSmall" : "BOB-RoadSmall");
                     lineSprite.spriteName = "normal";
                     lineSprite.tooltip = Translations.Translate(thisNetItem == null ? "BOB_SPR_SBL" : "BOB_SPR_SNT");
                     lineSprite.Show();
@@ -221,7 +222,7 @@ namespace BOB
                     replacementProb = thisItem.allProb;
 
                     // Show all- replacement sprite.
-                    lineSprite.atlas = TextureUtils.LoadSpriteAtlas(thisNetItem == null ? "BOB-BuildingsSmall" : "BOB-RoadsSmall");
+                    lineSprite.atlas = UITextures.LoadQuadSpriteAtlas(thisNetItem == null ? "BOB-BuildingsSmall" : "BOB-RoadsSmall");
                     lineSprite.spriteName = "normal";
                     lineSprite.tooltip = Translations.Translate(thisNetItem == null ? "BOB_SPR_ABL" : "BOB_SPR_ANT");
                     lineSprite.Show();
@@ -235,7 +236,7 @@ namespace BOB
                     //thisItem.showProbs = false;
 
                     // Show package replacement sprite.
-                    lineSprite.atlas = TextureUtils.LoadSpriteAtlas("BOB-PropPackSmall");
+                    lineSprite.atlas = UITextures.LoadQuadSpriteAtlas("BOB-PropPackSmall");
                     lineSprite.spriteName = "normal";
                     lineSprite.tooltip = Translations.Translate("BOB_SPR_PCK");
                     lineSprite.Show();

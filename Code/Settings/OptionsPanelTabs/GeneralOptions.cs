@@ -1,8 +1,10 @@
-﻿using ColossalFramework.UI;
-
-
-namespace BOB
+﻿namespace BOB
 {
+    using AlgernonCommons.Keybinding;
+    using AlgernonCommons.Translation;
+    using AlgernonCommons.UI;
+    using ColossalFramework.UI;
+
     /// <summary>
     /// Options panel for setting general mod options.
     /// </summary>
@@ -21,15 +23,15 @@ namespace BOB
             panel.autoLayout = true;
 
             // Language dropdown.
-            UIDropDown languageDrop = UIControls.AddPlainDropDown(panel, Translations.Translate("TRN_CHOICE"), Translations.LanguageList, Translations.Index);
+            UIDropDown languageDrop = UIDropDowns.AddPlainDropDown(panel, 0f, 0f, Translations.Translate("TRN_CHOICE"), Translations.LanguageList, Translations.Index);
             languageDrop.eventSelectedIndexChanged += (control, index) =>
             {
                 Translations.Index = index;
-                OptionsPanel.LocaleChanged();
+                OptionsPanelManager<OptionsPanel>.LocaleChanged();
             };
 
             // Hotkey control.
-            panel.gameObject.AddComponent<OptionsKeymapping>();
+            panel.gameObject.AddComponent<UUIKeymapping>();
 
             // Default grouping behaviour.
             string[] groupItems = new string[]
@@ -38,22 +40,23 @@ namespace BOB
                 Translations.Translate("BOB_PER_SIN"),
                 Translations.Translate("BOB_PER_GRP")
             };
-            UIDropDown groupDropDown = UIControls.AddPlainDropDown(panel, Translations.Translate("BOB_PER_IND"), groupItems, ModSettings.indDefault, 350f);
+            UIDropDown groupDropDown = UIDropDowns.AddPlainDropDown(panel, 0f, 0f, Translations.Translate("BOB_PER_IND"), groupItems, ModSettings.indDefault, 350f);
             groupDropDown.eventSelectedIndexChanged += (control, index) => ModSettings.indDefault = index;
 
             // Rember last position.
-            UICheckBox rememberPosCheck = UIControls.AddPlainCheckBox(panel, Translations.Translate("BOB_OPT_POS"));
+            UICheckBox rememberPosCheck = UICheckBoxes.AddPlainCheckBox(panel, Translations.Translate("BOB_OPT_POS"));
             rememberPosCheck.isChecked = ModSettings.rememberPosition;
             rememberPosCheck.eventCheckChanged += (control, isChecked) => ModSettings.rememberPosition = isChecked;
 
             // Disable vanilla tree tool network tree replacement.
-            UICheckBox disableTreeToolCheck = UIControls.AddPlainCheckBox(panel, Translations.Translate("BOB_OPT_DTT"));
+            UICheckBox disableTreeToolCheck = UICheckBoxes.AddPlainCheckBox(panel, Translations.Translate("BOB_OPT_DTT"));
             disableTreeToolCheck.isChecked = ModSettings.DisableTreeTool;
             disableTreeToolCheck.eventCheckChanged += (control, isChecked) => ModSettings.DisableTreeTool = isChecked;
 
             // Tree tool control.
-            panel.gameObject.AddComponent<TreeToolKeymapping>();
-
+            OptionsKeymapping treeDisableKeyMapping = panel.gameObject.AddComponent<OptionsKeymapping>();
+            treeDisableKeyMapping.Label = Translations.Translate("BOB_OPT_DTK");
+            treeDisableKeyMapping.Binding = HotkeyThreading.TreeDisableKey;
         }
     }
 }

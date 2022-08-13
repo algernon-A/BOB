@@ -1,9 +1,9 @@
-﻿using System.Linq;
-using System.Collections.Generic;
-
-
-namespace BOB
+﻿namespace BOB
 {
+	using System.Collections.Generic;
+	using System.Linq;
+	using AlgernonCommons;
+
 	/// <summary>
 	/// Class to manage replacement packs.
 	/// </summary>

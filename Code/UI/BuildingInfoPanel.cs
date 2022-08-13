@@ -1,12 +1,14 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using UnityEngine;
-using ColossalFramework.UI;
-
-
-namespace BOB
+﻿namespace BOB
 {
+	using System;
+	using System.Linq;
+	using System.Collections.Generic;
+	using AlgernonCommons;
+	using AlgernonCommons.Translation;
+	using AlgernonCommons.UI;
+	using ColossalFramework.UI;
+	using UnityEngine;
+
 	/// <summary>
 	/// Prop row fastlist item for sub-buildings.
 	/// </summary>
@@ -251,7 +253,7 @@ namespace BOB
 			try
 			{
 				// Fixed height checkbox.
-				customHeightCheck = UIControls.LabelledCheckBox(heightPanel, Margin, FixedHeightY, Translations.Translate("BOB_PNL_CUH"), tooltip: Translations.Translate("BOB_PNL_CUH_TIP"));
+				customHeightCheck = UICheckBoxes.AddLabelledCheckBox(heightPanel, Margin, FixedHeightY, Translations.Translate("BOB_PNL_CUH"), tooltip: Translations.Translate("BOB_PNL_CUH_TIP"));
 				customHeightCheck.eventCheckChanged += CustomHeightChange;
 
 				// Adjust y-slider position and panel height.
@@ -331,7 +333,7 @@ namespace BOB
 					subBuildingPanel.relativePosition = new Vector2(-205f, TitleHeight);
 
 					// Heading.
-					UILabel subTitleLabel = UIControls.AddLabel(subBuildingPanel, 5f, 5f, Translations.Translate("BOB_PNL_SUB"), 190f);
+					UILabel subTitleLabel = UILabels.AddLabel(subBuildingPanel, 5f, 5f, Translations.Translate("BOB_PNL_SUB"), 190f);
 					subTitleLabel.textAlignment = UIHorizontalAlignment.Center;
 					subTitleLabel.relativePosition = new Vector2(5f, (TitleHeight - subTitleLabel.height) / 2f);
 
@@ -370,7 +372,7 @@ namespace BOB
 
 			// Apply Harmony rendering patches.
 			RenderOverlays.CurrentBuilding = currentBuilding;
-			Patcher.PatchBuildingOverlays(true);
+			Patcher.Instance.PatchBuildingOverlays(true);
 		}
 
 

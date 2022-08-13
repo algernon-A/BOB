@@ -1,14 +1,16 @@
-﻿using System;
-using UnityEngine;
-using ColossalFramework.UI;
-
-
-namespace BOB
+﻿namespace BOB
 {
-	/// <summary>
-	/// Static class to manage the BOB pack panel.
-	/// </summary>
-	internal static class PackPanelManager
+    using System;
+    using AlgernonCommons;
+    using AlgernonCommons.Translation;
+    using AlgernonCommons.UI;
+    using ColossalFramework.UI;
+    using UnityEngine;
+
+    /// <summary>
+    /// Static class to manage the BOB pack panel.
+    /// </summary>
+    internal static class PackPanelManager
 	{
 		// Instance references.
 		private static GameObject uiGameObject;
@@ -164,8 +166,8 @@ namespace BOB
             packSelection.selectedIndex = -1;
 
             // Apply and revert button.
-            applyButton = UIControls.AddButton(this, Margin, FooterY, Translations.Translate("BOB_PCK_APP"));
-            revertButton = UIControls.AddButton(this, (ListWidth / 2) + (Margin * 2), FooterY, Translations.Translate("BOB_PCK_RVT"));
+            applyButton = UIButtons.AddButton(this, Margin, FooterY, Translations.Translate("BOB_PCK_APP"));
+            revertButton = UIButtons.AddButton(this, (ListWidth / 2) + (Margin * 2), FooterY, Translations.Translate("BOB_PCK_RVT"));
             applyButton.eventClicked += (control, clickEvent) => SetPackStatus(true);
             revertButton.eventClicked += (control, clickEvent) => SetPackStatus(false);
 

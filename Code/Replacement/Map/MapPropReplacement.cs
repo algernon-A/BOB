@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using ColossalFramework;
-using EManagersLib.API;
-
-
-namespace BOB
+﻿namespace BOB
 {
+	using System.Collections.Generic;
+	using AlgernonCommons;
+	using ColossalFramework;
+	using EManagersLib.API;
+
 	/// <summary>
 	/// Class to manage map prop replacements.
 	/// </summary>

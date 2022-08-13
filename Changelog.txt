@@ -1,4 +1,6 @@
 ﻿- Increase offset slider displayed maximum to 32
+- Refactor building and network replacement
+- Implement AlgernonCommons
 - Adjust debugging logging
 - Update UnifiedUI
 

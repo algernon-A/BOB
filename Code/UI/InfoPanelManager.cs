@@ -1,11 +1,11 @@
-﻿using System;
-using ColossalFramework.UI;
-using UnityEngine;
-using BOB.MessageBox;
-
-
-namespace BOB
+﻿namespace BOB
 {
+	using System;
+	using AlgernonCommons;
+	using AlgernonCommons.Notifications;
+	using ColossalFramework.UI;
+	using UnityEngine;
+
 	/// <summary>
 	/// Static class to manage the BOB info panel.
 	/// </summary>
@@ -98,9 +98,9 @@ namespace BOB
 				RenderOverlays.CurrentBuilding = null;
 
 				// Revert overlay patches.
-				Patcher.PatchBuildingOverlays(false);
-				Patcher.PatchNetworkOverlays(false);
-				Patcher.PatchMapOverlays(false);
+				Patcher.Instance.PatchBuildingOverlays(false);
+				Patcher.Instance.PatchNetworkOverlays(false);
+				Patcher.Instance.PatchMapOverlays(false);
 
 				// Clear tool lane overlay list.
 				BOBTool.Instance.renderLanes.Clear();
@@ -136,7 +136,7 @@ namespace BOB
 			{
 				// Set displaying flag and show message.
 				displayingException = true;
-				MessageBoxBase.ShowModal<ExceptionMessageBox>();
+				NotificationBase.ShowNotification<ExceptionNotification>();
 			}
 		}
 

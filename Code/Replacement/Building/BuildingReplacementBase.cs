@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-
-
-namespace BOB
+﻿namespace BOB
 {
+	using System;
+	using System.Collections.Generic;
+	using AlgernonCommons;
+
 	/// <summary>
 	/// Base class for building replacement.
 	/// </summary>

@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-
-
-namespace BOB
+﻿namespace BOB
 {
+	using System.Collections.Generic;
+	using AlgernonCommons;
+	using UnityEngine;
+
 	/// <summary>
 	/// Struct to hold wire thickness details.
 	/// </summary>

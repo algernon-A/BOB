@@ -1,13 +1,14 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using ColossalFramework;
-using ColossalFramework.UI;
-using EManagersLib.API;
-
-
-namespace BOB
+﻿namespace BOB
 {
+	using System;
+	using System.Linq;
+	using System.Collections.Generic;
+	using AlgernonCommons;
+	using AlgernonCommons.Translation;
+	using ColossalFramework;
+	using ColossalFramework.UI;
+	using EManagersLib.API;
+
 	/// <summary>
 	/// BOB map tree/prop replacement panel.
 	/// </summary>
@@ -40,7 +41,7 @@ namespace BOB
 			LoadedList();
 
 			// Apply Harmony rendering patches.
-			Patcher.PatchMapOverlays(true);
+			Patcher.Instance.PatchMapOverlays(true);
 		}
 
 

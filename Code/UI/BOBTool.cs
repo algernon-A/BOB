@@ -1,14 +1,15 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using ColossalFramework;
-using ColossalFramework.UI;
-using ColossalFramework.Math;
-using UnifiedUI.Helpers;
-using EManagersLib.API;
-
-
-namespace BOB
+﻿namespace BOB
 {
+	using System.Collections.Generic;
+	using AlgernonCommons.Translation;
+	using AlgernonCommons.UI;
+	using ColossalFramework;
+	using ColossalFramework.UI;
+	using ColossalFramework.Math;
+	using EManagersLib.API;
+	using UnifiedUI.Helpers;
+	using UnityEngine;
+
 	/// <summary>
 	/// The BOB selection tool.
 	/// </summary>
@@ -56,8 +57,8 @@ namespace BOB
 			PropAPI.Initialize();
 
 			// Load cursors.
-			lightCursor = TextureUtils.LoadCursor("BOB-CursorLight.png");
-			darkCursor = TextureUtils.LoadCursor("BOB-CursorDark.png");
+			lightCursor = UITextures.LoadCursor("BOB-CursorLight.png");
+			darkCursor = UITextures.LoadCursor("BOB-CursorDark.png");
 			m_cursor = darkCursor;
 
 			// Create new UUI button.
@@ -67,7 +68,7 @@ namespace BOB
 				tooltip: Translations.Translate("BOB_NAM"),
 				tool: this,
 				icon: UUIHelpers.LoadTexture(UUIHelpers.GetFullPath<Mod>("Resources", "BOB-UUI.png")),
-				hotkeys: new UUIHotKeys { ActivationKey = ModSettings.UUIKey });
+				hotkeys: new UUIHotKeys { ActivationKey = ModSettings.ToolKey });
 		}
 
 		// Ignore nodes, citizens, disasters, districts, transport lines, and vehicles.
@@ -77,7 +78,7 @@ namespace BOB
 		public override District.Flags GetDistrictIgnoreFlags() => District.Flags.All;
 		public override TransportLine.Flags GetTransportIgnoreFlags() => TransportLine.Flags.None;
 		public override VehicleParked.Flags GetParkedVehicleIgnoreFlags() => VehicleParked.Flags.All;
-		public override TreeInstance.Flags GetTreeIgnoreFlags() => TreeInstance.Flags.None;
+		public override global::TreeInstance.Flags GetTreeIgnoreFlags() => global::TreeInstance.Flags.None;
 		public override PropInstance.Flags GetPropIgnoreFlags() => PropInstance.Flags.None;
 		public override Vehicle.Flags GetVehicleIgnoreFlags() => Vehicle.Flags.LeftHandDrive | Vehicle.Flags.Created | Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted | Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped | Vehicle.Flags.Leaving | Vehicle.Flags.Arriving | Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff | Vehicle.Flags.Flying | Vehicle.Flags.Landing | Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack | Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing | Vehicle.Flags.Exporting | Vehicle.Flags.Parking | Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel | Vehicle.Flags.WaitingLoading | Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic | Vehicle.Flags.Underground | Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding;
 
@@ -203,7 +204,7 @@ namespace BOB
 						{
 							// Local references.
 							TreeManager treeManager = Singleton<TreeManager>.instance;
-							TreeInstance[] treeBuffer = treeManager.m_trees.m_buffer;
+							global::TreeInstance[] treeBuffer = treeManager.m_trees.m_buffer;
 
 							// Unhide previously hovered tree.
 							if (treeBuffer[m_hoverInstance.Tree].Hidden)

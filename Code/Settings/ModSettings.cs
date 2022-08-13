@@ -1,18 +1,22 @@
-﻿using System;
-using System.IO;
-using System.Xml.Serialization;
-using UnityEngine;
-using ColossalFramework;
-
-
-namespace BOB
+﻿namespace BOB
 {
-	/// <summary>
-	/// Global mod settings.
-	/// </summary>
-	/// 
-	[XmlRoot("TreePropReplacer")]
-	public class ModSettings
+    using System;
+    using System.IO;
+    using System.Xml.Serialization;
+    using AlgernonCommons;
+    using AlgernonCommons.Keybinding;
+    using AlgernonCommons.Translation;
+    using AlgernonCommons.XML;
+    using ColossalFramework;
+    using UnityEngine;
+
+
+    /// <summary>
+    /// Global mod settings.
+    /// </summary>
+    /// 
+    [XmlRoot("TreePropReplacer")]
+	public class ModSettings : SettingsXMLBase
 	{
         // BOB settings file name (old).
         [XmlIgnore]
@@ -25,6 +29,18 @@ namespace BOB
         // User settings directory.
         [XmlIgnore]
         private static readonly string UserSettingsDir = ColossalFramework.IO.DataLocation.localApplicationData;
+
+        /// <summary>
+        /// Gets the settings file name.
+        /// </summary>
+        [XmlIgnore]
+        private static readonly string SettingsFileName = Path.Combine(ColossalFramework.IO.DataLocation.localApplicationData, NewSettingsFileName);
+
+        /// <summary>
+        /// UUI key.
+        /// </summary>
+        [XmlIgnore]
+        private static readonly UnsavedInputKey UUIKey = new UnsavedInputKey(name: "BOB hotkey", keyCode: KeyCode.B, control: false, shift: false, alt: true);
 
         // Default behaviour of the show individual props setting.
         [XmlIgnore]
@@ -80,7 +96,7 @@ namespace BOB
             set
             {
                 _disableTreeTool = value;
-                Patcher.DisableTreeTool(value);
+                Patcher.Instance.DisableTreeTool(value);
             }
         }
         private static bool _disableTreeTool = false;
@@ -115,72 +131,28 @@ namespace BOB
             }
         }
         private static bool _thinnerWires = false;
-
+        
+        /// <summary>
 
         /// <summary>
-        /// Current hotkey as UUI UnsavedInputKey.
+        /// Gets or sets the tool hotkey.
         /// </summary>
-        [XmlIgnore]
-        internal static UnsavedInputKey UUIKey => uuiKey;
-
-
-        /// <summary>
-        /// Tool hotkey as ColossalFramework SavedInputKey.
-        /// </summary>
-        [XmlIgnore]
-        internal static InputKey ToolKey
-        {
-            get => uuiKey.value;
-
-            set => uuiKey.value = value;
-        }
-
-
-        // "What's new" notification last notified version.
-        [XmlElement("WhatsNewVersion")]
-		public string XMLWhatsNewVersion { get => whatsNewVersion; set => whatsNewVersion = value; }
-
-
-		// Language.
-		[XmlElement("Language")]
-		public string XMLLanguage
-		{
-			get => Translations.CurrentLanguage;
-
-			set => Translations.CurrentLanguage = value;
-        }
-
-        // Hotkey element.
         [XmlElement("PanelKey")]
-        public KeyBinding XMLPanelKey
+        public Keybinding XMLToolKey
         {
-            get => uuiKey.KeyBinding;
+            get => UUIKey.Keybinding;
 
-            set => uuiKey.KeyBinding = value;
+            set => UUIKey.Keybinding = value;
         }
 
 
         // Hotkey element.
         [XmlElement("TreeToolKey")]
-        public KeyBinding TreeToolKey
+        public Keybinding TreeToolKey
         {
-            get
-            {
-                return new KeyBinding
-                {
-                    keyCode = (int)UIThreading.treeDisableKey,
-                    control = UIThreading.treeDisableCtrl,
-                    shift = UIThreading.treeDisableShift,
-                    alt = UIThreading.treeDisableAlt
-                };
-            }
-            set
-            {
-                UIThreading.treeDisableKey = (KeyCode)value.keyCode;
-                UIThreading.treeDisableCtrl = value.control;
-                UIThreading.treeDisableShift = value.shift;
-                UIThreading.treeDisableAlt = value.alt;
-            }
+            get => HotkeyThreading.TreeDisableKey;
+
+            set => HotkeyThreading.TreeDisableKey = value;
         }
 
 
@@ -208,6 +180,11 @@ namespace BOB
         [XmlElement("DisableNetworkTreeTool")]
         public bool XMLDisableTreeTool { get => DisableTreeTool; set => DisableTreeTool = value; }
 
+        /// <summary>
+        /// Gets the current hotkey as a UUI UnsavedInputKey.
+        /// </summary>
+        [XmlIgnore]
+        internal static UnsavedInputKey ToolKey => UUIKey;
 
         /// <summary>
         /// Load settings from XML file.
@@ -282,69 +259,6 @@ namespace BOB
             {
                 Logging.LogException(e, "exception saving XML settings file");
             }
-        }
-    }
-
-
-    /// <summary>
-    /// Basic keybinding class - code and modifiers.
-    /// </summary>
-    public class KeyBinding
-    {
-        [XmlAttribute("KeyCode")]
-        public int keyCode;
-
-        [XmlAttribute("Control")]
-        public bool control;
-
-        [XmlAttribute("Shift")]
-        public bool shift;
-
-        [XmlAttribute("Alt")]
-        public bool alt;
-
-
-        /// <summary>
-        /// Encode keybinding as saved input key for UUI.
-        /// </summary>
-        /// <returns></returns>
-        internal InputKey Encode() => SavedInputKey.Encode((KeyCode)keyCode, control, shift, alt);
-    }
-
-
-    /// <summary>
-    /// UUI unsaved input key.
-    /// </summary>
-    public class UnsavedInputKey : UnifiedUI.Helpers.UnsavedInputKey
-    {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="name">Reference name</param>
-        /// <param name="keyCode">Keycode</param>
-        /// <param name="control">Control modifier key status</param>
-        /// <param name="shift">Shift modifier key status</param>
-        /// <param name="alt">Alt modifier key status</param>
-        public UnsavedInputKey(string name, KeyCode keyCode, bool control, bool shift, bool alt) :
-            base(keyName: name, modName: "Repaint", Encode(keyCode, control: control, shift: shift, alt: alt))
-        {
-        }
-
-
-        /// <summary>
-        /// Called by UUI when a key conflict is resolved.
-        /// Used here to save the new key setting.
-        /// </summary>
-        public override void OnConflictResolved() => ModSettings.Save();
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public KeyBinding KeyBinding
-        {
-            get => new KeyBinding { keyCode = (int)Key, control = Control, shift = Shift, alt = Alt };
-            set => this.value = value.Encode();
         }
     }
 }

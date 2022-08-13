@@ -1,15 +1,15 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Xml.Serialization;
-using System.Collections.Generic;
-using ICities;
-using ColossalFramework.Plugins;
-using ColossalFramework.Packaging;
-
-
-namespace BOB
+﻿namespace BOB
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Xml.Serialization;
+    using AlgernonCommons;
+    using ColossalFramework.Plugins;
+    using ColossalFramework.Packaging;
+    using ICities;
+
     /// <summary>
     /// Static utility class for managing prop replacement pack files.
     /// </summary>

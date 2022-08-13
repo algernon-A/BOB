@@ -1,11 +1,11 @@
-﻿using System.IO;
-using System.Collections.Generic;
-using ICities;
-using ColossalFramework.IO;
-
-
-namespace BOB
+﻿namespace BOB
 {
+    using System.IO;
+    using System.Collections.Generic;
+    using AlgernonCommons;
+    using ColossalFramework.IO;
+    using ICities;
+
     /// <summary>
     /// Handles savegame data saving and loading.
     /// </summary>

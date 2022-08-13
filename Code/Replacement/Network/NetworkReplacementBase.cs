@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
-
-
-namespace BOB
+﻿namespace BOB
 {
+	using System;
+	using System.Collections.Generic;
+	using AlgernonCommons;
+
 	/// <summary>
 	/// Base class for network replacement.
 	/// </summary>

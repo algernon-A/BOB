@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
-
-
-namespace BOB
+﻿namespace BOB
 {
+    using System;
+    using System.Collections.Generic;
+    using AlgernonCommons;
+    using UnityEngine;
+
     /// <summary>
     /// Class to manage added network props.
     /// </summary>

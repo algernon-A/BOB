@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-
-
-namespace BOB
+﻿namespace BOB
 {
+	using System.Collections.Generic;
+	using AlgernonCommons;
+
 	/// <summary>
 	/// Class to manage all-builing prop and tree replacements.
 	/// </summary>

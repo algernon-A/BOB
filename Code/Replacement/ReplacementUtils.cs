@@ -1,8 +1,8 @@
-﻿using System;
-
-
-namespace BOB
+﻿namespace BOB
 {
+	using System;
+	using AlgernonCommons;
+
 	/// <summary>
 	/// Static class for replacment record management utilities.
 	/// </summary>

@@ -1,13 +1,15 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using UnityEngine;
-using ColossalFramework;
-using ColossalFramework.UI;
-
-
-namespace BOB
+﻿namespace BOB
 {
+	using System;
+	using System.Linq;
+	using System.Collections.Generic;
+	using AlgernonCommons;
+	using AlgernonCommons.Translation;
+	using AlgernonCommons.UI;
+	using ColossalFramework;
+	using ColossalFramework.UI;
+	using UnityEngine;
+
 	/// <summary>
 	/// Panel for prop scale selection.
 	/// </summary>
@@ -219,7 +221,7 @@ namespace BOB
 			maxScaleSlider.value = 1f;
 
 			// Revert button.
-			revertButton = UIControls.AddSmallerButton(this, ControlX, RevertY, Translations.Translate("BOB_PNL_REV"), ControlWidth);
+			revertButton = UIButtons.AddSmallerButton(this, ControlX, RevertY, Translations.Translate("BOB_PNL_REV"), ControlWidth);
 			revertButton.eventClicked += Revert;
 			revertButton.Disable();
 

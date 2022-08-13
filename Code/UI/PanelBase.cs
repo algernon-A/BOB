@@ -1,9 +1,10 @@
-﻿using UnityEngine;
-using ColossalFramework.UI;
-
-
-namespace BOB
+﻿namespace BOB
 {
+	using AlgernonCommons.Translation;
+	using AlgernonCommons.UI;
+	using ColossalFramework.UI;
+	using UnityEngine;
+
 	/// <summary>
 	/// Panel to setup random props/trees.
 	/// </summary>
@@ -158,18 +159,18 @@ namespace BOB
 			closeButton.eventClick += (component, clickEvent) => CloseEvent();
 
 			// Name filter.
-			nameFilter = UIControls.SmallLabelledTextField(this, width - 200f - Margin, TitleHeight + Margin, Translations.Translate("BOB_FIL_NAME"));
+			nameFilter = UITextFields.AddSmallLabelledTextField(this, width - 200f - Margin, TitleHeight + Margin, Translations.Translate("BOB_FIL_NAME"));
 			// Event handlers for name filter textbox.
 			nameFilter.eventTextChanged += (control, text) => LoadedList();
 			nameFilter.eventTextSubmitted += (control, text) => LoadedList();
 
 			// Vanilla filter.
-			hideVanilla = UIControls.LabelledCheckBox((UIComponent)(object)this, nameFilter.relativePosition.x, nameFilter.relativePosition.y + nameFilter.height + (Margin / 2f), Translations.Translate("BOB_PNL_HDV"), 12f, 0.7f);
+			hideVanilla = UICheckBoxes.AddLabelledCheckBox((UIComponent)(object)this, nameFilter.relativePosition.x, nameFilter.relativePosition.y + nameFilter.height + (Margin / 2f), Translations.Translate("BOB_PNL_HDV"), 12f, 0.7f);
 			hideVanilla.isChecked = ModSettings.hideVanilla;
 			hideVanilla.eventCheckChanged += VanillaCheckChanged;
 
 			// Mode label.
-			modeLabel = UIControls.AddLabel(this, Margin, ToggleHeaderY, Translations.Translate("BOB_PNL_MOD"), textScale: 0.8f);
+			modeLabel = UILabels.AddLabel(this, Margin, ToggleHeaderY, Translations.Translate("BOB_PNL_MOD"), textScale: 0.8f);
 
 			// Tree/Prop checkboxes.
 			for (int i = 0; i < (int)PropTreeModes.NumModes; ++i)
@@ -447,10 +448,10 @@ namespace BOB
 
 			// Value field - added to parent, not to slider, otherwise slider catches all input attempts.  Integer textfields (stepsize == 1) have shorter widths.
 			float textFieldWidth = stepSize == 1 ? IntTextFieldWidth : FloatTextFieldWidth;
-			UITextField valueField = UIControls.TinyTextField(parent, xPos + Margin + newSlider.width - textFieldWidth, yPos + ValueY, textFieldWidth);
+			UITextField valueField = UITextFields.AddTinyTextField(parent, xPos + Margin + newSlider.width - textFieldWidth, yPos + ValueY, textFieldWidth);
 
 			// Title label.
-			UILabel titleLabel = UIControls.AddLabel(newSlider, 0f, LabelY, Translations.Translate(labelKey), textScale: 0.7f);
+			UILabel titleLabel = UILabels.AddLabel(newSlider, 0f, LabelY, Translations.Translate(labelKey), textScale: 0.7f);
 
 			// Autoscale tile label text, with minimum size 0.35.
 			while (titleLabel.width > newSlider.width - textFieldWidth && titleLabel.textScale > 0.35f)
@@ -460,14 +461,14 @@ namespace BOB
 
 			// Slider track.
 			UISlicedSprite sliderSprite = newSlider.AddUIComponent<UISlicedSprite>();
-			sliderSprite.atlas = TextureUtils.InGameAtlas;
+			sliderSprite.atlas = UITextures.InGameAtlas;
 			sliderSprite.spriteName = "BudgetSlider";
 			sliderSprite.size = new Vector2(newSlider.width, 9f);
 			sliderSprite.relativePosition = new Vector2(0f, 4f);
 
 			// Slider thumb.
 			UISlicedSprite sliderThumb = newSlider.AddUIComponent<UISlicedSprite>();
-			sliderThumb.atlas = TextureUtils.InGameAtlas;
+			sliderThumb.atlas = UITextures.InGameAtlas;
 			sliderThumb.spriteName = "SliderBudget";
 			newSlider.thumbObject = sliderThumb;
 
@@ -531,13 +532,13 @@ namespace BOB
 			// Checkbox sprites.
 			UISprite sprite = checkBox.AddUIComponent<UISprite>();
 			sprite.name = "UncheckedSprite";
-			sprite.atlas = TextureUtils.LoadSpriteAtlas(atlasName);
+			sprite.atlas = UITextures.LoadQuadSpriteAtlas(atlasName);
 			sprite.spriteName = "disabled";
 			sprite.size = new Vector2(ToggleSize, ToggleSize);
 			sprite.relativePosition = Vector3.zero;
 
 			checkBox.checkedBoxObject = sprite.AddUIComponent<UISprite>();
-			((UISprite)checkBox.checkedBoxObject).atlas = TextureUtils.LoadSpriteAtlas(atlasName);
+			((UISprite)checkBox.checkedBoxObject).atlas = UITextures.LoadQuadSpriteAtlas(atlasName);
 			((UISprite)checkBox.checkedBoxObject).spriteName = "pressed";
 			checkBox.checkedBoxObject.size = new Vector2(ToggleSize, ToggleSize);
 			checkBox.checkedBoxObject.relativePosition = Vector3.zero;

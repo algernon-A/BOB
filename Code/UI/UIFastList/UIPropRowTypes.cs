@@ -1,9 +1,9 @@
-﻿using UnityEngine;
-using ColossalFramework.UI;
-
-
-namespace BOB
+﻿namespace BOB
 {
+	using AlgernonCommons.UI;
+	using ColossalFramework.UI;
+	using UnityEngine;
+
 	/// <summary>
 	/// Prop row fastlist item for loaded props/trees.
 	/// </summary>
@@ -245,7 +245,7 @@ namespace BOB
 
 				lockSprite.size = new Vector2(17f, 17f);
 				lockSprite.relativePosition = new Vector2(width - 20f, 3f);
-				lockSprite.atlas = TextureUtils.LoadSpriteAtlas("BOB-Padlock");
+				lockSprite.atlas = UITextures.LoadQuadSpriteAtlas("BOB-Padlock");
 				SetLockSprite();
 
 				lockSprite.eventClicked += (control, clickEvent) =>

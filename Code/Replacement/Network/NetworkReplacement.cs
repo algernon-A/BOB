@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-
-
-namespace BOB
+﻿namespace BOB
 {
+	using System.Collections.Generic;
+	using AlgernonCommons;
+
 	/// <summary>
 	/// Class to manage network prop and tree replacements.
 	/// </summary>

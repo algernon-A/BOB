@@ -1,12 +1,14 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using ColossalFramework.UI;
-using UnityEngine;
-
-
-namespace BOB
+﻿namespace BOB
 {
+	using System;
+	using System.Linq;
+	using System.Collections.Generic;
+	using AlgernonCommons;
+	using AlgernonCommons.Translation;
+	using AlgernonCommons.UI;
+	using ColossalFramework.UI;
+	using UnityEngine;
+
 	/// <summary>
 	/// Abstract class for building and network BOB tree/prop replacement panels.
 	/// </summary>
@@ -123,7 +125,7 @@ namespace BOB
 					_unappliedChanges = value;
 
 					// Update apply button atlas to show/hide alert mark as appropriate.
-					applyButton.atlas = TextureUtils.LoadSpriteAtlas(value ? "BOB-OkSmallWarn" : "BOB-OkSmall");
+					applyButton.atlas = UITextures.LoadQuadSpriteAtlas(value ? "BOB-OkSmallWarn" : "BOB-OkSmall");
 
 					// Set button states for new state.
 					UpdateButtonStates();
@@ -230,7 +232,7 @@ namespace BOB
 				modeLabel.relativePosition += new Vector3(modeOffset, 0f);
 
 				// Hide button.
-				hideButton = AddIconButton(this, MidControlX + ActionSize + ActionSize, ActionsY, ActionSize, "BOB_PNL_HID", TextureUtils.LoadSpriteAtlas("BOB-InvisibleProp"));
+				hideButton = AddIconButton(this, MidControlX + ActionSize + ActionSize, ActionsY, ActionSize, "BOB_PNL_HID", UITextures.LoadQuadSpriteAtlas("BOB-InvisibleProp"));
 				hideButton.eventClicked += HideProp;
 
 				// Probability.
@@ -245,7 +247,7 @@ namespace BOB
 
 				// Offset panel.
 				UIPanel offsetPanel = Sliderpanel(this, MidControlX, OffsetPanelY, OffsetPanelHeight);
-				UILabel offsetLabel = UIControls.AddLabel(offsetPanel, 0f, OffsetLabelY, Translations.Translate("BOB_PNL_OFF"));
+				UILabel offsetLabel = UILabels.AddLabel(offsetPanel, 0f, OffsetLabelY, Translations.Translate("BOB_PNL_OFF"));
 				offsetLabel.textAlignment = UIHorizontalAlignment.Center;
 				while (offsetLabel.width > MidControlWidth)
 				{
@@ -260,7 +262,7 @@ namespace BOB
 
 				// Height panel.
 				heightPanel = Sliderpanel(this, MidControlX, HeightPanelY, HeightPanelShortHeight);
-				UILabel heightLabel = UIControls.AddLabel(heightPanel, 0f, OffsetLabelY, Translations.Translate("BOB_PNL_HEI"));
+				UILabel heightLabel = UILabels.AddLabel(heightPanel, 0f, OffsetLabelY, Translations.Translate("BOB_PNL_HEI"));
 				ySlider = AddBOBSlider(heightPanel, Margin, YOffsetY - 20f, MidControlWidth - (Margin * 2f), "BOB_PNL_YOF", -32f, 32f, 0.01f, "Y offset");
 				while (heightLabel.width > MidControlWidth)
 				{
@@ -277,11 +279,11 @@ namespace BOB
 				probabilitySlider.eventTrueValueChanged += SliderChange;
 
 				// Normal/random toggle.
-				randomCheck = UIControls.LabelledCheckBox((UIComponent)(object)this, hideVanilla.relativePosition.x, hideVanilla.relativePosition.y + hideVanilla.height + (Margin / 2f), Translations.Translate("BOB_PNL_RSW"), 12f, 0.7f);
+				randomCheck = UICheckBoxes.AddLabelledCheckBox((UIComponent)(object)this, hideVanilla.relativePosition.x, hideVanilla.relativePosition.y + hideVanilla.height + (Margin / 2f), Translations.Translate("BOB_PNL_RSW"), 12f, 0.7f);
 				randomCheck.eventCheckChanged += RandomCheckChanged;
 
 				// Random settings button.
-				UIButton randomButton = AddIconButton(this, RandomButtonX, ToggleY, ToggleSize, "BOB_PNL_RST", TextureUtils.LoadSpriteAtlas("BOB-Random"));
+				UIButton randomButton = AddIconButton(this, RandomButtonX, ToggleY, ToggleSize, "BOB_PNL_RST", UITextures.LoadQuadSpriteAtlas("BOB-Random"));
 				randomButton.eventClicked += (control, clickEvent) => BOBRandomPanel.Create();
 
 				// Set initial button states.
@@ -289,11 +291,11 @@ namespace BOB
 				UpdateModeIcons();
 
 				// Add button.
-				addButton = AddIconButton(this, MidControlX, ActionsY2, ActionSize, "BOB_PNL_ADD", TextureUtils.LoadSpriteAtlas("BOB-RoundPlus"));
+				addButton = AddIconButton(this, MidControlX, ActionsY2, ActionSize, "BOB_PNL_ADD", UITextures.LoadQuadSpriteAtlas("BOB-RoundPlus"));
 				addButton.eventClicked += (control, clickEvent) => AddNew();
 
 				// Remove button.
-				removeButton = AddIconButton(this, MidControlX + ActionSize, ActionsY2, ActionSize, "BOB_PNL_REM", TextureUtils.LoadSpriteAtlas("BOB-RoundMinus"));
+				removeButton = AddIconButton(this, MidControlX + ActionSize, ActionsY2, ActionSize, "BOB_PNL_REM", UITextures.LoadQuadSpriteAtlas("BOB-RoundMinus"));
 				removeButton.eventClicked += (control, clickEvent) => RemoveProp();
 
 				// Add/remove button initial visibility.
@@ -555,7 +557,7 @@ namespace BOB
 		{
 			// Slider panel.
 			UIPanel sliderPanel = parent.AddUIComponent<UIPanel>();
-			sliderPanel.atlas = TextureUtils.InGameAtlas;
+			sliderPanel.atlas = UITextures.InGameAtlas;
 			sliderPanel.backgroundSprite = "GenericPanel";
 			sliderPanel.color = new Color32(206, 206, 206, 255);
 			sliderPanel.size = new Vector2(MidControlWidth, height);
@@ -673,7 +675,7 @@ namespace BOB
 			for (int i = 0; i < (int)ReplacementModes.NumModes; ++i)
 			{
 				// Load atlas.
-				UITextureAtlas checkAtlas = TextureUtils.LoadSpriteAtlas(atlasNames[i]);
+				UITextureAtlas checkAtlas = UITextures.LoadQuadSpriteAtlas(atlasNames[i]);
 
 				// Update unchecked sprite. 
 				UISprite uncheckedSprite = modeChecks[i].Find<UISprite>("UncheckedSprite");

@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using ColossalFramework;
-
-
-namespace BOB
+﻿namespace BOB
 {
+	using System.Collections.Generic;
+	using AlgernonCommons;
+	using ColossalFramework;
+
 	/// <summary>
 	/// Cass to manage map tree replacements.
 	/// </summary>

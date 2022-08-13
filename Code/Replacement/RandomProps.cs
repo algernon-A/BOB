@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
-
-
-namespace BOB
+﻿namespace BOB
 {
+	using AlgernonCommons;
+	using System;
+	using System.Collections.Generic;
+	using UnityEngine;
+
 	/// <summary>
 	/// Static class to manage random prop and tree prefabs.
 	/// </summary>

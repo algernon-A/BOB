@@ -1,9 +1,11 @@
-﻿using ICities;
-using BOB.MessageBox;
-
-
-namespace BOB
+﻿namespace BOB
 {
+    using AlgernonCommons;
+    using AlgernonCommons.Notifications;
+    using AlgernonCommons.Translation;
+    using AlgernonCommons.UI;
+    using ICities;
+
     /// <summary>
     /// Main loading class: the mod runs from here.
     /// </summary>
@@ -19,7 +21,7 @@ namespace BOB
         /// <param name="loading">Loading mode (e.g. game, editor, scenario, etc.)</param>
         public override void OnCreated(ILoading loading)
         {
-            Logging.KeyMessage("version ", Mod.Version, " loading");
+            Logging.KeyMessage("version ", AssemblyUtils.TrimmedCurrentVersion, " loading");
 
             // Don't do anything if not in game (e.g. if we're going into an editor).
             if (loading.currentMode != AppMode.Game && loading.currentMode != AppMode.MapEditor)
@@ -28,7 +30,7 @@ namespace BOB
                 Logging.KeyMessage("not loading into game, skipping activation");
 
                 // Unload Harmony patches and exit before doing anything further.
-                Patcher.UnpatchAll();
+                Patcher.Instance.UnpatchAll();
                 return;
             }
 
@@ -49,7 +51,7 @@ namespace BOB
             new AddedNetworkProps();
 
             // Reflect overlay methods.
-            Patcher.ReflectOverlays();
+            Patcher.Instance.ReflectOverlays();
 
             base.OnCreated(loading);
         }
@@ -73,23 +75,23 @@ namespace BOB
             }
 
             // Check to see that Harmony 2 was properly loaded.
-            if (!Patcher.Patched)
+            if (!Patcher.Instance.Patched)
             {
                 // Harmony 2 wasn't loaded; abort.
                 Logging.Error("Harmony patches not applied; aborting");
                 isModEnabled = false;
 
                 // Display warning message.
-                ListMessageBox harmonyBox = MessageBoxBase.ShowModal<ListMessageBox>();
+                ListNotification harmonyNotification = NotificationBase.ShowNotification<ListNotification>();
 
                 // Key text items.
-                harmonyBox.AddParas(Translations.Translate("ERR_HAR0"), Translations.Translate("BOB_ERR_HAR"), Translations.Translate("BOB_ERR_FAT"), Translations.Translate("ERR_HAR1"));
+                harmonyNotification.AddParas(Translations.Translate("ERR_HAR0"), Translations.Translate("BOB_ERR_HAR"), Translations.Translate("BOB_ERR_FAT"), Translations.Translate("ERR_HAR1"));
 
                 // List of dot points.
-                harmonyBox.AddList(Translations.Translate("ERR_HAR2"), Translations.Translate("ERR_HAR3"));
+                harmonyNotification.AddList(Translations.Translate("ERR_HAR2"), Translations.Translate("ERR_HAR3"));
 
                 // Closing para.
-                harmonyBox.AddParas(Translations.Translate("MES_PAGE"));
+                harmonyNotification.AddParas(Translations.Translate("MES_PAGE"));
 
                 // Don't do anything further.
                 return;
@@ -113,7 +115,7 @@ namespace BOB
             WhatsNew.ShowWhatsNew();
 
             // Set up Network Skins 2 reflection.
-            AssemblyUtils.NS2Reflection();
+            ModUtils.NS2Reflection();
 
             // Enable thin wires, if applicable.
             if (ModSettings.ThinnerWires)
@@ -127,13 +129,13 @@ namespace BOB
             NetData.Update();
 
             // Set up options panel event handler.
-            OptionsPanel.OptionsEventHook();
+            OptionsPanelManager<OptionsPanel>.OptionsEventHook();
 
             // Display any exception message that occured during load.
             InfoPanelManager.CheckException();
 
             // Activate tool hotkey.
-            UIThreading.Operating = true;
+            HotkeyThreading.Operating = true;
 
             isLoaded = true;
             Logging.Message("loading complete");

@@ -1,9 +1,11 @@
-﻿using UnityEngine;
-using ColossalFramework.UI;
-
-
-namespace BOB
+﻿namespace BOB
 {
+    using AlgernonCommons;
+    using AlgernonCommons.Translation;
+    using AlgernonCommons.UI;
+    using ColossalFramework.UI;
+    using UnityEngine;
+
     /// <summary>
     /// Options panel for setting basic mod options.
     /// </summary>
@@ -90,25 +92,25 @@ namespace BOB
             configList.rowsData = new FastList<object>();
 
             // File name textfield.
-            UILabel fileTextLabel = UIControls.AddLabel(panel, ControlPanelX, ListY, "New configuration name:");
-            fileNameField = UIControls.AddTextField(panel, ControlPanelX, ListY + fileTextLabel.height);
+            UILabel fileTextLabel = UILabels.AddLabel(panel, ControlPanelX, ListY, "New configuration name:");
+            fileNameField = UITextFields.AddTextField(panel, ControlPanelX, ListY + fileTextLabel.height);
             fileNameField.eventTextChanged += (control, text) => UpdateButtonStates();
 
             // Buttons.
-            activeCopyButton = UIControls.AddButton(panel, ControlPanelX, ListY + 70f, Translations.Translate("BOB_CFG_SAC"), 300f, scale: 0.8f);
+            activeCopyButton = UIButtons.AddButton(panel, ControlPanelX, ListY + 70f, Translations.Translate("BOB_CFG_SAC"), 300f, scale: 0.8f);
             activeCopyButton.eventClicked += NewCurrent;
-            selectedCopyButton = UIControls.AddButton(panel, ControlPanelX, ListY + 105f, Translations.Translate("BOB_CFG_SSC"), 300f, scale: 0.8f);
+            selectedCopyButton = UIButtons.AddButton(panel, ControlPanelX, ListY + 105f, Translations.Translate("BOB_CFG_SSC"), 300f, scale: 0.8f);
             selectedCopyButton.eventClicked += CopySelected;
-            newCleanButton = UIControls.AddButton(panel, ControlPanelX, ListY + 140f, Translations.Translate("BOB_CFG_SEC"), 300f, scale: 0.8f);
+            newCleanButton = UIButtons.AddButton(panel, ControlPanelX, ListY + 140f, Translations.Translate("BOB_CFG_SEC"), 300f, scale: 0.8f);
             newCleanButton.eventClicked += NewClean;
-            deleteButton = UIControls.AddButton(panel, ControlPanelX, ListY + 210f, Translations.Translate("BOB_CFG_DEL"), 300f, scale: 0.8f);
+            deleteButton = UIButtons.AddButton(panel, ControlPanelX, ListY + 210f, Translations.Translate("BOB_CFG_DEL"), 300f, scale: 0.8f);
             deleteButton.eventClicked += Delete;
 
             // Ingame buttons - 'use custom' check and apply and nuke buttons.
             if (inGame)
             {
                 // Use custom check box.
-                customCheck = UIControls.LabelledCheckBox(panel, Margin, ToolBarY, Translations.Translate("BOB_CFG_UCS"));
+                customCheck = UICheckBoxes.AddLabelledCheckBox(panel, Margin, ToolBarY, Translations.Translate("BOB_CFG_UCS"));
                 customCheck.eventCheckChanged += (control, isChecked) =>
                 {
                     // If we've got a valid selection, set the current config name to this.
@@ -119,20 +121,20 @@ namespace BOB
                 };
 
                 // Apply button.
-                UIButton applyButton = UIControls.AddButton(panel, Margin, FooterY, Translations.Translate("BOB_CFG_LAA"), 400f, scale: 0.8f);
+                UIButton applyButton = UIButtons.AddButton(panel, Margin, FooterY, Translations.Translate("BOB_CFG_LAA"), 400f, scale: 0.8f);
                 applyButton.eventClicked += Apply;
 
                 // Use global configuration button.
-                UIButton globalButton = UIControls.AddButton(panel, Margin, FooterY + 50f, Translations.Translate("BOB_CFG_LGL"), 400f, scale: 0.8f);
+                UIButton globalButton = UIButtons.AddButton(panel, Margin, FooterY + 50f, Translations.Translate("BOB_CFG_LGL"), 400f, scale: 0.8f);
                 globalButton.eventClicked += UseGlobal;
 
                 // Clean up config button.
-                UIButton cleanUpButton = UIControls.AddButton(panel, Margin + 50f, FooterY + 150f, Translations.Translate("BOB_CFG_CLE"), 300f);
+                UIButton cleanUpButton = UIButtons.AddButton(panel, Margin + 50f, FooterY + 150f, Translations.Translate("BOB_CFG_CLE"), 300f);
                 cleanUpButton.tooltip = Translations.Translate("BOB_CFG_CLE_TIP");
                 cleanUpButton.eventClicked += (control, clickEvent) => ConfigurationUtils.Cleanup();
 
                 // Nuke all settings button.
-                UIButton nukeButton = UIControls.AddButton(panel, Margin + 50f, FooterY + 200f, Translations.Translate("BOB_NUKE"), 300f);
+                UIButton nukeButton = UIButtons.AddButton(panel, Margin + 50f, FooterY + 200f, Translations.Translate("BOB_NUKE"), 300f);
                 nukeButton.eventClicked += (control, clickEvent) =>
                 {
                     // Revert all-building and building settings.
@@ -140,7 +142,7 @@ namespace BOB
                 };
 
                 // Clean map data button.
-                UIButton cleanSaveButton = UIControls.AddButton(panel, Margin + 50f, FooterY + 280f, Translations.Translate("BOB_CFG_CMD"), 300f, scale: 0.8f, tooltip: Translations.Translate("BOB_CFG_CMD_TIP"));
+                UIButton cleanSaveButton = UIButtons.AddButton(panel, Margin + 50f, FooterY + 280f, Translations.Translate("BOB_CFG_CMD"), 300f, scale: 0.8f, tooltip: Translations.Translate("BOB_CFG_CMD_TIP"));
                 cleanSaveButton.eventClicked += (control, clickEvent) =>
                 {
                     // Clean all map data.

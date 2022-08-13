@@ -46,4 +46,5 @@
 		<Copy SourceFiles="@(_PrefabTemplates)" DestinationFolder="$(DeployDir)" />
 		<Copy SourceFiles="@(_ReplacementPacks)" DestinationFolder="$(DeployDir)/ReplacementPacks" />
 	</Target>
+	<Import Project="..\AlgernonCommons\AlgernonCommonsPatchingShared.projitems" Label="Shared" />
 </Project>

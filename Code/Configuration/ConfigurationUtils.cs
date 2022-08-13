@@ -1,13 +1,13 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.IO;
-using System.Xml.Serialization;
-using ColossalFramework;
-
-
-namespace BOB
+﻿namespace BOB
 {
+	using System;
+	using System.Collections.Generic;
+	using System.IO;
+	using System.Linq;
+	using System.Xml.Serialization;
+	using AlgernonCommons;
+	using ColossalFramework;
+
 	/// <summary>
 	/// XML serialization/deserialization utilities class.
 	/// </summary>
