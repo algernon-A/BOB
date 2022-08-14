@@ -74,7 +74,6 @@ namespace BOB
         /// <summary>
         /// Prop/tree checkboxes.
         /// </summary>
-
         protected readonly UICheckBox[] m_propTreeChecks = new UICheckBox[(int)PropTreeModes.NumModes];
 
         /// <summary>
@@ -83,9 +82,9 @@ namespace BOB
         protected UICheckBox m_hideVanilla;
 
         /// <summary>
-        /// Loaded prefab name sort button.
+        /// Replacement prefab name sort button.
         /// </summary>
-        protected UIButton m_loadedNameSearchButton;
+        protected UIButton m_replacementNameSortButton;
 
         /// <summary>
         /// Mode label.
@@ -93,9 +92,9 @@ namespace BOB
         protected UILabel m_modeLabel;
 
         /// <summary>
-        /// Loaded list search status.
+        /// Replacement prefab list sorting setting.
         /// </summary>
-        protected int m_loadedSearchStatus;
+        protected int m_replacementSortSetting;
 
         /// <summary>
         /// Indicates whether prop/tree check change events should be ignored.
@@ -128,7 +127,6 @@ namespace BOB
 
         // Current replacement mode.
         private PropTreeModes _propTreeMode = PropTreeModes.Prop;
-
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BOBPanelBase"/> class.
@@ -167,8 +165,8 @@ namespace BOB
             _textSearchField = UITextFields.AddSmallLabelledTextField(this, width - 200f - Margin, TitleHeight + Margin, Translations.Translate("BOB_FIL_NAME"));
 
             // Event handlers for text search field.
-            _textSearchField.eventTextChanged += (control, text) => LoadedList();
-            _textSearchField.eventTextSubmitted += (control, text) => LoadedList();
+            _textSearchField.eventTextChanged += (control, text) => RegenerateReplacementList();
+            _textSearchField.eventTextSubmitted += (control, text) => RegenerateReplacementList();
 
             // Vanilla filter.
             m_hideVanilla = UICheckBoxes.AddLabelledCheckBox((UIComponent)(object)this, _textSearchField.relativePosition.x, _textSearchField.relativePosition.y + _textSearchField.height + (Margin / 2f), Translations.Translate("BOB_PNL_HDV"), 12f, 0.7f);
@@ -292,16 +290,16 @@ namespace BOB
         protected abstract void CloseEvent();
 
         /// <summary>
-        /// Populates a fastlist with a filtered list of loaded trees or props.
+        /// Populates the replacement UIList with a filtered list of eligible relacement trees or props.
         /// </summary>
-        protected abstract void LoadedList();
+        protected abstract void RegenerateReplacementList();
 
         /// <summary>
         /// Hide vanilla check event handler.
         /// </summary>
         /// <param name="c">Calling component.</param>
         /// <param name="isChecked">New checked state.</param>
-        protected virtual void VanillaCheckChanged(UIComponent c, bool isChecked) => LoadedList();
+        protected virtual void VanillaCheckChanged(UIComponent c, bool isChecked) => RegenerateReplacementList();
 
         /// <summary>
         /// Performs actions required after a change to prop/tree mode.
@@ -360,29 +358,29 @@ namespace BOB
         }
 
         /// <summary>
-        /// Loaded list sort button event handler.
+        /// Replacement list sort button event handler.
         /// </summary>
         /// <param name="c">Calling component.</param>
         /// <param name="p">Mouse event parameter.</param>
-        protected virtual void SortLoaded(UIComponent c, UIMouseEventParameter p)
+        protected virtual void SortReplacements(UIComponent c, UIMouseEventParameter p)
         {
             // Toggle status (set to descending if we're currently ascending, otherwise set to ascending).
-            if (m_loadedSearchStatus == (int)OrderBy.NameAscending)
+            if (m_replacementSortSetting == (int)OrderBy.NameAscending)
             {
                 // Order by name descending.
-                m_loadedSearchStatus = (int)OrderBy.NameDescending;
+                m_replacementSortSetting = (int)OrderBy.NameDescending;
             }
             else
             {
                 // Order by name ascending.
-                m_loadedSearchStatus = (int)OrderBy.NameAscending;
+                m_replacementSortSetting = (int)OrderBy.NameAscending;
             }
 
             // Reset name order buttons.
-            SetSortButton(m_loadedNameSearchButton, m_loadedSearchStatus);
+            SetSortButton(m_replacementNameSortButton, m_replacementSortSetting);
 
-            // Regenerate loaded list.
-            LoadedList();
+            // Regenerate replacement list.
+            RegenerateReplacementList();
         }
 
         /// <summary>
@@ -552,9 +550,6 @@ namespace BOB
 
             // Set references.
             newSlider.ValueField = valueField;
-
-            // Event handler for textfield.
-            newSlider.ValueField.eventTextSubmitted += newSlider.OnTextSubmitted;
 
             // Set initial values.
             newSlider.StepSize = stepSize;

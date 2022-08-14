@@ -1,20 +1,24 @@
-﻿namespace BOB
+﻿// <copyright file="BOBRandomPanel.cs" company="algernon (K. Algernon A. Sheppard)">
+// Copyright (c) algernon (K. Algernon A. Sheppard). All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// </copyright>
+
+namespace BOB
 {
     using System;
-    using System.Linq;
     using System.Collections.Generic;
+    using System.Linq;
     using AlgernonCommons;
     using AlgernonCommons.Translation;
     using AlgernonCommons.UI;
     using ColossalFramework;
     using ColossalFramework.UI;
     using UnityEngine;
-    using BOB.Code.Replacement;
 
     /// <summary>
     /// Panel to setup random props/trees.
     /// </summary>
-    internal class BOBRandomPanel : BOBPanelBase
+    internal sealed class BOBRandomPanel : BOBPanelBase
     {
         // Layout constants - X.
         private const float RandomizerX = Margin;
@@ -39,178 +43,26 @@
         private const float RandomButtonY = LeftListY - ToggleSize - Margin;
         private const float NameFieldY = RandomButtonY - 22f - Margin;
 
-
         // Instance references.
-        private static GameObject uiGameObject;
-        private static BOBRandomPanel panel;
-        internal static BOBRandomPanel Panel => panel;
+        private static GameObject s_gameObject;
+        private static BOBRandomPanel s_panel;
 
         // Panel components.
-        private readonly UIFastList randomList, variationsList, loadedList;
-        private readonly UIButton removeRandomButton, renameButton;
-        private readonly UITextField nameField;
-        private readonly BOBSlider probSlider;
-        private readonly PreviewPanel previewPanel;
+        private readonly UIFastList _randomList;
+        private readonly UIFastList _variationsList;
+        private readonly UIFastList _loadedList;
+        private readonly UIButton _removeRandomButton;
+        private readonly UIButton _renameButton;
+        private readonly UITextField _nameField;
+        private readonly BOBSlider _probSlider;
+        private readonly PreviewPanel _previewPanel;
 
         // Current selections.
-        private BOBRandomPrefab selectedRandomPrefab;
+        private BOBRandomPrefab _selectedRandomPrefab;
         private PrefabInfo _selectedLoadedPrefab;
-        private BOBRandomPrefab.Variation selectedVariation;
-        private BOBRandomPrefab.Variation lastChangedVariant;
-        private bool ignoreValueChange = false;
-
-
-        // Panel width.
-        protected override float PanelWidth => LoadedX + LoadedWidth + Margin;
-
-        // Panel height.
-        protected override float PanelHeight => ListY + ListHeight + Margin;
-
-        // Panel opacity.
-        protected override float PanelOpacity => 1f;
-
-
-        /// <summary>
-        /// Creates the panel object in-game and displays it.
-        /// </summary>
-        internal static void Create()
-        {
-            try
-            {
-                // If no GameObject instance already set, create one.
-                if (uiGameObject == null)
-                {
-                    // Give it a unique name for easy finding with ModTools.
-                    uiGameObject = new GameObject("BOBRandomPanel");
-                    uiGameObject.transform.parent = UIView.GetAView().transform;
-
-                    // Create new panel instance and add it to GameObject.
-                    panel = uiGameObject.AddComponent<BOBRandomPanel>();
-
-                    // Hide previous window, if any.
-                    InfoPanelManager.Panel?.Hide();
-                }
-            }
-            catch (Exception e)
-            {
-                Logging.LogException(e, "exception creating random panel");
-            }
-        }
-
-
-        /// <summary>
-        /// Closes the panel by destroying the object (removing any ongoing UI overhead).
-        /// </summary>
-        internal static void Close()
-        {
-            // Don't do anything if no panel.
-            if (panel == null)
-            {
-                return;
-            }
-
-            // Save configuration file.
-            ConfigurationUtils.SaveConfig();
-
-            /*
-			// Need to do this for each building instance, so iterate through all buildings.
-			Building[] buildings = BuildingManager.instance.m_buildings.m_buffer;
-			for (ushort i = 0; i < buildings.Length; ++i)
-			{
-				// Local reference.
-				Building building = buildings[i];
-
-				// Check that this is a valid building in the dirty list.
-				if (building.m_flags != Building.Flags.None)
-				{
-					// Match - update building render.
-					BuildingManager.instance.UpdateBuildingRenderer(i, true);
-				}
-			}*/
-
-            // Refresh random prop/tree lists.
-            InfoPanelManager.RefreshRandom();
-
-
-            // Destroy game objects.
-            GameObject.Destroy(panel);
-            GameObject.Destroy(uiGameObject);
-
-            // Let the garbage collector do its work (and also let us know that we've closed the object).
-            panel = null;
-            uiGameObject = null;
-
-            // Show previous window, if any.
-            InfoPanelManager.Panel?.Show();
-        }
-
-
-        // Trees or props?
-        private bool IsTree => PropTreeMode == PropTreeModes.Tree;
-
-
-        /// <summary>
-        /// Sets the currently selected loaded prefab.
-        /// </summary>
-        internal PrefabInfo SelectedLoadedPrefab
-        {
-            private get => _selectedLoadedPrefab;
-
-            set
-            {
-                _selectedLoadedPrefab = value;
-                previewPanel.SetTarget(value);
-            }
-        }
-
-
-        /// <summary>
-        /// Sets the currently selected random component.
-        /// </summary>
-        internal BOBRandomPrefab.Variation SelectedVariation
-        {
-            set
-            {
-                selectedVariation = value;
-
-                // Disable events while updating value.
-                ignoreValueChange = true;
-                probSlider.value = value.Probability;
-                ignoreValueChange = false;
-            }
-        }
-
-
-        /// <summary>
-        /// Sets the currently selected random prefab.
-        /// </summary>
-        internal BOBRandomPrefab SelectedRandomPrefab
-        {
-            set
-            {
-                // Don't do anything if no change.
-                if (value == selectedRandomPrefab)
-                {
-                    return;
-                }
-
-                // Set selection.
-                selectedRandomPrefab = value;
-
-                // Reset variation lists.
-                selectedVariation = null;
-                variationsList.selectedIndex = -1;
-
-                // Regenerate variation UI fastlist.
-                VariationsList();
-
-                // Update name text.
-                nameField.text = selectedRandomPrefab?.Name ?? string.Empty;
-
-                // Update button states.
-                UpdateButtonStates();
-            }
-        }
+        private BOBRandomPrefab.Variation _selectedVariation;
+        private BOBRandomPrefab.Variation _lastChangedVariant;
+        private bool _ignoreValueChange = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BOBRandomPanel"/> class.
@@ -232,39 +84,39 @@
             randomizerPanel.width = RandomizerWidth;
             randomizerPanel.height = LeftListHeight;
             randomizerPanel.relativePosition = new Vector2(RandomizerX, LeftListY);
-            randomList = UIFastList.Create<UIRandomRefabRow>(randomizerPanel);
-            ListSetup(randomList);
+            _randomList = UIFastList.Create<UIRandomRefabRow>(randomizerPanel);
+            ListSetup(_randomList);
 
             // Variation selection list.
             UIPanel selectedPanel = AddUIComponent<UIPanel>();
             selectedPanel.width = SelectedWidth;
             selectedPanel.height = ListHeight;
             selectedPanel.relativePosition = new Vector2(SelectedX, ListY);
-            variationsList = UIFastList.Create<UIRandomComponentRow>(selectedPanel);
-            ListSetup(variationsList);
+            _variationsList = UIFastList.Create<UIRandomComponentRow>(selectedPanel);
+            ListSetup(_variationsList);
 
             // Loaded prop list.
             UIPanel loadedPanel = AddUIComponent<UIPanel>();
             loadedPanel.width = LoadedWidth;
             loadedPanel.height = ListHeight;
             loadedPanel.relativePosition = new Vector2(LoadedX, ListY);
-            loadedList = UIFastList.Create<UILoadedRandomPropRow>(loadedPanel);
-            ListSetup(loadedList);
+            _loadedList = UIFastList.Create<UILoadedRandomPropRow>(loadedPanel);
+            ListSetup(_loadedList);
 
             // Name change textfield.
-            nameField = UITextFields.AddTextField(this, Margin, NameFieldY, RandomizerWidth);
+            _nameField = UITextFields.AddTextField(this, Margin, NameFieldY, RandomizerWidth);
 
             // Add random prefab button.
             UIButton addRandomButton = AddIconButton(this, Margin, RandomButtonY, ToggleSize, "BOB_RND_NEW", UITextures.LoadQuadSpriteAtlas("BOB-RoundPlus"));
             addRandomButton.eventClicked += NewRandomPrefab;
 
             // Remove random prefab button.
-            removeRandomButton = AddIconButton(this, addRandomButton.relativePosition.x + ToggleSize, RandomButtonY, ToggleSize, "BOB_RND_DEL", UITextures.LoadQuadSpriteAtlas("BOB-RoundMinus"));
-            removeRandomButton.eventClicked += RemoveRandomPrefab;
+            _removeRandomButton = AddIconButton(this, addRandomButton.relativePosition.x + ToggleSize, RandomButtonY, ToggleSize, "BOB_RND_DEL", UITextures.LoadQuadSpriteAtlas("BOB-RoundMinus"));
+            _removeRandomButton.eventClicked += RemoveRandomPrefab;
 
             // Rename button.
-            renameButton = UIButtons.AddEvenSmallerButton(this, RandomButtonX, RandomButtonY, Translations.Translate("BOB_RND_REN"), RandomButtonWidth);
-            renameButton.eventClicked += RenameRandomPrefab;
+            _renameButton = UIButtons.AddEvenSmallerButton(this, RandomButtonX, RandomButtonY, Translations.Translate("BOB_RND_REN"), RandomButtonWidth);
+            _renameButton.eventClicked += RenameRandomPrefab;
 
             // Add variation button.
             UIButton addVariationButton = AddIconButton(this, MidControlX, ListY, ToggleSize, "BOB_RND_ADD", UITextures.LoadQuadSpriteAtlas("BOB-ArrowPlus"));
@@ -275,38 +127,38 @@
             removeVariationButton.eventClicked += RemoveVariation;
 
             // Order button.
-            m_loadedNameSearchButton = ArrowButton(this, LoadedX + 10f, ListY - 20f);
-            m_loadedNameSearchButton.eventClicked += SortLoaded;
+            m_replacementNameSortButton = ArrowButton(this, LoadedX + 10f, ListY - 20f);
+            m_replacementNameSortButton.eventClicked += SortReplacements;
 
             // Probability slider.
-            probSlider = AddBOBSlider(this, SelectedX + Margin, ToolY + Margin, SelectedWidth - (Margin * 2f), "BOB_PNL_PRB", 0, 100, 1, "Probability");
-            probSlider.eventTrueValueChanged += (control, value) =>
+            _probSlider = AddBOBSlider(this, SelectedX + Margin, ToolY + Margin, SelectedWidth - (Margin * 2f), "BOB_PNL_PRB", 0, 100, 1, "Probability");
+            _probSlider.EventTrueValueChanged += (c, value) =>
             {
-                if (selectedVariation != null)
+                if (_selectedVariation != null)
                 {
-                    selectedVariation.Probability = (int)value;
-                    lastChangedVariant = selectedVariation;
+                    _selectedVariation.Probability = (int)value;
+                    _lastChangedVariant = _selectedVariation;
 
-                    if (!ignoreValueChange)
+                    if (!_ignoreValueChange)
                     {
                         UpdateCurrentRandomPrefab();
                     }
 
-                    variationsList.Refresh();
+                    _variationsList.Refresh();
                     ConfigurationUtils.SaveConfig();
                 }
             };
 
             // Default is name ascending.
-            SetFgSprites(m_loadedNameSearchButton, "IconUpArrow2");
+            SetFgSprites(m_replacementNameSortButton, "IconUpArrow2");
 
             // Preview image.
-            previewPanel = AddUIComponent<PreviewPanel>();
-            previewPanel.relativePosition = new Vector2(this.width + Margin, ListY);
+            _previewPanel = AddUIComponent<PreviewPanel>();
+            _previewPanel.relativePosition = new Vector2(this.width + Margin, ListY);
 
             // Populate loaded lists.
-            RandomList();
-            LoadedList();
+            RegenerateRandomList();
+            RegenerateReplacementList();
 
             // Update button states.
             UpdateButtonStates();
@@ -315,17 +167,155 @@
             BringToFront();
         }
 
+        /// <summary>
+        /// Gets the active panel instance.
+        /// </summary>
+        internal static BOBRandomPanel Panel => s_panel;
+
+        /// <summary>
+        /// Sets the currently selected loaded prefab.
+        /// </summary>
+        internal PrefabInfo SelectedLoadedPrefab
+        {
+            private get => _selectedLoadedPrefab;
+
+            set
+            {
+                _selectedLoadedPrefab = value;
+                _previewPanel.SetTarget(value);
+            }
+        }
+
+        /// <summary>
+        /// Sets the currently selected random component.
+        /// </summary>
+        internal BOBRandomPrefab.Variation SelectedVariation
+        {
+            set
+            {
+                _selectedVariation = value;
+
+                // Disable events while updating value.
+                _ignoreValueChange = true;
+                _probSlider.value = value.Probability;
+                _ignoreValueChange = false;
+            }
+        }
+
+        /// <summary>
+        /// Sets the currently selected random prefab.
+        /// </summary>
+        internal BOBRandomPrefab SelectedRandomPrefab
+        {
+            set
+            {
+                // Don't do anything if no change.
+                if (value == _selectedRandomPrefab)
+                {
+                    return;
+                }
+
+                // Set selection.
+                _selectedRandomPrefab = value;
+
+                // Reset variation lists.
+                _selectedVariation = null;
+                _variationsList.selectedIndex = -1;
+
+                // Regenerate variation UI fastlist.
+                VariationsList();
+
+                // Update name text.
+                _nameField.text = _selectedRandomPrefab?.Name ?? string.Empty;
+
+                // Update button states.
+                UpdateButtonStates();
+            }
+        }
+
+        /// <summary>
+        /// Gets the panel width.
+        /// </summary>
+        protected override float PanelWidth => LoadedX + LoadedWidth + Margin;
+
+        /// <summary>
+        /// Gets the panel height.
+        /// </summary>
+        protected override float PanelHeight => ListY + ListHeight + Margin;
+
+        /// <summary>
+        /// Gets the panel opacity.
+        /// </summary>
+        protected override float PanelOpacity => 1f;
+
+        // Trees or props?
+        private bool IsTree => PropTreeMode == PropTreeModes.Tree;
+
+        /// <summary>
+        /// Creates the panel object in-game and displays it.
+        /// </summary>
+        internal static void Create()
+        {
+            try
+            {
+                // If no GameObject instance already set, create one.
+                if (s_gameObject == null)
+                {
+                    // Give it a unique name for easy finding with ModTools.
+                    s_gameObject = new GameObject("BOBRandomPanel");
+                    s_gameObject.transform.parent = UIView.GetAView().transform;
+
+                    // Create new panel instance and add it to GameObject.
+                    s_panel = s_gameObject.AddComponent<BOBRandomPanel>();
+
+                    // Hide previous window, if any.
+                    BOBPanelManager.Panel?.Hide();
+                }
+            }
+            catch (Exception e)
+            {
+                Logging.LogException(e, "exception creating random panel");
+            }
+        }
+
+        /// <summary>
+        /// Closes the panel by destroying the object (removing any ongoing UI overhead).
+        /// </summary>
+        internal static void Close()
+        {
+            // Don't do anything if no panel.
+            if (s_panel == null)
+            {
+                return;
+            }
+
+            // Save configuration file.
+            ConfigurationUtils.SaveConfig();
+
+            // Refresh random prop/tree lists.
+            BOBPanelManager.RefreshRandom();
+
+            // Destroy game objects.
+            GameObject.Destroy(s_panel);
+            GameObject.Destroy(s_gameObject);
+
+            // Let the garbage collector do its work (and also let us know that we've closed the object).
+            s_panel = null;
+            s_gameObject = null;
+
+            // Show previous window, if any.
+            BOBPanelManager.Panel?.Show();
+        }
 
         /// <summary>
         /// Close button event handler.
         /// </summary>
         protected override void CloseEvent() => Close();
 
-
         /// <summary>
-        /// Populates a fastlist with a filtered list of loaded trees or props.
+        /// Populates the replacement UIList with a filtered list of eligible relacement trees or props.
         /// </summary>
-        protected override void LoadedList()
+        protected override void RegenerateReplacementList()
         {
             // List of prefabs that have passed filtering.
             List<PrefabInfo> list = new List<PrefabInfo>();
@@ -357,7 +347,6 @@
                 // Prop - iterate through each prop in our list of loaded prefabs.
                 foreach (PropInfo loadedProp in PrefabLists.LoadedProps)
                 {
-
                     // Skip any props that require height or water maps.
                     if (loadedProp.m_requireHeightMap || loadedProp.m_requireWaterMap)
                     {
@@ -382,19 +371,18 @@
 
             // Master lists should already be sorted by display name so no need to sort again here.
             // Reverse order of filtered list if we're searching name descending.
-            if (m_loadedSearchStatus == (int)OrderBy.NameDescending)
+            if (m_replacementSortSetting == (int)OrderBy.NameDescending)
             {
                 list.Reverse();
             }
 
             // Create return fastlist from our filtered list.
-            loadedList.rowsData = new FastList<object>
+            _loadedList.rowsData = new FastList<object>
             {
                 m_buffer = list.ToArray(),
                 m_size = list.Count,
             };
         }
-
 
         /// <summary>
         /// Performs actions required after a change to prop/tree mode.
@@ -405,10 +393,9 @@
             SelectedRandomPrefab = null;
 
             // Regenerate lists.
-            RandomList();
-            LoadedList();
+            RegenerateRandomList();
+            RegenerateReplacementList();
         }
-
 
         /// <summary>
         /// Updates button states (enabled/disabled) according to current control states.
@@ -416,18 +403,17 @@
         private void UpdateButtonStates()
         {
             // Toggle enabled state based on whether or not there's a valid current selection.
-            bool buttonState = selectedRandomPrefab != null;
-            removeRandomButton.isEnabled = buttonState;
-            renameButton.isEnabled = buttonState;
+            bool buttonState = _selectedRandomPrefab != null;
+            _removeRandomButton.isEnabled = buttonState;
+            _renameButton.isEnabled = buttonState;
         }
-
 
         /// <summary>
         /// Create new random prefab event handler.
         /// </summary>
-        /// <param name="control">Calling component (unused)</param>
-        /// <param name="clickEvent">Mouse event parameter (unused)</param>
-        private void NewRandomPrefab(UIComponent control, UIMouseEventParameter clickEvent)
+        /// <param name="c">Calling component.</param>
+        /// <param name="p">Mouse event parameter.</param>
+        private void NewRandomPrefab(UIComponent c, UIMouseEventParameter p)
         {
             // New prefab record.
             BOBRandomPrefab newPrefab;
@@ -490,177 +476,171 @@
                 Logging.Message("Trying to find item");
 
                 // Yes - regenerate random list to reflect the change, and select the new item.
-                RandomList();
-                randomList.FindItem(newPrefab);
+                RegenerateRandomList();
+                _randomList.FindItem(newPrefab);
                 SelectedRandomPrefab = newPrefab;
             }
         }
 
-
         /// <summary>
         /// Remove random prefab event handler.
         /// </summary>
-        /// <param name="control">Calling component (unused)</param>
-        /// <param name="clickEvent">Mouse event parameter (unused)</param>
-        private void RemoveRandomPrefab(UIComponent control, UIMouseEventParameter clickEvent)
+        /// <param name="c">Calling component.</param>
+        /// <param name="p">Mouse event parameter.</param>
+        private void RemoveRandomPrefab(UIComponent c, UIMouseEventParameter p)
         {
             // Safety checks.
-            if (randomList.selectedIndex < 0 || selectedRandomPrefab == null)
+            if (_randomList.selectedIndex < 0 || _selectedRandomPrefab == null)
             {
                 return;
             }
 
             // Remove tree or prop from relevant list of random prefabs.
-            if (selectedRandomPrefab.Tree != null)
+            if (_selectedRandomPrefab.Tree != null)
             {
-                RandomPrefabs.RemoveRandomTree(selectedRandomPrefab.Tree);
+                RandomPrefabs.RemoveRandomTree(_selectedRandomPrefab.Tree);
             }
-            else if (selectedRandomPrefab.Prop != null)
+            else if (_selectedRandomPrefab.Prop != null)
             {
-                RandomPrefabs.RemoveRandomProp(selectedRandomPrefab.Prop);
+                RandomPrefabs.RemoveRandomProp(_selectedRandomPrefab.Prop);
             }
 
             // Reset selection and regenerate UI fastlist.
             SelectedRandomPrefab = null;
-            randomList.selectedIndex = -1;
-            RandomList();
+            _randomList.selectedIndex = -1;
+            RegenerateRandomList();
         }
-
 
         /// <summary>
         /// Rename random prefab event handler.
         /// </summary>
-        /// <param name="control">Calling component (unused)</param>
-        /// <param name="clickEvent">Mouse event parameter (unused)</param>
-        private void RenameRandomPrefab(UIComponent control, UIMouseEventParameter clickEvent)
+        /// <param name="c">Calling component.</param>
+        /// <param name="p">Mouse event parameter.</param>
+        private void RenameRandomPrefab(UIComponent c, UIMouseEventParameter p)
         {
             // Safety checks.
-            if (randomList.selectedIndex < 0 || selectedRandomPrefab == null || nameField.text.IsNullOrWhiteSpace())
+            if (_randomList.selectedIndex < 0 || _selectedRandomPrefab == null || _nameField.text.IsNullOrWhiteSpace())
             {
                 return;
             }
 
-            string trimmedName = nameField.text.Trim();
+            string trimmedName = _nameField.text.Trim();
 
             // Need unique name.
-            if ((selectedRandomPrefab.Prop != null & RandomPrefabs.DuplicatePropName(trimmedName)) || (selectedRandomPrefab.Tree != null && RandomPrefabs.DuplicateTreeName(trimmedName)))
+            if ((_selectedRandomPrefab.Prop != null & RandomPrefabs.DuplicatePropName(trimmedName)) || (_selectedRandomPrefab.Tree != null && RandomPrefabs.DuplicateTreeName(trimmedName)))
             {
                 Logging.Error("duplicate name");
                 return;
             }
 
             // If we got here, all good; rename random prop reference and PrefabInfo.
-            selectedRandomPrefab.Name = trimmedName;
-            if (selectedRandomPrefab.Prop != null)
+            _selectedRandomPrefab.Name = trimmedName;
+            if (_selectedRandomPrefab.Prop != null)
             {
-                selectedRandomPrefab.Prop.name = selectedRandomPrefab.Name;
+                _selectedRandomPrefab.Prop.name = _selectedRandomPrefab.Name;
             }
-            if (selectedRandomPrefab.Tree != null)
+
+            if (_selectedRandomPrefab.Tree != null)
             {
-                selectedRandomPrefab.Tree.name = selectedRandomPrefab.Name;
+                _selectedRandomPrefab.Tree.name = _selectedRandomPrefab.Name;
             }
 
             // Regenerate list.
-            RandomList();
+            RegenerateRandomList();
         }
-
 
         /// <summary>
         /// Add variation event handler.
         /// </summary>
-        /// <param name="control">Calling component (unused)</param>
-        /// <param name="clickEvent">Mouse event parameter (unused)</param>
-        private void AddVariation(UIComponent control, UIMouseEventParameter clickEvent)
+        /// <param name="c">Calling component.</param>
+        /// <param name="p">Mouse event parameter.</param>
+        private void AddVariation(UIComponent c, UIMouseEventParameter p)
         {
             // Make sure we've got a valid selection first.
-            if (SelectedLoadedPrefab == null || selectedRandomPrefab == null)
+            if (SelectedLoadedPrefab == null || _selectedRandomPrefab == null)
             {
                 return;
             }
 
             // Add selected prefab to list of variations and regenerate UI fastlist.
             BOBRandomPrefab.Variation newVariant = new BOBRandomPrefab.Variation { Name = SelectedLoadedPrefab.name, Prefab = SelectedLoadedPrefab, Probability = 0 };
-            selectedRandomPrefab.Variations.Add(newVariant);
+            _selectedRandomPrefab.Variations.Add(newVariant);
             VariationsList();
 
             // Select variation.
-            variationsList.FindItem(newVariant);
-            selectedVariation = newVariant;
+            _variationsList.FindItem(newVariant);
+            _selectedVariation = newVariant;
 
             // Update the random prefab with the new variation.
             UpdateCurrentRandomPrefab();
 
             // Update slider value.
-            probSlider.value = newVariant.Probability;
+            _probSlider.value = newVariant.Probability;
         }
-
 
         /// <summary>
         /// Remove variation event handler.
         /// </summary>
-        /// <param name="control">Calling component (unused)</param>
-        /// <param name="clickEvent">Mouse event parameter (unused)</param>
-        private void RemoveVariation(UIComponent control, UIMouseEventParameter clickEvent)
+        /// <param name="c">Calling component.</param>
+        /// <param name="p">Mouse event parameter.</param>
+        private void RemoveVariation(UIComponent c, UIMouseEventParameter p)
         {
             // Make sure we've got a valid selection first.
-            if (selectedVariation == null)
+            if (_selectedVariation == null)
             {
                 return;
             }
 
             // Remove selected prefab from list of variations and regenerate UI fastlist.
-            selectedRandomPrefab.Variations.Remove(selectedVariation);
+            _selectedRandomPrefab.Variations.Remove(_selectedVariation);
             VariationsList();
 
             // Update the random prefab to reflect the removal
             UpdateCurrentRandomPrefab();
         }
 
-
         /// <summary>
         /// Updates the variations for the current random prefab.
         /// </summary>
         private void UpdateCurrentRandomPrefab()
         {
-            int variationCount = selectedRandomPrefab.Variations.Count;
+            int variationCount = _selectedRandomPrefab.Variations.Count;
 
             // Recalculate probabilities.
             RecalculateProbabilities();
 
             // Trees or props?
-            if (selectedRandomPrefab.Tree != null)
+            if (_selectedRandomPrefab.Tree != null)
             {
                 // Trees - create new variations array.
-                selectedRandomPrefab.Tree.m_variations = new TreeInfo.Variation[variationCount];
+                _selectedRandomPrefab.Tree.m_variations = new TreeInfo.Variation[variationCount];
 
                 // Iterate through current variations list and add to prefab variation list.
                 for (int i = 0; i < variationCount; ++i)
                 {
-                    selectedRandomPrefab.Tree.m_variations[i] = new TreeInfo.Variation()
+                    _selectedRandomPrefab.Tree.m_variations[i] = new TreeInfo.Variation()
                     {
-                        m_finalTree = selectedRandomPrefab.Variations[i].Prefab as TreeInfo,
+                        m_finalTree = _selectedRandomPrefab.Variations[i].Prefab as TreeInfo,
                         m_probability = 100 / variationCount,
                     };
                 }
-
             }
-            else if (selectedRandomPrefab.Prop != null)
+            else if (_selectedRandomPrefab.Prop != null)
             {
                 // Props - create new variations array.
-                selectedRandomPrefab.Prop.m_variations = new PropInfo.Variation[variationCount];
+                _selectedRandomPrefab.Prop.m_variations = new PropInfo.Variation[variationCount];
 
                 // Iterate through current variations list and add to prefab variation list.
                 for (int i = 0; i < variationCount; ++i)
                 {
-                    selectedRandomPrefab.Prop.m_variations[i] = new PropInfo.Variation()
+                    _selectedRandomPrefab.Prop.m_variations[i] = new PropInfo.Variation()
                     {
-                        m_finalProp = selectedRandomPrefab.Variations[i].Prefab as PropInfo,
-                        m_probability = selectedRandomPrefab.Variations[i].Probability,
+                        m_finalProp = _selectedRandomPrefab.Variations[i].Prefab as PropInfo,
+                        m_probability = _selectedRandomPrefab.Variations[i].Probability,
                     };
                 }
             }
         }
-
 
         /// <summary>
         /// Recalculates the current component probabilities.
@@ -670,34 +650,34 @@
             Logging.Message("recalculating probabilities");
 
             // Get last changed variant - ignore if locked.
-            bool validLastChanged = lastChangedVariant != null;
+            bool validLastChanged = _lastChangedVariant != null;
 
             // Number of locked and unlocked entries and their summative probabilities.
             int lockedProbs = 0, unlockedProbs = 0, lockedCount = 0, unlockedCount = 0;
 
             // Iterate through all current variations, identifying locked probabilties.
-            for (int i = 0; i < selectedRandomPrefab.Variations.Count; ++i)
+            for (int i = 0; i < _selectedRandomPrefab.Variations.Count; ++i)
             {
                 // Ignore last changed variant.
-                if (!validLastChanged || (validLastChanged && selectedRandomPrefab.Variations[i] != lastChangedVariant))
+                if (!validLastChanged || (validLastChanged && _selectedRandomPrefab.Variations[i] != _lastChangedVariant))
                 {
                     // If this variation has a locked probability, add the probability to the total locked percentage and increment the locked counter - ignoring most recently changed item.
-                    if (selectedRandomPrefab.Variations[i].ProbLocked)
+                    if (_selectedRandomPrefab.Variations[i].ProbLocked)
                     {
-                        lockedProbs += selectedRandomPrefab.Variations[i].Probability;
+                        lockedProbs += _selectedRandomPrefab.Variations[i].Probability;
                         ++lockedCount;
                     }
                     else
                     {
                         // Unlocked.
-                        unlockedProbs += selectedRandomPrefab.Variations[i].Probability;
+                        unlockedProbs += _selectedRandomPrefab.Variations[i].Probability;
                         ++unlockedCount;
                     }
                 }
             }
 
             // Get the probability of the most recently changed probability.
-            int changedProb = validLastChanged ? lastChangedVariant.Probability : 0;
+            int changedProb = validLastChanged ? _lastChangedVariant.Probability : 0;
 
             // If total probs are more than 100, reduce unlocked probs to fit.
             /*if (lockedProbs + unlockedProbs + changedProb > 100)
@@ -745,49 +725,47 @@
             changedProb = Mathf.Clamp(changedProb, 1, 100 - lockedProbs - unlockedCount);
             if (validLastChanged)
             {
-                lastChangedVariant.Probability = changedProb;
+                _lastChangedVariant.Probability = changedProb;
             }
 
             // Now, assign probabilities.
             int residualProb = Mathf.Max(0, 100 - lockedProbs - changedProb);
-            for (int i = 0; i < selectedRandomPrefab.Variations.Count; ++i)
+            for (int i = 0; i < _selectedRandomPrefab.Variations.Count; ++i)
             {
                 // Ignore last changed variant.
-                if (!validLastChanged || (validLastChanged && selectedRandomPrefab.Variations[i] != lastChangedVariant))
+                if (!validLastChanged || (validLastChanged && _selectedRandomPrefab.Variations[i] != _lastChangedVariant))
                 {
-                    if (!selectedRandomPrefab.Variations[i].ProbLocked)
+                    if (!_selectedRandomPrefab.Variations[i].ProbLocked)
                     {
-                        selectedRandomPrefab.Variations[i].Probability = Mathf.Max(1, residualProb / unlockedCount--);
-                        residualProb -= selectedRandomPrefab.Variations[i].Probability;
+                        _selectedRandomPrefab.Variations[i].Probability = Mathf.Max(1, residualProb / unlockedCount--);
+                        residualProb -= _selectedRandomPrefab.Variations[i].Probability;
                     }
                 }
             }
 
             // Update probability slider.
-            if (selectedVariation != null)
+            if (_selectedVariation != null)
             {
-                probSlider.value = selectedVariation.Probability;
+                _probSlider.value = _selectedVariation.Probability;
             }
 
             // Regenerate list.
-            variationsList.Refresh();
+            _variationsList.Refresh();
         }
-
-
 
         /// <summary>
         /// Regenerates the random prefab UI fastlist.
         /// </summary>
-        private void RandomList()
+        private void RegenerateRandomList()
         {
             // Remove selection.
-            randomList.selectedIndex = -1;
+            _randomList.selectedIndex = -1;
 
             // Trees or props?
             if (IsTree)
             {
                 // Trees.
-                randomList.rowsData = new FastList<object>
+                _randomList.rowsData = new FastList<object>
                 {
                     m_buffer = PrefabLists.RandomTrees.OrderBy(x => x.Name.ToLower()).ToArray(),
                     m_size = PrefabLists.RandomTrees.Count,
@@ -796,7 +774,7 @@
             else
             {
                 // Props.
-                randomList.rowsData = new FastList<object>
+                _randomList.rowsData = new FastList<object>
                 {
                     m_buffer = PrefabLists.RandomProps.OrderBy(x => x.Name.ToLower()).ToArray(),
                     m_size = PrefabLists.RandomProps.Count,
@@ -804,20 +782,19 @@
             }
         }
 
-
         /// <summary>
         /// Regenerates the variations UI fastlist.
         /// </summary>
         private void VariationsList()
         {
             // Remove selection.
-            variationsList.selectedIndex = -1;
+            _variationsList.selectedIndex = -1;
 
             // Create return fastlist from our filtered list.
-            variationsList.rowsData = new FastList<object>
+            _variationsList.rowsData = new FastList<object>
             {
-                m_buffer = selectedRandomPrefab?.Variations?.OrderBy(x => PrefabLists.GetDisplayName(x.Name).ToLower()).ToArray(),
-                m_size = selectedRandomPrefab?.Variations?.Count ?? 0,
+                m_buffer = _selectedRandomPrefab?.Variations?.OrderBy(x => PrefabLists.GetDisplayName(x.Name).ToLower()).ToArray(),
+                m_size = _selectedRandomPrefab?.Variations?.Count ?? 0,
             };
         }
     }

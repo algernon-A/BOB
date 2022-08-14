@@ -1,9 +1,13 @@
-﻿using UnityEngine;
-using ColossalFramework.UI;
-
+﻿// <copyright file="BOBSlider.cs" company="algernon (K. Algernon A. Sheppard)">
+// Copyright (c) algernon (K. Algernon A. Sheppard). All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// </copyright>
 
 namespace BOB
 {
+    using ColossalFramework.UI;
+    using UnityEngine;
+
     /// <summary>
     /// Slider with integrated components.
     /// </summary>
@@ -15,21 +19,55 @@ namespace BOB
         // True (not displayed) value.
         private float trueValue;
 
-        // Float or integer slider?
-        public bool IsInt { get; set; } = false;
-
-        // Limit to visible range?
-        public bool LimitToVisible { get; set; } = false;
-
-        // Sub-components.
-        public UITextField ValueField { get; set; }
-
-        // Value changed event.
-        public event PropertyChangedEventHandler<float> eventTrueValueChanged;
-
+        // Linked slider value textfield.
+        private UITextField _valueTextField;
 
         /// <summary>
-        /// 'True' (not just displayed) slider value; use this instead of value to ensure proper operation.
+        /// Value changed event (includes true value, i.e. value changes beyond the visibile range that won't trigger the default slider OnValueChanged event).
+        /// </summary>
+        public event PropertyChangedEventHandler<float> EventTrueValueChanged;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this is an integer slider (true) or floating-point slider (false).
+        /// </summary>
+        public bool IsInt { get; set; } = false;
+        /// <summary>
+        /// Gets or sets a value indicating whether the slider range should be limited to the visisble slider range (default false).
+        /// </summary>
+        public bool LimitToVisible { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets the linked value display textfield instance.
+        /// </summary>
+        public UITextField ValueField
+        {
+            get => _valueTextField;
+
+            set
+            {
+                // Don't do anything if no change.
+                if (value != _valueTextField)
+                {
+                    // Remove any attached event handler before changing the linked field.
+                    if (_valueTextField != null)
+                    {
+                        _valueTextField.eventTextSubmitted -= OnTextSubmitted;
+                    }
+
+                    // Update value.
+                    _valueTextField = value;
+
+                    // Add event handler if there's an active new instance.
+                    if (_valueTextField != null)
+                    {
+                        _valueTextField.eventTextSubmitted += OnTextSubmitted;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the 'true' (not just displayed) slider value; use this instead of value to ensure proper operation.
         /// </summary>
         public float TrueValue
         {
@@ -50,19 +88,15 @@ namespace BOB
                 SetText();
 
                 // Trigger value changed events, if any.
-                if (this.eventTrueValueChanged != null)
-                {
-                    this.eventTrueValueChanged(this, trueValue);
-                }
+                EventTrueValueChanged?.Invoke(this, trueValue);
 
                 // Restore previous event state.
                 suppressEvents = oldSuppressEvents;
             }
         }
 
-
         /// <summary>
-        /// Minimum slider step size.  Setting to 1 will make this an integer slider.
+        /// Sets the minimum slider step size.  Setting to 1 will make this an integer slider.
         /// </summary>
         public float StepSize
         {
@@ -82,9 +116,8 @@ namespace BOB
             }
         }
 
-
         /// <summary>
-        /// Returns the current step multiplier based on modifier key states.
+        /// Gets the current step multiplier based on modifier key states.
         /// For float 0.1/0.01 for none/Ctrl, for Int just 1
         /// </summary>
         private float Multiplier
@@ -109,33 +142,6 @@ namespace BOB
             }
         }
 
-
-        /// <summary>
-        /// Handles textfield value change; should be added as eventTextSubmitted event handler.
-        /// </summary>
-        /// <param name="control">Calling component(unused)</param>
-        /// <param name="text">New text</param>
-        public void OnTextSubmitted(UIComponent _, string text)
-        {
-            // Don't do anything is events are suppressed.
-            if (!suppressEvents)
-            {
-                // Suppress events while we change things, to avoid infinite recursive update loops.
-                suppressEvents = true;
-
-                // Attempt to parse textfield value.
-                if (float.TryParse(text, out float result))
-                {
-                    // Successful parse - set slider value.
-                    TrueValue = result.RoundToNearest(Multiplier);
-                }
-
-                // Restore event handling.
-                suppressEvents = false;
-            }
-        }
-
-
         /// <summary>
         /// Called by game when slider value is changed.
         /// </summary>
@@ -152,33 +158,56 @@ namespace BOB
             base.OnValueChanged();
         }
 
-
         /// <summary>
         /// Called by game when mousewheel is scrolled.
         /// </summary>
-        /// <param name="mouseEvent">Mouse event parameter</param>
-        protected override void OnMouseWheel(UIMouseEventParameter mouseEvent)
+        /// <param name="p">Mouse event parameter.</param>
+        protected override void OnMouseWheel(UIMouseEventParameter p)
         {
             // Get current multiplier.
             float multiplier = Multiplier;
 
             // Set current value according to multiplier state.
-            TrueValue = trueValue.RoundToNearest(multiplier) + (mouseEvent.wheelDelta * multiplier);
+            TrueValue = trueValue.RoundToNearest(multiplier) + (p.wheelDelta * multiplier);
 
             // Use event and invoke any handlers.
-            mouseEvent.Use();
-            Invoke("OnMouseWheel", mouseEvent);
+            p.Use();
+            Invoke("OnMouseWheel", p);
         }
-
 
         /// <summary>
         /// Updates the displayed textfield values.
         /// </summary>
         private void SetText()
         {
-            if (ValueField != null)
+            if (_valueTextField != null)
             {
-                ValueField.text = TrueValue.RoundToNearest(Multiplier).ToString();
+                _valueTextField.text = TrueValue.RoundToNearest(Multiplier).ToString();
+            }
+        }
+
+        /// <summary>
+        /// Linked textfield value change event handler.
+        /// </summary>
+        /// <param name="c">Calling component.</param>
+        /// <param name="text">New text.</param>
+        private void OnTextSubmitted(UIComponent c, string text)
+        {
+            // Don't do anything is events are suppressed.
+            if (!suppressEvents)
+            {
+                // Suppress events while we change things, to avoid infinite recursive update loops.
+                suppressEvents = true;
+
+                // Attempt to parse textfield value.
+                if (float.TryParse(text, out float result))
+                {
+                    // Successful parse - set slider value.
+                    TrueValue = result.RoundToNearest(Multiplier);
+                }
+
+                // Restore event handling.
+                suppressEvents = false;
             }
         }
     }

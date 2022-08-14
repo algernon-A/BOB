@@ -141,7 +141,7 @@ namespace BOB
             OptionsPanelManager<OptionsPanel>.OptionsEventHook();
 
             // Display any exception message that occured during load.
-            InfoPanelManager.CheckException();
+            BOBPanelManager.CheckException();
 
             // Activate tool hotkey.
             HotkeyThreading.Operating = true;

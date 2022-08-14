@@ -11,7 +11,6 @@ namespace BOB
     using System.Linq;
     using System.Xml.Serialization;
     using AlgernonCommons;
-    using BOB.Code.Replacement;
     using ColossalFramework;
 
     /// <summary>
@@ -242,7 +241,7 @@ namespace BOB
             }
 
             // Display any exception message that occured during save.
-            InfoPanelManager.CheckException();
+            BOBPanelManager.CheckException();
         }
 
         /// <summary>

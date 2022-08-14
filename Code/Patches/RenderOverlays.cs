@@ -107,7 +107,7 @@ namespace BOB
         /// <param name="position">Prop position.</param>
         public static void HighlightProp(PropInfo prop, Vector3 position)
         {
-            if (InfoPanelManager.Panel != null & s_prop != null & s_prop == prop)
+            if (BOBPanelManager.Panel != null & s_prop != null & s_prop == prop)
             {
                 // Calculate radius of effect - largest of x and z size of props (minimum of 1 in any case).
                 Vector3 size = prop.m_mesh.bounds.size;
@@ -122,7 +122,7 @@ namespace BOB
         /// <param name="position">Tree position.</param>
         public static void HighlightTree(TreeInfo tree, Vector3 position)
         {
-            if (InfoPanelManager.Panel != null & s_tree != null & s_tree == tree)
+            if (BOBPanelManager.Panel != null & s_tree != null & s_tree == tree)
             {
                 // Calculate radius of effect - largest of x and z size of props (minimum of 1 in any case).
                 Vector3 size = tree.m_mesh.bounds.size;
@@ -197,7 +197,7 @@ namespace BOB
         /// <param name="index">Prop index.</param>
         public static void HighlightNetworkProp(PropInfo prop, Vector3 position, ushort segmentID, NetInfo.Lane lane, int index)
         {
-            if (InfoPanelManager.Panel != null & s_prop != null & s_prop == prop && (s_network == null || s_network == Singleton<NetManager>.instance.m_segments.m_buffer[segmentID].Info) & (s_propIndex < 0 | (s_lane == lane & s_propIndex == index)))
+            if (BOBPanelManager.Panel != null & s_prop != null & s_prop == prop && (s_network == null || s_network == Singleton<NetManager>.instance.m_segments.m_buffer[segmentID].Info) & (s_propIndex < 0 | (s_lane == lane & s_propIndex == index)))
             {
                 // Calculate radius of effect - largest of x and z size of props (minimum of 1 in any case).
                 Vector3 size = prop.m_mesh.bounds.size;
@@ -220,7 +220,7 @@ namespace BOB
         /// <param name="index">Prop index.</param>
         public static void HighlightNetworkTree(TreeInfo tree, Vector3 position, ushort segmentID, NetInfo.Lane lane, int index)
         {
-            if (InfoPanelManager.Panel != null & s_tree != null & s_tree == tree && (s_network != null || s_network == Singleton<NetManager>.instance.m_segments.m_buffer[segmentID].Info) & (s_propIndex < 0 | (s_lane == lane && s_propIndex == index)))
+            if (BOBPanelManager.Panel != null & s_tree != null & s_tree == tree && (s_network != null || s_network == Singleton<NetManager>.instance.m_segments.m_buffer[segmentID].Info) & (s_propIndex < 0 | (s_lane == lane && s_propIndex == index)))
             {
                 // Calculate radius of effect - largest of x and z size of props (minimum of 1 in any case).
                 Vector3 size = tree.m_mesh.bounds.size;

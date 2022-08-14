@@ -18,14 +18,10 @@ namespace BOB
         public ExceptionNotification()
         {
             // Add event handler to close button to clear exception display flags.
-            CloseButton.eventClicked += (c, p) =>
-            {
-                InfoPanelManager.wasException = false;
-                InfoPanelManager.displayingException = false;
-            };
+            CloseButton.eventClicked += (c, p) => BOBPanelManager.ClearException();
 
             // Display the exception along with accompanying text.
-            AddParas("Whoops, an exception occured in BOB, the tree and prop replacer.", "Please send a copy of your output log to algernon so the problem can be fixed!", "The exeption was: ", InfoPanelManager.exceptionMessage);
+            AddParas("Whoops, an exception occured in BOB, the tree and prop replacer.", "Please send a copy of your output log to algernon so the problem can be fixed!", "The exeption was: ", BOBPanelManager.ExceptionMessage);
         }
     }
 }

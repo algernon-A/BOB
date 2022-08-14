@@ -437,7 +437,7 @@ namespace BOB
                     selectedIndex = i;
 
                     // Set current panel selection.
-                    InfoPanelManager.Panel.ReplacementPrefab = prefab;
+                    BOBPanelManager.Panel.SelectedReplacementPrefab = prefab;
 
                     // If the selected index is outside the current visibility range, move the to show it.
                     if (selectedIndex < listPosition || selectedIndex > listPosition + m_rows.m_size)
@@ -473,7 +473,7 @@ namespace BOB
                     selectedIndex = i;
 
                     // Set current panel selection.
-                    InfoPanelManager.Panel.ReplacementPrefab = prefab;
+                    BOBPanelManager.Panel.SelectedReplacementPrefab = prefab;
 
                     // If the selected index is outside the current visibility range, move the to show it.
                     if (selectedIndex < listPosition || selectedIndex > listPosition + m_rows.m_size)
@@ -515,7 +515,7 @@ namespace BOB
                         selectedIndex = i;
 
                         // Set current panel selection.
-                        InfoPanelManager.Panel.CurrentTargetItem = targetListItem;
+                        BOBPanelManager.Panel.SelectedTargetItem = targetListItem;
 
                         // If the selected index is outside the current visibility range, move the to show it.
                         if (selectedIndex < listPosition || selectedIndex > listPosition + m_rows.m_size)

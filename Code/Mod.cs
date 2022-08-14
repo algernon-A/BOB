@@ -5,6 +5,7 @@
 
 namespace BOB
 {
+    using AlgernonCommons;
     using AlgernonCommons.Patching;
     using AlgernonCommons.Translation;
     using AlgernonCommons.UI;
@@ -50,6 +51,9 @@ namespace BOB
                 // Otherwise, queue the hook for when the intro's finished loading.
                 LoadingManager.instance.m_introLoaded += OptionsPanelManager<OptionsPanel>.OptionsEventHook;
             }
+
+            // Set up exception notifications.
+            Logging.EventExceptionOccured += BOBPanelManager.RecordException;
         }
 
         /// <summary>

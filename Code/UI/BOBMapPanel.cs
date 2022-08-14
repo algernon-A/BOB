@@ -1,8 +1,13 @@
-﻿namespace BOB
+﻿// <copyright file="BOBMapPanel.cs" company="algernon (K. Algernon A. Sheppard)">
+// Copyright (c) algernon (K. Algernon A. Sheppard). All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// </copyright>
+
+namespace BOB
 {
     using System;
-    using System.Linq;
     using System.Collections.Generic;
+    using System.Linq;
     using AlgernonCommons;
     using AlgernonCommons.Translation;
     using ColossalFramework;
@@ -12,43 +17,12 @@
     /// <summary>
     /// BOB map tree/prop replacement panel.
     /// </summary>
-    internal class BOBMapInfoPanel : BOBInfoPanelBase
+    internal sealed class BOBMapPanel : BOBInfoPanelBase
     {
         /// <summary>
-        /// Sets the target prefab.
+        /// Initializes a new instance of the <see cref="BOBMapPanel"/> class.
         /// </summary>
-        /// <param name="targetPrefabInfo">Target prefab to set</param>
-        internal override void SetTarget(PrefabInfo targetPrefabInfo)
-        {
-            // Base setup.
-            base.SetTarget(targetPrefabInfo);
-
-            // Title label.
-            SetTitle(Translations.Translate("BOB_NAM"));
-
-            // Set intial prop/tree mode, deselecting previous selection and disabling events throughout.
-            m_ignorePropTreeCheckChanged = true;
-            m_propTreeChecks[(int)PropTreeMode].isChecked = false;
-            PropTreeMode = targetPrefabInfo is TreeInfo ? PropTreeModes.Tree : PropTreeModes.Prop;
-            m_propTreeChecks[(int)PropTreeMode].isChecked = true;
-            m_ignorePropTreeCheckChanged = false;
-
-            // Populate target list and select target item.
-            TargetList();
-            targetList.FindTargetItem(targetPrefabInfo);
-
-            // Populate loaded list.
-            LoadedList();
-
-            // Apply Harmony rendering patches.
-            Patcher.Instance.PatchMapOverlays(true);
-        }
-
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        internal BOBMapInfoPanel()
+        internal BOBMapPanel()
         {
             try
             {
@@ -66,28 +40,57 @@
             }
         }
 
+        /// <summary>
+        /// Sets the target parent prefab.
+        /// </summary>
+        /// <param name="targetPrefabInfo">Target prefab to set.</param>
+        internal override void SetTargetParent(PrefabInfo targetPrefabInfo)
+        {
+            // Base setup.
+            base.SetTargetParent(targetPrefabInfo);
+
+            // Title label.
+            SetTitle(Translations.Translate("BOB_NAM"));
+
+            // Set intial prop/tree mode, deselecting previous selection and disabling events throughout.
+            m_ignorePropTreeCheckChanged = true;
+            m_propTreeChecks[(int)PropTreeMode].isChecked = false;
+            PropTreeMode = targetPrefabInfo is TreeInfo ? PropTreeModes.Tree : PropTreeModes.Prop;
+            m_propTreeChecks[(int)PropTreeMode].isChecked = true;
+            m_ignorePropTreeCheckChanged = false;
+
+            // Regenerate target list and select target item.
+            RegenerateTargetList();
+            m_targetList.FindTargetItem(targetPrefabInfo);
+
+            // Regenerate replacement list.
+            RegenerateReplacementList();
+
+            // Apply Harmony rendering patches.
+            Patcher.Instance.PatchMapOverlays(true);
+        }
 
         /// <summary>
         /// Apply button event handler.
-        /// <param name="control">Calling component (unused)</param>
-        /// <param name="mouseEvent">Mouse event (unused)</param>
         /// </summary>
-        protected override void Apply(UIComponent control, UIMouseEventParameter mouseEvent)
+        /// <param name="c">Calling component.</param>
+        /// <param name="p">Mouse event parameter.</param>
+        protected override void Apply(UIComponent c, UIMouseEventParameter p)
         {
             try
             {
                 // Apply replacement.
-                if (!m_propTreeChecks[(int)PropTreeModes.Prop].isChecked && ReplacementPrefab is TreeInfo replacementTree)
+                if (!m_propTreeChecks[(int)PropTreeModes.Prop].isChecked && SelectedReplacementPrefab is TreeInfo replacementTree)
                 {
-                    MapTreeReplacement.Instance.Apply((CurrentTargetItem.replacementPrefab ?? CurrentTargetItem.originalPrefab) as TreeInfo, replacementTree);
+                    MapTreeReplacement.Instance.Apply((SelectedTargetItem.replacementPrefab ?? SelectedTargetItem.originalPrefab) as TreeInfo, replacementTree);
                 }
-                else if (!m_propTreeChecks[(int)PropTreeModes.Tree].isChecked && ReplacementPrefab is PropInfo replacementProp)
+                else if (!m_propTreeChecks[(int)PropTreeModes.Tree].isChecked && SelectedReplacementPrefab is PropInfo replacementProp)
                 {
-                    MapPropReplacement.Instance.Apply((CurrentTargetItem.replacementPrefab ?? CurrentTargetItem.originalPrefab) as PropInfo, replacementProp);
+                    MapPropReplacement.Instance.Apply((SelectedTargetItem.replacementPrefab ?? SelectedTargetItem.originalPrefab) as PropInfo, replacementProp);
                 }
 
                 // Update current target.
-                CurrentTargetItem.replacementPrefab = ReplacementPrefab;
+                SelectedTargetItem.replacementPrefab = SelectedReplacementPrefab;
 
                 // Perform post-replacment updates.
                 FinishUpdate();
@@ -99,31 +102,30 @@
             }
         }
 
-
         /// <summary>
         /// Revert button event handler.
-        /// <param name="control">Calling component (unused)</param>
-        /// <param name="mouseEvent">Mouse event (unused)</param>
         /// </summary>
-        protected override void Revert(UIComponent control, UIMouseEventParameter mouseEvent)
+        /// <param name="c">Calling component.</param>
+        /// <param name="p">Mouse event parameter.</param>
+        protected override void Revert(UIComponent c, UIMouseEventParameter p)
         {
             try
             {
                 // Individual building prop reversion - ensuire that we've got a current selection before doing anything.
-                if (CurrentTargetItem != null && CurrentTargetItem is TargetListItem)
+                if (SelectedTargetItem != null && SelectedTargetItem is TargetListItem)
                 {
                     // Individual reversion.
-                    if (CurrentTargetItem.replacementPrefab is TreeInfo tree)
+                    if (SelectedTargetItem.replacementPrefab is TreeInfo tree)
                     {
                         MapTreeReplacement.Instance.Revert(tree);
                     }
-                    else if (CurrentTargetItem.replacementPrefab is PropInfo prop)
+                    else if (SelectedTargetItem.replacementPrefab is PropInfo prop)
                     {
                         MapPropReplacement.Instance.Revert(prop);
                     }
 
                     // Clear current target replacement prefab.
-                    CurrentTargetItem.replacementPrefab = null;
+                    SelectedTargetItem.replacementPrefab = null;
                 }
 
                 // Perform post-replacment updates.
@@ -136,46 +138,42 @@
             }
         }
 
-
         /// <summary>
         /// Updates button states (enabled/disabled) according to current control states.
         /// </summary>
         protected override void UpdateButtonStates()
         {
             // Disable by default (selectively (re)-enable if eligible).
-            applyButton.Disable();
-            revertButton.Disable();
+            m_applyButton.Disable();
+            m_revertButton.Disable();
 
             // Buttons are only enabled if a current target item is selected.
-            if (CurrentTargetItem != null)
+            if (SelectedTargetItem != null)
             {
                 // Replacement requires a valid replacement selection.
-                if (ReplacementPrefab != null)
+                if (SelectedReplacementPrefab != null)
                 {
-                    applyButton.Enable();
+                    m_applyButton.Enable();
                 }
 
                 // Reversion requires a currently active replacement.
-                if (CurrentTargetItem.replacementPrefab != null)
+                if (SelectedTargetItem.replacementPrefab != null)
                 {
-                    revertButton.Enable();
-                    revertButton.tooltip = Translations.Translate("BOB_PNL_REV_UND");
+                    m_revertButton.Enable();
+                    m_revertButton.tooltip = Translations.Translate("BOB_PNL_REV_UND");
                 }
                 else
                 {
-                    revertButton.tooltip = Translations.Translate("BOB_PNL_REV_TIP");
+                    m_revertButton.tooltip = Translations.Translate("BOB_PNL_REV_TIP");
                 }
             }
         }
 
-
         /// <summary>
-        /// Populates the target list with a list of map trees or props.
+        /// Regenerates the target fastlist with a list of target-specific trees or props.
         /// </summary>
-        protected override void TargetList()
+        protected override void RegenerateTargetList()
         {
-            Logging.Message("starting TargetList");
-
             // List of prefabs that have passed filtering.
             List<TargetListItem> itemList = new List<TargetListItem>();
 
@@ -287,20 +285,20 @@
             }
 
             // Create return fastlist from our filtered list, ordering by name.
-            targetList.rowsData = new FastList<object>
+            m_targetList.rowsData = new FastList<object>
             {
-                m_buffer = targetSearchStatus == (int)OrderBy.NameDescending ? itemList.OrderByDescending(item => item.DisplayName).ToArray() : itemList.OrderBy(item => item.DisplayName).ToArray(),
-                m_size = itemList.Count
+                m_buffer = m_targetSortSetting == (int)OrderBy.NameDescending ? itemList.OrderByDescending(item => item.DisplayName).ToArray() : itemList.OrderBy(item => item.DisplayName).ToArray(),
+                m_size = itemList.Count,
             };
 
             // If the list is empty, show the 'no props' label; otherwise, hide it.
             if (itemList.Count == 0)
             {
-                noPropsLabel.Show();
+                m_noPropsLabel.Show();
             }
             else
             {
-                noPropsLabel.Hide();
+                m_noPropsLabel.Hide();
             }
         }
     }

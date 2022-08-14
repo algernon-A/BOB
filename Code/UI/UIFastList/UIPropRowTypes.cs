@@ -20,7 +20,7 @@
         public override void UpdateSelection()
         {
             // Update currently selected replacement prefab.
-            InfoPanelManager.Panel.ReplacementPrefab = thisPrefab;
+            BOBPanelManager.Panel.SelectedReplacementPrefab = thisPrefab;
         }
 
 
@@ -103,7 +103,7 @@
         public override void UpdateSelection()
         {
             // Update currently selected target prefab.
-            InfoPanelManager.Panel.CurrentTargetItem = thisItem;
+            BOBPanelManager.Panel.SelectedTargetItem = thisItem;
         }
     }
 

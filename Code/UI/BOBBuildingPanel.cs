@@ -1,8 +1,13 @@
-﻿namespace BOB
+﻿// <copyright file="BOBBuildingPanel.cs" company="algernon (K. Algernon A. Sheppard)">
+// Copyright (c) algernon (K. Algernon A. Sheppard). All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// </copyright>
+
+namespace BOB
 {
     using System;
-    using System.Linq;
     using System.Collections.Generic;
+    using System.Linq;
     using AlgernonCommons;
     using AlgernonCommons.Translation;
     using AlgernonCommons.UI;
@@ -10,167 +15,56 @@
     using UnityEngine;
 
     /// <summary>
-    /// Prop row fastlist item for sub-buildings.
-    /// </summary>
-    public class UISubBuildingRow : UIPropRow
-    {
-        // Sub-building reference index.
-        private int subBuildingIndex;
-
-
-        /// <summary>
-        /// Called when this item is selected.
-        /// </summary>
-        public override void UpdateSelection()
-        {
-            // Update currently selected target prefab.
-            if (InfoPanelManager.Panel is BOBBuildingInfoPanel buildingPanel)
-            {
-                buildingPanel.SetSubBuilding(subBuildingIndex);
-            }
-        }
-
-
-        /// <summary>
-        /// Called when list item is displayed.
-        /// </summary>
-        public override void Display(object data, bool isRowOdd)
-        {
-            // Perform initial setup for new rows.
-            if (nameLabel == null)
-            {
-                isVisible = true;
-                canFocus = true;
-                isInteractive = true;
-                width = parent.width;
-                height = RowHeight;
-
-                // Add object name label.
-                nameLabel = AddUIComponent<UILabel>();
-                nameLabel.width = this.width - 10f;
-                nameLabel.textScale = TextScale;
-            }
-
-            // Get sub-building index number.
-            subBuildingIndex = (int)data;
-
-            // Set display text.
-            nameLabel.text = ((InfoPanelManager.Panel as BOBBuildingInfoPanel).SubBuildingNames[subBuildingIndex] ?? "");
-
-            // Set label position
-            nameLabel.relativePosition = new Vector2(5f, PaddingY);
-
-            // Set initial background as deselected state.
-            Deselect(isRowOdd);
-        }
-    }
-
-
-    /// <summary>
     /// BOB building tree/prop replacement panel.
     /// </summary>
-    internal class BOBBuildingInfoPanel : BOBInfoPanel
+    internal sealed class BOBBuildingPanel : BOBInfoPanel
     {
-
-        // Dictionary getter for debugging.
-        // TODO: remove.
-        private Dictionary<BuildingInfo, Dictionary<int, BuildingPropHandler>> GetDict => BuildingHandlers.GetDict;
-
-        // Current selection reference.
-        private BuildingInfo currentBuilding;
-
         // Original selection values.
-        private readonly List<BuildingPropHandler> originalValues = new List<BuildingPropHandler>();
-
-        // Sub-buildings.
-        private BuildingInfo[] subBuildings;
-        internal string[] SubBuildingNames { get; private set; }
+        private readonly List<BuildingPropHandler> _originalValues = new List<BuildingPropHandler>();
 
         // Panel components.
-        private UIPanel subBuildingPanel;
-        private UIFastList subBuildingList;
-        private readonly UICheckBox customHeightCheck;
+        private readonly UICheckBox _customHeightCheck;
+        private UIPanel _subBuildingPanel;
+        private UIFastList _subBuildingList;
 
+        // Sub-buildings.
+        private BuildingInfo _selectedSubBuilding;
+        private BuildingInfo[] _subBuildings;
+        private string[] _subBuildingNames;
 
         /// <summary>
-        /// Mode icon atlas names for prop modes.
+        /// Initializes a new instance of the <see cref="BOBBuildingPanel"/> class.
         /// </summary>
-        protected override string[] PropModeAtlas => new string[(int)ReplacementModes.NumModes]
+        internal BOBBuildingPanel()
         {
-            "BOB-ThisPropSmall",
-            "BOB-SamePropSmall",
-            "BOB-BuildingsSmall"
-        };
+            try
+            {
+                // Fixed height checkbox.
+                _customHeightCheck = UICheckBoxes.AddLabelledCheckBox(m_heightPanel, Margin, FixedHeightY, Translations.Translate("BOB_PNL_CUH"), tooltip: Translations.Translate("BOB_PNL_CUH_TIP"));
+                _customHeightCheck.eventCheckChanged += CustomHeightChange;
 
+                // Adjust y-slider position and panel height.
+                m_ySlider.relativePosition += new Vector3(0f, 20f);
+                m_ySlider.ValueField.relativePosition += new Vector3(0f, 20f);
+                m_heightPanel.height = HeightPanelBottomY;
 
-        /// <summary>
-        /// Mode icon atlas names for tree modes.
-        /// </summary>
-        protected override string[] TreeModeAtlas => new string[(int)ReplacementModes.NumModes]
-        {
-            "BOB-ThisTreeSmall",
-            "BOB-SameTreeSmall",
-            "BOB-BuildingsSmall"
-        };
+                // Regenerate replacement list.
+                RegenerateReplacementList();
 
-
-        /// <summary>
-        /// Mode icon tootlip keys for prop modes.
-        /// </summary>
-        protected override string[] PropModeTipKeys => new string[(int)ReplacementModes.NumModes]
-        {
-            "BOB_PNL_M_PIB",
-            "BOB_PNL_M_PGB",
-            "BOB_PNL_M_PAB"
-        };
-
-
-        /// <summary>
-        /// Mode icon tootlip keys for tree modes.
-        /// </summary>
-        protected override string[] TreeModeTipKeys => new string[(int)ReplacementModes.NumModes]
-        {
-            "BOB_PNL_M_TIB",
-            "BOB_PNL_M_TGB",
-            "BOB_PNL_M_TAB"
-        };
-
-
-        /// <summary>
-        /// Currently selected building.
-        /// </summary>
-        protected override BuildingInfo SelectedBuilding => currentBuilding;
-
-
-        /// <summary>
-        /// Sets the current sub-building selection to the specified index.
-        /// </summary>
-        /// <param name="index">Index number of specified sub-building</param>
-        internal void SetSubBuilding(int index)
-        {
-            // Revert any preview.
-            RevertPreview();
-
-            // Set current building.
-            currentBuilding = subBuildings[index];
-
-            // Reset current items.
-            CurrentTargetItem = null;
-            ReplacementPrefab = null;
-
-            // Reset loaded lists.
-            LoadedList();
-            TargetList();
-
-            // Update overlay.
-            RenderOverlays.Building = currentBuilding;
+                // Update button states.
+                UpdateButtonStates();
+            }
+            catch (Exception e)
+            {
+                // Log and report any exception.
+                Logging.LogException(e, "exception creating building panel");
+            }
         }
 
-
         /// <summary>
-        /// Handles changes to the currently selected target prefab.
+        /// Sets the current target item and updates button states accordingly.
         /// </summary>
-        internal override TargetListItem CurrentTargetItem
+        internal override TargetListItem SelectedTargetItem
         {
             set
             {
@@ -180,15 +74,15 @@
                     RevertPreview();
 
                     // Call base, while ignoring replacement prefab change live application.
-                    ignoreSelectedPrefabChange = true;
-                    base.CurrentTargetItem = value;
-                    ignoreSelectedPrefabChange = false;
+                    m_ignoreSelectedPrefabChange = true;
+                    base.SelectedTargetItem = value;
+                    m_ignoreSelectedPrefabChange = false;
 
                     // Ensure valid selection before proceeding.
-                    if (currentBuilding != null)
+                    if (_selectedSubBuilding != null)
                     {
                         // Set custom height checkbox.
-                        customHeightCheck.isChecked = currentBuilding.m_props[IndividualIndex].m_fixedHeight;
+                        _customHeightCheck.isChecked = _selectedSubBuilding.m_props[IndividualIndex].m_fixedHeight;
 
                         // Is this an added prop?
                         if (buildingTargetListItem.isAdded)
@@ -197,18 +91,18 @@
 
                             // Yes - set sliders directly.
                             // Disable events.
-                            ignoreSliderValueChange = true;
+                            m_ignoreSliderValueChange = true;
 
                             // Set slider values.
-                            BuildingInfo.Prop buildingProp = currentBuilding.m_props[IndividualIndex];
-                            angleSlider.TrueValue = buildingProp.m_radAngle * Mathf.Rad2Deg;
-                            xSlider.TrueValue = buildingProp.m_position.x;
-                            ySlider.TrueValue = buildingProp.m_position.y;
-                            zSlider.TrueValue = buildingProp.m_position.z;
-                            probabilitySlider.TrueValue = buildingProp.m_probability;
+                            BuildingInfo.Prop buildingProp = _selectedSubBuilding.m_props[IndividualIndex];
+                            m_rotationSlider.TrueValue = buildingProp.m_radAngle * Mathf.Rad2Deg;
+                            m_xSlider.TrueValue = buildingProp.m_position.x;
+                            m_ySlider.TrueValue = buildingProp.m_position.y;
+                            m_zSlider.TrueValue = buildingProp.m_position.z;
+                            m_probabilitySlider.TrueValue = buildingProp.m_probability;
 
                             // Re-enable events.
-                            ignoreSliderValueChange = false;
+                            m_ignoreSliderValueChange = false;
 
                             // All done here.
                             return;
@@ -227,9 +121,48 @@
             }
         }
 
+        /// <summary>
+        /// Gets the mode icon atlas names for prop modes.
+        /// </summary>
+        protected override string[] PropModeAtlas => new string[(int)ReplacementModes.NumModes]
+        {
+            "BOB-ThisPropSmall",
+            "BOB-SamePropSmall",
+            "BOB-BuildingsSmall",
+        };
 
         /// <summary>
-        /// Current replacement mode.
+        /// Gets the mode icon atlas names for tree modes.
+        /// </summary>
+        protected override string[] TreeModeAtlas => new string[(int)ReplacementModes.NumModes]
+        {
+            "BOB-ThisTreeSmall",
+            "BOB-SameTreeSmall",
+            "BOB-BuildingsSmall",
+        };
+
+        /// <summary>
+        /// Gets the mode icon tooltip keys for prop modes.
+        /// </summary>
+        protected override string[] PropModeTipKeys => new string[(int)ReplacementModes.NumModes]
+        {
+            "BOB_PNL_M_PIB",
+            "BOB_PNL_M_PGB",
+            "BOB_PNL_M_PAB",
+        };
+
+        /// <summary>
+        /// Gets the mode icon tooltip keys for tree modes.
+        /// </summary>
+        protected override string[] TreeModeTipKeys => new string[(int)ReplacementModes.NumModes]
+        {
+            "BOB_PNL_M_TIB",
+            "BOB_PNL_M_TGB",
+            "BOB_PNL_M_TAB",
+        };
+
+        /// <summary>
+        /// Sets the current replacement mode.
         /// </summary>
         protected override ReplacementModes CurrentMode
         {
@@ -239,142 +172,110 @@
 
                 // Show/hide add new prop button based on mode.
                 bool eligibleMode = CurrentMode == ReplacementModes.Individual | CurrentMode == ReplacementModes.Grouped;
-                addButton.isVisible = eligibleMode;
-                removeButton.isVisible = eligibleMode;
+                m_addButton.isVisible = eligibleMode;
+                m_removeButton.isVisible = eligibleMode;
             }
         }
 
-
         /// <summary>
-        /// Constructor.
+        /// Sets the target parent prefab.
         /// </summary>
-        internal BOBBuildingInfoPanel()
-        {
-            try
-            {
-                // Fixed height checkbox.
-                customHeightCheck = UICheckBoxes.AddLabelledCheckBox(heightPanel, Margin, FixedHeightY, Translations.Translate("BOB_PNL_CUH"), tooltip: Translations.Translate("BOB_PNL_CUH_TIP"));
-                customHeightCheck.eventCheckChanged += CustomHeightChange;
-
-                // Adjust y-slider position and panel height.
-                ySlider.relativePosition += new Vector3(0f, 20f);
-                ySlider.ValueField.relativePosition += new Vector3(0f, 20f);
-                heightPanel.height = HeightPanelFullHeight;
-
-                // Populate loaded list.
-                LoadedList();
-
-                // Update button states.
-                UpdateButtonStates();
-            }
-            catch (Exception e)
-            {
-                // Log and report any exception.
-                Logging.LogException(e, "exception creating building panel");
-            }
-        }
-
-
-        /// <summary>
-        /// Sets the target prefab.
-        /// </summary>
-        /// <param name="targetPrefabInfo">Target prefab to set</param>
-        internal override void SetTarget(PrefabInfo targetPrefabInfo)
+        /// <param name="targetPrefabInfo">Target prefab to set.</param>
+        internal override void SetTargetParent(PrefabInfo targetPrefabInfo)
         {
             // Don't do anything if invalid target, or target hasn't changed.
-            if (!(targetPrefabInfo is BuildingInfo) || selectedPrefab == targetPrefabInfo)
+            if (!(targetPrefabInfo is BuildingInfo) || SelectedBuilding == targetPrefabInfo)
             {
                 return;
             }
 
             // Base setup.
-            base.SetTarget(targetPrefabInfo);
+            base.SetTargetParent(targetPrefabInfo);
 
             // Set target reference.
-            currentBuilding = targetPrefabInfo as BuildingInfo;
+            _selectedSubBuilding = targetPrefabInfo as BuildingInfo;
 
             // Does this building have sub-buildings?
-            if (currentBuilding.m_subBuildings != null && currentBuilding.m_subBuildings.Length > 0)
+            if (_selectedSubBuilding.m_subBuildings != null && _selectedSubBuilding.m_subBuildings.Length > 0)
             {
                 // Yes - create lists of sub-buildings (names and infos).
-                int numSubs = currentBuilding.m_subBuildings.Length;
+                int numSubs = _selectedSubBuilding.m_subBuildings.Length;
                 int numChoices = numSubs + 1;
-                SubBuildingNames = new string[numChoices];
-                subBuildings = new BuildingInfo[numChoices];
-                SubBuildingNames[0] = PrefabLists.GetDisplayName(currentBuilding);
-                subBuildings[0] = currentBuilding;
+                _subBuildingNames = new string[numChoices];
+                _subBuildings = new BuildingInfo[numChoices];
+                _subBuildingNames[0] = PrefabLists.GetDisplayName(_selectedSubBuilding);
+                _subBuildings[0] = _selectedSubBuilding;
 
                 object[] subBuildingIndexes = new object[numChoices];
                 subBuildingIndexes[0] = 0;
 
                 for (int i = 0; i < numSubs; ++i)
                 {
-                    SubBuildingNames[i + 1] = PrefabLists.GetDisplayName(currentBuilding.m_subBuildings[i].m_buildingInfo);
-                    subBuildings[i + 1] = currentBuilding.m_subBuildings[i].m_buildingInfo;
+                    _subBuildingNames[i + 1] = PrefabLists.GetDisplayName(_selectedSubBuilding.m_subBuildings[i].m_buildingInfo);
+                    _subBuildings[i + 1] = _selectedSubBuilding.m_subBuildings[i].m_buildingInfo;
                     subBuildingIndexes[i + 1] = i + 1;
                 }
 
                 // Add sub-building menu, if it doesn't already exist.
-                if (subBuildingPanel == null)
+                if (_subBuildingPanel == null)
                 {
-                    subBuildingPanel = this.AddUIComponent<UIPanel>();
+                    _subBuildingPanel = this.AddUIComponent<UIPanel>();
 
                     // Basic behaviour.
-                    subBuildingPanel.autoLayout = false;
-                    subBuildingPanel.canFocus = true;
-                    subBuildingPanel.isInteractive = true;
+                    _subBuildingPanel.autoLayout = false;
+                    _subBuildingPanel.canFocus = true;
+                    _subBuildingPanel.isInteractive = true;
 
                     // Appearance.
-                    subBuildingPanel.backgroundSprite = "MenuPanel2";
-                    subBuildingPanel.opacity = PanelOpacity;
+                    _subBuildingPanel.backgroundSprite = "MenuPanel2";
+                    _subBuildingPanel.opacity = PanelOpacity;
 
                     // Size and position.
-                    subBuildingPanel.size = new Vector2(200f, PanelHeight - TitleHeight);
-                    subBuildingPanel.relativePosition = new Vector2(-205f, TitleHeight);
+                    _subBuildingPanel.size = new Vector2(200f, PanelHeight - TitleHeight);
+                    _subBuildingPanel.relativePosition = new Vector2(-205f, TitleHeight);
 
                     // Heading.
-                    UILabel subTitleLabel = UILabels.AddLabel(subBuildingPanel, 5f, 5f, Translations.Translate("BOB_PNL_SUB"), 190f);
+                    UILabel subTitleLabel = UILabels.AddLabel(_subBuildingPanel, 5f, 5f, Translations.Translate("BOB_PNL_SUB"), 190f);
                     subTitleLabel.textAlignment = UIHorizontalAlignment.Center;
                     subTitleLabel.relativePosition = new Vector2(5f, (TitleHeight - subTitleLabel.height) / 2f);
 
                     // List panel.
-                    UIPanel subBuildingListPanel = subBuildingPanel.AddUIComponent<UIPanel>();
+                    UIPanel subBuildingListPanel = _subBuildingPanel.AddUIComponent<UIPanel>();
                     subBuildingListPanel.relativePosition = new Vector2(Margin, TitleHeight);
-                    subBuildingListPanel.width = subBuildingPanel.width - (Margin * 2f);
-                    subBuildingListPanel.height = subBuildingPanel.height - TitleHeight - (Margin * 2f);
-                    subBuildingList = UIFastList.Create<UISubBuildingRow>(subBuildingListPanel);
-                    ListSetup(subBuildingList);
+                    subBuildingListPanel.width = _subBuildingPanel.width - (Margin * 2f);
+                    subBuildingListPanel.height = _subBuildingPanel.height - TitleHeight - (Margin * 2f);
+                    _subBuildingList = UIFastList.Create<UISubBuildingRow>(subBuildingListPanel);
+                    ListSetup(_subBuildingList);
 
                     // Create return fastlist from our filtered list.
-                    subBuildingList.rowsData = new FastList<object>
+                    _subBuildingList.rowsData = new FastList<object>
                     {
                         m_buffer = subBuildingIndexes,
-                        m_size = subBuildingIndexes.Length
+                        m_size = subBuildingIndexes.Length,
                     };
                 }
                 else
                 {
                     // If the sub-building panel has already been created. just make sure it's visible.
-                    subBuildingPanel.Show();
+                    _subBuildingPanel.Show();
                 }
             }
             else
             {
                 // Otherwise, hide the sub-building panel (if it exists).
-                subBuildingPanel?.Hide();
+                _subBuildingPanel?.Hide();
             }
 
-            // Populate target list and select target item.
-            TargetList();
+            // Regenerate target list and select target item.
+            RegenerateTargetList();
 
             // Record original stats for preview.
             RecordOriginal();
 
             // Apply Harmony rendering patches.
-            RenderOverlays.Building = currentBuilding;
+            RenderOverlays.Building = _selectedSubBuilding;
             Patcher.Instance.PatchBuildingOverlays(true);
         }
-
 
         /// <summary>
         /// Previews the current change.
@@ -382,18 +283,18 @@
         protected override void PreviewChange()
         {
             // Don't do anything if no current selection.
-            if (CurrentTargetItem == null)
+            if (SelectedTargetItem == null)
             {
                 return;
             }
 
             // Don't do anything if no changes.
-            if (xSlider.value == 0f &&
-                ySlider.value == 0f &&
-                zSlider.value == 0f &&
-                angleSlider.value == 0f &&
-                probabilitySlider.value.RoundToNearest(1) == CurrentTargetItem.originalProb &&
-                ReplacementPrefab == CurrentTargetItem.CurrentPrefab)
+            if (m_xSlider.value == 0f &&
+                m_ySlider.value == 0f &&
+                m_zSlider.value == 0f &&
+                m_rotationSlider.value == 0f &&
+                m_probabilitySlider.value.RoundToNearest(1) == SelectedTargetItem.originalProb &&
+                SelectedReplacementPrefab == SelectedTargetItem.CurrentPrefab)
             {
                 // Reset apply button icon.
                 UnappliedChanges = false;
@@ -404,17 +305,17 @@
             // Generate prevew record entry.
             BOBConfig.BuildingReplacement previewReplacement = new BOBConfig.BuildingReplacement
             {
-                ReplacementInfo = ReplacementPrefab ?? CurrentTargetItem.originalPrefab,
-                OffsetX = xSlider.TrueValue,
-                OffsetY = ySlider.TrueValue,
-                OffsetZ = zSlider.TrueValue,
-                Angle = angleSlider.TrueValue,
-                Probability = (int)probabilitySlider.TrueValue.RoundToNearest(1),
-                CustomHeight = customHeightCheck.isChecked,
+                ReplacementInfo = SelectedReplacementPrefab ?? SelectedTargetItem.originalPrefab,
+                OffsetX = m_xSlider.TrueValue,
+                OffsetY = m_ySlider.TrueValue,
+                OffsetZ = m_zSlider.TrueValue,
+                Angle = m_rotationSlider.TrueValue,
+                Probability = (int)m_probabilitySlider.TrueValue.RoundToNearest(1),
+                CustomHeight = _customHeightCheck.isChecked,
             };
 
             // Update preview for each handler.
-            foreach (BuildingPropHandler handler in originalValues)
+            foreach (BuildingPropHandler handler in _originalValues)
             {
                 PreviewChange(handler, previewReplacement);
             }
@@ -423,13 +324,12 @@
             BuildingData.Update();
 
             // Update highlighting target.
-            RenderOverlays.Prop = ReplacementPrefab as PropInfo;
-            RenderOverlays.Tree = ReplacementPrefab as TreeInfo;
+            RenderOverlays.Prop = SelectedReplacementPrefab as PropInfo;
+            RenderOverlays.Tree = SelectedReplacementPrefab as TreeInfo;
 
             // Update apply button icon to indicate change.
             UnappliedChanges = true;
         }
-
 
         /// <summary>
         /// Reverts any previewed changes back to original prop/tree state.
@@ -437,7 +337,7 @@
         protected override void RevertPreview()
         {
             // Iterate through each original value.
-            foreach (BuildingPropHandler handler in originalValues)
+            foreach (BuildingPropHandler handler in _originalValues)
             {
                 // Restore original values.
                 handler.ClearPreview();
@@ -450,13 +350,12 @@
             UnappliedChanges = false;
         }
 
-
         /// <summary>
         /// Apply button event handler.
-        /// <param name="control">Calling component (unused)</param>
-        /// <param name="mouseEvent">Mouse event (unused)</param>
         /// </summary>
-        protected override void Apply(UIComponent control, UIMouseEventParameter mouseEvent)
+        /// <param name="c">Calling component.</param>
+        /// <param name="p">Mouse event parameter.</param>
+        protected override void Apply(UIComponent c, UIMouseEventParameter p)
         {
             // First, undo any preview.
             RevertPreview();
@@ -464,16 +363,16 @@
             try
             {
                 // Make sure we have valid a target and replacement.
-                if (CurrentTargetItem is BuildingTargetListItem buildingTargetListItem && ReplacementPrefab != null)
+                if (SelectedTargetItem is BuildingTargetListItem buildingTargetListItem && SelectedReplacementPrefab != null)
                 {
                     // Check for added prop - instead of replacing, we update the original added prop reference.
-                    if (CurrentTargetItem.isAdded)
+                    if (SelectedTargetItem.isAdded)
                     {
-                        AddedBuildingProps.Instance.Update(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, CurrentTargetItem.index, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, customHeightCheck.isChecked);
+                        AddedBuildingProps.Instance.Update(_selectedSubBuilding, SelectedTargetItem.originalPrefab, SelectedReplacementPrefab, SelectedTargetItem.index, m_rotationSlider.TrueValue, m_xSlider.TrueValue, m_ySlider.TrueValue, m_zSlider.TrueValue, (int)m_probabilitySlider.TrueValue, _customHeightCheck.isChecked);
 
                         // Update current target.
-                        CurrentTargetItem.originalPrefab = ReplacementPrefab;
-                        CurrentTargetItem.originalProb = (int)probabilitySlider.TrueValue;
+                        SelectedTargetItem.originalPrefab = SelectedReplacementPrefab;
+                        SelectedTargetItem.originalProb = (int)m_probabilitySlider.TrueValue;
                     }
                     else
                     {
@@ -482,17 +381,17 @@
                         {
                             case ReplacementModes.Individual:
                                 // Individual replacement.
-                                IndividualBuildingReplacement.Instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, IndividualIndex, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, customHeightCheck.isChecked, buildingTargetListItem.IndividualReplacement);
+                                IndividualBuildingReplacement.Instance.Replace(_selectedSubBuilding, SelectedTargetItem.originalPrefab, SelectedReplacementPrefab, IndividualIndex, m_rotationSlider.TrueValue, m_xSlider.TrueValue, m_ySlider.TrueValue, m_zSlider.TrueValue, (int)m_probabilitySlider.TrueValue, _customHeightCheck.isChecked, buildingTargetListItem.IndividualReplacement);
                                 break;
 
                             case ReplacementModes.Grouped:
                                 // Grouped replacement.
-                                GroupedBuildingReplacement.Instance.Replace(currentBuilding, CurrentTargetItem.originalPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, customHeightCheck.isChecked, buildingTargetListItem.GroupedReplacement);
+                                GroupedBuildingReplacement.Instance.Replace(_selectedSubBuilding, SelectedTargetItem.originalPrefab, SelectedReplacementPrefab, -1, m_rotationSlider.TrueValue, m_xSlider.TrueValue, m_ySlider.TrueValue, m_zSlider.TrueValue, (int)m_probabilitySlider.TrueValue, _customHeightCheck.isChecked, buildingTargetListItem.GroupedReplacement);
                                 break;
 
                             case ReplacementModes.All:
                                 // All- replacement.
-                                AllBuildingReplacement.Instance.Replace(null, CurrentTargetItem.originalPrefab, ReplacementPrefab, -1, angleSlider.TrueValue, xSlider.TrueValue, ySlider.TrueValue, zSlider.TrueValue, (int)probabilitySlider.TrueValue, customHeightCheck.isChecked, buildingTargetListItem.AllReplacement);
+                                AllBuildingReplacement.Instance.Replace(null, SelectedTargetItem.originalPrefab, SelectedReplacementPrefab, -1, m_rotationSlider.TrueValue, m_xSlider.TrueValue, m_ySlider.TrueValue, m_zSlider.TrueValue, (int)m_probabilitySlider.TrueValue, _customHeightCheck.isChecked, buildingTargetListItem.AllReplacement);
                                 break;
 
                             default:
@@ -508,12 +407,12 @@
                     RecordOriginal();
 
                     // Update target list and buttons.
-                    TargetList();
+                    RegenerateTargetList();
                     UpdateButtonStates();
 
                     // Update highlighting target.
-                    RenderOverlays.Prop = ReplacementPrefab as PropInfo;
-                    RenderOverlays.Tree = ReplacementPrefab as TreeInfo;
+                    RenderOverlays.Prop = SelectedReplacementPrefab as PropInfo;
+                    RenderOverlays.Tree = SelectedReplacementPrefab as TreeInfo;
 
                     // Perform post-replacement processing.
                     FinishUpdate();
@@ -526,26 +425,25 @@
             }
         }
 
-
         /// <summary>
         /// Revert button event handler.
-        /// <param name="control">Calling component (unused)</param>
-        /// <param name="mouseEvent">Mouse event (unused)</param>
         /// </summary>
-        protected override void Revert(UIComponent control, UIMouseEventParameter mouseEvent)
+        /// <param name="c">Calling component.</param>
+        /// <param name="p">Mouse event parameter.</param>
+        protected override void Revert(UIComponent c, UIMouseEventParameter p)
         {
             // Revert any unapplied changes first.
             if (UnappliedChanges)
             {
                 // Reset slider values by reassigning the current target item - this will also revert any preview.
-                CurrentTargetItem = CurrentTargetItem;
+                SelectedTargetItem = SelectedTargetItem;
                 return;
             }
 
             try
             {
                 // Make sure we've got a valid selection.
-                if (CurrentTargetItem is BuildingTargetListItem buildingTargetListItem)
+                if (SelectedTargetItem is BuildingTargetListItem buildingTargetListItem)
                 {
                     // Individual building prop reversion?
                     if (buildingTargetListItem.IndividualReplacement != null)
@@ -572,7 +470,7 @@
                     RecordOriginal();
 
                     // Update target list.
-                    TargetList();
+                    RegenerateTargetList();
 
                     // Perform post-replacement processing.
                     FinishUpdate();
@@ -585,11 +483,10 @@
             }
         }
 
-
         /// <summary>
         /// Updates the target item record for changes in replacement status (e.g. after applying or reverting changes).
         /// </summary>
-        /// <param name="targetListItem">Target item</param>
+        /// <param name="targetListItem">Target item.</param>
         protected override void UpdateTargetItem(TargetListItem targetListItem)
         {
             if (targetListItem is BuildingTargetListItem buildingItem)
@@ -602,7 +499,7 @@
                 }
 
                 // Is this an added prop?
-                if (AddedBuildingProps.Instance.IsAdded(currentBuilding, propIndex))
+                if (AddedBuildingProps.Instance.IsAdded(_selectedSubBuilding, propIndex))
                 {
                     targetListItem.index = propIndex;
                     targetListItem.isAdded = true;
@@ -610,7 +507,7 @@
                 else
                 {
                     // Non-added prop; update stored references.
-                    BuildingPropHandler handler = BuildingHandlers.GetHandler(currentBuilding, propIndex);
+                    BuildingPropHandler handler = BuildingHandlers.GetHandler(_selectedSubBuilding, propIndex);
                     if (handler != null)
                     {
                         buildingItem.IndividualReplacement = handler.GetReplacement(ReplacementPriority.IndividualReplacement);
@@ -621,33 +518,32 @@
             }
         }
 
-
         /// <summary>
-        /// Populates the target fastlist with a list of target-specific trees or props.
+        /// Regenerates the target fastlist with a list of target-specific trees or props.
         /// </summary>
-        protected override void TargetList()
+        protected override void RegenerateTargetList()
         {
             // Clear current selection.
-            targetList.selectedIndex = -1;
+            m_targetList.selectedIndex = -1;
 
             // List of prefabs that have passed filtering.
             List<TargetListItem> itemList = new List<TargetListItem>();
 
             // Check to see if this building contains any props.
-            if (currentBuilding.m_props == null || currentBuilding.m_props.Length == 0)
+            if (_selectedSubBuilding.m_props == null || _selectedSubBuilding.m_props.Length == 0)
             {
                 // No props - show 'no props' label and return an empty list.
-                noPropsLabel.Show();
-                targetList.rowsData = new FastList<object>();
+                m_noPropsLabel.Show();
+                m_targetList.rowsData = new FastList<object>();
 
                 // Force clearance of current target item.
-                CurrentTargetItem = null;
+                SelectedTargetItem = null;
 
                 return;
             }
 
             // Iterate through each prop in building.
-            for (int propIndex = 0; propIndex < currentBuilding.m_props.Length; ++propIndex)
+            for (int propIndex = 0; propIndex < _selectedSubBuilding.m_props.Length; ++propIndex)
             {
                 // Create new list item.
                 BuildingTargetListItem targetListItem = new BuildingTargetListItem();
@@ -656,11 +552,11 @@
                 PrefabInfo originalInfo = null;
                 if (PropTreeMode == PropTreeModes.Tree)
                 {
-                    originalInfo = (PrefabInfo)currentBuilding.m_props[propIndex]?.m_tree ?? currentBuilding.m_props[propIndex]?.m_prop;
+                    originalInfo = (PrefabInfo)_selectedSubBuilding.m_props[propIndex]?.m_tree ?? _selectedSubBuilding.m_props[propIndex]?.m_prop;
                 }
                 else
                 {
-                    originalInfo = (PrefabInfo)currentBuilding.m_props[propIndex]?.m_prop ?? currentBuilding.m_props[propIndex]?.m_tree;
+                    originalInfo = (PrefabInfo)_selectedSubBuilding.m_props[propIndex]?.m_prop ?? _selectedSubBuilding.m_props[propIndex]?.m_tree;
                 }
 
                 // Check to see if we were succesful - if not (e.g. we only want trees and this is a prop), continue on to next building prop.
@@ -671,11 +567,11 @@
 
                 // Get original (pre-replacement) tree/prop prefab and current probability (as default original probability).
                 targetListItem.originalPrefab = originalInfo;
-                targetListItem.originalProb = currentBuilding.m_props[propIndex].m_probability;
-                targetListItem.originalAngle = currentBuilding.m_props[propIndex].m_radAngle * Mathf.Rad2Deg;
+                targetListItem.originalProb = _selectedSubBuilding.m_props[propIndex].m_probability;
+                targetListItem.originalAngle = _selectedSubBuilding.m_props[propIndex].m_radAngle * Mathf.Rad2Deg;
 
                 // Is this an added prop?
-                if (AddedBuildingProps.Instance.IsAdded(currentBuilding, propIndex))
+                if (AddedBuildingProps.Instance.IsAdded(_selectedSubBuilding, propIndex))
                 {
                     targetListItem.index = propIndex;
                     targetListItem.isAdded = true;
@@ -683,7 +579,7 @@
                 else
                 {
                     // Non-added prop - see if we've got an existing reference.
-                    BuildingPropHandler handler = BuildingHandlers.GetHandler(currentBuilding, propIndex);
+                    BuildingPropHandler handler = BuildingHandlers.GetHandler(_selectedSubBuilding, propIndex);
                     if (handler != null)
                     {
                         // Existing reference found - get the relevant original prefab name.
@@ -770,23 +666,22 @@
             }
 
             // Create return fastlist from our filtered list, ordering by name.
-            targetList.rowsData = new FastList<object>
+            m_targetList.rowsData = new FastList<object>
             {
-                m_buffer = targetSearchStatus == (int)OrderBy.NameDescending ? itemList.OrderByDescending(item => item.DisplayName).ToArray() : itemList.OrderBy(item => item.DisplayName).ToArray(),
-                m_size = itemList.Count
+                m_buffer = m_targetSortSetting == (int)OrderBy.NameDescending ? itemList.OrderByDescending(item => item.DisplayName).ToArray() : itemList.OrderBy(item => item.DisplayName).ToArray(),
+                m_size = itemList.Count,
             };
 
             // If the list is empty, show the 'no props' label; otherwise, hide it.
-            if (targetList.rowsData.m_size == 0)
+            if (m_targetList.rowsData.m_size == 0)
             {
-                noPropsLabel.Show();
+                m_noPropsLabel.Show();
             }
             else
             {
-                noPropsLabel.Hide();
+                m_noPropsLabel.Hide();
             }
         }
-
 
         /// <summary>
         /// Performs actions to be taken once an update (application or reversion) has been applied, including saving data, updating button states, and refreshing renders.
@@ -799,14 +694,13 @@
             BuildingData.Update();
         }
 
-
         /// <summary>
         /// Adds a new tree or prop.
         /// </summary>
         protected override void AddNew()
         {
             // Make sure a valid replacement prefab is set.
-            if (ReplacementPrefab != null)
+            if (SelectedReplacementPrefab != null)
             {
                 // Revert any preview.
                 RevertPreview();
@@ -814,16 +708,16 @@
                 // Add new prop.
                 BOBConfig.BuildingReplacement newProp = new BOBConfig.BuildingReplacement
                 {
-                    IsTree = ReplacementPrefab is TreeInfo,
-                    Replacement = ReplacementPrefab.name,
-                    Angle = angleSlider.TrueValue,
-                    OffsetX = xSlider.TrueValue,
-                    OffsetY = ySlider.TrueValue,
-                    OffsetZ = zSlider.TrueValue,
-                    Probability = (int)probabilitySlider.TrueValue,
-                    ParentInfo = currentBuilding,
-                    ReplacementInfo = ReplacementPrefab,
-                    CustomHeight = customHeightCheck.isChecked,
+                    IsTree = SelectedReplacementPrefab is TreeInfo,
+                    Replacement = SelectedReplacementPrefab.name,
+                    Angle = m_rotationSlider.TrueValue,
+                    OffsetX = m_xSlider.TrueValue,
+                    OffsetY = m_ySlider.TrueValue,
+                    OffsetZ = m_zSlider.TrueValue,
+                    Probability = (int)m_probabilitySlider.TrueValue,
+                    ParentInfo = _selectedSubBuilding,
+                    ReplacementInfo = SelectedReplacementPrefab,
+                    CustomHeight = _customHeightCheck.isChecked,
                 };
                 AddedBuildingProps.Instance.AddNew(newProp);
 
@@ -832,14 +726,13 @@
             }
         }
 
-
         /// <summary>
         /// Removes an added tree or prop.
         /// </summary>
         protected override void RemoveProp()
         {
             // Safety first - need an individual index that's an added prop.
-            if (CurrentTargetItem == null || CurrentTargetItem.index < 0 || !AddedBuildingProps.Instance.IsAdded(currentBuilding, CurrentTargetItem.index))
+            if (SelectedTargetItem == null || SelectedTargetItem.index < 0 || !AddedBuildingProps.Instance.IsAdded(_selectedSubBuilding, SelectedTargetItem.index))
             {
                 return;
             }
@@ -849,12 +742,11 @@
 
             // Create new props array with one fewer entry, and copy the old props to it.
             // Remove prop reference and update other references as appropriate.
-            AddedBuildingProps.Instance.RemoveNew(currentBuilding, CurrentTargetItem.index);
+            AddedBuildingProps.Instance.RemoveNew(_selectedSubBuilding, SelectedTargetItem.index);
 
             // Post-action cleanup.
             UpdateAddedProps();
         }
-
 
         /// <summary>
         /// Record original prop values before previewing.
@@ -862,10 +754,10 @@
         protected override void RecordOriginal()
         {
             // Clear existing list.
-            originalValues.Clear();
+            _originalValues.Clear();
 
             // Don't do anything if no valid selection.
-            if (CurrentTargetItem?.originalPrefab == null || currentBuilding == null)
+            if (SelectedTargetItem?.originalPrefab == null || _selectedSubBuilding == null)
             {
                 return;
             }
@@ -881,42 +773,64 @@
                     {
                         for (int j = 0; j < prefab.m_props.Length; ++j)
                         {
-                            if (prefab.m_props[j].m_prop == CurrentTargetItem.CurrentPrefab | prefab.m_props[j].m_tree == CurrentTargetItem.CurrentPrefab)
+                            if (prefab.m_props[j].m_prop == SelectedTargetItem.CurrentPrefab | prefab.m_props[j].m_tree == SelectedTargetItem.CurrentPrefab)
                             {
-                                originalValues.Add(GetOriginalData(prefab, j));
+                                _originalValues.Add(GetOriginalData(prefab, j));
                             }
                         }
                     }
                 }
             }
-            else if (CurrentTargetItem.index < 0)
+            else if (SelectedTargetItem.index < 0)
             {
                 // Grouped replacement - iterate through each instance and record values.
-                for (int i = 0; i < CurrentTargetItem.indexes.Count; ++i)
+                for (int i = 0; i < SelectedTargetItem.indexes.Count; ++i)
                 {
-                    originalValues.Add(GetOriginalData(currentBuilding, CurrentTargetItem.indexes[i]));
+                    _originalValues.Add(GetOriginalData(_selectedSubBuilding, SelectedTargetItem.indexes[i]));
                 }
             }
             else
             {
                 // Individual replacement - record original values.
-                originalValues.Add(GetOriginalData(currentBuilding, CurrentTargetItem.index));
+                _originalValues.Add(GetOriginalData(_selectedSubBuilding, SelectedTargetItem.index));
             }
         }
 
+        /// <summary>
+        /// Sets the current sub-building selection to the specified index.
+        /// </summary>
+        /// <param name="index">Index number of specified sub-building.</param>
+        private void SetSubBuilding(int index)
+        {
+            // Revert any preview.
+            RevertPreview();
+
+            // Set current building.
+            _selectedSubBuilding = _subBuildings[index];
+
+            // Reset current items.
+            SelectedTargetItem = null;
+            SelectedReplacementPrefab = null;
+
+            // Reset lists.
+            RegenerateReplacementList();
+            RegenerateTargetList();
+
+            // Update overlay.
+            RenderOverlays.Building = _selectedSubBuilding;
+        }
 
         /// <summary>
         /// Custom height checkbox event handler.
         /// </summary>
-        /// <param name="control">Calling component (unused)</param>
-        /// <param name="isChecked">New checked state</param>
-        private void CustomHeightChange(UIComponent control, bool isChecked)
+        /// <param name="c">Calling component.</param>
+        /// <param name="isChecked">New checked state.</param>
+        private void CustomHeightChange(UIComponent c, bool isChecked)
         {
             // Show/hide Y position slider based on value.
-            ySlider.isVisible = isChecked;
-            ySlider.ValueField.isVisible = isChecked;
+            m_ySlider.isVisible = isChecked;
+            m_ySlider.ValueField.isVisible = isChecked;
         }
-
 
         /// <summary>
         /// Called after any added prop manipulations (addition or removal) to perform cleanup.
@@ -924,25 +838,24 @@
         private void UpdateAddedProps()
         {
             // Update building prop references.
-            currentBuilding.CheckReferences();
+            _selectedSubBuilding.CheckReferences();
 
             // Clear current selection.
-            CurrentTargetItem = null;
+            SelectedTargetItem = null;
 
             // Perform regular post-processing.
             FinishUpdate();
-            TargetList();
+            RegenerateTargetList();
 
             // Rebuild recorded originals list.
             RecordOriginal();
         }
 
-
         /// <summary>
         /// Previews the change for the current target item.
         /// </summary>
-        /// <param name="handler">Prop handler</param>
-        /// <param name="previewReplacement">Replacement to preview</param>
+        /// <param name="handler">Prop handler.</param>
+        /// <param name="previewReplacement">Replacement to preview.</param>
         private void PreviewChange(BuildingPropHandler handler, BOBConfig.BuildingReplacement previewReplacement)
         {
             handler.PreviewReplacement(previewReplacement);
@@ -951,13 +864,12 @@
             BuildingData.DirtyList.Add(handler.BuildingInfo);
         }
 
-
         /// <summary>
         /// Gets original (current) prop data.
         /// </summary>
-        /// <param name="buildingInfo">Building prefab</param>
-        /// <param name="propIndex">Prop index</param>
-        /// <returns>New prop handler containing original data</returns>
+        /// <param name="buildingInfo">Building prefab.</param>
+        /// <param name="propIndex">Prop index.</param>
+        /// <returns>New prop handler containing original data.</returns>
         private BuildingPropHandler GetOriginalData(BuildingInfo buildingInfo, int propIndex)
         {
             // Ensure that the index is valid before proceeding.
@@ -969,6 +881,60 @@
 
             // Create a new prop handler based on the current prop state (not the original).
             return BuildingHandlers.GetOrAddHandler(buildingInfo, propIndex);
+        }
+
+        /// <summary>
+        /// Prop row fastlist item for sub-buildings.
+        /// </summary>
+        private class UISubBuildingRow : UIPropRow
+        {
+            // Sub-building reference index.
+            private int subBuildingIndex;
+
+            /// <summary>
+            /// Called when this item is selected.
+            /// </summary>
+            public override void UpdateSelection()
+            {
+                // Update currently selected target prefab.
+                if (BOBPanelManager.Panel is BOBBuildingPanel buildingPanel)
+                {
+                    buildingPanel.SetSubBuilding(subBuildingIndex);
+                }
+            }
+
+            /// <summary>
+            /// Called when list item is displayed.
+            /// </summary>
+            public override void Display(object data, bool isRowOdd)
+            {
+                // Perform initial setup for new rows.
+                if (nameLabel == null)
+                {
+                    isVisible = true;
+                    canFocus = true;
+                    isInteractive = true;
+                    width = parent.width;
+                    height = RowHeight;
+
+                    // Add object name label.
+                    nameLabel = AddUIComponent<UILabel>();
+                    nameLabel.width = this.width - 10f;
+                    nameLabel.textScale = TextScale;
+                }
+
+                // Get sub-building index number.
+                subBuildingIndex = (int)data;
+
+                // Set display text.
+                nameLabel.text = (BOBPanelManager.Panel as BOBBuildingPanel)._subBuildingNames[subBuildingIndex] ?? string.Empty;
+
+                // Set label position
+                nameLabel.relativePosition = new Vector2(5f, PaddingY);
+
+                // Set initial background as deselected state.
+                Deselect(isRowOdd);
+            }
         }
     }
 }

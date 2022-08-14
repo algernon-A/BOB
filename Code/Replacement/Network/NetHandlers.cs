@@ -17,12 +17,6 @@ namespace BOB
         private static readonly Dictionary<NetInfo.Lane, Dictionary<int, LanePropHandler>> Handlers = new Dictionary<NetInfo.Lane, Dictionary<int, LanePropHandler>>();
 
         /// <summary>
-        /// Gets a reference to the master dictionary (for debugging purposes).
-        /// DO NOT USE to access the dictionary directly; this is simply for visibility via ModTools.
-        /// </summary>
-        internal static Dictionary<NetInfo.Lane, Dictionary<int, LanePropHandler>> GetDict => Handlers;
-
-        /// <summary>
         /// Gets any existing prop handler for the given parameters, creating a new one if one doesn't already exist.
         /// </summary>
         /// <param name="netInfo">Network prefab for this prop.</param>

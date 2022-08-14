@@ -1,4 +1,9 @@
-﻿namespace BOB
+﻿// <copyright file="OptionsPanel.cs" company="algernon (K. Algernon A. Sheppard)">
+// Copyright (c) algernon (K. Algernon A. Sheppard). All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// </copyright>
+
+namespace BOB
 {
     using AlgernonCommons.UI;
     using ColossalFramework.UI;
@@ -9,7 +14,7 @@
     internal class OptionsPanel : UIPanel
     {
         /// <summary>
-        /// Creates the panel object in-game and displays it.
+        /// Initializes a new instance of the <see cref="OptionsPanel"/> class.
         /// </summary>
         internal OptionsPanel()
         {

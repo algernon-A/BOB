@@ -23,7 +23,7 @@ namespace BOB
         internal GeneralOptionsPanel(UITabstrip tabStrip, int tabIndex)
         {
             // Add tab and helper.
-            UIPanel panel = PanelUtils.AddTab(tabStrip, Translations.Translate("BOB_OPT_GEN"), tabIndex);
+            UIPanel panel = UITabstrips.AddTextTab(tabStrip, Translations.Translate("BOB_OPT_GEN"), tabIndex, out _);
             UIHelper helper = new UIHelper(panel);
             panel.autoLayout = true;
 

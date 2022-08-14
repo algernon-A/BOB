@@ -17,12 +17,6 @@ namespace BOB
         private static readonly Dictionary<BuildingInfo, Dictionary<int, BuildingPropHandler>> Handlers = new Dictionary<BuildingInfo, Dictionary<int, BuildingPropHandler>>();
 
         /// <summary>
-        /// Gets a reference to the master dictionary (for debugging purposes).
-        /// DO NOT USE to access the dictionary directly; this is simply for visibility via ModTools.
-        /// </summary>
-        internal static Dictionary<BuildingInfo, Dictionary<int, BuildingPropHandler>> GetDict => Handlers;
-
-        /// <summary>
         /// Gets any existing prop handler for the given parameters, creating a new one if one doesn't already exist.
         /// </summary>
         /// <param name="buildingInfo">Building prefab for this prop.</param>

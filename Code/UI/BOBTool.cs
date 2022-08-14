@@ -1,11 +1,16 @@
-﻿namespace BOB
+﻿// <copyright file="BOBTool.cs" company="algernon (K. Algernon A. Sheppard)">
+// Copyright (c) algernon (K. Algernon A. Sheppard). All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// </copyright>
+
+namespace BOB
 {
     using System.Collections.Generic;
     using AlgernonCommons.Translation;
     using AlgernonCommons.UI;
     using ColossalFramework;
-    using ColossalFramework.UI;
     using ColossalFramework.Math;
+    using ColossalFramework.UI;
     using EManagersLib.API;
     using UnifiedUI.Helpers;
     using UnityEngine;
@@ -15,88 +20,76 @@
     /// </summary>
     public class BOBTool : DefaultTool
     {
-        // Cursor textures.
-        protected CursorInfo lightCursor;
-        protected CursorInfo darkCursor;
-
         // List of lane overlays to render.
-        internal List<Bezier3> renderLanes = new List<Bezier3>();
+        private readonly List<Bezier3> _laneOverlays = new List<Bezier3>();
 
-
-
-        public enum Mode
-        {
-            Select,
-            NodeOrSegment,
-            Building,
-            PropOrTree
-        }
-
+        // Cursor textures.
+        private CursorInfo _lightCursor;
+        private CursorInfo _darkCursor;
 
         /// <summary>
-        /// Instance reference.
+        /// Gets the active instance reference.
         /// </summary>
-        public static BOBTool Instance => ToolsModifierControl.toolController?.gameObject?.GetComponent<BOBTool>();
-
+        internal static BOBTool Instance => ToolsModifierControl.toolController?.gameObject?.GetComponent<BOBTool>();
 
         /// <summary>
-        /// Returns true if the BOB tool is currently active, false otherwise.
+        /// Gets a value indicating whether the RON tool is currently active (true) or inactive (false).
         /// </summary>
-        public static bool IsActiveTool => Instance != null && ToolsModifierControl.toolController.CurrentTool == Instance;
-
+        internal static bool IsActiveTool => Instance != null && ToolsModifierControl.toolController.CurrentTool == Instance;
 
         /// <summary>
-        /// Initialise the tool.
-        /// Called by unity when the tool is created.
+        /// Gets the list of lane overlays to render.
         /// </summary>
-        protected override void Awake()
-        {
-            base.Awake();
-
-            // Initializae PropAPI.
-            PropAPI.Initialize();
-
-            // Load cursors.
-            lightCursor = UITextures.LoadCursor("BOB-CursorLight.png");
-            darkCursor = UITextures.LoadCursor("BOB-CursorDark.png");
-            m_cursor = darkCursor;
-
-            // Create new UUI button.
-            UIComponent uuiButton = UUIHelpers.RegisterToolButton(
-                name: nameof(BOBTool),
-                groupName: null, // default group
-                tooltip: Translations.Translate("BOB_NAM"),
-                tool: this,
-                icon: UUIHelpers.LoadTexture(UUIHelpers.GetFullPath<Mod>("Resources", "BOB-UUI.png")),
-                hotkeys: new UUIHotKeys { ActivationKey = ModSettings.ToolKey });
-        }
-
-        // Ignore nodes, citizens, disasters, districts, transport lines, and vehicles.
-        public override NetNode.Flags GetNodeIgnoreFlags() => NetNode.Flags.All;
-        public override CitizenInstance.Flags GetCitizenIgnoreFlags() => CitizenInstance.Flags.All;
-        public override DisasterData.Flags GetDisasterIgnoreFlags() => DisasterData.Flags.All;
-        public override District.Flags GetDistrictIgnoreFlags() => District.Flags.All;
-        public override TransportLine.Flags GetTransportIgnoreFlags() => TransportLine.Flags.None;
-        public override VehicleParked.Flags GetParkedVehicleIgnoreFlags() => VehicleParked.Flags.All;
-        public override global::TreeInstance.Flags GetTreeIgnoreFlags() => global::TreeInstance.Flags.None;
-        public override PropInstance.Flags GetPropIgnoreFlags() => PropInstance.Flags.None;
-        public override Vehicle.Flags GetVehicleIgnoreFlags() => Vehicle.Flags.LeftHandDrive | Vehicle.Flags.Created | Vehicle.Flags.Deleted | Vehicle.Flags.Spawned | Vehicle.Flags.Inverted | Vehicle.Flags.TransferToTarget | Vehicle.Flags.TransferToSource | Vehicle.Flags.Emergency1 | Vehicle.Flags.Emergency2 | Vehicle.Flags.WaitingPath | Vehicle.Flags.Stopped | Vehicle.Flags.Leaving | Vehicle.Flags.Arriving | Vehicle.Flags.Reversed | Vehicle.Flags.TakingOff | Vehicle.Flags.Flying | Vehicle.Flags.Landing | Vehicle.Flags.WaitingSpace | Vehicle.Flags.WaitingCargo | Vehicle.Flags.GoingBack | Vehicle.Flags.WaitingTarget | Vehicle.Flags.Importing | Vehicle.Flags.Exporting | Vehicle.Flags.Parking | Vehicle.Flags.CustomName | Vehicle.Flags.OnGravel | Vehicle.Flags.WaitingLoading | Vehicle.Flags.Congestion | Vehicle.Flags.DummyTraffic | Vehicle.Flags.Underground | Vehicle.Flags.Transition | Vehicle.Flags.InsideBuilding;
-
-
-        // Select all buildings.
-        public override Building.Flags GetBuildingIgnoreFlags() => Building.Flags.None;
+        internal List<Bezier3> LaneOverlays => _laneOverlays;
 
         /// <summary>
-        /// Called by the game.  Sets which network segments are ignored by the tool (always returns none, i.e. all segments are selectable by the tool).
+        /// Sets which network segments are ignored by the tool (always returns none, i.e. all segments are selectable by the tool).
         /// </summary>
-        /// <param name="nameOnly">Always set to false</param>
-        /// <returns>NetSegment.Flags.None</returns>
+        /// <param name="nameOnly">Always set to false.</param>
+        /// <returns>NetSegment.Flags.None.</returns>
         public override NetSegment.Flags GetSegmentIgnoreFlags(out bool nameOnly)
         {
             nameOnly = false;
             return NetSegment.Flags.None;
         }
 
+        /// <summary>
+        /// Sets vehicle ingore flags to ignore all vehicles.
+        /// </summary>
+        /// <returns>Vehicle flags ignoring all vehicles.</returns>
+        public override Vehicle.Flags GetVehicleIgnoreFlags() =>
+            Vehicle.Flags.LeftHandDrive
+            | Vehicle.Flags.Created
+            | Vehicle.Flags.Deleted
+            | Vehicle.Flags.Spawned
+            | Vehicle.Flags.Inverted
+            | Vehicle.Flags.TransferToTarget
+            | Vehicle.Flags.TransferToSource
+            | Vehicle.Flags.Emergency1
+            | Vehicle.Flags.Emergency2
+            | Vehicle.Flags.WaitingPath
+            | Vehicle.Flags.Stopped
+            | Vehicle.Flags.Leaving
+            | Vehicle.Flags.Arriving
+            | Vehicle.Flags.Reversed
+            | Vehicle.Flags.TakingOff
+            | Vehicle.Flags.Flying
+            | Vehicle.Flags.Landing
+            | Vehicle.Flags.WaitingSpace
+            | Vehicle.Flags.WaitingCargo
+            | Vehicle.Flags.GoingBack
+            | Vehicle.Flags.WaitingTarget
+            | Vehicle.Flags.Importing
+            | Vehicle.Flags.Exporting
+            | Vehicle.Flags.Parking
+            | Vehicle.Flags.CustomName
+            | Vehicle.Flags.OnGravel
+            | Vehicle.Flags.WaitingLoading
+            | Vehicle.Flags.Congestion
+            | Vehicle.Flags.DummyTraffic
+            | Vehicle.Flags.Underground
+            | Vehicle.Flags.Transition
+            | Vehicle.Flags.InsideBuilding;
 
         /// <summary>
         /// Called by the game every simulation step.
@@ -115,21 +108,21 @@
                 m_buildingService = GetService(),
                 m_propService = GetService(),
                 m_treeService = GetService(),
-                m_districtNameOnly = Singleton<InfoManager>.instance.CurrentMode != InfoManager.InfoMode.Districts,
-                m_ignoreTerrain = GetTerrainIgnore(),
-                m_ignoreNodeFlags = GetNodeIgnoreFlags(),
+                m_districtNameOnly = true,
+                m_ignoreTerrain = true,
+                m_ignoreNodeFlags = NetNode.Flags.All,
                 m_ignoreSegmentFlags = GetSegmentIgnoreFlags(out input.m_segmentNameOnly),
-                m_ignoreBuildingFlags = GetBuildingIgnoreFlags(),
-                m_ignoreTreeFlags = GetTreeIgnoreFlags(),
-                m_ignorePropFlags = GetPropIgnoreFlags(),
+                m_ignoreBuildingFlags = Building.Flags.None,
+                m_ignoreTreeFlags = global::TreeInstance.Flags.None,
+                m_ignorePropFlags = PropInstance.Flags.None,
                 m_ignoreVehicleFlags = GetVehicleIgnoreFlags(),
-                m_ignoreParkedVehicleFlags = GetParkedVehicleIgnoreFlags(),
-                m_ignoreCitizenFlags = GetCitizenIgnoreFlags(),
-                m_ignoreTransportFlags = GetTransportIgnoreFlags(),
-                m_ignoreDistrictFlags = GetDistrictIgnoreFlags(),
-                m_ignoreParkFlags = GetParkIgnoreFlags(),
-                m_ignoreDisasterFlags = GetDisasterIgnoreFlags(),
-                m_transportTypes = GetTransportTypes()
+                m_ignoreParkedVehicleFlags = VehicleParked.Flags.All,
+                m_ignoreCitizenFlags = CitizenInstance.Flags.All,
+                m_ignoreTransportFlags = TransportLine.Flags.All,
+                m_ignoreDistrictFlags = District.Flags.All,
+                m_ignoreParkFlags = DistrictPark.Flags.All,
+                m_ignoreDisasterFlags = DisasterData.Flags.All,
+                m_transportTypes = 0,
             };
 
             // Enable ferry line selection.
@@ -245,18 +238,17 @@
             }
 
             // Set cursor.
-            m_cursor = validHover ? lightCursor : darkCursor;
+            m_cursor = validHover ? _lightCursor : _darkCursor;
 
             // Set mouse position and record errors.
             m_mousePosition = output.m_hitPos;
             m_selectErrors = errors;
         }
 
-
         /// <summary>
         /// Called by game when overlay is to be rendered.
         /// </summary>
-        /// <param name="cameraInfo">Current camera instance</param>
+        /// <param name="cameraInfo">Current camera instance.</param>
         public override void RenderOverlay(RenderManager.CameraInfo cameraInfo)
         {
             // 5m vertical offset in each direction to allow for terrain changes.
@@ -269,13 +261,13 @@
             base.RenderOverlay(cameraInfo);
 
             // If any lane overlays are ready to be rendered, render them.
-            if (renderLanes.Count != 0)
+            if (_laneOverlays.Count != 0)
             {
                 // Set color.
                 Color renderColor = Color.magenta * RenderOverlays.Intensity;
 
                 // Iterate through list.
-                foreach (Bezier3 bezier in renderLanes)
+                foreach (Bezier3 bezier in _laneOverlays)
                 {
                     // Calculate minimum and maximum y-values.
                     float minY = Mathf.Min(bezier.a.y, bezier.d.y) - verticalOffset;
@@ -287,7 +279,6 @@
                 }
             }
         }
-
 
         /// <summary>
         /// Toggles the current tool to/from the BOB tool.
@@ -308,8 +299,33 @@
         }
 
         /// <summary>
+        /// Initialise the tool.
+        /// Called by unity when the tool is created.
+        /// </summary>
+        protected override void Awake()
+        {
+            base.Awake();
+
+            // Initializae PropAPI.
+            PropAPI.Initialize();
+
+            // Load cursors.
+            _lightCursor = UITextures.LoadCursor("BOB-CursorLight.png");
+            _darkCursor = UITextures.LoadCursor("BOB-CursorDark.png");
+            m_cursor = _darkCursor;
+
+            // Create new UUI button.
+            UIComponent uuiButton = UUIHelpers.RegisterToolButton(
+                name: nameof(BOBTool),
+                groupName: null, // default group
+                tooltip: Translations.Translate("BOB_NAM"),
+                tool: this,
+                icon: UUIHelpers.LoadTexture(UUIHelpers.GetFullPath<Mod>("Resources", "BOB-UUI.png")),
+                hotkeys: new UUIHotKeys { ActivationKey = ModSettings.ToolKey });
+        }
+
+        /// <summary>
         /// Called by game when tool is enabled.
-        /// Used to open the replacer panel.
         /// </summary>
         protected override void OnEnable()
         {
@@ -324,7 +340,6 @@
             }
         }
 
-
         /// <summary>
         /// Called by game when tool is disabled.
         /// Used to close the BOB info panel.
@@ -334,13 +349,15 @@
             base.OnDisable();
 
             // Is a BOB info panel already open?
-            if (InfoPanelManager.Panel != null)
+            if (BOBPanelManager.Panel != null)
             {
                 // Yes - close it.
-                InfoPanelManager.Close();
+                BOBPanelManager.Close();
             }
-        }
 
+            // Clear tool lane overlay list.
+            _laneOverlays.Clear();
+        }
 
         /// <summary>
         /// Unity late update handling.
@@ -351,15 +368,14 @@
             base.OnToolLateUpdate();
 
             // Force the info mode to none.
-            ToolBase.ForceInfoMode(InfoManager.InfoMode.None, InfoManager.SubInfoMode.None);
+            ForceInfoMode(InfoManager.InfoMode.None, InfoManager.SubInfoMode.None);
         }
-
 
         /// <summary>
         /// Tool GUI event processing.
         /// Called by game every GUI update.
         /// </summary>
-        /// <param name="e">Event</param>
+        /// <param name="e">Event.</param>
         protected override void OnToolGUI(Event e)
         {
             // Check for escape key.
@@ -370,7 +386,7 @@
                 ToolsModifierControl.SetTool<DefaultTool>();
 
                 // Close window, if open.
-                InfoPanelManager.Close();
+                BOBPanelManager.Close();
             }
 
             // Don't do anything if mouse is inside UI or if there are any errors other than failed raycast.
@@ -390,12 +406,13 @@
                     UIInput.MouseUsed();
 
                     // Create the info panel with the hovered building prefab.
-                    InfoPanelManager.SetTarget(Singleton<BuildingManager>.instance.m_buildings.m_buffer[building].Info);
+                    BOBPanelManager.SetTargetParent(Singleton<BuildingManager>.instance.m_buildings.m_buffer[building].Info);
                 }
             }
             else
             {
                 ushort segment = m_hoverInstance.NetSegment;
+
                 // Try to get a hovered network instance.
                 if (segment != 0)
                 {
@@ -406,13 +423,13 @@
                         UIInput.MouseUsed();
 
                         // Create the info panel with the hovered network prefab.
-                        InfoPanelManager.SetTarget(Singleton<NetManager>.instance.m_segments.m_buffer[segment].Info);
+                        BOBPanelManager.SetTargetParent(Singleton<NetManager>.instance.m_segments.m_buffer[segment].Info);
                     }
                 }
                 else
                 {
-
                     uint tree = m_hoverInstance.Tree;
+
                     // Try to get a hovered tree instance.
                     if (tree != 0)
                     {
@@ -423,12 +440,13 @@
                             UIInput.MouseUsed();
 
                             // Create the info panel with the hovered network prefab.
-                            InfoPanelManager.SetTarget(Singleton<TreeManager>.instance.m_trees.m_buffer[tree].Info);
+                            BOBPanelManager.SetTargetParent(Singleton<TreeManager>.instance.m_trees.m_buffer[tree].Info);
                         }
                     }
                     else
                     {
                         uint prop = PropAPI.GetPropID(m_hoverInstance);
+
                         // Try to get a hovered prop instance.
                         if (prop != 0)
                         {
@@ -439,7 +457,7 @@
                                 UIInput.MouseUsed();
 
                                 // Create the info panel with the hovered network prefab.
-                                InfoPanelManager.SetTarget(PropAPI.Wrapper.GetInfo(prop));
+                                BOBPanelManager.SetTargetParent(PropAPI.Wrapper.GetInfo(prop));
                             }
                         }
                     }
