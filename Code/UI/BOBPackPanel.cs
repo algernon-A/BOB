@@ -43,7 +43,7 @@ namespace BOB
         // Panel components.
         private readonly UIButton _applyButton;
         private readonly UIButton _revertButton;
-        private readonly UIFastList _packSelection;
+        private readonly UIList _packSelectionList;
 
         // Reference variables.
         private string selectedPack;
@@ -96,16 +96,8 @@ namespace BOB
             packListPanel.relativePosition = new Vector3(Margin, TitleBarHeight);
 
             // Pack selection list.
-            _packSelection = UIFastList.Create<UIPackRow>(packListPanel);
-            _packSelection.backgroundSprite = "UnlockingPanel";
-            _packSelection.width = packListPanel.width;
-            _packSelection.height = packListPanel.height;
-            _packSelection.canSelect = true;
-            _packSelection.rowHeight = RowHeight;
-            _packSelection.autoHideScrollbar = true;
-            _packSelection.relativePosition = Vector3.zero;
-            _packSelection.rowsData = new FastList<object>();
-            _packSelection.selectedIndex = -1;
+            _packSelectionList = UIList.AddUIList<PackRow>(packListPanel, 0f, 0f, ListWidth, ListHeight);
+            _packSelectionList.EventSelectionChanged += (c, data) => SelectedPack = data as string;
 
             // Apply and revert button.
             _applyButton = UIButtons.AddButton(this, Margin, FooterY, Translations.Translate("BOB_PCK_APP"));
@@ -118,7 +110,7 @@ namespace BOB
             _revertButton.Disable();
 
             // Populate list.
-            _packSelection.rowsData = NetworkPackReplacement.Instance.GetPackFastList();
+            _packSelectionList.Data = NetworkPackReplacement.Instance.GetPackFastList();
 
             // Focus.
             BringToFront();
@@ -184,7 +176,7 @@ namespace BOB
             // Set pack status,
             NetworkPackReplacement.Instance.SetPackStatus(selectedPack, status);
             ConfigurationUtils.SaveConfig();
-            _packSelection.Refresh();
+            _packSelectionList.Refresh();
 
             // Update buttons.
             UpdateButtonStates();
@@ -250,80 +242,73 @@ namespace BOB
         /// <summary>
         /// An individual row in the list of replacement packs.
         /// </summary>
-        private class UIPackRow : UIBasicRow
+        private class PackRow : UIListRow
         {
+            // Layout constants.
+            private const float SpriteSize = 20f;
+
             // Panel components.
+            private UILabel _nameLabel;
             private UISprite _statusSprite;
             private UISprite _notLoadedSprite;
-            private string thisPack;
 
             /// <summary>
-            /// Generates and displays a pack row.
+            /// Gets the height for this row.
             /// </summary>
-            /// <param name="data">Object to list.</param>
-            /// <param name="isRowOdd">If the row is an odd-numbered row (for background banding).</param>
-            public override void Display(object data, bool isRowOdd)
+            public override float RowHeight => BOBPackPanel.RowHeight;
+
+            /// <summary>
+            /// Generates and displays a list row.
+            /// </summary>
+            /// <param name="data">Object data to display.</param>
+            /// <param name="rowIndex">Row index number (for background banding).</param>
+            public override void Display(object data, int rowIndex)
             {
                 // Perform initial setup for new rows.
-                if (rowLabel == null)
+                if (_nameLabel == null)
                 {
-                    isVisible = true;
-                    canFocus = true;
-                    isInteractive = true;
-                    width = parent.width;
-                    height = RowHeight;
+                    _nameLabel = AddLabel(Margin, parent.width - Margin - Margin);
 
-                    rowLabel = AddUIComponent<UILabel>();
-                    rowLabel.width = ListWidth;
-                    rowLabel.relativePosition = new Vector3(TextX, 6f);
-                }
-
-                if (_statusSprite == null)
-                {
                     _statusSprite = AddUIComponent<UISprite>();
-                    _statusSprite.size = new Vector2(20f, 20f);
-                    _statusSprite.relativePosition = new Vector3(5f, 5f);
-                }
+                    _statusSprite.size = new Vector2(SpriteSize, SpriteSize);
+                    _statusSprite.relativePosition = new Vector3(Margin, Margin);
 
-                if (_notLoadedSprite == null)
-                {
                     _notLoadedSprite = AddUIComponent<UISprite>();
-                    _notLoadedSprite.size = new Vector2(20f, 20f);
-                    _notLoadedSprite.relativePosition = new Vector3(30f, 5f);
+                    _notLoadedSprite.size = new Vector2(SpriteSize, SpriteSize);
+                    _notLoadedSprite.relativePosition = new Vector3(SpriteSize + Margin + Margin, Margin);
                     _notLoadedSprite.spriteName = "NotificationIconNotHappy";
                 }
 
                 // Set selected pack.
-                thisPack = data as string;
-                rowLabel.text = thisPack;
-
-                // Set sprite status.
-                bool packStatus = NetworkPackReplacement.Instance.GetPackStatus(thisPack);
-                bool notAllLoaded = NetworkPackReplacement.Instance.PackNotAllLoaded(thisPack);
-                _statusSprite.spriteName = packStatus ? "AchievementCheckedTrue" : "AchievementCheckedFalse";
-                _statusSprite.tooltip = packStatus ? Translations.Translate("BOB_PCK_APP_I") : Translations.Translate("BOB_PCK_RVT_I");
-                if (notAllLoaded)
+                if (data is string thisPack)
                 {
-                    _notLoadedSprite.Show();
-                    _notLoadedSprite.tooltip = Translations.Translate("BOB_PCK_NAL");
+                    _nameLabel.text = thisPack;
+
+                    // Set sprite status.
+                    bool packStatus = NetworkPackReplacement.Instance.GetPackStatus(thisPack);
+                    bool notAllLoaded = NetworkPackReplacement.Instance.PackNotAllLoaded(thisPack);
+                    _statusSprite.spriteName = packStatus ? "AchievementCheckedTrue" : "AchievementCheckedFalse";
+                    _statusSprite.tooltip = packStatus ? Translations.Translate("BOB_PCK_APP_I") : Translations.Translate("BOB_PCK_RVT_I");
+                    if (notAllLoaded)
+                    {
+                        _notLoadedSprite.Show();
+                        _notLoadedSprite.tooltip = Translations.Translate("BOB_PCK_NAL");
+                    }
+                    else
+                    {
+                        _notLoadedSprite.Hide();
+                    }
                 }
                 else
                 {
+                    // Just in case - no valid data.
+                    _nameLabel.text = string.Empty;
+                    _statusSprite.Hide();
                     _notLoadedSprite.Hide();
                 }
 
                 // Set initial background as deselected state.
-                Deselect(isRowOdd);
-            }
-
-            /// <summary>
-            /// Mouse click event handler - updates the selection to what was clicked.
-            /// </summary>
-            /// <param name="p">Mouse event parameter.</param>
-            protected override void OnClick(UIMouseEventParameter p)
-            {
-                base.OnClick(p);
-                s_panel.SelectedPack = thisPack;
+                Deselect(rowIndex);
             }
         }
     }

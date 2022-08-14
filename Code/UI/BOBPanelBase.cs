@@ -561,28 +561,6 @@ namespace BOB
         }
 
         /// <summary>
-        /// Performs initial fastlist setup.
-        /// </summary>
-        /// <param name="fastList">Fastlist to set up.</param>
-        protected void ListSetup(UIFastList fastList)
-        {
-            // Apperance, size and position.
-            fastList.backgroundSprite = "UnlockingPanel";
-            fastList.width = fastList.parent.width;
-            fastList.height = fastList.parent.height;
-            fastList.relativePosition = Vector2.zero;
-            fastList.rowHeight = UIPropRow.RowHeight;
-
-            // Behaviour.
-            fastList.canSelect = true;
-            fastList.autoHideScrollbar = true;
-
-            // Data.
-            fastList.rowsData = new FastList<object>();
-            fastList.selectedIndex = -1;
-        }
-
-        /// <summary>
         /// Adds an icon toggle checkbox.
         /// </summary>
         /// <param name="parent">Parent component.</param>

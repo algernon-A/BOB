@@ -21,7 +21,7 @@ namespace BOB
 
         // Layout constants - Y values.
         private const float RowHeight = 30f;
-        private const float ListHeight = 300f;
+        private const float ListHeight = RowHeight * 10;
         private const float TitleBarHeight = 40f;
         private const float ToolBarHeight = 30f;
         private const float ListY = TitleBarHeight;
@@ -39,7 +39,7 @@ namespace BOB
         private static string s_selectedConfig;
 
         // Panel components.
-        private readonly UIFastList _configList;
+        private readonly UIList _configList;
         private readonly UICheckBox _customCheck;
         private readonly UITextField _fileNameField;
         private readonly UIButton _activeCopyButton;
@@ -75,15 +75,8 @@ namespace BOB
             configListPanel.relativePosition = new Vector2(Margin, ListY);
 
             // Config selection list.
-            _configList = UIFastList.Create<UIConfigRow>(configListPanel);
-            _configList.backgroundSprite = "UnlockingPanel";
-            _configList.width = configListPanel.width;
-            _configList.height = configListPanel.height;
-            _configList.canSelect = true;
-            _configList.rowHeight = RowHeight;
-            _configList.autoHideScrollbar = true;
-            _configList.relativePosition = Vector2.zero;
-            _configList.rowsData = new FastList<object>();
+            _configList = UIList.AddUIList<ConfigRow>(configListPanel, 0f, 0f, ListWidth, ListHeight);
+            _configList.EventSelectionChanged += (c, data) => SelectedConfig = data as string;
 
             // File name textfield.
             UILabel fileTextLabel = UILabels.AddLabel(panel, ControlPanelX, ListY, "New configuration name:");
@@ -152,10 +145,10 @@ namespace BOB
             if (_customCheck != null && _customCheck.isChecked)
             {
                 // Try to select current config name.
-                s_selectedConfig = _configList.FindItem(ConfigurationUtils.CurrentSavedConfigName);
+                _configList.FindItem(ConfigurationUtils.CurrentSavedConfigName);
 
                 // Did we find it?
-                if (s_selectedConfig == null)
+                if (_configList.SelectedIndex == -1)
                 {
                     // Not found; uncheck the use custom check.
                     _customCheck.isChecked = false;
@@ -186,8 +179,7 @@ namespace BOB
         /// </summary>
         private void RefreshList()
         {
-            _configList.selectedIndex = -1;
-            _configList.rowsData = ConfigurationUtils.GetConfigFastList();
+            _configList.Data = ConfigurationUtils.GetConfigFastList();
             s_selectedConfig = null;
 
             // Update button states.
@@ -352,54 +344,37 @@ namespace BOB
         }
 
         /// <summary>
-        /// An individual row in the list of config files.
+        /// UIList row item for config file names.
         /// </summary>
-        private class UIConfigRow : UIBasicRow
+        private class ConfigRow : UIListRow
         {
-            // Panel components.
-            private string _thisConfigName;
-
-            // Layout constants.
-            protected override float TextX => 10f;
+            // Display label.
+            private UILabel _nameLabel;
 
             /// <summary>
-            /// Generates and displays a pack row.
+            /// Gets the height for this row.
             /// </summary>
-            /// <param name="data">Object to list.</param>
-            /// <param name="isRowOdd">If the row is an odd-numbered row (for background banding).</param>
-            public override void Display(object data, bool isRowOdd)
+            public override float RowHeight => ConfigurationsPanel.RowHeight;
+
+            /// <summary>
+            /// Generates and displays a list row.
+            /// </summary>
+            /// <param name="data">Object data to display.</param>
+            /// <param name="rowIndex">Row index number (for background banding).</param>
+            public override void Display(object data, int rowIndex)
             {
                 // Perform initial setup for new rows.
-                if (rowLabel == null)
+                if (_nameLabel == null)
                 {
-                    isVisible = true;
-                    canFocus = true;
-                    isInteractive = true;
-                    width = parent.width;
-                    height = BOBPackPanel.RowHeight;
-
-                    rowLabel = AddUIComponent<UILabel>();
-                    rowLabel.width = ConfigurationsPanel.ListWidth;
-                    rowLabel.relativePosition = new Vector2(TextX, 6f);
+                    // Add name labels.
+                    _nameLabel = AddLabel(Margin, parent.width - Margin - Margin, 1.0f);
                 }
 
-                // Set selected config.
-                _thisConfigName = data as string;
-                rowLabel.text = _thisConfigName ?? "Null";
+                // Set display text.
+                _nameLabel.text = data as string ?? "Null";
 
                 // Set initial background as deselected state.
-                Deselect(isRowOdd);
-            }
-
-            /// <summary>
-            /// Mouse click event handler - updates the selection to what was clicked.
-            /// </summary>
-            /// <param name="p">Mouse event parameter.</param>
-            protected override void OnClick(UIMouseEventParameter p)
-            {
-                base.OnClick(p);
-
-                SelectedConfig = _thisConfigName;
+                Deselect(rowIndex);
             }
         }
     }

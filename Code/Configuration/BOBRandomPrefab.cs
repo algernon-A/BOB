@@ -27,7 +27,7 @@ namespace BOB
         public List<Variation> Variations { get; set; } = new List<Variation>();
 
         /// <summary>
-        /// Gets or sets the prop prefabv info for this random prefab.
+        /// Gets or sets the prop prefab info for this random prefab.
         /// </summary>
         [XmlIgnore]
         public PropInfo Prop { get; set; }

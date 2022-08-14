@@ -290,7 +290,7 @@ namespace BOB
                 base.SelectedTargetItem = value;
 
                 // Don't show rotation slider for trees.
-                _rotationPanel.isVisible = !(value?.CurrentPrefab is TreeInfo);
+                _rotationPanel.isVisible = !(value?.ActivePrefab is TreeInfo);
 
                 // Record original stats for preview.
                 RecordOriginal();
@@ -475,7 +475,7 @@ namespace BOB
                 }
 
                 // Reversion requires a currently active replacement.
-                if (SelectedTargetItem.ActiveReplacement)
+                if (SelectedTargetItem.HasActiveReplacement)
                 {
                     m_revertButton.Enable();
                     m_revertButton.tooltip = Translations.Translate("BOB_PNL_REV_UND");
@@ -506,7 +506,7 @@ namespace BOB
             m_addButton.isEnabled = SelectedReplacementPrefab != null;
 
             // Disable/enable remove new prop button.
-            m_removeButton.isEnabled = SelectedTargetItem != null && SelectedTargetItem.isAdded;
+            m_removeButton.isEnabled = SelectedTargetItem != null && SelectedTargetItem.IsAdded;
         }
 
         /// <summary>
@@ -521,7 +521,7 @@ namespace BOB
                 if (PropTreeMode == PropTreeModes.Tree)
                 {
                     // Trees.
-                    m_replacementList.rowsData = new FastList<object>
+                    m_replacementList.Data = new FastList<object>
                     {
                         m_buffer = PrefabLists.RandomTrees.OrderBy(x => x.Name.ToLower()).ToArray(),
                         m_size = PrefabLists.RandomTrees.Count,
@@ -530,7 +530,7 @@ namespace BOB
                 else if (PropTreeMode == PropTreeModes.Prop)
                 {
                     // Props.
-                    m_replacementList.rowsData = new FastList<object>
+                    m_replacementList.Data = new FastList<object>
                     {
                         m_buffer = PrefabLists.RandomProps.OrderBy(x => x.Name.ToLower()).ToArray(),
                         m_size = PrefabLists.RandomProps.Count,
@@ -543,7 +543,7 @@ namespace BOB
                     randomList.AddRange(PrefabLists.RandomProps);
                     randomList.AddRange(PrefabLists.RandomTrees);
 
-                    m_replacementList.rowsData = new FastList<object>
+                    m_replacementList.Data = new FastList<object>
                     {
                         m_buffer = randomList.OrderBy(x => x.Name.ToLower()).ToArray(),
                         m_size = randomList.Count,
@@ -553,12 +553,9 @@ namespace BOB
                 // Reverse order of filtered list if we're searching name descending.
                 if (m_replacementSortSetting == (int)OrderBy.NameDescending)
                 {
-                    Array.Reverse(m_replacementList.rowsData.m_buffer);
+                    Array.Reverse(m_replacementList.Data.m_buffer);
                     m_replacementList.Refresh();
                 }
-
-                // Clear selection.
-                m_replacementList.selectedIndex = -1;
             }
             else
             {
@@ -584,7 +581,7 @@ namespace BOB
                 m_xSlider.TrueValue = 0;
                 m_ySlider.TrueValue = 0;
                 m_zSlider.TrueValue = 0;
-                m_probabilitySlider.TrueValue = SelectedTargetItem != null ? SelectedTargetItem.originalProb : 100;
+                m_probabilitySlider.TrueValue = SelectedTargetItem != null ? SelectedTargetItem.OriginalProbability : 100;
             }
             else
             {
@@ -682,7 +679,7 @@ namespace BOB
                             RegenerateTargetList();
 
                             // Clear selection.
-                            m_targetList.selectedIndex = -1;
+                            m_targetList.SelectedIndex = -1;
                             SelectedTargetItem = null;
                         }
                     }

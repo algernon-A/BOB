@@ -76,27 +76,30 @@ namespace BOB
         {
             set
             {
-                if (value is NetTargetListItem netTargetListItem)
+                // First, undo any preview.
+                RevertPreview();
+
+                // Call base, while ignoring replacement prefab change live application.
+                m_ignoreSelectedPrefabChange = true;
+                base.SelectedTargetItem = value;
+                m_ignoreSelectedPrefabChange = false;
+
+                // Clear original data and record new references.
+                RecordOriginal();
+
+                if (value is TargetNetItem targetNetItem)
                 {
-                    // First, undo any preview.
-                    RevertPreview();
-
-                    // Call base, while ignoring replacement prefab change live application.
-                    m_ignoreSelectedPrefabChange = true;
-                    base.SelectedTargetItem = value;
-                    m_ignoreSelectedPrefabChange = false;
-
                     // Ensure valid selection before proceeding.
                     if (SelectedNet != null)
                     {
                         // Set lane highlighting selection for individual items.
-                        if (netTargetListItem.lane > -1)
+                        if (targetNetItem.LaneIndex > -1)
                         {
-                            RenderOverlays.Lane = SelectedNet.m_lanes[netTargetListItem.lane];
+                            RenderOverlays.Lane = SelectedNet.m_lanes[targetNetItem.LaneIndex];
                         }
 
                         // Is this an added prop?
-                        if (netTargetListItem.isAdded)
+                        if (targetNetItem.IsAdded)
                         {
                             // Yes - set sliders from replacement record.
                             SetSliders(AddedNetworkProps.Instance.ReplacementRecord(SelectedNet, IndividualLane, IndividualIndex));
@@ -107,14 +110,14 @@ namespace BOB
                         else
                         {
                             // Set sliders according to highest active replacement (will be null if none).
-                            SetSliders(netTargetListItem.IndividualReplacement ?? netTargetListItem.GroupedReplacement ?? netTargetListItem.AllReplacement ?? netTargetListItem.PackReplacement);
+                            SetSliders(targetNetItem.IndividualReplacement ?? targetNetItem.GroupedReplacement ?? targetNetItem.AllReplacement ?? targetNetItem.PackReplacement);
                             return;
                         }
                     }
-
-                    // If we got here, there's no valid current selection; set all offset fields to defaults by passing null to SetSliders().
-                    SetSliders(null);
                 }
+
+                // If we got here, there's no valid current selection; set all offset fields to defaults by passing null to SetSliders().
+                SetSliders(null);
             }
         }
 
@@ -183,9 +186,9 @@ namespace BOB
         {
             get
             {
-                if (SelectedTargetItem is NetTargetListItem netTargetListItem)
+                if (SelectedTargetItem is TargetNetItem targetNetItem)
                 {
-                    return netTargetListItem.lane < 0 ? netTargetListItem.lanes[0] : netTargetListItem.lane;
+                    return targetNetItem.LaneIndex < 0 ? targetNetItem.LaneIndexes[0] : targetNetItem.LaneIndex;
                 }
 
                 // If we got here, no valid lane was available; return -1 (should never happen, but you never know, plus we need to keep the compiler happy).
@@ -246,16 +249,16 @@ namespace BOB
         protected override void PreviewChange()
         {
             // Don't do anything if no current selection.
-            if (SelectedTargetItem is NetTargetListItem netTargetListItem)
+            if (SelectedTargetItem is TargetNetItem targetNetItem)
             {
                 // Don't do anything if no changes.
                 if (m_xSlider.TrueValue == 0f &&
                     m_ySlider.TrueValue == 0f &&
                     m_zSlider.TrueValue == 0f &&
                     m_rotationSlider.TrueValue == 0f &&
-                    m_probabilitySlider.TrueValue.RoundToNearest(1) == netTargetListItem.originalProb &&
-                    SelectedReplacementPrefab == netTargetListItem.CurrentPrefab &&
-                    _repeatSlider.TrueValue == netTargetListItem.originalRepeat)
+                    m_probabilitySlider.TrueValue.RoundToNearest(1) == targetNetItem.OriginalProbability &&
+                    SelectedReplacementPrefab == targetNetItem.ActivePrefab &&
+                    _repeatSlider.TrueValue == targetNetItem.OriginalRepeat)
                 {
                     // Reset apply button icon.
                     UnappliedChanges = false;
@@ -266,7 +269,7 @@ namespace BOB
                 // Generate prevew record entry.
                 BOBConfig.NetReplacement previewReplacement = new BOBConfig.NetReplacement
                 {
-                    ReplacementInfo = SelectedReplacementPrefab ?? netTargetListItem.originalPrefab,
+                    ReplacementInfo = SelectedReplacementPrefab ?? targetNetItem.OriginalPrefab,
                     OffsetX = m_xSlider.TrueValue,
                     OffsetY = m_ySlider.TrueValue,
                     OffsetZ = m_zSlider.TrueValue,
@@ -305,6 +308,9 @@ namespace BOB
                 handler.ClearPreview();
             }
 
+            // Update prefabs.
+            NetData.Update();
+
             // Reset apply button icon
             UnappliedChanges = false;
         }
@@ -322,17 +328,28 @@ namespace BOB
                 RevertPreview();
 
                 // Make sure we have valid a target and replacement.
-                if (SelectedTargetItem is NetTargetListItem netTargetListItem && SelectedReplacementPrefab != null)
+                if (SelectedTargetItem is TargetNetItem targetNetItem && SelectedReplacementPrefab != null)
                 {
                     // Check for added prop - instead of replacing, we update the original added prop reference.
-                    if (SelectedTargetItem.isAdded)
+                    if (targetNetItem.IsAdded)
                     {
-                        AddedNetworkProps.Instance.Update(SelectedNet, netTargetListItem.originalPrefab, SelectedReplacementPrefab, netTargetListItem.lane, netTargetListItem.index, m_rotationSlider.TrueValue, m_xSlider.TrueValue, m_ySlider.TrueValue, m_zSlider.TrueValue, (int)m_probabilitySlider.TrueValue, _repeatSlider.TrueValue);
+                        AddedNetworkProps.Instance.Update(
+                            SelectedNet,
+                            targetNetItem.OriginalPrefab,
+                            SelectedReplacementPrefab,
+                            targetNetItem.LaneIndex,
+                            targetNetItem.PropIndex,
+                            m_rotationSlider.TrueValue,
+                            m_xSlider.TrueValue,
+                            m_ySlider.TrueValue,
+                            m_zSlider.TrueValue,
+                            (int)m_probabilitySlider.TrueValue,
+                            _repeatSlider.TrueValue);
 
-                        // Update current target.
-                        netTargetListItem.originalPrefab = SelectedReplacementPrefab;
-                        netTargetListItem.originalProb = (int)m_probabilitySlider.TrueValue;
-                        netTargetListItem.originalRepeat = _repeatSlider.TrueValue;
+                        // Update target record to the new state.
+                        targetNetItem.OriginalPrefab = SelectedReplacementPrefab;
+                        targetNetItem.OriginalProbability = (int)m_probabilitySlider.TrueValue;
+                        targetNetItem.OriginalRepeat = _repeatSlider.TrueValue;
                     }
                     else
                     {
@@ -340,17 +357,53 @@ namespace BOB
                         switch (CurrentMode)
                         {
                             case ReplacementModes.Individual:
-                                IndividualNetworkReplacement.Instance.Replace(SelectedNet, netTargetListItem.originalPrefab ?? netTargetListItem.replacementPrefab, SelectedReplacementPrefab, IndividualLane, IndividualIndex, m_rotationSlider.TrueValue, m_xSlider.TrueValue, m_ySlider.TrueValue, m_zSlider.TrueValue, (int)m_probabilitySlider.TrueValue, _repeatSlider.TrueValue, netTargetListItem.IndividualReplacement);
+                                IndividualNetworkReplacement.Instance.Replace(
+                                    SelectedNet,
+                                    targetNetItem.OriginalPrefab,
+                                    SelectedReplacementPrefab,
+                                    IndividualLane,
+                                    IndividualIndex,
+                                    m_rotationSlider.TrueValue,
+                                    m_xSlider.TrueValue,
+                                    m_ySlider.TrueValue,
+                                    m_zSlider.TrueValue,
+                                    (int)m_probabilitySlider.TrueValue,
+                                    _repeatSlider.TrueValue,
+                                    targetNetItem.IndividualReplacement);
                                 break;
 
                             case ReplacementModes.Grouped:
                                 // Grouped replacement.
-                                GroupedNetworkReplacement.Instance.Replace(SelectedNet, netTargetListItem.originalPrefab ?? netTargetListItem.replacementPrefab, SelectedReplacementPrefab, -1, -1, m_rotationSlider.TrueValue, m_xSlider.TrueValue, m_ySlider.TrueValue, m_zSlider.TrueValue, (int)m_probabilitySlider.TrueValue, -1, netTargetListItem.GroupedReplacement);
+                                GroupedNetworkReplacement.Instance.Replace(
+                                    SelectedNet,
+                                    targetNetItem.OriginalPrefab,
+                                    SelectedReplacementPrefab,
+                                    -1,
+                                    -1,
+                                    m_rotationSlider.TrueValue,
+                                    m_xSlider.TrueValue,
+                                    m_ySlider.TrueValue,
+                                    m_zSlider.TrueValue,
+                                    (int)m_probabilitySlider.TrueValue,
+                                    -1,
+                                    targetNetItem.GroupedReplacement);
                                 break;
 
                             case ReplacementModes.All:
                                 // All- replacement.
-                                AllNetworkReplacement.Instance.Replace(null, netTargetListItem.originalPrefab ?? netTargetListItem.replacementPrefab, SelectedReplacementPrefab, -1, -1, m_rotationSlider.TrueValue, m_xSlider.TrueValue, m_ySlider.TrueValue, m_zSlider.TrueValue, (int)m_probabilitySlider.TrueValue, -1, netTargetListItem.AllReplacement);
+                                AllNetworkReplacement.Instance.Replace(
+                                    null,
+                                    targetNetItem.OriginalPrefab,
+                                    SelectedReplacementPrefab,
+                                    -1,
+                                    -1,
+                                    m_rotationSlider.TrueValue,
+                                    m_xSlider.TrueValue,
+                                    m_ySlider.TrueValue,
+                                    m_zSlider.TrueValue,
+                                    (int)m_probabilitySlider.TrueValue,
+                                    -1,
+                                    targetNetItem.AllReplacement);
                                 break;
 
                             default:
@@ -402,26 +455,26 @@ namespace BOB
             try
             {
                 // Make sure we've got a valid selection.
-                if (SelectedTargetItem is NetTargetListItem netTargetListItem)
+                if (SelectedTargetItem is TargetNetItem targetNetItem)
                 {
                     // Individual prop reversion?
-                    if (netTargetListItem.IndividualReplacement != null)
+                    if (targetNetItem.IndividualReplacement != null)
                     {
                         // Individual reversion.
-                        IndividualNetworkReplacement.Instance.RemoveReplacement(netTargetListItem.IndividualReplacement);
+                        IndividualNetworkReplacement.Instance.RemoveReplacement(targetNetItem.IndividualReplacement);
                     }
-                    else if (netTargetListItem.GroupedReplacement != null)
+                    else if (targetNetItem.GroupedReplacement != null)
                     {
                         // Grouped reversion.
-                        GroupedNetworkReplacement.Instance.RemoveReplacement(netTargetListItem.GroupedReplacement);
+                        GroupedNetworkReplacement.Instance.RemoveReplacement(targetNetItem.GroupedReplacement);
                     }
-                    else if (netTargetListItem.AllReplacement != null)
+                    else if (targetNetItem.AllReplacement != null)
                     {
                         // All-network reversion - make sure we've got a currently active replacement before doing anything.
-                        if (netTargetListItem.originalPrefab)
+                        if (targetNetItem.OriginalPrefab)
                         {
                             // All-network reversion.
-                            AllNetworkReplacement.Instance.RemoveReplacement(netTargetListItem.AllReplacement);
+                            AllNetworkReplacement.Instance.RemoveReplacement(targetNetItem.AllReplacement);
                         }
                     }
 
@@ -448,27 +501,27 @@ namespace BOB
         /// <param name="targetListItem">Target item.</param>
         protected override void UpdateTargetItem(TargetListItem targetListItem)
         {
-            if (targetListItem is NetTargetListItem netItem)
+            if (targetListItem is TargetNetItem targetNetItem)
             {
                 // Determine index to test - if no individual index, just grab first one from list.
-                int propIndex = netItem.index;
+                int propIndex = targetNetItem.LaneIndex;
                 if (propIndex < 0)
                 {
-                    propIndex = netItem.indexes[0];
+                    propIndex = targetNetItem.LaneIndexes[0];
                 }
 
                 // Determine lane to test - if no individual lane, just grab first one from list.
-                int lane = netItem.lane;
+                int lane = targetNetItem.LaneIndex;
                 if (lane < 0)
                 {
-                    lane = netItem.lanes[0];
+                    lane = targetNetItem.LaneIndexes[0];
                 }
 
                 // Is this an added prop?
                 if (AddedNetworkProps.Instance.IsAdded(SelectedNet, lane, propIndex))
                 {
-                    targetListItem.index = propIndex;
-                    targetListItem.isAdded = true;
+                    targetNetItem.PropIndex = propIndex;
+                    targetNetItem.IsAdded = true;
                 }
                 else
                 {
@@ -476,9 +529,9 @@ namespace BOB
                     LanePropHandler handler = NetHandlers.GetHandler(SelectedNet.m_lanes[lane], propIndex);
                     if (handler != null)
                     {
-                        netItem.IndividualReplacement = handler.GetReplacement(ReplacementPriority.IndividualReplacement);
-                        netItem.GroupedReplacement = handler.GetReplacement(ReplacementPriority.GroupedReplacement);
-                        netItem.AllReplacement = handler.GetReplacement(ReplacementPriority.AllReplacement);
+                        targetNetItem.IndividualReplacement = handler.GetReplacement(ReplacementPriority.IndividualReplacement);
+                        targetNetItem.GroupedReplacement = handler.GetReplacement(ReplacementPriority.GroupedReplacement);
+                        targetNetItem.AllReplacement = handler.GetReplacement(ReplacementPriority.AllReplacement);
                     }
                 }
             }
@@ -490,7 +543,7 @@ namespace BOB
         protected override void RegenerateTargetList()
         {
             // Clear current selection.
-            m_targetList.selectedIndex = -1;
+            m_targetList.SelectedIndex = -1;
 
             // List of prefabs that have passed filtering.
             List<TargetListItem> itemList = new List<TargetListItem>();
@@ -500,7 +553,7 @@ namespace BOB
             {
                 // No lanes - show 'no props' label and return an empty list.
                 m_noPropsLabel.Show();
-                m_targetList.rowsData = new FastList<object>();
+                m_targetList.Data = new FastList<object>();
 
                 // Force clearance of current target item.
                 SelectedTargetItem = null;
@@ -536,7 +589,7 @@ namespace BOB
                 for (int propIndex = 0; propIndex < laneProps.Length; ++propIndex)
                 {
                     // Create new list item.
-                    NetTargetListItem targetListItem = new NetTargetListItem();
+                    TargetNetItem targetNetItem = new TargetNetItem();
 
                     // Try to get relevant prefab (prop/tree), falling back to the other type if null (to allow for tree-prop changes), using finalProp.
                     PrefabInfo originalInfo = null;
@@ -555,18 +608,17 @@ namespace BOB
                         continue;
                     }
 
-                    // Get original (pre-replacement) tree/prop prefab and current probability (as default original probability).
-                    targetListItem.originalPrefab = originalInfo;
-                    targetListItem.originalProb = laneProps[propIndex].m_probability;
-                    targetListItem.originalAngle = laneProps[propIndex].m_angle;
-                    targetListItem.originalRepeat = laneProps[propIndex].m_repeatDistance;
+                    // Get current tree/prop prefab and probability, as default original values.
+                    targetNetItem.OriginalPrefab = originalInfo;
+                    targetNetItem.OriginalProbability = laneProps[propIndex].m_probability;
+                    targetNetItem.OriginalRepeat = laneProps[propIndex].m_repeatDistance;
 
                     // Is this an added prop?
                     if (AddedNetworkProps.Instance.IsAdded(lanes[lane], propIndex))
                     {
-                        targetListItem.index = propIndex;
-                        targetListItem.lane = lane;
-                        targetListItem.isAdded = true;
+                        targetNetItem.PropIndex = propIndex;
+                        targetNetItem.LaneIndex = lane;
+                        targetNetItem.IsAdded = true;
                     }
                     else
                     {
@@ -584,66 +636,69 @@ namespace BOB
                             }
 
                             // Record active replacements.
-                            targetListItem.IndividualReplacement = handler.GetReplacement(ReplacementPriority.IndividualReplacement);
-                            targetListItem.GroupedReplacement = handler.GetReplacement(ReplacementPriority.GroupedReplacement);
-                            targetListItem.AllReplacement = handler.GetReplacement(ReplacementPriority.AllReplacement);
-                            targetListItem.PackReplacement = handler.GetReplacement(ReplacementPriority.PackReplacement);
+                            targetNetItem.IndividualReplacement = handler.GetReplacement(ReplacementPriority.IndividualReplacement);
+                            targetNetItem.GroupedReplacement = handler.GetReplacement(ReplacementPriority.GroupedReplacement);
+                            targetNetItem.AllReplacement = handler.GetReplacement(ReplacementPriority.AllReplacement);
+                            targetNetItem.PackReplacement = handler.GetReplacement(ReplacementPriority.PackReplacement);
+
+                            // Record current values as replacement values.
+                            targetNetItem.ReplacementPrefab = targetNetItem.OriginalPrefab;
+                            targetNetItem.ReplacementProbability = targetNetItem.OriginalProbability;
 
                             // Update original values from the reference.
-                            targetListItem.originalPrefab = handler.OriginalPrefab;
-                            targetListItem.originalAngle = handler.OriginalAngle;
-                            targetListItem.originalProb = handler.OriginalProbability;
-                            targetListItem.originalRepeat = handler.OriginalRepeatDistance;
+                            targetNetItem.OriginalPrefab = handler.OriginalPrefab;
+                            targetNetItem.OriginalProbability = handler.OriginalProbability;
+                            targetNetItem.OriginalRepeat = handler.OriginalRepeatDistance;
                         }
 
                         // Grouped or individual?
                         if (CurrentMode == (int)ReplacementModes.Individual)
                         {
                             // Individual - set index to the current prop indexes.
-                            targetListItem.index = propIndex;
-                            targetListItem.lane = lane;
+                            targetNetItem.PropIndex = propIndex;
+                            targetNetItem.LaneIndex = lane;
                         }
                         else
                         {
                             // Grouped - set index to -1 and add to our list of indexes.
-                            targetListItem.index = -1;
-                            targetListItem.lane = -1;
-                            targetListItem.indexes.Add(propIndex);
-                            targetListItem.lanes.Add(lane);
+                            targetNetItem.PropIndex = -1;
+                            targetNetItem.LaneIndex = -1;
+                            targetNetItem.PropIndexes.Add(propIndex);
+                            targetNetItem.LaneIndexes.Add(lane);
                         }
                     }
 
                     // Check for match with 'prop' mode - either original or replacement needs to be prop.
-                    if (PropTreeMode == PropTreeModes.Prop && !(originalInfo is PropInfo) && !(targetListItem.originalPrefab is PropInfo))
+                    if (PropTreeMode == PropTreeModes.Prop && !(originalInfo is PropInfo) && !(targetNetItem.OriginalPrefab is PropInfo))
                     {
                         continue;
                     }
 
                     // Check for match with 'tree' mode - either original or replacement needs to be tree.
-                    if (PropTreeMode == PropTreeModes.Tree && !(originalInfo is TreeInfo) && !(targetListItem.originalPrefab is TreeInfo))
+                    if (PropTreeMode == PropTreeModes.Tree && !(originalInfo is TreeInfo) && !(targetNetItem.OriginalPrefab is TreeInfo))
                     {
                         continue;
                     }
 
                     // Are we grouping?
-                    if (targetListItem.index == -1)
+                    if (targetNetItem.PropIndex == -1)
                     {
                         // Yes, grouping - initialise a flag to show if we've matched.
                         bool matched = false;
 
                         // Iterate through each item in our existing list of props.
-                        foreach (NetTargetListItem item in itemList)
+                        foreach (TargetNetItem item in itemList)
                         {
                             // Check to see if we already have this in the list - matching original prefab, individual replacement prefab, network replacement prefab, all-network replacement prefab, and probability.
-                            if (item.originalPrefab == targetListItem.originalPrefab
-                                && item.IndividualReplacement == targetListItem.IndividualReplacement
-                                && item.GroupedReplacement == targetListItem.GroupedReplacement
-                                && item.AllReplacement == targetListItem.AllReplacement
-                                && item.originalProb == targetListItem.originalProb)
+                            if (item.OriginalPrefab == targetNetItem.OriginalPrefab
+                                && item.IndividualReplacement == targetNetItem.IndividualReplacement
+                                && item.GroupedReplacement == targetNetItem.GroupedReplacement
+                                && item.AllReplacement == targetNetItem.AllReplacement
+                                && item.OriginalProbability == targetNetItem.OriginalProbability)
                             {
                                 // We've already got an identical grouped instance of this item - add this index and lane to the lists of indexes and lanes under that item and set the flag to indicate that we've done so.
-                                item.indexes.Add(propIndex);
-                                item.lanes.Add(lane);
+                                item.PropIndexes.Add(propIndex);
+                                item.LaneIndexes.Add(lane);
                                 matched = true;
 
                                 // No point going any further through the list, since we've already found our match.
@@ -660,12 +715,12 @@ namespace BOB
                     }
 
                     // Add this item to our list.
-                    itemList.Add(targetListItem);
+                    itemList.Add(targetNetItem);
                 }
             }
 
             // Create return fastlist from our filtered list, ordering by name.
-            m_targetList.rowsData = new FastList<object>()
+            m_targetList.Data = new FastList<object>()
             {
                 m_buffer = m_targetSortSetting == (int)OrderBy.NameDescending ? itemList.OrderByDescending(item => item.DisplayName).ToArray() : itemList.OrderBy(item => item.DisplayName).ToArray(),
                 m_size = itemList.Count,
@@ -734,9 +789,9 @@ namespace BOB
         protected override void RemoveProp()
         {
             // Safety first - need an individual index that's an added prop.
-            if (SelectedTargetItem is NetTargetListItem netTargetListItem)
+            if (SelectedTargetItem is TargetNetItem targetNetItem)
             {
-                if (netTargetListItem.index < 0 || netTargetListItem.lane < 0 || !AddedNetworkProps.Instance.IsAdded(SelectedNet, netTargetListItem.lane, SelectedTargetItem.index))
+                if (targetNetItem.PropIndex < 0 || targetNetItem.LaneIndex < 0 || !AddedNetworkProps.Instance.IsAdded(SelectedNet, targetNetItem.LaneIndex, targetNetItem.PropIndex))
                 {
                     return;
                 }
@@ -746,7 +801,7 @@ namespace BOB
 
                 // Create new props array with one fewer entry, and copy the old props to it.
                 // Remove prop reference and update other references as appropriate.
-                AddedNetworkProps.Instance.RemoveNew(SelectedNet, netTargetListItem.lane, netTargetListItem.index);
+                AddedNetworkProps.Instance.RemoveNew(SelectedNet, targetNetItem.LaneIndex, targetNetItem.PropIndex);
 
                 // Post-action cleanup.
                 UpdateAddedPops();
@@ -761,10 +816,10 @@ namespace BOB
             // Clear existing list.
             _originalValues.Clear();
 
-            if (SelectedTargetItem is NetTargetListItem netTargetListItem)
+            if (SelectedTargetItem is TargetNetItem targetNetItem)
             {
                 // Don't do anything if no valid selection.
-                if (netTargetListItem.originalPrefab == null || SelectedNet == null)
+                if (targetNetItem.OriginalPrefab == null || SelectedNet == null)
                 {
                     return;
                 }
@@ -786,7 +841,7 @@ namespace BOB
                                 {
                                     for (int k = 0; k < laneProps.Length; ++k)
                                     {
-                                        if (laneProps[k].m_prop == SelectedTargetItem.CurrentPrefab | laneProps[k].m_tree == netTargetListItem.CurrentPrefab)
+                                        if (laneProps[k].m_prop == targetNetItem.ReplacementPrefab || laneProps[k].m_tree == targetNetItem.ReplacementPrefab)
                                         {
                                             _originalValues.Add(GetOriginalData(prefab, j, k));
                                         }
@@ -796,18 +851,18 @@ namespace BOB
                         }
                     }
                 }
-                else if (netTargetListItem.index < 0)
+                else if (targetNetItem.PropIndex < 0)
                 {
                     // Grouped replacement - iterate through each instance and record values.
-                    for (int i = 0; i < netTargetListItem.indexes.Count; ++i)
+                    for (int i = 0; i < targetNetItem.PropIndexes.Count; ++i)
                     {
-                        _originalValues.Add(GetOriginalData(SelectedNet, netTargetListItem.lanes[i], netTargetListItem.indexes[i]));
+                        _originalValues.Add(GetOriginalData(SelectedNet, targetNetItem.LaneIndexes[i], targetNetItem.PropIndexes[i]));
                     }
                 }
                 else
                 {
                     // Individual replacement - record original values.
-                    _originalValues.Add(GetOriginalData(SelectedNet, netTargetListItem.lane, netTargetListItem.index));
+                    _originalValues.Add(GetOriginalData(SelectedNet, targetNetItem.LaneIndex, targetNetItem.PropIndex));
                 }
             }
         }
@@ -837,10 +892,10 @@ namespace BOB
             // Disable events.
             m_ignoreSliderValueChange = true;
 
-            if (SelectedTargetItem is NetTargetListItem netTargetListItem)
+            if (SelectedTargetItem is TargetNetItem targetNetItem)
             {
                 // Are we eligible for repeat distance (eligibile target and in individual mode).
-                if (CurrentMode == ReplacementModes.Individual && netTargetListItem != null && (netTargetListItem.originalRepeat > 1f || netTargetListItem.isAdded))
+                if (CurrentMode == ReplacementModes.Individual && targetNetItem != null && (targetNetItem.OriginalRepeat > 1f || targetNetItem.IsAdded))
                 {
                     // Yes - do we have a replacement?
                     if (replacement is BOBConfig.NetReplacement netReplacement && netReplacement.RepeatDistance > 1f)
@@ -851,7 +906,7 @@ namespace BOB
                     else
                     {
                         // No replacement; show original value.
-                        _repeatSlider.TrueValue = netTargetListItem.originalRepeat;
+                        _repeatSlider.TrueValue = targetNetItem.OriginalRepeat;
                     }
 
                     // Show slider.

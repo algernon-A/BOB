@@ -37,7 +37,7 @@ namespace BOB
         // Layout constants - Y.
         private const float ToolY = TitleHeight + Margin;
         private const float ListY = ToolY + ToolbarHeight + Margin;
-        private const float ListHeight = UIPropRow.RowHeight * 16f;
+        private const float ListHeight = UIListRow.DefaultRowHeight * 16f;
         private const float LeftListY = ListY + 64f;
         private const float LeftListHeight = ListHeight - 64f;
         private const float RandomButtonY = LeftListY - ToggleSize - Margin;
@@ -48,9 +48,9 @@ namespace BOB
         private static BOBRandomPanel s_panel;
 
         // Panel components.
-        private readonly UIFastList _randomList;
-        private readonly UIFastList _variationsList;
-        private readonly UIFastList _loadedList;
+        private readonly UIList _randomList;
+        private readonly UIList _variationsList;
+        private readonly UIList _loadedList;
         private readonly UIButton _removeRandomButton;
         private readonly UIButton _renameButton;
         private readonly UITextField _nameField;
@@ -84,24 +84,24 @@ namespace BOB
             randomizerPanel.width = RandomizerWidth;
             randomizerPanel.height = LeftListHeight;
             randomizerPanel.relativePosition = new Vector2(RandomizerX, LeftListY);
-            _randomList = UIFastList.Create<UIRandomRefabRow>(randomizerPanel);
-            ListSetup(_randomList);
+            _randomList = UIList.AddUIList<LoadedPrefabItem.DisplayRow>(randomizerPanel, 0f, 0f, RandomizerWidth, LeftListHeight);
+            _randomList.EventSelectionChanged += (c, data) => SelectedRandomPrefab = data as BOBRandomPrefab;
 
             // Variation selection list.
             UIPanel selectedPanel = AddUIComponent<UIPanel>();
             selectedPanel.width = SelectedWidth;
             selectedPanel.height = ListHeight;
             selectedPanel.relativePosition = new Vector2(SelectedX, ListY);
-            _variationsList = UIFastList.Create<UIRandomComponentRow>(selectedPanel);
-            ListSetup(_variationsList);
+            _variationsList = UIList.AddUIList<RandomComponentRow>(selectedPanel, 0f, 0f, SelectedWidth, ListHeight);
+            _randomList.EventSelectionChanged += (c, data) => SelectedVariation = data as BOBRandomPrefab.Variation;
 
             // Loaded prop list.
             UIPanel loadedPanel = AddUIComponent<UIPanel>();
             loadedPanel.width = LoadedWidth;
             loadedPanel.height = ListHeight;
             loadedPanel.relativePosition = new Vector2(LoadedX, ListY);
-            _loadedList = UIFastList.Create<UILoadedRandomPropRow>(loadedPanel);
-            ListSetup(_loadedList);
+            _loadedList = UIList.AddUIList<LoadedPrefabItem.DisplayRow>(loadedPanel, 0f, 0f, LoadedWidth, ListHeight);
+            _randomList.EventSelectionChanged += (c, data) => SelectedLoadedPrefab = (data as LoadedPrefabItem)?.Prefab;
 
             // Name change textfield.
             _nameField = UITextFields.AddTextField(this, Margin, NameFieldY, RandomizerWidth);
@@ -220,7 +220,7 @@ namespace BOB
 
                 // Reset variation lists.
                 _selectedVariation = null;
-                _variationsList.selectedIndex = -1;
+                _variationsList.SelectedIndex = -1;
 
                 // Regenerate variation UI fastlist.
                 VariationsList();
@@ -318,23 +318,20 @@ namespace BOB
         protected override void RegenerateReplacementList()
         {
             // List of prefabs that have passed filtering.
-            List<PrefabInfo> list = new List<PrefabInfo>();
+            List<LoadedPrefabItem> list = new List<LoadedPrefabItem>();
 
             bool nameFilterActive = !SearchText.IsNullOrWhiteSpace();
 
             if (IsTree)
             {
                 // Tree - iterate through each prop in our list of loaded prefabs.
-                foreach (TreeInfo loadedTree in PrefabLists.LoadedTrees)
+                foreach (LoadedPrefabItem loadedTree in PrefabLists.LoadedTreeItems)
                 {
-                    // Set display name.
-                    string displayName = PrefabLists.GetDisplayName(loadedTree);
-
                     // Apply vanilla filtering if selected.
-                    if (!m_hideVanilla.isChecked || !displayName.StartsWith("[v]"))
+                    if (!m_hideVanilla.isChecked | !loadedTree.IsVanilla)
                     {
                         // Apply name filter.
-                        if (!nameFilterActive || displayName.ToLower().Contains(SearchText.Trim().ToLower()))
+                        if (!nameFilterActive || loadedTree.DisplayName.ToLower().Contains(SearchText.Trim().ToLower()))
                         {
                             // Filtering passed - add this prefab to our list.
                             list.Add(loadedTree);
@@ -345,22 +342,19 @@ namespace BOB
             else
             {
                 // Prop - iterate through each prop in our list of loaded prefabs.
-                foreach (PropInfo loadedProp in PrefabLists.LoadedProps)
+                foreach (LoadedPrefabItem loadedProp in PrefabLists.LoadedPropItems)
                 {
                     // Skip any props that require height or water maps.
-                    if (loadedProp.m_requireHeightMap || loadedProp.m_requireWaterMap)
+                    if (loadedProp.Prop.m_requireHeightMap | !loadedProp.IsVanilla)
                     {
                         continue;
                     }
 
-                    // Set display name.
-                    string displayName = PrefabLists.GetDisplayName(loadedProp);
-
                     // Apply vanilla filtering if selected.
-                    if (!m_hideVanilla.isChecked || !displayName.StartsWith("[v]"))
+                    if (!m_hideVanilla.isChecked | !loadedProp.IsVanilla)
                     {
                         // Apply name filter.
-                        if (!nameFilterActive || displayName.ToLower().Contains(SearchText.Trim().ToLower()))
+                        if (!nameFilterActive || loadedProp.DisplayName.ToLower().Contains(SearchText.Trim().ToLower()))
                         {
                             // Filtering passed - add this prefab to our list.
                             list.Add(loadedProp);
@@ -377,7 +371,7 @@ namespace BOB
             }
 
             // Create return fastlist from our filtered list.
-            _loadedList.rowsData = new FastList<object>
+            _loadedList.Data = new FastList<object>
             {
                 m_buffer = list.ToArray(),
                 m_size = list.Count,
@@ -490,7 +484,7 @@ namespace BOB
         private void RemoveRandomPrefab(UIComponent c, UIMouseEventParameter p)
         {
             // Safety checks.
-            if (_randomList.selectedIndex < 0 || _selectedRandomPrefab == null)
+            if (_randomList.SelectedIndex < 0 || _selectedRandomPrefab == null)
             {
                 return;
             }
@@ -507,7 +501,7 @@ namespace BOB
 
             // Reset selection and regenerate UI fastlist.
             SelectedRandomPrefab = null;
-            _randomList.selectedIndex = -1;
+            _randomList.SelectedIndex = -1;
             RegenerateRandomList();
         }
 
@@ -519,7 +513,7 @@ namespace BOB
         private void RenameRandomPrefab(UIComponent c, UIMouseEventParameter p)
         {
             // Safety checks.
-            if (_randomList.selectedIndex < 0 || _selectedRandomPrefab == null || _nameField.text.IsNullOrWhiteSpace())
+            if (_randomList.SelectedIndex < 0 || _selectedRandomPrefab == null || _nameField.text.IsNullOrWhiteSpace())
             {
                 return;
             }
@@ -758,14 +752,11 @@ namespace BOB
         /// </summary>
         private void RegenerateRandomList()
         {
-            // Remove selection.
-            _randomList.selectedIndex = -1;
-
             // Trees or props?
             if (IsTree)
             {
                 // Trees.
-                _randomList.rowsData = new FastList<object>
+                _randomList.Data = new FastList<object>
                 {
                     m_buffer = PrefabLists.RandomTrees.OrderBy(x => x.Name.ToLower()).ToArray(),
                     m_size = PrefabLists.RandomTrees.Count,
@@ -774,7 +765,7 @@ namespace BOB
             else
             {
                 // Props.
-                _randomList.rowsData = new FastList<object>
+                _randomList.Data = new FastList<object>
                 {
                     m_buffer = PrefabLists.RandomProps.OrderBy(x => x.Name.ToLower()).ToArray(),
                     m_size = PrefabLists.RandomProps.Count,
@@ -787,11 +778,8 @@ namespace BOB
         /// </summary>
         private void VariationsList()
         {
-            // Remove selection.
-            _variationsList.selectedIndex = -1;
-
             // Create return fastlist from our filtered list.
-            _variationsList.rowsData = new FastList<object>
+            _variationsList.Data = new FastList<object>
             {
                 m_buffer = _selectedRandomPrefab?.Variations?.OrderBy(x => PrefabLists.GetDisplayName(x.Name).ToLower()).ToArray(),
                 m_size = _selectedRandomPrefab?.Variations?.Count ?? 0,

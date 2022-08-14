@@ -55,7 +55,6 @@ namespace BOB
                     if (localBuilder.LocalIndex == 17)
                     {
                         // Yes - insert call to RenderOverlays.HighlightBuildingProp(i, prop, ref building)
-                        Logging.KeyMessage("adding building HighlightBuildingProp call after stloc.s 17");
                         yield return new CodeInstruction(OpCodes.Ldarg_1);
                         yield return new CodeInstruction(OpCodes.Ldloc_S, IVarIndex);
                         yield return new CodeInstruction(OpCodes.Ldloc_S, BuildingInfoPropIndex);
@@ -121,7 +120,7 @@ namespace BOB
             IEnumerator<CodeInstruction> instructionsEnumerator = instructions.GetEnumerator();
             CodeInstruction instruction;
             bool foundPropCandidate = false, foundTreeCandidate = false;
-            string candidateName, methodName;
+            string methodName;
             int prefabIndex, positionIndex;
 
             // Iterate through all instructions in original method.
@@ -165,7 +164,6 @@ namespace BOB
                             if (foundPropCandidate)
                             {
                                 // Prop.
-                                candidateName = "Prop";
                                 prefabIndex = PropVarIndex;
                                 positionIndex = PropPositionVarIndex;
                                 methodName = nameof(RenderOverlays.HighlightNetworkProp);
@@ -173,14 +171,12 @@ namespace BOB
                             else
                             {
                                 // Tree.
-                                candidateName = "Tree";
                                 prefabIndex = TreeVarIndex;
                                 positionIndex = TreePositionVarIndex;
                                 methodName = nameof(RenderOverlays.HighlightNetworkTree);
                             }
 
                             // Insert call to PropOverlays.Highlight method after original call.
-                            Logging.KeyMessage("adding network Highlight", candidateName, " call after RenderInstance");
                             yield return new CodeInstruction(OpCodes.Ldloc_S, prefabIndex);
                             yield return new CodeInstruction(OpCodes.Ldloc_S, positionIndex);
                             yield return new CodeInstruction(OpCodes.Ldarg_2); // segment ID
@@ -234,7 +230,6 @@ namespace BOB
                         if (instruction.opcode == OpCodes.Call && instruction.operand.ToString().StartsWith("Void RenderInstance"))
                         {
                             // Yes - insert call to PropOverlays.Highlight method after original call.
-                            Logging.KeyMessage("adding tree Highlight call after RenderInstance");
                             yield return new CodeInstruction(OpCodes.Ldloc_S, TreeVarIndex);
                             yield return new CodeInstruction(OpCodes.Ldloc_S, TreePositionVarIndex);
                             yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(RenderOverlays), nameof(RenderOverlays.HighlightTree)));
@@ -270,7 +265,6 @@ namespace BOB
                 if (instruction.opcode == OpCodes.Call && instruction.operand.ToString().StartsWith("Void RenderInstance"))
                 {
                     // Yes - insert call to PropOverlays.Highlight method after original call.
-                    Logging.KeyMessage("adding prop Highlight call after RenderInstance");
                     yield return new CodeInstruction(OpCodes.Ldloc_S, PropVarIndex);
                     yield return new CodeInstruction(OpCodes.Ldloc_S, PropPositionVarIndex);
                     yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(RenderOverlays), nameof(RenderOverlays.HighlightProp)));

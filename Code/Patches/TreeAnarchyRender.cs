@@ -1,5 +1,10 @@
-﻿#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-namespace BOB
+﻿// <copyright file="TreeAnarchyRender.cs" company="algernon (K. Algernon A. Sheppard)">
+// Copyright (c) Quistar. All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// </copyright>
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+namespace BOB.EML
 {
     using System;
     using System.Reflection;

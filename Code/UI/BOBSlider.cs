@@ -31,6 +31,7 @@ namespace BOB
         /// Gets or sets a value indicating whether this is an integer slider (true) or floating-point slider (false).
         /// </summary>
         public bool IsInt { get; set; } = false;
+
         /// <summary>
         /// Gets or sets a value indicating whether the slider range should be limited to the visisble slider range (default false).
         /// </summary>
@@ -118,7 +119,7 @@ namespace BOB
 
         /// <summary>
         /// Gets the current step multiplier based on modifier key states.
-        /// For float 0.1/0.01 for none/Ctrl, for Int just 1
+        /// For float 0.1/0.01 for none/Ctrl, for Int just 1.
         /// </summary>
         private float Multiplier
         {

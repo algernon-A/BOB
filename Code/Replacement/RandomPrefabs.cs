@@ -30,14 +30,14 @@ namespace BOB
         /// </summary>
         /// <param name="propName">Prop name to check.</param>
         /// <returns>True if name is already in use, false otherwise.</returns>
-        internal static bool DuplicatePropName(string propName) => RandomProps.Find(x => x.Name.Equals(propName)) != null || Array.Find(PrefabLists.LoadedProps, x => x.name.Equals(propName)) != null;
+        internal static bool DuplicatePropName(string propName) => RandomProps.Find(x => x.Name.Equals(propName)) != null || Array.Find(PrefabLists.LoadedPropItems, x => x.Prefab.name.Equals(propName)) != null;
 
         /// <summary>
         /// Checks to see if the given tree name is already in use.
         /// </summary>
         /// <param name="treeName">Tree name to check.</param>
         /// <returns>True if name is already in use, false otherwise.</returns>
-        internal static bool DuplicateTreeName(string treeName) => RandomTrees.Find(x => x.Name.Equals(treeName)) != null || Array.Find(PrefabLists.LoadedTrees, x => x.name.Equals(treeName)) != null;
+        internal static bool DuplicateTreeName(string treeName) => RandomTrees.Find(x => x.Name.Equals(treeName)) != null || Array.Find(PrefabLists.LoadedTreeItems, x => x.Prefab.name.Equals(treeName)) != null;
 
         /// <summary>
         /// Creates a new random prop prefab.

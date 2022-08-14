@@ -25,7 +25,7 @@ namespace BOB
         // Panel components.
         private readonly UICheckBox _customHeightCheck;
         private UIPanel _subBuildingPanel;
-        private UIFastList _subBuildingList;
+        private UIList _subBuildingList;
 
         // Sub-buildings.
         private BuildingInfo _selectedSubBuilding;
@@ -68,16 +68,19 @@ namespace BOB
         {
             set
             {
-                if (value is BuildingTargetListItem buildingTargetListItem)
+                // First, undo any preview.
+                RevertPreview();
+
+                // Call base, while ignoring replacement prefab change live application.
+                m_ignoreSelectedPrefabChange = true;
+                base.SelectedTargetItem = value;
+                m_ignoreSelectedPrefabChange = false;
+
+                // Clear original data and record new references.
+                RecordOriginal();
+
+                if (value is TargetBuildingItem targetBuildingItem)
                 {
-                    // First, undo any preview.
-                    RevertPreview();
-
-                    // Call base, while ignoring replacement prefab change live application.
-                    m_ignoreSelectedPrefabChange = true;
-                    base.SelectedTargetItem = value;
-                    m_ignoreSelectedPrefabChange = false;
-
                     // Ensure valid selection before proceeding.
                     if (_selectedSubBuilding != null)
                     {
@@ -85,39 +88,22 @@ namespace BOB
                         _customHeightCheck.isChecked = _selectedSubBuilding.m_props[IndividualIndex].m_fixedHeight;
 
                         // Is this an added prop?
-                        if (buildingTargetListItem.isAdded)
+                        if (targetBuildingItem.IsAdded)
                         {
-                            Logging.Message("setting sliders for added prop at index ", IndividualIndex);
-
-                            // Yes - set sliders directly.
-                            // Disable events.
-                            m_ignoreSliderValueChange = true;
-
-                            // Set slider values.
-                            BuildingInfo.Prop buildingProp = _selectedSubBuilding.m_props[IndividualIndex];
-                            m_rotationSlider.TrueValue = buildingProp.m_radAngle * Mathf.Rad2Deg;
-                            m_xSlider.TrueValue = buildingProp.m_position.x;
-                            m_ySlider.TrueValue = buildingProp.m_position.y;
-                            m_zSlider.TrueValue = buildingProp.m_position.z;
-                            m_probabilitySlider.TrueValue = buildingProp.m_probability;
-
-                            // Re-enable events.
-                            m_ignoreSliderValueChange = false;
-
-                            // All done here.
-                            return;
+                            // Yes - set sliders from replacement record.
+                            SetSliders(AddedBuildingProps.Instance.ReplacementRecord(_selectedSubBuilding, IndividualIndex));
                         }
                         else
                         {
                             // Set sliders according to highest active replacement (will be null if none).
-                            SetSliders(buildingTargetListItem.IndividualReplacement ?? buildingTargetListItem.GroupedReplacement ?? buildingTargetListItem.AllReplacement);
+                            SetSliders(targetBuildingItem.IndividualReplacement ?? targetBuildingItem.GroupedReplacement ?? targetBuildingItem.AllReplacement);
                             return;
                         }
                     }
-
-                    // If we got here, there's no valid current selection; set all offset fields to defaults by passing null to SetSliders().
-                    SetSliders(null);
                 }
+
+                // If we got here, there's no valid current selection; set all offset fields to defaults by passing null to SetSliders().
+                SetSliders(null);
             }
         }
 
@@ -244,11 +230,11 @@ namespace BOB
                     subBuildingListPanel.relativePosition = new Vector2(Margin, TitleHeight);
                     subBuildingListPanel.width = _subBuildingPanel.width - (Margin * 2f);
                     subBuildingListPanel.height = _subBuildingPanel.height - TitleHeight - (Margin * 2f);
-                    _subBuildingList = UIFastList.Create<UISubBuildingRow>(subBuildingListPanel);
-                    ListSetup(_subBuildingList);
+                    _subBuildingList = UIList.AddUIList<SubBuildingRow>(subBuildingListPanel, 0f, 0f, subBuildingListPanel.width, subBuildingListPanel.height);
+                    _subBuildingList.EventSelectionChanged += (c, data) => SetSubBuilding((int)data);
 
                     // Create return fastlist from our filtered list.
-                    _subBuildingList.rowsData = new FastList<object>
+                    _subBuildingList.Data = new FastList<object>
                     {
                         m_buffer = subBuildingIndexes,
                         m_size = subBuildingIndexes.Length,
@@ -293,8 +279,8 @@ namespace BOB
                 m_ySlider.value == 0f &&
                 m_zSlider.value == 0f &&
                 m_rotationSlider.value == 0f &&
-                m_probabilitySlider.value.RoundToNearest(1) == SelectedTargetItem.originalProb &&
-                SelectedReplacementPrefab == SelectedTargetItem.CurrentPrefab)
+                m_probabilitySlider.value.RoundToNearest(1) == SelectedTargetItem.OriginalProbability &&
+                SelectedReplacementPrefab == SelectedTargetItem.ActivePrefab)
             {
                 // Reset apply button icon.
                 UnappliedChanges = false;
@@ -305,7 +291,7 @@ namespace BOB
             // Generate prevew record entry.
             BOBConfig.BuildingReplacement previewReplacement = new BOBConfig.BuildingReplacement
             {
-                ReplacementInfo = SelectedReplacementPrefab ?? SelectedTargetItem.originalPrefab,
+                ReplacementInfo = SelectedReplacementPrefab ?? SelectedTargetItem.OriginalPrefab,
                 OffsetX = m_xSlider.TrueValue,
                 OffsetY = m_ySlider.TrueValue,
                 OffsetZ = m_zSlider.TrueValue,
@@ -363,16 +349,26 @@ namespace BOB
             try
             {
                 // Make sure we have valid a target and replacement.
-                if (SelectedTargetItem is BuildingTargetListItem buildingTargetListItem && SelectedReplacementPrefab != null)
+                if (SelectedTargetItem is TargetBuildingItem targetBuildingItem && SelectedReplacementPrefab != null)
                 {
                     // Check for added prop - instead of replacing, we update the original added prop reference.
-                    if (SelectedTargetItem.isAdded)
+                    if (targetBuildingItem.IsAdded)
                     {
-                        AddedBuildingProps.Instance.Update(_selectedSubBuilding, SelectedTargetItem.originalPrefab, SelectedReplacementPrefab, SelectedTargetItem.index, m_rotationSlider.TrueValue, m_xSlider.TrueValue, m_ySlider.TrueValue, m_zSlider.TrueValue, (int)m_probabilitySlider.TrueValue, _customHeightCheck.isChecked);
+                        AddedBuildingProps.Instance.Update(
+                            _selectedSubBuilding,
+                            targetBuildingItem.OriginalPrefab,
+                            SelectedReplacementPrefab,
+                            targetBuildingItem.PropIndex,
+                            m_rotationSlider.TrueValue,
+                            m_xSlider.TrueValue,
+                            m_ySlider.TrueValue,
+                            m_zSlider.TrueValue,
+                            (int)m_probabilitySlider.TrueValue,
+                            _customHeightCheck.isChecked);
 
-                        // Update current target.
-                        SelectedTargetItem.originalPrefab = SelectedReplacementPrefab;
-                        SelectedTargetItem.originalProb = (int)m_probabilitySlider.TrueValue;
+                        // Update target record to the new state.
+                        targetBuildingItem.OriginalPrefab = SelectedReplacementPrefab;
+                        targetBuildingItem.OriginalProbability = (int)m_probabilitySlider.TrueValue;
                     }
                     else
                     {
@@ -381,17 +377,50 @@ namespace BOB
                         {
                             case ReplacementModes.Individual:
                                 // Individual replacement.
-                                IndividualBuildingReplacement.Instance.Replace(_selectedSubBuilding, SelectedTargetItem.originalPrefab, SelectedReplacementPrefab, IndividualIndex, m_rotationSlider.TrueValue, m_xSlider.TrueValue, m_ySlider.TrueValue, m_zSlider.TrueValue, (int)m_probabilitySlider.TrueValue, _customHeightCheck.isChecked, buildingTargetListItem.IndividualReplacement);
+                                IndividualBuildingReplacement.Instance.Replace(
+                                    _selectedSubBuilding,
+                                    targetBuildingItem.OriginalPrefab,
+                                    SelectedReplacementPrefab,
+                                    IndividualIndex,
+                                    m_rotationSlider.TrueValue,
+                                    m_xSlider.TrueValue,
+                                    m_ySlider.TrueValue,
+                                    m_zSlider.TrueValue,
+                                    (int)m_probabilitySlider.TrueValue,
+                                    _customHeightCheck.isChecked,
+                                    targetBuildingItem.IndividualReplacement);
                                 break;
 
                             case ReplacementModes.Grouped:
                                 // Grouped replacement.
-                                GroupedBuildingReplacement.Instance.Replace(_selectedSubBuilding, SelectedTargetItem.originalPrefab, SelectedReplacementPrefab, -1, m_rotationSlider.TrueValue, m_xSlider.TrueValue, m_ySlider.TrueValue, m_zSlider.TrueValue, (int)m_probabilitySlider.TrueValue, _customHeightCheck.isChecked, buildingTargetListItem.GroupedReplacement);
+                                GroupedBuildingReplacement.Instance.Replace(
+                                    _selectedSubBuilding,
+                                    targetBuildingItem.OriginalPrefab,
+                                    SelectedReplacementPrefab,
+                                    -1,
+                                    m_rotationSlider.TrueValue,
+                                    m_xSlider.TrueValue,
+                                    m_ySlider.TrueValue,
+                                    m_zSlider.TrueValue,
+                                    (int)m_probabilitySlider.TrueValue,
+                                    _customHeightCheck.isChecked,
+                                    targetBuildingItem.GroupedReplacement);
                                 break;
 
                             case ReplacementModes.All:
                                 // All- replacement.
-                                AllBuildingReplacement.Instance.Replace(null, SelectedTargetItem.originalPrefab, SelectedReplacementPrefab, -1, m_rotationSlider.TrueValue, m_xSlider.TrueValue, m_ySlider.TrueValue, m_zSlider.TrueValue, (int)m_probabilitySlider.TrueValue, _customHeightCheck.isChecked, buildingTargetListItem.AllReplacement);
+                                AllBuildingReplacement.Instance.Replace(
+                                    null,
+                                    targetBuildingItem.OriginalPrefab,
+                                    SelectedReplacementPrefab,
+                                    -1,
+                                    m_rotationSlider.TrueValue,
+                                    m_xSlider.TrueValue,
+                                    m_ySlider.TrueValue,
+                                    m_zSlider.TrueValue,
+                                    (int)m_probabilitySlider.TrueValue,
+                                    _customHeightCheck.isChecked,
+                                    targetBuildingItem.AllReplacement);
                                 break;
 
                             default:
@@ -443,26 +472,26 @@ namespace BOB
             try
             {
                 // Make sure we've got a valid selection.
-                if (SelectedTargetItem is BuildingTargetListItem buildingTargetListItem)
+                if (SelectedTargetItem is TargetBuildingItem targetBuildingItem)
                 {
                     // Individual building prop reversion?
-                    if (buildingTargetListItem.IndividualReplacement != null)
+                    if (targetBuildingItem.IndividualReplacement != null)
                     {
                         // Individual reversion.
-                        IndividualBuildingReplacement.Instance.RemoveReplacement(buildingTargetListItem.IndividualReplacement);
+                        IndividualBuildingReplacement.Instance.RemoveReplacement(targetBuildingItem.IndividualReplacement);
                     }
-                    else if (buildingTargetListItem.GroupedReplacement != null)
+                    else if (targetBuildingItem.GroupedReplacement != null)
                     {
                         // Grouped reversion.
-                        GroupedBuildingReplacement.Instance.RemoveReplacement(buildingTargetListItem.GroupedReplacement);
+                        GroupedBuildingReplacement.Instance.RemoveReplacement(targetBuildingItem.GroupedReplacement);
                     }
-                    else if (buildingTargetListItem.AllReplacement != null)
+                    else if (targetBuildingItem.AllReplacement != null)
                     {
                         // All-building reversion - make sure we've got a currently active replacement before doing anything.
-                        if (buildingTargetListItem.originalPrefab)
+                        if (targetBuildingItem.OriginalPrefab)
                         {
                             // All-building reversion.
-                            AllBuildingReplacement.Instance.RemoveReplacement(buildingTargetListItem.AllReplacement);
+                            AllBuildingReplacement.Instance.RemoveReplacement(targetBuildingItem.AllReplacement);
                         }
                     }
 
@@ -489,20 +518,20 @@ namespace BOB
         /// <param name="targetListItem">Target item.</param>
         protected override void UpdateTargetItem(TargetListItem targetListItem)
         {
-            if (targetListItem is BuildingTargetListItem buildingItem)
+            if (targetListItem is TargetBuildingItem targetBuildingItem)
             {
                 // Determine index to test - if no individual index, just grab first one from list.
-                int propIndex = targetListItem.index;
+                int propIndex = targetListItem.PropIndex;
                 if (propIndex < 0)
                 {
-                    propIndex = targetListItem.indexes[0];
+                    propIndex = targetListItem.PropIndexes[0];
                 }
 
                 // Is this an added prop?
                 if (AddedBuildingProps.Instance.IsAdded(_selectedSubBuilding, propIndex))
                 {
-                    targetListItem.index = propIndex;
-                    targetListItem.isAdded = true;
+                    targetBuildingItem.PropIndex = propIndex;
+                    targetBuildingItem.IsAdded = true;
                 }
                 else
                 {
@@ -510,9 +539,9 @@ namespace BOB
                     BuildingPropHandler handler = BuildingHandlers.GetHandler(_selectedSubBuilding, propIndex);
                     if (handler != null)
                     {
-                        buildingItem.IndividualReplacement = handler.GetReplacement(ReplacementPriority.IndividualReplacement);
-                        buildingItem.GroupedReplacement = handler.GetReplacement(ReplacementPriority.GroupedReplacement);
-                        buildingItem.AllReplacement = handler.GetReplacement(ReplacementPriority.AllReplacement);
+                        targetBuildingItem.IndividualReplacement = handler.GetReplacement(ReplacementPriority.IndividualReplacement);
+                        targetBuildingItem.GroupedReplacement = handler.GetReplacement(ReplacementPriority.GroupedReplacement);
+                        targetBuildingItem.AllReplacement = handler.GetReplacement(ReplacementPriority.AllReplacement);
                     }
                 }
             }
@@ -524,7 +553,7 @@ namespace BOB
         protected override void RegenerateTargetList()
         {
             // Clear current selection.
-            m_targetList.selectedIndex = -1;
+            m_targetList.SelectedIndex = -1;
 
             // List of prefabs that have passed filtering.
             List<TargetListItem> itemList = new List<TargetListItem>();
@@ -534,7 +563,7 @@ namespace BOB
             {
                 // No props - show 'no props' label and return an empty list.
                 m_noPropsLabel.Show();
-                m_targetList.rowsData = new FastList<object>();
+                m_targetList.Data = new FastList<object>();
 
                 // Force clearance of current target item.
                 SelectedTargetItem = null;
@@ -546,7 +575,7 @@ namespace BOB
             for (int propIndex = 0; propIndex < _selectedSubBuilding.m_props.Length; ++propIndex)
             {
                 // Create new list item.
-                BuildingTargetListItem targetListItem = new BuildingTargetListItem();
+                TargetBuildingItem targetBuildingItem = new TargetBuildingItem();
 
                 // Try to get relevant prefab (prop/tree), falling back to the other type if null (to allow for tree-prop changes), using finalProp.
                 PrefabInfo originalInfo = null;
@@ -565,16 +594,15 @@ namespace BOB
                     continue;
                 }
 
-                // Get original (pre-replacement) tree/prop prefab and current probability (as default original probability).
-                targetListItem.originalPrefab = originalInfo;
-                targetListItem.originalProb = _selectedSubBuilding.m_props[propIndex].m_probability;
-                targetListItem.originalAngle = _selectedSubBuilding.m_props[propIndex].m_radAngle * Mathf.Rad2Deg;
+                // Get current tree/prop prefab and probability, as default original values.
+                targetBuildingItem.OriginalPrefab = originalInfo;
+                targetBuildingItem.OriginalProbability = _selectedSubBuilding.m_props[propIndex].m_probability;
 
                 // Is this an added prop?
                 if (AddedBuildingProps.Instance.IsAdded(_selectedSubBuilding, propIndex))
                 {
-                    targetListItem.index = propIndex;
-                    targetListItem.isAdded = true;
+                    targetBuildingItem.PropIndex = propIndex;
+                    targetBuildingItem.IsAdded = true;
                 }
                 else
                 {
@@ -592,60 +620,63 @@ namespace BOB
                         }
 
                         // Record active replacements.
-                        targetListItem.IndividualReplacement = handler.GetReplacement(ReplacementPriority.IndividualReplacement);
-                        targetListItem.GroupedReplacement = handler.GetReplacement(ReplacementPriority.GroupedReplacement);
-                        targetListItem.AllReplacement = handler.GetReplacement(ReplacementPriority.AllReplacement);
+                        targetBuildingItem.IndividualReplacement = handler.GetReplacement(ReplacementPriority.IndividualReplacement);
+                        targetBuildingItem.GroupedReplacement = handler.GetReplacement(ReplacementPriority.GroupedReplacement);
+                        targetBuildingItem.AllReplacement = handler.GetReplacement(ReplacementPriority.AllReplacement);
+
+                        // Record current values as replacement values.
+                        targetBuildingItem.ReplacementPrefab = targetBuildingItem.OriginalPrefab;
+                        targetBuildingItem.ReplacementProbability = targetBuildingItem.OriginalProbability;
 
                         // Update original values from the reference.
-                        targetListItem.originalPrefab = handler.OriginalPrefab;
-                        targetListItem.originalAngle = handler.OriginalRadAngle * Mathf.Rad2Deg;
-                        targetListItem.originalProb = handler.OriginalProbability;
+                        targetBuildingItem.OriginalPrefab = handler.OriginalPrefab;
+                        targetBuildingItem.OriginalProbability = handler.OriginalProbability;
                     }
 
                     // Grouped or individual?  Check is here (non-added prop section) as added props are always individual.
                     if (CurrentMode == ReplacementModes.Individual)
                     {
                         // Individual - set index to the current building prop indexes.
-                        targetListItem.index = propIndex;
+                        targetBuildingItem.PropIndex = propIndex;
                     }
                     else
                     {
                         // Grouped - set index to -1 and add to our list of indexes.
-                        targetListItem.index = -1;
-                        targetListItem.indexes.Add(propIndex);
+                        targetBuildingItem.PropIndex = -1;
+                        targetBuildingItem.PropIndexes.Add(propIndex);
                     }
                 }
 
                 // Check for match with 'prop' mode - either original or replacement needs to be prop.
-                if (PropTreeMode == PropTreeModes.Prop && !(originalInfo is PropInfo) && !(targetListItem.originalPrefab is PropInfo))
+                if (PropTreeMode == PropTreeModes.Prop && !(originalInfo is PropInfo) && !(targetBuildingItem.OriginalPrefab is PropInfo))
                 {
                     continue;
                 }
 
                 // Check for match with 'tree' mode - either original or replacement needs to be tree.
-                if (PropTreeMode == PropTreeModes.Tree && !(originalInfo is TreeInfo) && !(targetListItem.originalPrefab is TreeInfo))
+                if (PropTreeMode == PropTreeModes.Tree && !(originalInfo is TreeInfo) && !(targetBuildingItem.OriginalPrefab is TreeInfo))
                 {
                     continue;
                 }
 
                 // Are we grouping?
-                if (targetListItem.index == -1)
+                if (targetBuildingItem.PropIndex == -1)
                 {
                     // Yes, grouping - initialise a flag to show if we've matched.
                     bool matched = false;
 
                     // Iterate through each item in our existing list of props.
-                    foreach (BuildingTargetListItem item in itemList)
+                    foreach (TargetBuildingItem item in itemList)
                     {
                         // Check to see if we already have this in the list - matching original prefab, replacements, and probability.
-                        if (item.originalPrefab == targetListItem.originalPrefab &&
-                            item.IndividualReplacement == targetListItem.IndividualReplacement &&
-                            item.GroupedReplacement == targetListItem.GroupedReplacement &&
-                            item.AllReplacement == targetListItem.AllReplacement &&
-                            item.originalProb == targetListItem.originalProb)
+                        if (item.OriginalPrefab == targetBuildingItem.OriginalPrefab &&
+                            item.IndividualReplacement == targetBuildingItem.IndividualReplacement &&
+                            item.GroupedReplacement == targetBuildingItem.GroupedReplacement &&
+                            item.AllReplacement == targetBuildingItem.AllReplacement &&
+                            item.OriginalProbability == targetBuildingItem.OriginalProbability)
                         {
                             // We've already got an identical grouped instance of this item - add this index and lane to the lists of indexes and lanes under that item and set the flag to indicate that we've done so.
-                            item.indexes.Add(propIndex);
+                            item.PropIndexes.Add(propIndex);
                             matched = true;
 
                             // No point going any further through the list, since we've already found our match.
@@ -662,18 +693,18 @@ namespace BOB
                 }
 
                 // Add this item to our list.
-                itemList.Add(targetListItem);
+                itemList.Add(targetBuildingItem);
             }
 
             // Create return fastlist from our filtered list, ordering by name.
-            m_targetList.rowsData = new FastList<object>
+            m_targetList.Data = new FastList<object>
             {
                 m_buffer = m_targetSortSetting == (int)OrderBy.NameDescending ? itemList.OrderByDescending(item => item.DisplayName).ToArray() : itemList.OrderBy(item => item.DisplayName).ToArray(),
                 m_size = itemList.Count,
             };
 
             // If the list is empty, show the 'no props' label; otherwise, hide it.
-            if (m_targetList.rowsData.m_size == 0)
+            if (m_targetList.Data.m_size == 0)
             {
                 m_noPropsLabel.Show();
             }
@@ -732,7 +763,7 @@ namespace BOB
         protected override void RemoveProp()
         {
             // Safety first - need an individual index that's an added prop.
-            if (SelectedTargetItem == null || SelectedTargetItem.index < 0 || !AddedBuildingProps.Instance.IsAdded(_selectedSubBuilding, SelectedTargetItem.index))
+            if (SelectedTargetItem == null || SelectedTargetItem.PropIndex < 0 || !AddedBuildingProps.Instance.IsAdded(_selectedSubBuilding, SelectedTargetItem.PropIndex))
             {
                 return;
             }
@@ -742,7 +773,7 @@ namespace BOB
 
             // Create new props array with one fewer entry, and copy the old props to it.
             // Remove prop reference and update other references as appropriate.
-            AddedBuildingProps.Instance.RemoveNew(_selectedSubBuilding, SelectedTargetItem.index);
+            AddedBuildingProps.Instance.RemoveNew(_selectedSubBuilding, SelectedTargetItem.PropIndex);
 
             // Post-action cleanup.
             UpdateAddedProps();
@@ -757,7 +788,7 @@ namespace BOB
             _originalValues.Clear();
 
             // Don't do anything if no valid selection.
-            if (SelectedTargetItem?.originalPrefab == null || _selectedSubBuilding == null)
+            if (SelectedTargetItem?.OriginalPrefab == null || _selectedSubBuilding == null)
             {
                 return;
             }
@@ -773,7 +804,7 @@ namespace BOB
                     {
                         for (int j = 0; j < prefab.m_props.Length; ++j)
                         {
-                            if (prefab.m_props[j].m_prop == SelectedTargetItem.CurrentPrefab | prefab.m_props[j].m_tree == SelectedTargetItem.CurrentPrefab)
+                            if (prefab.m_props[j].m_prop == SelectedTargetItem.ReplacementPrefab || prefab.m_props[j].m_tree == SelectedTargetItem.ReplacementPrefab)
                             {
                                 _originalValues.Add(GetOriginalData(prefab, j));
                             }
@@ -781,18 +812,18 @@ namespace BOB
                     }
                 }
             }
-            else if (SelectedTargetItem.index < 0)
+            else if (SelectedTargetItem.PropIndex < 0)
             {
                 // Grouped replacement - iterate through each instance and record values.
-                for (int i = 0; i < SelectedTargetItem.indexes.Count; ++i)
+                for (int i = 0; i < SelectedTargetItem.PropIndexes.Count; ++i)
                 {
-                    _originalValues.Add(GetOriginalData(_selectedSubBuilding, SelectedTargetItem.indexes[i]));
+                    _originalValues.Add(GetOriginalData(_selectedSubBuilding, SelectedTargetItem.PropIndexes[i]));
                 }
             }
             else
             {
                 // Individual replacement - record original values.
-                _originalValues.Add(GetOriginalData(_selectedSubBuilding, SelectedTargetItem.index));
+                _originalValues.Add(GetOriginalData(_selectedSubBuilding, SelectedTargetItem.PropIndex));
             }
         }
 
@@ -884,56 +915,41 @@ namespace BOB
         }
 
         /// <summary>
-        /// Prop row fastlist item for sub-buildings.
+        /// UIList row item for sub-buildings.
         /// </summary>
-        private class UISubBuildingRow : UIPropRow
+        private class SubBuildingRow : UIListRow
         {
-            // Sub-building reference index.
-            private int subBuildingIndex;
+            // Display label.
+            private UILabel _nameLabel;
 
             /// <summary>
-            /// Called when this item is selected.
+            /// Generates and displays a list row.
             /// </summary>
-            public override void UpdateSelection()
-            {
-                // Update currently selected target prefab.
-                if (BOBPanelManager.Panel is BOBBuildingPanel buildingPanel)
-                {
-                    buildingPanel.SetSubBuilding(subBuildingIndex);
-                }
-            }
-
-            /// <summary>
-            /// Called when list item is displayed.
-            /// </summary>
-            public override void Display(object data, bool isRowOdd)
+            /// <param name="data">Object data to display.</param>
+            /// <param name="rowIndex">Row index number (for background banding).</param>
+            public override void Display(object data, int rowIndex)
             {
                 // Perform initial setup for new rows.
-                if (nameLabel == null)
+                if (_nameLabel == null)
                 {
-                    isVisible = true;
-                    canFocus = true;
-                    isInteractive = true;
-                    width = parent.width;
-                    height = RowHeight;
-
-                    // Add object name label.
-                    nameLabel = AddUIComponent<UILabel>();
-                    nameLabel.width = this.width - 10f;
-                    nameLabel.textScale = TextScale;
+                    // Add name labels.
+                    _nameLabel = AddLabel(Margin, parent.width - Margin - Margin);
                 }
 
                 // Get sub-building index number.
-                subBuildingIndex = (int)data;
-
-                // Set display text.
-                nameLabel.text = (BOBPanelManager.Panel as BOBBuildingPanel)._subBuildingNames[subBuildingIndex] ?? string.Empty;
-
-                // Set label position
-                nameLabel.relativePosition = new Vector2(5f, PaddingY);
+                if (data is int subBuildingIndex)
+                {
+                    // Set display text.
+                    _nameLabel.text = (BOBPanelManager.Panel as BOBBuildingPanel)?._subBuildingNames[subBuildingIndex] ?? string.Empty;
+                }
+                else
+                {
+                    // Just in case.
+                    _nameLabel.text = string.Empty;
+                }
 
                 // Set initial background as deselected state.
-                Deselect(isRowOdd);
+                Deselect(rowIndex);
             }
         }
     }

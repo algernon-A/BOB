@@ -209,7 +209,7 @@ namespace BOB
                             taHarmony.Unpatch(_treeAnarchyTarget, _treeAnarchyMethod);
 
                             // Apply our own modified replacement.
-                            TreeAnarchyRender.Setup();
+                            EML.TreeAnarchyRender.Setup();
                             harmonyInstance.Patch(_treeAnarchyTarget, prefix: new HarmonyMethod(_treeAnarchyPatch));
                         }
                     }
@@ -275,7 +275,7 @@ namespace BOB
             if (_treeAnarchyMethod != null)
             {
                 _treeAnarchyTarget = AccessTools.Method(typeof(TreeManager), "EndRenderingImpl");
-                _treeAnarchyPatch = AccessTools.Method(typeof(TreeAnarchyRender), nameof(TreeAnarchyRender.EndRenderingImplPrefix));
+                _treeAnarchyPatch = AccessTools.Method(typeof(EML.TreeAnarchyRender), nameof(EML.TreeAnarchyRender.EndRenderingImplPrefix));
             }
         }
 

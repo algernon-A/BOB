@@ -92,7 +92,7 @@ namespace BOB
                 float minY = yPos - 1f;
                 float maxY = yPos + data.Height + 1f;
 
-                renderManager.OverlayEffect.DrawCircle(cameraInfo, circleColor, data.Position, data.Radius, minY, maxY, false, true); ;
+                renderManager.OverlayEffect.DrawCircle(cameraInfo, circleColor, data.Position, data.Radius, minY, maxY, false, true);
                 renderManager.OverlayEffect.DrawCircle(cameraInfo, effectColor, data.Position, data.Radius + effectRadius, minY, maxY, false, true);
             }
 

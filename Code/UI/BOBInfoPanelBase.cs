@@ -59,12 +59,12 @@ namespace BOB
         /// <summary>
         /// Target prefab selection list.
         /// </summary>
-        protected readonly UIFastList m_targetList;
+        protected readonly UIList m_targetList;
 
         /// <summary>
         /// Replacement prefab selection list.
         /// </summary>
-        protected readonly UIFastList m_replacementList;
+        protected readonly UIList m_replacementList;
 
         /// <summary>
         /// Label displayed when no props are eligible for current selection.
@@ -90,7 +90,7 @@ namespace BOB
 
         // Layout constants - Y.
         private const float ListY = FilterY + FilterHeight;
-        private const float ListHeight = UIPropRow.RowHeight * 18f;
+        private const float ListHeight = UIListRow.DefaultRowHeight * 18f;
         private const float ActionHeaderY = ActionsY - 15f;
 
         // Private components.
@@ -138,16 +138,26 @@ namespace BOB
                 leftPanel.width = LeftWidth;
                 leftPanel.height = ListHeight;
                 leftPanel.relativePosition = new Vector2(Margin, ListY);
-                m_targetList = UIFastList.Create<UIPrefabPropRow>(leftPanel);
-                ListSetup(m_targetList);
+                m_targetList = UIList.AddUIList<TargetListItem.DisplayRow>(leftPanel, 0f, 0f, LeftWidth, ListHeight);
+                m_targetList.EventSelectionChanged += (c, data) => SelectedTargetItem = data as TargetListItem;
 
                 // Replacement prop list.
                 _rightPanel = AddUIComponent<UIPanel>();
                 _rightPanel.width = RightWidth;
                 _rightPanel.height = ListHeight;
                 _rightPanel.relativePosition = new Vector2(RightX, ListY);
-                m_replacementList = UIFastList.Create<UILoadedPropRow>(_rightPanel);
-                ListSetup(m_replacementList);
+                m_replacementList = UIList.AddUIList<LoadedPrefabItem.DisplayRow>(_rightPanel, 0f, 0f, _rightPanel.width, _rightPanel.height);
+                m_replacementList.EventSelectionChanged += (c, data) =>
+                {
+                    if (data is BOBRandomPrefab randomPrefab)
+                    {
+                        SelectedReplacementPrefab = (PrefabInfo)randomPrefab.Prop ?? randomPrefab.Tree;
+                    }
+                    else
+                    {
+                        SelectedReplacementPrefab = data as PrefabInfo;
+                    }
+                };
 
                 // 'No props' label (starts hidden).
                 m_noPropsLabel = leftPanel.AddUIComponent<UILabel>();
@@ -200,7 +210,7 @@ namespace BOB
                 // Check if actual item has been set.
                 if (_selectedTargetItem != null)
                 {
-                    PrefabInfo effectivePrefab = _selectedTargetItem.individualPrefab ?? _selectedTargetItem.replacementPrefab ?? _selectedTargetItem.allPrefab ?? _selectedTargetItem.originalPrefab;
+                    PrefabInfo effectivePrefab = _selectedTargetItem.ActivePrefab;
 
                     // Select current replacement prefab.
                     m_replacementList.FindItem(effectivePrefab);
@@ -209,14 +219,14 @@ namespace BOB
                     SelectedReplacementPrefab = effectivePrefab;
 
                     // Set highlighting.
-                    RenderOverlays.PropIndex = _selectedTargetItem.index;
+                    RenderOverlays.PropIndex = _selectedTargetItem.PropIndex;
                     RenderOverlays.Prop = effectivePrefab as PropInfo;
                     RenderOverlays.Tree = effectivePrefab as TreeInfo;
                 }
                 else
                 {
                     // No valid current selection - clear selection.
-                    m_targetList.selectedIndex = -1;
+                    m_targetList.SelectedIndex = -1;
 
                     // Clear highlighting.
                     RenderOverlays.PropIndex = -1;
@@ -264,7 +274,7 @@ namespace BOB
         /// <summary>
         /// Gets the current individual index number of the current selection.  This could be either the direct index or in the index array, depending on situation.
         /// </summary>
-        protected int IndividualIndex => _selectedTargetItem.index < 0 ? _selectedTargetItem.indexes[0] : _selectedTargetItem.index;
+        protected int IndividualIndex => _selectedTargetItem.PropIndex < 0 ? _selectedTargetItem.PropIndexes[0] : _selectedTargetItem.PropIndex;
 
         /// <summary>
         /// Gets the currently selected building (null if none).
@@ -311,7 +321,7 @@ namespace BOB
         internal void UpdateTargetList()
         {
             // Iterate through each item in list.
-            foreach (object item in m_targetList.rowsData)
+            foreach (object item in m_targetList.Data)
             {
                 if (item is TargetListItem targetListItem)
                 {
@@ -338,8 +348,8 @@ namespace BOB
 
                 // Clear selection.
                 SelectedTargetItem = null;
-                m_targetList.listPosition = 0;
-                m_targetList.selectedIndex = -1;
+                m_targetList.CurrentPosition = 0;
+                m_targetList.SelectedIndex = -1;
 
                 // Update button states.
                 UpdateButtonStates();
@@ -415,11 +425,8 @@ namespace BOB
         /// </summary>
         protected override void RegenerateReplacementList()
         {
-            // Clear current selection.
-            m_replacementList.selectedIndex = -1;
-
             // List of prefabs that have passed filtering.
-            List<PrefabInfo> list = new List<PrefabInfo>();
+            List<LoadedPrefabItem> list = new List<LoadedPrefabItem>();
 
             bool nameFilterActive = !SearchText.IsNullOrWhiteSpace();
 
@@ -427,16 +434,13 @@ namespace BOB
             if (PropTreeMode == PropTreeModes.Tree || PropTreeMode == PropTreeModes.Both)
             {
                 // Tree - iterate through each tree in our list of loaded prefabs.
-                foreach (TreeInfo loadedTree in PrefabLists.LoadedTrees)
+                foreach (LoadedPrefabItem loadedTree in PrefabLists.LoadedTreeItems)
                 {
-                    // Set display name.
-                    string displayName = PrefabLists.GetDisplayName(loadedTree);
-
                     // Apply vanilla filtering if selected.
-                    if (!m_hideVanilla.isChecked || !displayName.StartsWith("[v]"))
+                    if (!m_hideVanilla.isChecked | loadedTree.IsVanilla)
                     {
                         // Apply name filter.
-                        if (!nameFilterActive || displayName.ToLower().Contains(SearchText.Trim().ToLower()))
+                        if (!nameFilterActive || loadedTree.DisplayName.ToLower().Contains(SearchText.Trim().ToLower()))
                         {
                             // Filtering passed - add this prefab to our list.
                             list.Add(loadedTree);
@@ -449,16 +453,13 @@ namespace BOB
             if (PropTreeMode == PropTreeModes.Prop || PropTreeMode == PropTreeModes.Both)
             {
                 // Iterate through each prop in our list of loaded prefabs.
-                foreach (PropInfo loadedProp in PrefabLists.LoadedProps)
+                foreach (LoadedPrefabItem loadedProp in PrefabLists.LoadedPropItems)
                 {
-                    // Set display name.
-                    string displayName = PrefabLists.GetDisplayName(loadedProp);
-
                     // Apply vanilla filtering if selected.
-                    if (!m_hideVanilla.isChecked || !displayName.StartsWith("[v]"))
+                    if (!m_hideVanilla.isChecked | loadedProp.IsVanilla)
                     {
                         // Apply name filter.
-                        if (!nameFilterActive || displayName.ToLower().Contains(SearchText.Trim().ToLower()))
+                        if (!nameFilterActive || loadedProp.DisplayName.ToLower().Contains(SearchText.Trim().ToLower()))
                         {
                             // Filtering passed - add this prefab to our list.
                             list.Add(loadedProp);
@@ -471,7 +472,7 @@ namespace BOB
             if (PropTreeMode == PropTreeModes.Both)
             {
                 Logging.Message("ordering lists");
-                list = list.OrderBy(x => PrefabLists.GetDisplayName(x.name).ToLower()).ToList();
+                list = list.OrderBy(x => x.DisplayName.ToLower()).ToList();
             }
 
             // Master lists should already be sorted by display name so no need to sort again here.
@@ -482,7 +483,7 @@ namespace BOB
             }
 
             // Create return fastlist from our filtered list.
-            m_replacementList.rowsData = new FastList<object>
+            m_replacementList.Data = new FastList<object>
             {
                 m_buffer = list.ToArray(),
                 m_size = list.Count,
@@ -491,12 +492,12 @@ namespace BOB
             // Select current replacement prefab, if any.
             if (_selectedReplacementPrefab != null)
             {
-                m_replacementList.FindItem(_selectedReplacementPrefab);
+                m_replacementList.FindItem<LoadedPrefabItem>(x => x.Prefab == _selectedReplacementPrefab);
             }
             else
             {
                 // No current selection.
-                m_replacementList.selectedIndex = -1;
+                m_replacementList.SelectedIndex = -1;
             }
         }
 

@@ -61,7 +61,7 @@ namespace BOB
             }
             else
             {
-                // Otherwise, check for panel and prefab type match; if they match, update existing panel, otherwise close the existing panel (retaining BOB tool) and create new one with the new selection. 
+                // Otherwise, check for panel and prefab type match; if they match, update existing panel, otherwise close the existing panel (retaining BOB tool) and create new one with the new selection.
                 if (selectedPrefab is BuildingInfo)
                 {
                     // Building.
@@ -107,7 +107,7 @@ namespace BOB
         /// <summary>
         /// Closes the panel by destroying the object (removing any ongoing UI overhead).
         /// </summary>
-        /// <param name="resetTool">True to reset to default tool; false to leave current tool untouched (default true)</param>
+        /// <param name="resetTool">True to reset to default tool; false to leave current tool untouched (default true).</param>
         internal static void Close(bool resetTool = true)
         {
             // Check for null, just in case - this is also called by pressing Esc when BOB tool is active.

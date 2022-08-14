@@ -61,7 +61,7 @@ namespace BOB
 
             // Regenerate target list and select target item.
             RegenerateTargetList();
-            m_targetList.FindTargetItem(targetPrefabInfo);
+            m_targetList.FindItem<LoadedPrefabItem>(x => x.Prefab == targetPrefabInfo);
 
             // Regenerate replacement list.
             RegenerateReplacementList();
@@ -82,15 +82,15 @@ namespace BOB
                 // Apply replacement.
                 if (!m_propTreeChecks[(int)PropTreeModes.Prop].isChecked && SelectedReplacementPrefab is TreeInfo replacementTree)
                 {
-                    MapTreeReplacement.Instance.Apply((SelectedTargetItem.replacementPrefab ?? SelectedTargetItem.originalPrefab) as TreeInfo, replacementTree);
+                    MapTreeReplacement.Instance.Apply(SelectedTargetItem.ActivePrefab as TreeInfo, replacementTree);
                 }
                 else if (!m_propTreeChecks[(int)PropTreeModes.Tree].isChecked && SelectedReplacementPrefab is PropInfo replacementProp)
                 {
-                    MapPropReplacement.Instance.Apply((SelectedTargetItem.replacementPrefab ?? SelectedTargetItem.originalPrefab) as PropInfo, replacementProp);
+                    MapPropReplacement.Instance.Apply(SelectedTargetItem.ActivePrefab as PropInfo, replacementProp);
                 }
 
                 // Update current target.
-                SelectedTargetItem.replacementPrefab = SelectedReplacementPrefab;
+                SelectedTargetItem.ReplacementPrefab = SelectedReplacementPrefab;
 
                 // Perform post-replacment updates.
                 FinishUpdate();
@@ -115,17 +115,17 @@ namespace BOB
                 if (SelectedTargetItem != null && SelectedTargetItem is TargetListItem)
                 {
                     // Individual reversion.
-                    if (SelectedTargetItem.replacementPrefab is TreeInfo tree)
+                    if (SelectedTargetItem.ReplacementPrefab is TreeInfo tree)
                     {
                         MapTreeReplacement.Instance.Revert(tree);
                     }
-                    else if (SelectedTargetItem.replacementPrefab is PropInfo prop)
+                    else if (SelectedTargetItem.ReplacementPrefab is PropInfo prop)
                     {
                         MapPropReplacement.Instance.Revert(prop);
                     }
 
                     // Clear current target replacement prefab.
-                    SelectedTargetItem.replacementPrefab = null;
+                    SelectedTargetItem.ReplacementPrefab = null;
                 }
 
                 // Perform post-replacment updates.
@@ -157,7 +157,7 @@ namespace BOB
                 }
 
                 // Reversion requires a currently active replacement.
-                if (SelectedTargetItem.replacementPrefab != null)
+                if (SelectedTargetItem.ReplacementPrefab != null)
                 {
                     m_revertButton.Enable();
                     m_revertButton.tooltip = Translations.Translate("BOB_PNL_REV_UND");
@@ -184,7 +184,7 @@ namespace BOB
             for (uint i = 0; i < (PropTreeMode == PropTreeModes.Tree ? trees.Length : PropAPI.PropBufferLen); ++i)
             {
                 // Create new list item, hiding probabilities.
-                TargetListItem propListItem = new TargetListItem { showProbs = false };
+                TargetListItem propListItem = new TargetListItem { ShowProbs = false };
 
                 if (PropTreeMode == PropTreeModes.Tree)
                 {
@@ -198,18 +198,18 @@ namespace BOB
                     }
 
                     // Try to get any tree replacement.
-                    propListItem.originalPrefab = MapTreeReplacement.Instance.GetOriginal(tree.Info);
+                    propListItem.OriginalPrefab = MapTreeReplacement.Instance.GetOriginal(tree.Info);
 
                     // Did we find a current replacment?
-                    if (propListItem.originalPrefab == null)
+                    if (propListItem.OriginalPrefab == null)
                     {
                         // No - set current item as the original tree.
-                        propListItem.originalPrefab = tree.Info;
+                        propListItem.OriginalPrefab = tree.Info;
                     }
                     else
                     {
                         // Yes - record current item as replacement.
-                        propListItem.replacementPrefab = tree.Info;
+                        propListItem.ReplacementPrefab = tree.Info;
                     }
                 }
                 else
@@ -228,56 +228,52 @@ namespace BOB
                     }
 
                     // Try to get any prop replacement.
-                    propListItem.originalPrefab = MapPropReplacement.Instance.GetOriginal(prop);
+                    propListItem.OriginalPrefab = MapPropReplacement.Instance.GetOriginal(prop);
 
                     // Did we find a current replacment?
-                    if (propListItem.originalPrefab == null)
+                    if (propListItem.OriginalPrefab == null)
                     {
                         // No - set current item as the original prop.
-                        propListItem.originalPrefab = prop;
+                        propListItem.OriginalPrefab = prop;
                     }
                     else
                     {
                         // Yes - record current item as replacement.
-                        propListItem.replacementPrefab = prop;
+                        propListItem.ReplacementPrefab = prop;
                     }
                 }
 
                 // Check to see if we were succesful - if not (e.g. we only want trees and this is a prop), continue on to next instance.
-                if (propListItem.originalPrefab?.name == null)
+                if (propListItem.OriginalPrefab?.name == null)
                 {
                     continue;
                 }
 
                 // Map instances are always grouped, and we don't have lists of indexes - too many trees!
-                propListItem.index = -1;
+                propListItem.PropIndex = -1;
 
-                // Are we grouping?
-                if (propListItem.index == -1)
+                // Initialise a flag to show if we've matched.
+                bool matched = false;
+
+                // Iterate through each item in our existing list of props.
+                foreach (TargetListItem item in itemList)
                 {
-                    // Yes, grouping - initialise a flag to show if we've matched.
-                    bool matched = false;
-
-                    // Iterate through each item in our existing list of props.
-                    foreach (TargetListItem item in itemList)
+                    // Check to see if we already have this in the list - matching original prefab.
+                    if (item.OriginalPrefab == propListItem.OriginalPrefab)
                     {
-                        // Check to see if we already have this in the list - matching original prefab.
-                        if (item.originalPrefab == propListItem.originalPrefab)
-                        {
-                            // We've already got an identical grouped instance of this item - set the flag to indicate that we've match it.
-                            matched = true;
+                        // We've already got an identical grouped instance of this item - set the flag to indicate that we've match it.
+                        matched = true;
 
-                            // No point going any further through the list, since we've already found our match.
-                            break;
-                        }
+                        // No point going any further through the list, since we've already found our match.
+                        break;
                     }
+                }
 
-                    // Did we get a match?
-                    if (matched)
-                    {
-                        // Yes - continue on to next tree (without adding this item separately to the list).
-                        continue;
-                    }
+                // Did we get a match?
+                if (matched)
+                {
+                    // Yes - continue on to next tree (without adding this item separately to the list).
+                    continue;
                 }
 
                 // Add this item to our list.
@@ -285,7 +281,7 @@ namespace BOB
             }
 
             // Create return fastlist from our filtered list, ordering by name.
-            m_targetList.rowsData = new FastList<object>
+            m_targetList.Data = new FastList<object>
             {
                 m_buffer = m_targetSortSetting == (int)OrderBy.NameDescending ? itemList.OrderByDescending(item => item.DisplayName).ToArray() : itemList.OrderBy(item => item.DisplayName).ToArray(),
                 m_size = itemList.Count,

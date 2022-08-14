@@ -21,7 +21,7 @@ namespace BOB
     internal sealed class BOBScalePanel : BOBPanelBase
     {
         // Layout constants - X.
-        private const float ControlX = (Margin * 2f);
+        private const float ControlX = Margin * 2f;
         private const float ControlWidth = 250f;
         private const float LoadedX = ControlX + ControlWidth + (Margin * 2f);
         private const float LoadedWidth = 440f;
@@ -33,7 +33,7 @@ namespace BOB
         private const float MinOffsetY = ListY;
         private const float MaxOffsetY = MinOffsetY + SliderHeight;
         private const float RevertY = MaxOffsetY + SliderHeight + 45f;
-        private const float ListHeight = UIPropRow.RowHeight * 16f;
+        private const float ListHeight = UIListRow.DefaultRowHeight * 16f;
 
         // Instance references.
         private static GameObject s_gameObject;
@@ -43,7 +43,7 @@ namespace BOB
         private static PropTreeModes s_openingMode = PropTreeModes.Prop;
 
         // Panel components.
-        private readonly UIFastList loadedList;
+        private readonly UIList _loadedList;
         private readonly BOBSlider _minScaleSlider;
         private readonly BOBSlider _maxScaleSlider;
         private readonly UIButton _revertButton;
@@ -88,14 +88,14 @@ namespace BOB
             loadedPanel.width = LoadedWidth;
             loadedPanel.height = ListHeight;
             loadedPanel.relativePosition = new Vector2(LoadedX, ListY);
-            loadedList = UIFastList.Create<UILoadedScalingPropRow>(loadedPanel);
-            ListSetup(loadedList);
+            _loadedList = UIList.AddUIList<LoadedPrefabItem.DisplayRow>(loadedPanel, 0f, 0f, LoadedWidth, ListHeight);
+            _loadedList.EventSelectionChanged += (c, data) => _selectedLoadedPrefab = (data as LoadedPrefabItem)?.Prefab;
 
             // Order button.
             m_replacementNameSortButton = ArrowButton(this, LoadedX + 10f, ListY - 20f);
             m_replacementNameSortButton.eventClicked += SortReplacements;
 
-            _loadedCreatorButton = ArrowButton(this, LoadedX + UILoadedScalingPropRow.CreatorX + 10f, ListY - 20f);
+            _loadedCreatorButton = ArrowButton(this, LoadedX + LoadedPrefabItem.DisplayRow.CreatorLabelX + 10f, ListY - 20f);
             _loadedCreatorButton.eventClicked += SortReplacements;
 
             // Default is name ascending.
@@ -189,15 +189,14 @@ namespace BOB
         /// </summary>
         protected override PropTreeModes InitialPropTreeMode => s_openingMode;
 
-
         // Trees or props?
         private bool IsTree => PropTreeMode == PropTreeModes.Tree;
 
         /// <summary>
         /// Creates the panel object in-game and displays it.
         /// </summary>
-        /// <param name="initialMode">Initial prop-tree opening mode</param>
-        /// <param name="selectedPrefab">Already selected prefab (null if none)</param>
+        /// <param name="initialMode">Initial prop-tree opening mode.</param>
+        /// <param name="selectedPrefab">Already selected prefab (null if none).</param>
         internal static void Create(PropTreeModes initialMode, PrefabInfo selectedPrefab)
         {
             try
@@ -226,7 +225,7 @@ namespace BOB
                     if (selectedPrefab != null)
                     {
                         s_panel.SelectedLoadedPrefab = selectedPrefab;
-                        s_panel.loadedList.FindItem(selectedPrefab);
+                        s_panel._loadedList.FindItem<LoadedPrefabItem>(x => x.Prefab == selectedPrefab);
                     }
 
                     // Hide previous window, if any.
@@ -273,26 +272,23 @@ namespace BOB
         protected override void RegenerateReplacementList()
         {
             // List of prefabs that have passed filtering.
-            List<LoadedListItem> list = new List<LoadedListItem>();
+            List<LoadedPrefabItem> list = new List<LoadedPrefabItem>();
 
             bool nameFilterActive = !SearchText.IsNullOrWhiteSpace();
 
             if (IsTree)
             {
                 // Tree - iterate through each prop in our list of loaded prefabs.
-                foreach (TreeInfo loadedTree in PrefabLists.LoadedTrees)
+                foreach (LoadedPrefabItem loadedTree in PrefabLists.LoadedTreeItems)
                 {
-                    // Set display name.
-                    string displayName = PrefabLists.GetDisplayName(loadedTree);
-
                     // Apply vanilla filtering if selected.
-                    if (!m_hideVanilla.isChecked || !displayName.StartsWith("[v]"))
+                    if (!m_hideVanilla.isChecked | !loadedTree.IsVanilla)
                     {
                         // Apply name filter.
-                        if (!nameFilterActive || displayName.ToLower().Contains(SearchText.Trim().ToLower()))
+                        if (!nameFilterActive || loadedTree.DisplayName.ToLower().Contains(SearchText.Trim().ToLower()))
                         {
                             // Filtering passed - add this prefab to our list.
-                            list.Add(new LoadedListItem(loadedTree));
+                            list.Add(loadedTree);
                         }
                     }
                 }
@@ -300,19 +296,16 @@ namespace BOB
             else
             {
                 // Prop - iterate through each prop in our list of loaded prefabs.
-                foreach (PropInfo loadedProp in PrefabLists.LoadedProps)
+                foreach (LoadedPrefabItem loadedProp in PrefabLists.LoadedPropItems)
                 {
-                    // Set display name.
-                    string displayName = PrefabLists.GetDisplayName(loadedProp);
-
                     // Apply vanilla filtering if selected.
-                    if (!m_hideVanilla.isChecked || !displayName.StartsWith("[v]"))
+                    if (!m_hideVanilla.isChecked | !loadedProp.IsVanilla)
                     {
                         // Apply name filter.
-                        if (!nameFilterActive || displayName.ToLower().Contains(SearchText.Trim().ToLower()))
+                        if (!nameFilterActive || loadedProp.DisplayName.ToLower().Contains(SearchText.Trim().ToLower()))
                         {
                             // Filtering passed - add this prefab to our list.
-                            list.Add(new LoadedListItem(loadedProp));
+                            list.Add(loadedProp);
                         }
                     }
                 }
@@ -323,21 +316,21 @@ namespace BOB
             switch (m_replacementSortSetting)
             {
                 case (int)OrderBy.NameDescending:
-                    objectArray = list.OrderByDescending(item => item.displayName).ToArray();
+                    objectArray = list.OrderByDescending(item => item.DisplayName).ToArray();
                     break;
                 case (int)OrderBy.CreatorAscending:
-                    objectArray = list.OrderBy(item => item.creatorName).ToArray();
+                    objectArray = list.OrderBy(item => item.CreatorName).ToArray();
                     break;
                 case (int)OrderBy.CreatorDescending:
-                    objectArray = list.OrderByDescending(item => item.creatorName).ToArray();
+                    objectArray = list.OrderByDescending(item => item.CreatorName).ToArray();
                     break;
                 default:
-                    objectArray = list.OrderBy(item => item.displayName).ToArray();
+                    objectArray = list.OrderBy(item => item.DisplayName).ToArray();
                     break;
             }
 
             // Create return fastlist from our filtered list.
-            loadedList.rowsData = new FastList<object>
+            _loadedList.Data = new FastList<object>
             {
                 m_buffer = objectArray,
                 m_size = list.Count,
@@ -346,12 +339,12 @@ namespace BOB
             // Select currently selected prefab, if any.
             if (_selectedLoadedPrefab != null)
             {
-                loadedList.FindPrefabInItem(_selectedLoadedPrefab);
+                _loadedList.FindItem<LoadedPrefabItem>(x => x.Prefab == _selectedLoadedPrefab);
             }
             else
             {
                 // No current selection.
-                loadedList.selectedIndex = -1;
+                _loadedList.SelectedIndex = -1;
             }
         }
 

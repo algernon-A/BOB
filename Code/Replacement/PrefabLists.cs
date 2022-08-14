@@ -21,14 +21,14 @@ namespace BOB
         private static readonly Dictionary<ulong, string> s_creators = new Dictionary<ulong, string>();
 
         /// <summary>
-        /// Gets the list of loaded props..
+        /// Gets the list of loaded prop items.
         /// </summary>
-        internal static PropInfo[] LoadedProps { get; private set; }
+        internal static LoadedPrefabItem[] LoadedPropItems { get; private set; }
 
         /// <summary>
-        /// Gets the list of loaded trees.
+        /// Gets the list of loaded tree items.
         /// </summary>
-        internal static TreeInfo[] LoadedTrees { get; private set; }
+        internal static LoadedPrefabItem[] LoadedTreeItems { get; private set; }
 
         /// <summary>
         /// Gets the randomp prop template.
@@ -99,9 +99,23 @@ namespace BOB
                 }
             }
 
-            // Order lists by name.
-            LoadedProps = props.OrderBy(prop => GetDisplayName(prop)).ToList().ToArray();
-            LoadedTrees = trees.OrderBy(tree => GetDisplayName(tree)).ToList().ToArray();
+            // Generate target prop list.
+            props = props.OrderBy(prop => GetDisplayName(prop)).ToList();
+            LoadedPropItems = new LoadedPrefabItem[props.Count];
+            int index = 0;
+            foreach (PropInfo prop in props)
+            {
+                LoadedPropItems[index++] = new LoadedPrefabItem(prop);
+            }
+
+            // Generate target tree list.
+            trees = trees.OrderBy(tree => GetDisplayName(tree)).ToList();
+            LoadedTreeItems = new LoadedPrefabItem[trees.Count];
+            index = 0;
+            foreach (TreeInfo tree in trees)
+            {
+                LoadedTreeItems[index++] = new LoadedPrefabItem(tree);
+            }
 
             // Populate creators dictionary.
             GetCreators();
