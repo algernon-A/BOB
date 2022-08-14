@@ -67,7 +67,7 @@
             instance = this;
 
             // Determine if we're in-game or not; use status of replacer managers to determine.
-            inGame = BuildingReplacement.Instance != null && NetworkReplacement.Instance != null;
+            inGame = GroupedBuildingReplacement.Instance != null && GroupedNetworkReplacement.Instance != null;
 
             // Add tab and helper.
             UIPanel panel = PanelUtils.AddTab(tabStrip, Translations.Translate("BOB_OPT_CFG"), tabIndex);
@@ -146,8 +146,8 @@
                 cleanSaveButton.eventClicked += (control, clickEvent) =>
                 {
                     // Clean all map data.
-                    MapTreeReplacement.instance.Setup();
-                    MapPropReplacement.instance.Setup();
+                    MapTreeReplacement.Instance.Replacements.Clear();
+                    MapPropReplacement.Instance.Replacements.Clear();
                 };
             }
 
@@ -335,7 +335,7 @@
             bool validSelection = !string.IsNullOrEmpty(selectedConfig);
 
             // Need a valid filename to enable creating new files, and 'current selction' is only valid when in-game.
-            activeCopyButton.isEnabled = validFile & Loading.isLoaded;
+            activeCopyButton.isEnabled = validFile & Loading.IsLoaded;
             newCleanButton.isEnabled = validFile;
 
             // Selected copy button requires both a valid filename and valid current selection.

@@ -1,21 +1,25 @@
-﻿using System.Collections.Generic;
-using System.Reflection.Emit;
-using HarmonyLib;
-
+﻿// <copyright file="TreeToolPatch.cs" company="algernon (K. Algernon A. Sheppard)">
+// Copyright (c) algernon (K. Algernon A. Sheppard). All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// </copyright>
 
 namespace BOB
 {
+    using System.Collections.Generic;
+    using System.Reflection.Emit;
+    using HarmonyLib;
+
     /// <summary>
     /// Harmony patch to disable vanilla road tree replacement.
     /// Applied manually via patcher in response to setting selection.
     /// </summary>
     public static class TreeToolPatch
     {
-        // <summary>
+        /// <summary>
         /// Harmony transpiler for TreeTool.SimulationStep, to disable vanilla road tree replacement.
         /// </summary>
-        /// <param name="instructions">Original ILCode</param>
-        /// <returns>Patched ILCode</returns>
+        /// <param name="instructions">Original ILCode.</param>
+        /// <returns>Patched ILCode.</returns>
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             // Instruction parsing.

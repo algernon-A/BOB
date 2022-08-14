@@ -1,4 +1,9 @@
-﻿namespace BOB
+﻿// <copyright file="Loading.cs" company="algernon (K. Algernon A. Sheppard)">
+// Copyright (c) algernon (K. Algernon A. Sheppard). All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// </copyright>
+
+namespace BOB
 {
     using AlgernonCommons;
     using AlgernonCommons.Notifications;
@@ -12,8 +17,13 @@
     public class Loading : LoadingExtensionBase
     {
         // Internal flags.
-        internal static bool isModEnabled = false;
-        internal static bool isLoaded = false;
+        private static bool s_isLoaded = false;
+        private bool _isModEnabled = false;
+
+        /// <summary>
+        /// Gets a value indicating whether the mod has finished loading.
+        /// </summary>
+        internal static bool IsLoaded => s_isLoaded;
 
         /// <summary>
         /// Called by the game when the mod is initialised at the start of the loading process.
@@ -26,7 +36,7 @@
             // Don't do anything if not in game (e.g. if we're going into an editor).
             if (loading.currentMode != AppMode.Game && loading.currentMode != AppMode.MapEditor)
             {
-                isModEnabled = false;
+                _isModEnabled = false;
                 Logging.KeyMessage("not loading into game, skipping activation");
 
                 // Unload Harmony patches and exit before doing anything further.
@@ -35,13 +45,13 @@
             }
 
             // All good to go at this point.
-            isModEnabled = true;
+            _isModEnabled = true;
 
             // Initialise data sets prior to savegame load.
             new AllBuildingReplacement();
             new AllNetworkReplacement();
-            new BuildingReplacement();
-            new NetworkReplacement();
+            new GroupedBuildingReplacement();
+            new GroupedNetworkReplacement();
             new IndividualBuildingReplacement();
             new IndividualNetworkReplacement();
             new MapTreeReplacement();
@@ -56,7 +66,6 @@
             base.OnCreated(loading);
         }
 
-
         /// <summary>
         /// Called by the game when level loading is complete.
         /// </summary>
@@ -68,7 +77,7 @@
             base.OnLevelLoaded(mode);
 
             // Don't do anything further if we're not operating.
-            if (!isModEnabled)
+            if (!_isModEnabled)
             {
                 Logging.Message("exiting");
                 return;
@@ -79,7 +88,7 @@
             {
                 // Harmony 2 wasn't loaded; abort.
                 Logging.Error("Harmony patches not applied; aborting");
-                isModEnabled = false;
+                _isModEnabled = false;
 
                 // Display warning message.
                 ListNotification harmonyNotification = NotificationBase.ShowNotification<ListNotification>();
@@ -137,10 +146,9 @@
             // Activate tool hotkey.
             HotkeyThreading.Operating = true;
 
-            isLoaded = true;
+            s_isLoaded = true;
             Logging.Message("loading complete");
         }
-
 
         /// <summary>
         /// Called by the game when exiting loaded leve.
@@ -148,7 +156,7 @@
         public override void OnLevelUnloading()
         {
             base.OnLevelUnloading();
-            isLoaded = false;
+            s_isLoaded = false;
         }
     }
 }

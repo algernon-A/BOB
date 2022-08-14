@@ -1,4 +1,9 @@
-﻿namespace BOB
+﻿// <copyright file="ModUtils.cs" company="algernon (K. Algernon A. Sheppard)">
+// Copyright (c) algernon (K. Algernon A. Sheppard). All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// </copyright>
+
+namespace BOB
 {
     using System;
     using System.Reflection;
@@ -11,10 +16,9 @@
     internal static class ModUtils
     {
         // NS2 reflection records.
-        internal static MethodInfo ns2Recalculate;
-        internal static Type networkSkin;
-        internal static Type networkSkinManager;
-
+        private static MethodInfo _ns2Recalculate;
+        private static Type _networkSkin;
+        private static Type _networkSkinManager;
 
         /// <summary>
         /// Uses reflection to find the NetworkSkinManager.instance.AppliedSkin.Recalculate method of Network Skins 2.
@@ -36,20 +40,20 @@
                             Logging.Message("Found NetworkSkins");
 
                             // Found NetworkSkins.dll that's part of an enabled plugin; try to get its NetworkSkin class.
-                            networkSkin = assembly.GetType("NetworkSkins.Skins.NetworkSkin");
-                            if (networkSkin != null)
+                            _networkSkin = assembly.GetType("NetworkSkins.Skins.NetworkSkin");
+                            if (_networkSkin != null)
                             {
                                 Logging.Message("found NetworkSkin");
 
                                 // Success - now try to get NetworkSkinManager class.
-                                networkSkinManager = assembly.GetType("NetworkSkins.Skins.NetworkSkinManager");
-                                if (networkSkinManager != null)
+                                _networkSkinManager = assembly.GetType("NetworkSkins.Skins.NetworkSkinManager");
+                                if (_networkSkinManager != null)
                                 {
                                     Logging.Message("found NetworkSkinManager");
 
                                     // Success - now try to get the Recalculate method from NetworkSkin.
-                                    ns2Recalculate = networkSkin.GetMethod("Recalculate");
-                                    if (ns2Recalculate != null)
+                                    _ns2Recalculate = _networkSkin.GetMethod("Recalculate");
+                                    if (_ns2Recalculate != null)
                                     {
                                         Logging.Message("found NetworkSkin.Recalculate");
                                     }
@@ -71,7 +75,6 @@
             Logging.Message("Network Skins 2 not found");
         }
 
-
         /// <summary>
         /// Triggers a recalculation of Network Skins 2 applied skins.
         /// Should be called whenever a network changes.
@@ -79,13 +82,13 @@
         internal static void NS2Recalculate()
         {
             // Make sure we've got valid references before doing anything.
-            if (networkSkin == null || networkSkinManager == null || ns2Recalculate == null)
+            if (_networkSkin == null || _networkSkinManager == null || _ns2Recalculate == null)
             {
                 return;
             }
 
             // Get Network Skins 2 skin manager instance.
-            PropertyInfo ns2SkinManagerInstance = networkSkinManager.GetProperty("instance");
+            PropertyInfo ns2SkinManagerInstance = _networkSkinManager.GetProperty("instance");
             if (ns2SkinManagerInstance == null)
             {
                 Logging.Error("couldn't find NS2 NetworkSkinManager.instance");
@@ -140,60 +143,16 @@
                 object appliedSkin = appliedSkinsFieldValue.GetType().GetProperty("Item").GetValue(appliedSkinsFieldValue, new object[] { i });
 
                 // Invoke recalculate.
-                ns2Recalculate.Invoke(appliedSkin, null);
+                _ns2Recalculate.Invoke(appliedSkin, null);
             }
         }
-
-
-        /// <summary>
-        /// Checks to see if another mod is installed, based on a provided assembly name.
-        /// </summary>
-        /// <param name="assemblyName">Name of the mod assembly</param>
-        /// <param name="enabledOnly">True if the mod needs to be enabled for the purposes of this check; false if it doesn't matter</param>
-        /// <returns>True if the mod is installed (and, if enabledOnly is true, is also enabled), false otherwise</returns>
-        internal static bool IsModInstalled(string assemblyName, bool enabledOnly = false)
-        {
-            // Convert assembly name to lower case.
-            string assemblyNameLower = assemblyName.ToLower();
-
-            // Iterate through the full list of plugins.
-            foreach (PluginManager.PluginInfo plugin in PluginManager.instance.GetPluginsInfo())
-            {
-                try
-                {
-                    foreach (Assembly assembly in plugin.GetAssemblies())
-                    {
-                        if (assembly.GetName().Name.ToLower().Equals(assemblyNameLower))
-                        {
-                            Logging.Message("found mod assembly ", assemblyName);
-                            if (enabledOnly)
-                            {
-                                return plugin.isEnabled;
-                            }
-                            else
-                            {
-                                return true;
-                            }
-                        }
-                    }
-                }
-                catch
-                {
-                    // Don't care.
-                }
-            }
-
-            // If we've made it here, then we haven't found a matching assembly.
-            return false;
-        }
-
 
         /// <summary>
         /// Checks to see if another mod is installed and enabled, based on a provided assembly name, and if so, returns the assembly reference.
-        /// Case-sensitive!  PloppableRICO is not the same as ploppablerico!
+        /// Case-sensitive!  PloppableRICO is not the same as ploppablerico!.
         /// </summary>
-        /// <param name="assemblyName">Name of the mod assembly</param>
-        /// <returns>Assembly reference if target is found and enabled, null otherwise</returns>
+        /// <param name="assemblyName">Name of the mod assembly.</param>
+        /// <returns>Assembly reference if target is found and enabled, null otherwise.</returns>
         internal static Assembly GetEnabledAssembly(string assemblyName)
         {
             // Iterate through the full list of plugins.
@@ -218,16 +177,16 @@
             return null;
         }
 
-
         /// <summary>
         /// Attempts to find the EndRenderingImplPrefix method of Tree Anarchy.
         /// </summary>
+        /// <returns>EndRenderingImplePrefix method of Tree Anarchy, or null if unsuccessful.</returns>
         internal static MethodInfo TreeAnarchyReflection()
         {
             Logging.KeyMessage("Attempting to find Tree Anarchy");
 
             // Get assembly.
-            Assembly taAssembly = ModUtils.GetEnabledAssembly("TreeAnarchy");
+            Assembly taAssembly = GetEnabledAssembly("TreeAnarchy");
 
             if (taAssembly == null)
             {

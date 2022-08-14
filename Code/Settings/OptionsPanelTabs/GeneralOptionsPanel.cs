@@ -1,4 +1,9 @@
-﻿namespace BOB
+﻿// <copyright file="GeneralOptionsPanel.cs" company="algernon (K. Algernon A. Sheppard)">
+// Copyright (c) algernon (K. Algernon A. Sheppard). All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// </copyright>
+
+namespace BOB
 {
     using AlgernonCommons.Keybinding;
     using AlgernonCommons.Translation;
@@ -11,10 +16,10 @@
     internal class GeneralOptionsPanel
     {
         /// <summary>
-        /// Adds mod options tab to tabstrip.
+        /// Initializes a new instance of the <see cref="GeneralOptionsPanel"/> class.
         /// </summary>
-        /// <param name="tabStrip">Tab strip to add to</param>
-        /// <param name="tabIndex">Index number of tab</param>
+        /// <param name="tabStrip">Tab strip to add to.</param>
+        /// <param name="tabIndex">Index number of tab.</param>
         internal GeneralOptionsPanel(UITabstrip tabStrip, int tabIndex)
         {
             // Add tab and helper.
@@ -38,15 +43,15 @@
             {
                 Translations.Translate("BOB_PER_LST"),
                 Translations.Translate("BOB_PER_SIN"),
-                Translations.Translate("BOB_PER_GRP")
+                Translations.Translate("BOB_PER_GRP"),
             };
-            UIDropDown groupDropDown = UIDropDowns.AddPlainDropDown(panel, 0f, 0f, Translations.Translate("BOB_PER_IND"), groupItems, ModSettings.indDefault, 350f);
-            groupDropDown.eventSelectedIndexChanged += (control, index) => ModSettings.indDefault = index;
+            UIDropDown groupDropDown = UIDropDowns.AddPlainDropDown(panel, 0f, 0f, Translations.Translate("BOB_PER_IND"), groupItems, ModSettings.IndividualDefault, 350f);
+            groupDropDown.eventSelectedIndexChanged += (control, index) => ModSettings.IndividualDefault = index;
 
             // Rember last position.
             UICheckBox rememberPosCheck = UICheckBoxes.AddPlainCheckBox(panel, Translations.Translate("BOB_OPT_POS"));
-            rememberPosCheck.isChecked = ModSettings.rememberPosition;
-            rememberPosCheck.eventCheckChanged += (control, isChecked) => ModSettings.rememberPosition = isChecked;
+            rememberPosCheck.isChecked = ModSettings.RememberPosition;
+            rememberPosCheck.eventCheckChanged += (control, isChecked) => ModSettings.RememberPosition = isChecked;
 
             // Disable vanilla tree tool network tree replacement.
             UICheckBox disableTreeToolCheck = UICheckBoxes.AddPlainCheckBox(panel, Translations.Translate("BOB_OPT_DTT"));

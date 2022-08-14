@@ -88,7 +88,7 @@
 
             // Serialize tree replacement dictionary.
             List<string> treeNames = new List<string>();
-            foreach (KeyValuePair<TreeInfo, TreeInfo> replacement in MapTreeReplacement.instance.replacements)
+            foreach (KeyValuePair<TreeInfo, TreeInfo> replacement in MapTreeReplacement.Instance.Replacements)
             {
                 treeNames.Add(replacement.Key.name);
                 treeNames.Add(replacement.Value.name);
@@ -96,7 +96,7 @@
 
             // Serialize prop replacement dictionary.
             List<string> propNames = new List<string>();
-            foreach (KeyValuePair<PropInfo, PropInfo> replacement in MapPropReplacement.instance.replacements)
+            foreach (KeyValuePair<PropInfo, PropInfo> replacement in MapPropReplacement.Instance.Replacements)
             {
                 propNames.Add(replacement.Key.name);
                 propNames.Add(replacement.Value.name);
@@ -186,7 +186,7 @@
                     }
 
                     // If we got here, success!  Add to dictionary.
-                    MapTreeReplacement.instance.replacements.Add(targetTree, replacementTree);
+                    MapTreeReplacement.Instance.Replacements.Add(targetTree, replacementTree);
                 }
             }
 
@@ -220,7 +220,7 @@
                     }
 
                     // If we got here, success!  Add to dictionary.
-                    MapPropReplacement.instance.replacements.Add(targetProp, replacementProp);
+                    MapPropReplacement.Instance.Replacements.Add(targetProp, replacementProp);
                 }
             }
         }

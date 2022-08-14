@@ -73,10 +73,10 @@ namespace BOB
             }
 
             // Show grey if not all prefabs are loaded.
-            rowLabel.textColor = thisPrefab == null || thisPrefab.missingVariant ? Color.gray : Color.white;
+            rowLabel.textColor = thisPrefab == null || thisPrefab.MissingVariant ? Color.gray : Color.white;
 
             // Set selected prop.
-            rowLabel.text = thisPrefab?.name ?? "null";
+            rowLabel.text = thisPrefab?.Name ?? "null";
 
             // Set initial background as deselected state.
             Deselect(isRowOdd);

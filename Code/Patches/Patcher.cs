@@ -18,7 +18,7 @@ namespace BOB
     public class Patcher : PatcherBase
     {
         // Tree Anarchy Harmony identifier.
-        private const string taHarmonyID = "quistar.treeanarchy.mod";
+        private const string TAharmonyID = "quistar.treeanarchy.mod";
 
         // Target methods - overlays.
         private MethodInfo _buildingOverlayTarget;
@@ -79,7 +79,7 @@ namespace BOB
         /// <summary>
         /// Applies or unapplies overlayer patches for buildings.
         /// </summary>
-        /// <param name="active">True to enable patches; false to disable</param>
+        /// <param name="active">True to enable patches; false to disable.</param>
         internal void PatchBuildingOverlays(bool active)
         {
             // Don't do anything if we're already at the current state.
@@ -122,11 +122,10 @@ namespace BOB
             }
         }
 
-
         /// <summary>
         /// Applies or unapplies overlayer patches for networks.
         /// </summary>
-        /// <param name="active">True to enable patches; false to disable</param>
+        /// <param name="active">True to enable patches; false to disable.</param>
         internal void PatchNetworkOverlays(bool active)
         {
             // Don't do anything if we're already at the current state.
@@ -172,7 +171,7 @@ namespace BOB
         /// <summary>
         /// Applies or unapplies overlayer patches for map trees and props.
         /// </summary>
-        /// <param name="active">True to enable patches; false to disable</param>
+        /// <param name="active">True to enable patches; false to disable.</param>
         internal void PatchMapOverlays(bool active)
         {
             // Don't do anything if we're already at the current state.
@@ -185,7 +184,6 @@ namespace BOB
 
                     // Manually patch building overlay renderer.
                     Harmony harmonyInstance = new Harmony(HarmonyID);
-
 
                     // Safety check.
                     if (_treeOverlayTarget == null || _propOverlayTarget == null || _renderOverlayPatch == null || _treeRenderTarget == null || _treeRenderTranspiler == null || _propRenderTarget == null || _propRenderTranspiler == null)
@@ -207,7 +205,7 @@ namespace BOB
                         if (_treeAnarchyMethod != null)
                         {
                             // Remove existing Tree Anarchy prefix.
-                            Harmony taHarmony = new Harmony(taHarmonyID);
+                            Harmony taHarmony = new Harmony(TAharmonyID);
                             taHarmony.Unpatch(_treeAnarchyTarget, _treeAnarchyMethod);
 
                             // Apply our own modified replacement.
@@ -230,7 +228,7 @@ namespace BOB
                             harmonyInstance.Unpatch(_treeAnarchyTarget, _treeAnarchyPatch);
 
                             // Re-apply Tree Anarchy patch.
-                            Harmony taHarmony = new Harmony(taHarmonyID);
+                            Harmony taHarmony = new Harmony(TAharmonyID);
                             taHarmony.Patch(_treeAnarchyTarget, prefix: new HarmonyMethod(_treeAnarchyMethod));
                         }
                     }
@@ -284,7 +282,7 @@ namespace BOB
         /// <summary>
         /// Patches the game's tree tool to enable/disable network tree replacement.
         /// </summary>
-        /// <param name="enabled">True to enable the patch (disable network tree replacement), false to revert patch</param>
+        /// <param name="enabled">True to enable the patch (disable network tree replacement), false to revert patch.</param>
         internal void DisableTreeTool(bool enabled)
         {
             // Target and patch.

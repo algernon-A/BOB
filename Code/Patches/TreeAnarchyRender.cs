@@ -1,22 +1,30 @@
-﻿using ColossalFramework;
-using UnityEngine;
-using TreeAnarchy;
-using System.Reflection.Emit;
-using System.Reflection;
-using System;
-using System.Runtime.CompilerServices;
-using HarmonyLib;
-
-
+﻿#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 namespace BOB
 {
+    using System;
+    using System.Reflection;
+    using System.Reflection.Emit;
+    using System.Runtime.CompilerServices;
+    using ColossalFramework;
+    using HarmonyLib;
+    using TreeAnarchy;
+    using UnityEngine;
+
     /// <summary>
     /// Copied from Tree Anarchy by Quistar.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:Elements should be documented", Justification = "Copied code")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.NamingRules", "SA1312:Variable names should begin with lower-case letter", Justification = "Copied code")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1116:Split parameters should start on line after declaration", Justification = "Copied code")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1202:Elements should be ordered by access", Justification = "Copied code")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1117:Parameters should be on same line or separate lines", Justification = "Copied code")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.LayoutRules", "SA1513:Closing brace should be followed by blank line", Justification = "Copied code")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.NamingRules", "SA1313:Parameter names should begin with lower-case letter", Justification = "Harmony")]
     public static class TreeAnarchyRender
     {
-        private delegate T PrefabGetter<out T>();
         private static PrefabGetter<FastList<PrefabCollection<TreeInfo>.PrefabData>> m_simulationPrefabs;
+
+        private delegate T PrefabGetter<out T>();
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         internal static void Setup()
@@ -44,7 +52,7 @@ namespace BOB
         }
 
         [HarmonyPriority(Priority.First)]
-        public unsafe static bool EndRenderingImplPrefix(TreeManager __instance, RenderManager.CameraInfo cameraInfo)
+        public static unsafe bool EndRenderingImplPrefix(TreeManager __instance, RenderManager.CameraInfo cameraInfo)
         {
             int treeLayer = __instance.m_treeLayer;
             ref DrawCallData drawCallData = ref __instance.m_drawCallData;
@@ -66,7 +74,7 @@ namespace BOB
             int len = rmInstance.m_renderedGroups.m_size;
             fixed (Quaternion* pQuaternions = &TAManager.m_treeQuaternions[0])
             fixed (TAManager.ExtraTreeInfo* pExtraInfos = &TAManager.m_extraTreeInfos[0])
-            fixed (TreeInstance* pTrees = &__instance.m_trees.m_buffer[0])
+            fixed (global::TreeInstance* pTrees = &__instance.m_trees.m_buffer[0])
             fixed (uint* pGrid = &__instance.m_treeGrid[0])
             {
                 for (int i = 0; i < len; i++)
@@ -76,18 +84,18 @@ namespace BOB
                     {
                         int startX = renderGroup.m_x * 540 / 45;
                         int startZ = renderGroup.m_z * 540 / 45;
-                        int endX = (renderGroup.m_x + 1) * 540 / 45 - 1;
-                        int endZ = (renderGroup.m_z + 1) * 540 / 45 - 1;
+                        int endX = ((renderGroup.m_x + 1) * 540 / 45) - 1;
+                        int endZ = ((renderGroup.m_z + 1) * 540 / 45) - 1;
                         for (int j = startZ; j <= endZ; j++)
                         {
                             for (int k = startX; k <= endX; k++)
                             {
-                                uint treeID = *(pGrid + (j * 540 + k));
+                                uint treeID = *(pGrid + ((j * 540) + k));
                                 while (treeID != 0u)
                                 {
-                                    TreeInstance* pTree = pTrees + treeID;
+                                    global::TreeInstance* pTree = pTrees + treeID;
                                     ushort flags = pTree->m_flags;
-                                    if ((flags & 0x0f00) != 0 && (flags & (ushort)TreeInstance.Flags.Hidden) == 0)
+                                    if ((flags & 0x0f00) != 0 && (flags & (ushort)global::TreeInstance.Flags.Hidden) == 0)
                                     {
                                         TreeInfo info = pTree->Info;
                                         Vector3 position = pTree->Position;
@@ -96,7 +104,6 @@ namespace BOB
                                             TAManager.ExtraTreeInfo* extraTreeInfo = pExtraInfos + treeID;
                                             float scale = extraTreeInfo->TreeScale;
                                             float brightness = extraTreeInfo->m_brightness;
-
 
                                             // Render overlay.
                                             RenderOverlays.HighlightTree(info, position);
@@ -110,7 +117,7 @@ namespace BOB
                                                 materialBlock.SetVector(ID_ObjectIndex, objectIndex);
                                                 drawCallData.m_defaultCalls++;
                                                 Graphics.DrawMesh(info.m_mesh,
-                                                    Matrix4x4.TRS(position, *(pQuaternions + ((int)(position.x * position.x + position.z * position.z) % 359)), new Vector3(scale, scale, scale)),
+                                                    Matrix4x4.TRS(position, *(pQuaternions + ((int)((position.x * position.x) + (position.z * position.z)) % 359)), new Vector3(scale, scale, scale)),
                                                     info.m_material, info.m_prefabDataLayer, null, 0, materialBlock);
                                             }
                                             else
@@ -164,7 +171,7 @@ namespace BOB
                                                     info.m_lodMin = lodMin;
                                                     info.m_lodMax = lodMax;
                                                     drawCallData.m_lodCalls++;
-                                                    drawCallData.m_batchedCalls += (info.m_lodCount - 1);
+                                                    drawCallData.m_batchedCalls += info.m_lodCount - 1;
                                                     Graphics.DrawMesh(mesh, identity, info.m_lodMaterial, info.m_prefabDataLayer, null, 0, materialBlock);
                                                     info.m_lodCount = 0;
                                                 }
@@ -222,7 +229,7 @@ namespace BOB
                         info.m_lodMin = lodMin;
                         info.m_lodMax = lodMax;
                         drawCallData.m_lodCalls++;
-                        drawCallData.m_batchedCalls += (info.m_lodCount - 1);
+                        drawCallData.m_batchedCalls += info.m_lodCount - 1;
                         Graphics.DrawMesh(mesh, identity, info.m_lodMaterial, info.m_prefabDataLayer, null, 0, materialBlock);
                         info.m_lodCount = 0;
                     }
@@ -232,3 +239,4 @@ namespace BOB
         }
     }
 }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

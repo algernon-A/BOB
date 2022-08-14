@@ -29,8 +29,8 @@
         private UISprite lineSprite;
 
         // ObjectData.
-		protected TargetListItem thisItem;
-		protected int index;
+        protected TargetListItem thisItem;
+        protected int index;
 
 
         // Background for each list item.

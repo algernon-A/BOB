@@ -11,23 +11,23 @@
     /// Static class to manage the BOB pack panel.
     /// </summary>
     internal static class PackPanelManager
-	{
-		// Instance references.
-		private static GameObject uiGameObject;
-		private static BOBPackPanel _panel;
-		internal static BOBPackPanel Panel => _panel;
+    {
+        // Instance references.
+        private static GameObject uiGameObject;
+        private static BOBPackPanel _panel;
+        internal static BOBPackPanel Panel => _panel;
 
-		// Recent state.
-		internal static float lastX, lastY;
+        // Recent state.
+        internal static float lastX, lastY;
 
 
-		/// <summary>
-		/// Creates the panel object in-game and displays it.
-		/// </summary>
-		internal static void Create()
-		{
-			try
-			{
+        /// <summary>
+        /// Creates the panel object in-game and displays it.
+        /// </summary>
+        internal static void Create()
+        {
+            try
+            {
                 // If no instance already set, create one.
                 if (uiGameObject == null)
                 {
@@ -36,46 +36,46 @@
 
                     _panel = uiGameObject.AddComponent<BOBPackPanel>();
                 }
-			}
-			catch (Exception e)
-			{
-				Logging.LogException(e, "exception creating PackPanel");
-			}
-		}
+            }
+            catch (Exception e)
+            {
+                Logging.LogException(e, "exception creating PackPanel");
+            }
+        }
 
 
-		/// <summary>
-		/// Closes the panel by destroying the object (removing any ongoing UI overhead).
-		/// </summary>
-		internal static void Close()
-		{
-			// Store previous position.
-			lastX = _panel.relativePosition.x;
-			lastY = _panel.relativePosition.y;
+        /// <summary>
+        /// Closes the panel by destroying the object (removing any ongoing UI overhead).
+        /// </summary>
+        internal static void Close()
+        {
+            // Store previous position.
+            lastX = _panel.relativePosition.x;
+            lastY = _panel.relativePosition.y;
 
-			// Destroy game objects.
-			GameObject.Destroy(_panel);
-			GameObject.Destroy(uiGameObject);
+            // Destroy game objects.
+            GameObject.Destroy(_panel);
+            GameObject.Destroy(uiGameObject);
 
-			// Let the garbage collector do its work (and also let us know that we've closed the object).
-			_panel = null;
-			uiGameObject = null;
-		}
-	}
+            // Let the garbage collector do its work (and also let us know that we've closed the object).
+            _panel = null;
+            uiGameObject = null;
+        }
+    }
 
 
-	/// <summary>
-	/// Panel for replacement pack selection and application.
-	/// </summary>
-	internal class BOBPackPanel : UIPanel
+    /// <summary>
+    /// Panel for replacement pack selection and application.
+    /// </summary>
+    internal class BOBPackPanel : UIPanel
     {
         // Layout constants.
         internal const float RowHeight = 30f;
         internal const float ListWidth = 710f;
-		private const float Margin = 5f;
-		private const float PanelWidth = ListWidth + (Margin * 2f);
-		private const float ListHeight = 300f;
-		private const float TitleBarHeight = 40f;
+        private const float Margin = 5f;
+        private const float PanelWidth = ListWidth + (Margin * 2f);
+        private const float ListHeight = 300f;
+        private const float TitleBarHeight = 40f;
         private const float FooterY = TitleBarHeight + ListHeight + Margin;
         private const float FooterHeight = 30f;
         private const float PanelHeight = FooterY + FooterHeight + Margin;
@@ -225,7 +225,7 @@
                 revertButton.Disable();
 
                 return;
-            }    
+            }
 
             // Check status of current pack.
             if (NetworkPackReplacement.Instance.GetPackStatus(selectedPack))

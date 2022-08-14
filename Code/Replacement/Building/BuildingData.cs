@@ -1,41 +1,32 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using ColossalFramework;
-
+﻿// <copyright file="BuildingData.cs" company="algernon (K. Algernon A. Sheppard)">
+// Copyright (c) algernon (K. Algernon A. Sheppard). All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// </copyright>
 
 namespace BOB
 {
+    using System.Collections.Generic;
+    using ColossalFramework;
+    using UnityEngine;
+
     /// <summary>
     /// Static class to handle centralised building data.
     /// </summary>
     internal static class BuildingData
     {
-        // List of dirty net prefabs.
-        private static HashSet<BuildingInfo> dirtyList;
-
+        // List of dirty building prefabs.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.NamingRules", "SA1311:Static readonly fields should begin with upper-case letter", Justification = "Private static readonly field")]
+        private static readonly HashSet<BuildingInfo> s_dirtyList = new HashSet<BuildingInfo>();
 
         /// <summary>
-        /// Dirty prefabs list.
+        /// Gets the dirty prefabs list.
         /// </summary>
-        internal static HashSet<BuildingInfo> DirtyList
-        {
-            get
-            {
-                // Initialise list if it isn't already.
-                if (dirtyList == null)
-                {
-                    dirtyList = new HashSet<BuildingInfo>();
-                }
-
-                return dirtyList;
-            }
-        }
-
+        internal static HashSet<BuildingInfo> DirtyList => s_dirtyList;
 
         /// <summary>
         /// Refreshes building prefabs and renders for the specified building prefab.
         /// </summary>
-        /// <param name="prefab">Building prefab to update</param>
+        /// <param name="prefab">Building prefab to update.</param>
         internal static void UpdateBuilding(BuildingInfo prefab)
         {
             // Hashset of render group coordinates to update.
@@ -64,8 +55,8 @@ namespace BOB
 
                     // Calculate building render group.
                     Vector3 position = buildings[i].m_position;
-                    int num = Mathf.Clamp((int)(position.x / 64f + 135f), 0, 269);
-                    int num2 = Mathf.Clamp((int)(position.z / 64f + 135f), 0, 269);
+                    int num = Mathf.Clamp((int)((position.x / 64f) + 135f), 0, 269);
+                    int num2 = Mathf.Clamp((int)((position.z / 64f) + 135f), 0, 269);
                     int x = num * 45 / 270;
                     int z = num2 * 45 / 270;
 
@@ -73,6 +64,7 @@ namespace BOB
                     groupHash.Add(new KeyValuePair<int, int>(x, z));
                 }
             }
+
             // Iterate through each key in group.
             foreach (KeyValuePair<int, int> keyPair in groupHash)
             {
@@ -84,14 +76,13 @@ namespace BOB
             }
         }
 
-
         /// <summary>
         /// Refreshes building prefabs and renders for all 'dirty' buildings.
         /// </summary>
         internal static void Update()
         {
             // Don't do anything if nothing to update.
-            if (dirtyList == null || dirtyList.Count == 0)
+            if (s_dirtyList == null || s_dirtyList.Count == 0)
             {
                 return;
             }
@@ -121,8 +112,8 @@ namespace BOB
 
                     // Calculate building render group.
                     Vector3 position = buildings[i].m_position;
-                    int num = Mathf.Clamp((int)(position.x / 64f + 135f), 0, 269);
-                    int num2 = Mathf.Clamp((int)(position.z / 64f + 135f), 0, 269);
+                    int num = Mathf.Clamp((int)((position.x / 64f) + 135f), 0, 269);
+                    int num2 = Mathf.Clamp((int)((position.z / 64f) + 135f), 0, 269);
                     int x = num * 45 / 270;
                     int z = num2 * 45 / 270;
 
@@ -142,7 +133,7 @@ namespace BOB
             }
 
             // Clear dirty prefabs list.
-            DirtyList.Clear();
+            s_dirtyList.Clear();
         }
     }
 }
