@@ -352,7 +352,7 @@ namespace BOB
             if (BOBPanelManager.Panel != null)
             {
                 // Yes - close it.
-                BOBPanelManager.Close();
+                BOBPanelManager.Panel?.Close();
             }
 
             // Clear tool lane overlay list.
@@ -386,7 +386,7 @@ namespace BOB
                 ToolsModifierControl.SetTool<DefaultTool>();
 
                 // Close window, if open.
-                BOBPanelManager.Close();
+                BOBPanelManager.Panel?.Close();
             }
 
             // Don't do anything if mouse is inside UI or if there are any errors other than failed raycast.

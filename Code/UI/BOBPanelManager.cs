@@ -71,7 +71,7 @@ namespace BOB
                     }
                     else
                     {
-                        Close();
+                        Panel.Close();
                         Create(selectedPrefab);
                     }
                 }
@@ -84,7 +84,7 @@ namespace BOB
                     }
                     else
                     {
-                        Close();
+                        Panel.Close();
                         Create(selectedPrefab);
                     }
                 }
@@ -97,38 +97,10 @@ namespace BOB
                     }
                     else
                     {
-                        Close();
+                        Panel.Close();
                         Create(selectedPrefab);
                     }
                 }
-            }
-        }
-
-        /// <summary>
-        /// Closes the panel by destroying the object (removing any ongoing UI overhead).
-        /// </summary>
-        internal static void Close()
-        {
-            // Check for null, just in case - this is also called by pressing Esc when BOB tool is active.
-            if (s_panel != null)
-            {
-                // Close the panel.
-                s_panel.Close();
-
-                // Stop highlighting.
-                RenderOverlays.ClearHighlighting();
-
-                // Revert overlay patches.
-                Patcher.Instance.PatchBuildingOverlays(false);
-                Patcher.Instance.PatchNetworkOverlays(false);
-                Patcher.Instance.PatchMapOverlays(false);
-
-                // Clear tool lane overlay list.
-                BOBTool.Instance.LaneOverlays.Clear();
-
-                // Store previous position.
-                s_previousX = Panel.relativePosition.x;
-                s_previousY = Panel.relativePosition.y;
             }
         }
 
@@ -219,7 +191,7 @@ namespace BOB
                     }
 
                     // Create panel close event handler.
-                    s_panel.EventClose += Close;
+                    s_panel.EventClose += DestroyPanel;
 
                     // Set up panel with selected prefab.
                     Panel.SetTargetParent(selectedPrefab);
@@ -254,6 +226,21 @@ namespace BOB
             {
                 return;
             }
+
+            // Stop highlighting.
+            RenderOverlays.ClearHighlighting();
+
+            // Revert overlay patches.
+            Patcher.Instance.PatchBuildingOverlays(false);
+            Patcher.Instance.PatchNetworkOverlays(false);
+            Patcher.Instance.PatchMapOverlays(false);
+
+            // Clear tool lane overlay list.
+            BOBTool.Instance.LaneOverlays.Clear();
+
+            // Store previous position.
+            s_previousX = Panel.relativePosition.x;
+            s_previousY = Panel.relativePosition.y;
 
             // Destroy game objects.
             GameObject.Destroy(s_panel);

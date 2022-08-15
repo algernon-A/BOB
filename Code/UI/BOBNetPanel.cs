@@ -888,32 +888,29 @@ namespace BOB
             // Disable events.
             m_ignoreSliderValueChange = true;
 
-            if (SelectedTargetItem is TargetNetItem targetNetItem)
+            // Are we eligible for repeat distance (eligibile target and in individual mode).
+            if (CurrentMode == ReplacementModes.Individual && SelectedTargetItem is TargetNetItem targetNetItem && (targetNetItem.OriginalRepeat > 1f || targetNetItem.IsAdded))
             {
-                // Are we eligible for repeat distance (eligibile target and in individual mode).
-                if (CurrentMode == ReplacementModes.Individual && targetNetItem != null && (targetNetItem.OriginalRepeat > 1f || targetNetItem.IsAdded))
+                // Yes - do we have a replacement?
+                if (replacement is BOBConfig.NetReplacement netReplacement && netReplacement.RepeatDistance > 1f)
                 {
-                    // Yes - do we have a replacement?
-                    if (replacement is BOBConfig.NetReplacement netReplacement && netReplacement.RepeatDistance > 1f)
-                    {
-                        // Yes - set repeat distance slider value and show the slider.
-                        _repeatSlider.TrueValue = netReplacement.RepeatDistance;
-                    }
-                    else
-                    {
-                        // No replacement; show original value.
-                        _repeatSlider.TrueValue = targetNetItem.OriginalRepeat;
-                    }
-
-                    // Show slider.
-                    _repeatSlider.parent.Show();
+                    // Yes - set repeat distance slider value and show the slider.
+                    _repeatSlider.TrueValue = netReplacement.RepeatDistance;
                 }
                 else
                 {
-                    // Hide repeat slider if no value to show.
-                    _repeatSlider.TrueValue = 0f;
-                    _repeatSlider.parent.Hide();
+                    // No replacement; show original value.
+                    _repeatSlider.TrueValue = targetNetItem.OriginalRepeat;
                 }
+
+                // Show slider.
+                _repeatSlider.parent.Show();
+            }
+            else
+            {
+                // Hide repeat slider if no value to show.
+                _repeatSlider.TrueValue = 0f;
+                _repeatSlider.parent.Hide();
             }
 
             base.SetSliders(replacement);
