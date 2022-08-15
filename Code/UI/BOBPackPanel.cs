@@ -5,8 +5,6 @@
 
 namespace BOB
 {
-    using System;
-    using AlgernonCommons;
     using AlgernonCommons.Translation;
     using AlgernonCommons.UI;
     using ColossalFramework.UI;
@@ -15,7 +13,7 @@ namespace BOB
     /// <summary>
     /// Panel for replacement pack selection and application.
     /// </summary>
-    internal sealed class BOBPackPanel : UIPanel
+    internal sealed class BOBPackPanel : StandalonePanel
     {
         /// <summary>
         /// List row height.
@@ -29,16 +27,10 @@ namespace BOB
 
         // Layout constants.
         private const float Margin = 5f;
-        private const float PanelWidth = ListWidth + (Margin * 2f);
         private const float ListHeight = 300f;
         private const float TitleBarHeight = 40f;
         private const float FooterY = TitleBarHeight + ListHeight + Margin;
         private const float FooterHeight = 30f;
-        private const float PanelHeight = FooterY + FooterHeight + Margin;
-
-        // Instance references.
-        private static GameObject s_gameObject;
-        private static BOBPackPanel s_panel;
 
         // Panel components.
         private readonly UIButton _applyButton;
@@ -53,42 +45,6 @@ namespace BOB
         /// </summary>
         internal BOBPackPanel()
         {
-            // Basic behaviour.
-            autoLayout = false;
-            canFocus = true;
-            isInteractive = true;
-
-            // Appearance.
-            backgroundSprite = "MenuPanel2";
-            opacity = 1f;
-
-            // Size.
-            width = PanelWidth;
-            height = PanelHeight;
-
-            // Drag bar.
-            UIDragHandle dragHandle = AddUIComponent<UIDragHandle>();
-            dragHandle.width = this.width - 50f;
-            dragHandle.height = this.height;
-            dragHandle.relativePosition = Vector3.zero;
-            dragHandle.target = this;
-
-            // Title label.
-            UILabel titleLabel = AddUIComponent<UILabel>();
-            titleLabel.relativePosition = new Vector2(50f, 13f);
-            titleLabel.text = Translations.Translate("BOB_NAM");
-
-            // Close button.
-            UIButton closeButton = AddUIComponent<UIButton>();
-            closeButton.relativePosition = new Vector2(width - 35, 2);
-            closeButton.normalBgSprite = "buttonclose";
-            closeButton.hoveredBgSprite = "buttonclosehover";
-            closeButton.pressedBgSprite = "buttonclosepressed";
-            closeButton.eventClick += (c, p) =>
-            {
-                Close();
-            };
-
             // Pack list panel.
             UIPanel packListPanel = AddUIComponent<UIPanel>();
             packListPanel.width = ListWidth;
@@ -118,6 +74,16 @@ namespace BOB
         }
 
         /// <summary>
+        /// Gets the panel width.
+        /// </summary>
+        public override float PanelWidth => ListWidth + (Margin * 2f);
+
+        /// <summary>
+        /// Gets the panel height.
+        /// </summary>
+        public override float PanelHeight => FooterY + FooterHeight + Margin;
+
+        /// <summary>
         /// Sets the currently selected pack, updating panel button states accordingly.
         /// </summary>
         internal string SelectedPack
@@ -132,40 +98,9 @@ namespace BOB
         }
 
         /// <summary>
-        /// Creates the panel object in-game and displays it.
+        /// Gets the panel's title.
         /// </summary>
-        internal static void Create()
-        {
-            try
-            {
-                // If no instance already set, create one.
-                if (s_gameObject == null)
-                {
-                    s_gameObject = new GameObject("BOBPackPanel");
-                    s_gameObject.transform.parent = UIView.GetAView().transform;
-
-                    s_panel = s_gameObject.AddComponent<BOBPackPanel>();
-                }
-            }
-            catch (Exception e)
-            {
-                Logging.LogException(e, "exception creating PackPanel");
-            }
-        }
-
-        /// <summary>
-        /// Closes the panel by destroying the object (removing any ongoing UI overhead).
-        /// </summary>
-        internal static void Close()
-        {
-            // Destroy game objects.
-            GameObject.Destroy(s_panel);
-            GameObject.Destroy(s_gameObject);
-
-            // Let the garbage collector do its work (and also let us know that we've closed the object).
-            s_panel = null;
-            s_gameObject = null;
-        }
+        protected override string PanelTitle => Translations.Translate("BOB_NAM");
 
         /// <summary>
         /// Sets the pack status of the currently selected pack.

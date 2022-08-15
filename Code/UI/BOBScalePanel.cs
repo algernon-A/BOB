@@ -35,13 +35,6 @@ namespace BOB
         private const float RevertY = MaxOffsetY + SliderHeight + 45f;
         private const float ListHeight = UIListRow.DefaultRowHeight * 16f;
 
-        // Instance references.
-        private static GameObject s_gameObject;
-        private static BOBScalePanel s_panel;
-
-        // Opening prop/tree mode.
-        private static PropTreeModes s_openingMode = PropTreeModes.Prop;
-
         // Panel components.
         private readonly UIList _loadedList;
         private readonly BOBSlider _minScaleSlider;
@@ -66,9 +59,6 @@ namespace BOB
             // Disable 'both' check.
             m_propTreeChecks[(int)PropTreeModes.Both].Disable();
             m_propTreeChecks[(int)PropTreeModes.Both].Hide();
-
-            // Title label.
-            SetTitle(Translations.Translate("BOB_NAM") + " : " + Translations.Translate("BOB_SCA_TIT"));
 
             // Minimum scale slider.
             _minScaleSlider = AddBOBSlider(this, ControlX, MinOffsetY, ControlWidth - (Margin * 2f), "BOB_SCA_MIN", 0.5f, 2f, 0.5f, "MinScale");
@@ -106,12 +96,20 @@ namespace BOB
 
             // Bring to front.
             BringToFront();
+
+            // Hide previous window, if any.
+            BOBPanelManager.Panel?.Hide();
         }
 
         /// <summary>
-        /// Gets the active panel instance.
+        /// Gets the panel width.
         /// </summary>
-        internal static BOBScalePanel Panel => s_panel;
+        public override float PanelWidth => LoadedX + LoadedWidth + Margin;
+
+        /// <summary>
+        /// Gets the panel height.
+        /// </summary>
+        public override float PanelHeight => ListY + ListHeight + Margin;
 
         /// <summary>
         /// Sets the currently selected loaded prefab.
@@ -170,101 +168,12 @@ namespace BOB
         }
 
         /// <summary>
-        /// Gets the panel width.
+        /// Gets the panel's title.
         /// </summary>
-        protected override float PanelWidth => LoadedX + LoadedWidth + Margin;
-
-        /// <summary>
-        /// Gets the panel height.
-        /// </summary>
-        protected override float PanelHeight => ListY + ListHeight + Margin;
-
-        /// <summary>
-        /// Gets the panel opacity.
-        /// </summary>
-        protected override float PanelOpacity => 1f;
-
-        /// <summary>
-        /// Gets the initial prop-tree mode for this panel.
-        /// </summary>
-        protected override PropTreeModes InitialPropTreeMode => s_openingMode;
+        protected override string PanelTitle => Translations.Translate("BOB_NAM") + " : " + Translations.Translate("BOB_SCA_TIT");
 
         // Trees or props?
         private bool IsTree => PropTreeMode == PropTreeModes.Tree;
-
-        /// <summary>
-        /// Creates the panel object in-game and displays it.
-        /// </summary>
-        /// <param name="initialMode">Initial prop-tree opening mode.</param>
-        /// <param name="selectedPrefab">Already selected prefab (null if none).</param>
-        internal static void Create(PropTreeModes initialMode, PrefabInfo selectedPrefab)
-        {
-            try
-            {
-                // If no GameObject instance already set, create one.
-                if (s_gameObject == null)
-                {
-                    // Give it a unique name for easy finding with ModTools.
-                    s_gameObject = new GameObject("BOBScalePanel");
-                    s_gameObject.transform.parent = UIView.GetAView().transform;
-
-                    // Set opening prop-tree mode.
-                    if (initialMode == PropTreeModes.Tree)
-                    {
-                        s_openingMode = PropTreeModes.Tree;
-                    }
-                    else
-                    {
-                        s_openingMode = PropTreeModes.Prop;
-                    }
-
-                    // Create new panel instance and add it to GameObject.
-                    s_panel = s_gameObject.AddComponent<BOBScalePanel>();
-
-                    // Select previously selected prefab, if any.
-                    if (selectedPrefab != null)
-                    {
-                        s_panel.SelectedLoadedPrefab = selectedPrefab;
-                        s_panel._loadedList.FindItem<LoadedPrefabItem>(x => x.Prefab == selectedPrefab);
-                    }
-
-                    // Hide previous window, if any.
-                    BOBPanelManager.Panel?.Hide();
-                }
-            }
-            catch (Exception e)
-            {
-                Logging.LogException(e, "exception creating scale panel");
-            }
-        }
-
-        /// <summary>
-        /// Closes the panel by destroying the object (removing any ongoing UI overhead).
-        /// </summary>
-        internal static void Close()
-        {
-            // Don't do anything if no panel.
-            if (s_panel == null)
-            {
-                return;
-            }
-
-            // Destroy game objects.
-            GameObject.Destroy(s_panel);
-            GameObject.Destroy(s_gameObject);
-
-            // Let the garbage collector do its work (and also let us know that we've closed the object).
-            s_panel = null;
-            s_gameObject = null;
-
-            // Show previous window, if any.
-            BOBPanelManager.Panel?.Show();
-        }
-
-        /// <summary>
-        /// Close button event handler.
-        /// </summary>
-        protected override void CloseEvent() => Close();
 
         /// <summary>
         /// Populates the replacement UIList with a filtered list of eligible relacement trees or props.
@@ -407,6 +316,15 @@ namespace BOB
 
             // Regenerate replacement list.
             RegenerateReplacementList();
+        }
+
+        /// <summary>
+        /// Performs any actions required before closing the panel.
+        /// </summary>
+        protected override void PreClose()
+        {
+            // Show previous window, if any.
+            BOBPanelManager.Panel?.Show();
         }
 
         /// <summary>

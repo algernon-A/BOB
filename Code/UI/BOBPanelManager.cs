@@ -71,7 +71,7 @@ namespace BOB
                     }
                     else
                     {
-                        Close(false);
+                        Close();
                         Create(selectedPrefab);
                     }
                 }
@@ -84,7 +84,7 @@ namespace BOB
                     }
                     else
                     {
-                        Close(false);
+                        Close();
                         Create(selectedPrefab);
                     }
                 }
@@ -97,7 +97,7 @@ namespace BOB
                     }
                     else
                     {
-                        Close(false);
+                        Close();
                         Create(selectedPrefab);
                     }
                 }
@@ -107,18 +107,16 @@ namespace BOB
         /// <summary>
         /// Closes the panel by destroying the object (removing any ongoing UI overhead).
         /// </summary>
-        /// <param name="resetTool">True to reset to default tool; false to leave current tool untouched (default true).</param>
-        internal static void Close(bool resetTool = true)
+        internal static void Close()
         {
             // Check for null, just in case - this is also called by pressing Esc when BOB tool is active.
             if (s_panel != null)
             {
-                // Perform any panel actions on close.
+                // Close the panel.
                 s_panel.Close();
 
                 // Stop highlighting.
-                s_panel.SelectedTargetItem = null;
-                RenderOverlays.Building = null;
+                RenderOverlays.ClearHighlighting();
 
                 // Revert overlay patches.
                 Patcher.Instance.PatchBuildingOverlays(false);
@@ -131,20 +129,6 @@ namespace BOB
                 // Store previous position.
                 s_previousX = Panel.relativePosition.x;
                 s_previousY = Panel.relativePosition.y;
-
-                // Destroy game objects.
-                GameObject.Destroy(Panel);
-                GameObject.Destroy(s_gameObject);
-
-                // Let the garbage collector do its work (and also let us know that we've closed the object).
-                s_panel = null;
-                s_gameObject = null;
-
-                // Restore default tool if needed.
-                if (resetTool)
-                {
-                    ToolsModifierControl.SetTool<DefaultTool>();
-                }
             }
         }
 
@@ -234,6 +218,9 @@ namespace BOB
                         return;
                     }
 
+                    // Create panel close event handler.
+                    s_panel.EventClose += Close;
+
                     // Set up panel with selected prefab.
                     Panel.SetTargetParent(selectedPrefab);
                 }
@@ -255,6 +242,26 @@ namespace BOB
                     s_gameObject = null;
                 }
             }
+        }
+
+        /// <summary>
+        /// Destroys the panel and containing GameObject (removing any ongoing UI overhead).
+        /// </summary>
+        private static void DestroyPanel()
+        {
+            // Don't do anything if no panel.
+            if (s_panel == null)
+            {
+                return;
+            }
+
+            // Destroy game objects.
+            GameObject.Destroy(s_panel);
+            GameObject.Destroy(s_gameObject);
+
+            // Let the garbage collector do its work (and also let us know that we've closed the object).
+            s_panel = null;
+            s_gameObject = null;
         }
     }
 }

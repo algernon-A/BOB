@@ -50,7 +50,7 @@ namespace BOB
 
                 // Add pack button.
                 UIButton packButton = AddIconButton(this, PackButtonX, ToggleY, ToggleSize, "BOB_PNL_PKB", UITextures.LoadQuadSpriteAtlas("BOB-PropPack"));
-                packButton.eventClicked += (component, clickEvent) => BOBPackPanel.Create();
+                packButton.eventClicked += (component, clickEvent) => StandalonePanelManager<BOBPackPanel>.Create();
 
                 // Add repeat slider.
                 UIPanel repeatPanel = Sliderpanel(this, MidControlX, RepeatSliderY + Margin, SliderHeight);

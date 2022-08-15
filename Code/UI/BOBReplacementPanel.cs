@@ -211,7 +211,7 @@ namespace BOB
 
                 // Random settings button.
                 UIButton randomButton = AddIconButton(this, RandomButtonX, ToggleY, ToggleSize, "BOB_PNL_RST", UITextures.LoadQuadSpriteAtlas("BOB-Random"));
-                randomButton.eventClicked += (control, clickEvent) => BOBRandomPanel.Create();
+                randomButton.eventClicked += (control, clickEvent) => StandalonePanelManager<BOBRandomPanel>.Create();
 
                 // Set initial button states.
                 UpdateButtonStates();
@@ -318,6 +318,11 @@ namespace BOB
         protected abstract string[] TreeModeTipKeys { get; }
 
         /// <summary>
+        /// Gets the panel's title.
+        /// </summary>
+        protected override string PanelTitle => Translations.Translate("BOB_NAM");
+
+        /// <summary>
         /// Gets the initial tree/prop checked state for this panel.
         /// </summary>
         protected override PropTreeModes InitialPropTreeMode => ModSettings.LastPropTreeMode;
@@ -379,15 +384,6 @@ namespace BOB
         }
 
         /// <summary>
-        /// Performs any actions-on-close for the panel.
-        /// </summary>
-        internal override void Close()
-        {
-            // Perform post-update tasks, such as saving the config file and refreshing renders.
-            FinishUpdate();
-        }
-
-        /// <summary>
         /// Sets the target parent prefab.
         /// </summary>
         /// <param name="targetPrefabInfo">Target prefab to set.</param>
@@ -398,8 +394,8 @@ namespace BOB
 
             base.SetTargetParent(targetPrefabInfo);
 
-            // Title label.
-            SetTitle(Translations.Translate("BOB_NAM") + ": " + GetDisplayName(targetPrefabInfo.name));
+            // Update title label.
+            TitleText = Translations.Translate("BOB_NAM") + ": " + GetDisplayName(targetPrefabInfo.name);
         }
 
         /// <summary>
@@ -562,6 +558,15 @@ namespace BOB
                 // No - show normal loaded prefab list.
                 base.RegenerateReplacementList();
             }
+        }
+
+        /// <summary>
+        /// Performs any actions required before closing the panel.
+        /// </summary>
+        protected override void PreClose()
+        {
+            // Perform post-update tasks, such as saving the config file and refreshing renders.
+            FinishUpdate();
         }
 
         /// <summary>

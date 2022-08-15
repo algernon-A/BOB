@@ -181,7 +181,7 @@ namespace BOB
 
                 // Scale button.
                 UIButton scaleButton = AddIconButton(this, MiddleX, ToggleY, ToggleSize, "BOB_PNL_SCA", UITextures.LoadQuadSpriteAtlas("BOB-Scale"));
-                scaleButton.eventClicked += (control, clickEvent) => BOBScalePanel.Create(PropTreeMode, _selectedReplacementPrefab);
+                scaleButton.eventClicked += (control, clickEvent) => StandalonePanelManager<BOBScalePanel>.Create();
 
                 // Preview image.
                 _previewPanel = AddUIComponent<PreviewPanel>();
@@ -195,6 +195,16 @@ namespace BOB
                 Logging.LogException(e, "exception creating base info panel");
             }
         }
+
+        /// <summary>
+        /// Gets the panel width.
+        /// </summary>
+        public override float PanelWidth => RightX + RightWidth + Margin;
+
+        /// <summary>
+        /// Gets the panel height.
+        /// </summary>
+        public override float PanelHeight => ListY + ListHeight + (Margin * 2f);
 
         /// <summary>
         /// Gets or sets the current target item and updates button states accordingly.
@@ -255,16 +265,6 @@ namespace BOB
                 _previewPanel.SetTarget(value);
             }
         }
-
-        /// <summary>
-        /// Gets the panel width.
-        /// </summary>
-        protected override float PanelWidth => RightX + RightWidth + Margin;
-
-        /// <summary>
-        /// Gets the panel height.
-        /// </summary>
-        protected override float PanelHeight => ListY + ListHeight + (Margin * 2f);
 
         /// <summary>
         /// Gets the panel opacity.
@@ -356,13 +356,6 @@ namespace BOB
         }
 
         /// <summary>
-        /// Performs any actions-on-close for the panel.
-        /// </summary>
-        internal virtual void Close()
-        {
-        }
-
-        /// <summary>
         /// Regenerates the target fastlist with a list of target-specific trees or props.
         /// </summary>
         protected abstract void RegenerateTargetList();
@@ -385,11 +378,6 @@ namespace BOB
         /// <param name="c">Calling component.</param>
         /// <param name="p">Mouse event parameter.</param>
         protected abstract void Revert(UIComponent c, UIMouseEventParameter p);
-
-        /// <summary>
-        /// Close button event handler.
-        /// </summary>
-        protected override void CloseEvent() => BOBPanelManager.Close();
 
         /// <summary>
         /// Updates the target item record for changes in replacement status (e.g. after applying or reverting changes).

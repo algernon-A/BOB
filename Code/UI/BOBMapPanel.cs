@@ -41,6 +41,11 @@ namespace BOB
         }
 
         /// <summary>
+        /// Gets the panel's title.
+        /// </summary>
+        protected override string PanelTitle => Translations.Translate("BOB_NAM");
+
+        /// <summary>
         /// Sets the target parent prefab.
         /// </summary>
         /// <param name="targetPrefabInfo">Target prefab to set.</param>
@@ -48,9 +53,6 @@ namespace BOB
         {
             // Base setup.
             base.SetTargetParent(targetPrefabInfo);
-
-            // Title label.
-            SetTitle(Translations.Translate("BOB_NAM"));
 
             // Set intial prop/tree mode, deselecting previous selection and disabling events throughout.
             m_ignorePropTreeCheckChanged = true;

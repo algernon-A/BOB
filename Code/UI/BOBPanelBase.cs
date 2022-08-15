@@ -14,7 +14,7 @@ namespace BOB
     /// Panel to setup random props/trees.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:Fields should be private", Justification = "Protected fields")]
-    internal abstract class BOBPanelBase : UIPanel
+    internal abstract class BOBPanelBase : StandalonePanel
     {
         /// <summary>
         /// Layout margin.
@@ -123,7 +123,6 @@ namespace BOB
 
         // Private components.
         private readonly UITextField _textSearchField;
-        private UILabel _titleLabel;
 
         // Current replacement mode.
         private PropTreeModes _propTreeMode = PropTreeModes.Prop;
@@ -134,33 +133,6 @@ namespace BOB
         /// </summary>
         internal BOBPanelBase()
         {
-            // Basic behaviour.
-            autoLayout = false;
-            canFocus = true;
-            isInteractive = true;
-
-            // Appearance.
-            backgroundSprite = "MenuPanel2";
-            opacity = PanelOpacity;
-
-            // Size.
-            size = new Vector2(PanelWidth, PanelHeight);
-
-            // Drag bar.
-            UIDragHandle dragHandle = AddUIComponent<UIDragHandle>();
-            dragHandle.width = this.width - 50f;
-            dragHandle.height = this.height;
-            dragHandle.relativePosition = Vector3.zero;
-            dragHandle.target = this;
-
-            // Close button.
-            UIButton closeButton = AddUIComponent<UIButton>();
-            closeButton.relativePosition = new Vector2(width - 35, 2);
-            closeButton.normalBgSprite = "buttonclose";
-            closeButton.hoveredBgSprite = "buttonclosehover";
-            closeButton.pressedBgSprite = "buttonclosepressed";
-            closeButton.eventClick += (component, clickEvent) => CloseEvent();
-
             // Text search field.
             _textSearchField = UITextFields.AddSmallLabelledTextField(this, width - 200f - Margin, TitleHeight + Margin, Translations.Translate("BOB_FIL_NAME"));
 
@@ -244,21 +216,6 @@ namespace BOB
         }
 
         /// <summary>
-        /// Gets the panel width.
-        /// </summary>
-        protected abstract float PanelWidth { get; }
-
-        /// <summary>
-        /// Gets the panel height.
-        /// </summary>
-        protected abstract float PanelHeight { get; }
-
-        /// <summary>
-        /// Gets the panel opacity.
-        /// </summary>
-        protected abstract float PanelOpacity { get; }
-
-        /// <summary>
         /// Gets the initial prop-tree mode for this panel.
         /// </summary>
         protected virtual PropTreeModes InitialPropTreeMode => PropTreeModes.Prop;
@@ -283,11 +240,6 @@ namespace BOB
         /// Gets the current search text.
         /// </summary>
         protected string SearchText => _textSearchField.text;
-
-        /// <summary>
-        /// Close button event handler.
-        /// </summary>
-        protected abstract void CloseEvent();
 
         /// <summary>
         /// Populates the replacement UIList with a filtered list of eligible relacement trees or props.
@@ -443,23 +395,6 @@ namespace BOB
             newButton.tooltip = Translations.Translate(tooltipKey);
 
             return newButton;
-        }
-
-        /// <summary>
-        /// Adds the title text label.
-        /// </summary>
-        /// <param name="title">Title text.</param>
-        protected void SetTitle(string title)
-        {
-            // Create new title lablel if none already set.
-            if (_titleLabel == null)
-            {
-                _titleLabel = AddUIComponent<UILabel>();
-            }
-
-            // Set text.
-            _titleLabel.text = title;
-            _titleLabel.relativePosition = new Vector2(50f, (TitleHeight - _titleLabel.height) / 2f);
         }
 
         /// <summary>

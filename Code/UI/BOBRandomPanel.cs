@@ -43,10 +43,6 @@ namespace BOB
         private const float RandomButtonY = LeftListY - ToggleSize - Margin;
         private const float NameFieldY = RandomButtonY - 22f - Margin;
 
-        // Instance references.
-        private static GameObject s_gameObject;
-        private static BOBRandomPanel s_panel;
-
         // Panel components.
         private readonly UIList _randomList;
         private readonly UIList _variationsList;
@@ -71,9 +67,6 @@ namespace BOB
         {
             // Default position - centre in screen.
             relativePosition = new Vector2(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
-
-            // Title label.
-            SetTitle(Translations.Translate("BOB_NAM") + " : " + Translations.Translate("BOB_RND_TIT"));
 
             // Disable 'both' check.
             m_propTreeChecks[(int)PropTreeModes.Both].Disable();
@@ -165,12 +158,20 @@ namespace BOB
 
             // Bring to front.
             BringToFront();
+
+            // Hide previous window, if any.
+            BOBPanelManager.Panel?.Hide();
         }
 
         /// <summary>
-        /// Gets the active panel instance.
+        /// Gets the panel width.
         /// </summary>
-        internal static BOBRandomPanel Panel => s_panel;
+        public override float PanelWidth => LoadedX + LoadedWidth + Margin;
+
+        /// <summary>
+        /// Gets the panel height.
+        /// </summary>
+        public override float PanelHeight => ListY + ListHeight + Margin;
 
         /// <summary>
         /// Sets the currently selected loaded prefab.
@@ -234,83 +235,12 @@ namespace BOB
         }
 
         /// <summary>
-        /// Gets the panel width.
+        /// Gets the panel's title.
         /// </summary>
-        protected override float PanelWidth => LoadedX + LoadedWidth + Margin;
-
-        /// <summary>
-        /// Gets the panel height.
-        /// </summary>
-        protected override float PanelHeight => ListY + ListHeight + Margin;
-
-        /// <summary>
-        /// Gets the panel opacity.
-        /// </summary>
-        protected override float PanelOpacity => 1f;
+        protected override string PanelTitle => Translations.Translate("BOB_NAM") + " : " + Translations.Translate("BOB_RND_TIT");
 
         // Trees or props?
         private bool IsTree => PropTreeMode == PropTreeModes.Tree;
-
-        /// <summary>
-        /// Creates the panel object in-game and displays it.
-        /// </summary>
-        internal static void Create()
-        {
-            try
-            {
-                // If no GameObject instance already set, create one.
-                if (s_gameObject == null)
-                {
-                    // Give it a unique name for easy finding with ModTools.
-                    s_gameObject = new GameObject("BOBRandomPanel");
-                    s_gameObject.transform.parent = UIView.GetAView().transform;
-
-                    // Create new panel instance and add it to GameObject.
-                    s_panel = s_gameObject.AddComponent<BOBRandomPanel>();
-
-                    // Hide previous window, if any.
-                    BOBPanelManager.Panel?.Hide();
-                }
-            }
-            catch (Exception e)
-            {
-                Logging.LogException(e, "exception creating random panel");
-            }
-        }
-
-        /// <summary>
-        /// Closes the panel by destroying the object (removing any ongoing UI overhead).
-        /// </summary>
-        internal static void Close()
-        {
-            // Don't do anything if no panel.
-            if (s_panel == null)
-            {
-                return;
-            }
-
-            // Save configuration file.
-            ConfigurationUtils.SaveConfig();
-
-            // Refresh random prop/tree lists.
-            BOBPanelManager.RefreshRandom();
-
-            // Destroy game objects.
-            GameObject.Destroy(s_panel);
-            GameObject.Destroy(s_gameObject);
-
-            // Let the garbage collector do its work (and also let us know that we've closed the object).
-            s_panel = null;
-            s_gameObject = null;
-
-            // Show previous window, if any.
-            BOBPanelManager.Panel?.Show();
-        }
-
-        /// <summary>
-        /// Close button event handler.
-        /// </summary>
-        protected override void CloseEvent() => Close();
 
         /// <summary>
         /// Populates the replacement UIList with a filtered list of eligible relacement trees or props.
@@ -389,6 +319,21 @@ namespace BOB
             // Regenerate lists.
             RegenerateRandomList();
             RegenerateReplacementList();
+        }
+
+        /// <summary>
+        /// Performs any actions required before closing the panel.
+        /// </summary>
+        protected override void PreClose()
+        {
+            // Save configuration file.
+            ConfigurationUtils.SaveConfig();
+
+            // Refresh random prop/tree lists.
+            BOBPanelManager.RefreshRandom();
+
+            // Show previous window, if any.
+            BOBPanelManager.Panel?.Show();
         }
 
         /// <summary>

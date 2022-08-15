@@ -234,6 +234,21 @@ namespace BOB
         }
 
         /// <summary>
+        /// Clears all highlighting data.
+        /// </summary>
+        internal static void ClearHighlighting()
+        {
+            Overlays.Clear();
+
+            s_propIndex = -1;
+            s_prop = null;
+            s_tree = null;
+            s_building = null;
+            s_lane = null;
+            s_network = null;
+        }
+
+        /// <summary>
         /// Overlay data struct.
         /// </summary>
         public struct OverlayData
