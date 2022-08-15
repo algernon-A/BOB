@@ -17,7 +17,7 @@ namespace BOB
     /// <summary>
     /// BOB map tree/prop replacement panel.
     /// </summary>
-    internal sealed class BOBMapPanel : BOBInfoPanelBase
+    internal sealed class BOBMapPanel : BOBReplacementPanelBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="BOBMapPanel"/> class.

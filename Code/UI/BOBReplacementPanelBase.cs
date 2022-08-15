@@ -1,4 +1,4 @@
-﻿// <copyright file="BOBInfoPanelBase.cs" company="algernon (K. Algernon A. Sheppard)">
+﻿// <copyright file="BOBReplacementPanelBase.cs" company="algernon (K. Algernon A. Sheppard)">
 // Copyright (c) algernon (K. Algernon A. Sheppard). All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 // </copyright>
@@ -19,7 +19,7 @@ namespace BOB
     /// Abstract base class for all BOB tree/prop replacement panels.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:Fields should be private", Justification = "Protected fields")]
-    internal abstract class BOBInfoPanelBase : BOBPanelBase
+    internal abstract class BOBReplacementPanelBase : BOBPanelBase
     {
         /// <summary>
         /// Middle layout column relative X position.
@@ -104,9 +104,9 @@ namespace BOB
         private PrefabInfo _selectedReplacementPrefab;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BOBInfoPanelBase"/> class.
+        /// Initializes a new instance of the <see cref="BOBReplacementPanelBase"/> class.
         /// </summary>
-        internal BOBInfoPanelBase()
+        internal BOBReplacementPanelBase()
         {
             try
             {
@@ -155,7 +155,7 @@ namespace BOB
                     }
                     else
                     {
-                        SelectedReplacementPrefab = data as PrefabInfo;
+                        SelectedReplacementPrefab = (data as LoadedPrefabItem)?.Prefab;
                     }
                 };
 
@@ -347,7 +347,6 @@ namespace BOB
                 _selectedParentPrefab = targetPrefabInfo;
 
                 // Clear selection.
-                SelectedTargetItem = null;
                 m_targetList.CurrentPosition = 0;
                 m_targetList.SelectedIndex = -1;
 
@@ -405,10 +404,6 @@ namespace BOB
         /// </summary>
         protected override void PropTreeChange()
         {
-            // Reset current items.
-            SelectedTargetItem = null;
-            SelectedReplacementPrefab = null;
-
             // Set 'no props' label text.
             m_noPropsLabel.text = Translations.Translate(PropTreeMode == PropTreeModes.Tree ? "BOB_PNL_NOT" : "BOB_PNL_NOP");
 
@@ -493,11 +488,6 @@ namespace BOB
             if (_selectedReplacementPrefab != null)
             {
                 m_replacementList.FindItem<LoadedPrefabItem>(x => x.Prefab == _selectedReplacementPrefab);
-            }
-            else
-            {
-                // No current selection.
-                m_replacementList.SelectedIndex = -1;
             }
         }
 

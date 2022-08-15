@@ -1,4 +1,4 @@
-﻿// <copyright file="BOBInfoPanel.cs" company="algernon (K. Algernon A. Sheppard)">
+﻿// <copyright file="BOBReplacementPanel.cs" company="algernon (K. Algernon A. Sheppard)">
 // Copyright (c) algernon (K. Algernon A. Sheppard). All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
 // </copyright>
@@ -18,7 +18,7 @@ namespace BOB
     /// Abstract class for building and network BOB tree/prop replacement panels.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:Fields should be private", Justification = "Protected fields")]
-    internal abstract class BOBInfoPanel : BOBInfoPanelBase
+    internal abstract class BOBReplacementPanel : BOBReplacementPanelBase
     {
         /// <summary>
         /// Mode button strip relative X-position.
@@ -132,9 +132,9 @@ namespace BOB
         private ReplacementModes _currentMode = ReplacementModes.Grouped;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BOBInfoPanel"/> class.
+        /// Initializes a new instance of the <see cref="BOBReplacementPanel"/> class.
         /// </summary>
-        internal BOBInfoPanel()
+        internal BOBReplacementPanel()
         {
             try
             {
@@ -677,10 +677,6 @@ namespace BOB
                         {
                             // Rebuild target list.
                             RegenerateTargetList();
-
-                            // Clear selection.
-                            m_targetList.SelectedIndex = -1;
-                            SelectedTargetItem = null;
                         }
                     }
                 }

@@ -18,7 +18,7 @@ namespace BOB
     {
         // Instance references.
         private static GameObject s_gameObject;
-        private static BOBInfoPanelBase s_panel;
+        private static BOBReplacementPanelBase s_panel;
 
         // Previous state.
         private static float s_previousX;
@@ -36,7 +36,7 @@ namespace BOB
         /// <summary>
         /// Gets the active panel instance.
         /// </summary>
-        internal static BOBInfoPanelBase Panel => s_panel;
+        internal static BOBReplacementPanelBase Panel => s_panel;
 
         /// <summary>
         /// Gets the last saved panel X position.
@@ -186,7 +186,7 @@ namespace BOB
         /// </summary>
         internal static void RefreshRandom()
         {
-            if (Panel is BOBInfoPanel infoPanel)
+            if (Panel is BOBReplacementPanel infoPanel)
             {
                 infoPanel.RefreshRandom();
             }

@@ -17,7 +17,7 @@ namespace BOB
     /// <summary>
     /// BOB network tree/prop replacement panel.
     /// </summary>
-    internal sealed class BOBNetPanel : BOBInfoPanel
+    internal sealed class BOBNetPanel : BOBReplacementPanel
     {
         // Layout constants.
         private const float PackButtonX = RandomButtonX + ToggleSize;
@@ -554,10 +554,6 @@ namespace BOB
                 // No lanes - show 'no props' label and return an empty list.
                 m_noPropsLabel.Show();
                 m_targetList.Data = new FastList<object>();
-
-                // Force clearance of current target item.
-                SelectedTargetItem = null;
-
                 return;
             }
 
@@ -928,9 +924,6 @@ namespace BOB
         /// </summary>
         private void UpdateAddedPops()
         {
-            // Clear current selection.
-            SelectedTargetItem = null;
-
             // Perform regular post-processing.
             FinishUpdate();
             RegenerateTargetList();

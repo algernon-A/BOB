@@ -17,7 +17,7 @@ namespace BOB
     /// <summary>
     /// BOB building tree/prop replacement panel.
     /// </summary>
-    internal sealed class BOBBuildingPanel : BOBInfoPanel
+    internal sealed class BOBBuildingPanel : BOBReplacementPanel
     {
         // Original selection values.
         private readonly List<BuildingPropHandler> _originalValues = new List<BuildingPropHandler>();
@@ -565,9 +565,6 @@ namespace BOB
                 m_noPropsLabel.Show();
                 m_targetList.Data = new FastList<object>();
 
-                // Force clearance of current target item.
-                SelectedTargetItem = null;
-
                 return;
             }
 
@@ -839,10 +836,6 @@ namespace BOB
             // Set current building.
             _selectedSubBuilding = _subBuildings[index];
 
-            // Reset current items.
-            SelectedTargetItem = null;
-            SelectedReplacementPrefab = null;
-
             // Reset lists.
             RegenerateReplacementList();
             RegenerateTargetList();
@@ -870,9 +863,6 @@ namespace BOB
         {
             // Update building prop references.
             _selectedSubBuilding.CheckReferences();
-
-            // Clear current selection.
-            SelectedTargetItem = null;
 
             // Perform regular post-processing.
             FinishUpdate();
