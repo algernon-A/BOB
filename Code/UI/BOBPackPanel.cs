@@ -26,7 +26,6 @@ namespace BOB
         internal const float ListWidth = 710f;
 
         // Layout constants.
-        private const float Margin = 5f;
         private const float ListHeight = 300f;
         private const float TitleBarHeight = 40f;
         private const float FooterY = TitleBarHeight + ListHeight + Margin;

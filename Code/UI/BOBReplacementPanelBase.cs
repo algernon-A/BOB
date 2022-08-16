@@ -90,7 +90,7 @@ namespace BOB
 
         // Layout constants - Y.
         private const float ListY = FilterY + FilterHeight;
-        private const float ListHeight = UIListRow.DefaultRowHeight * 20f;
+        private const float ListHeight = UIList.DefaultRowHeight * 20f;
         private const float ActionHeaderY = ActionsY - 15f;
 
         // Private components.

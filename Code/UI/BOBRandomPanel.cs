@@ -37,7 +37,7 @@ namespace BOB
         // Layout constants - Y.
         private const float ToolY = TitleHeight + Margin;
         private const float ListY = ToolY + ToolbarHeight + Margin;
-        private const float ListHeight = UIListRow.DefaultRowHeight * 16f;
+        private const float ListHeight = UIList.DefaultRowHeight * 16f;
         private const float LeftListY = ListY + 64f;
         private const float LeftListHeight = ListHeight - 64f;
         private const float RandomButtonY = LeftListY - ToggleSize - Margin;

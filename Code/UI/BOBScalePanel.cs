@@ -33,7 +33,7 @@ namespace BOB
         private const float MinOffsetY = ListY;
         private const float MaxOffsetY = MinOffsetY + SliderHeight;
         private const float RevertY = MaxOffsetY + SliderHeight + 45f;
-        private const float ListHeight = UIListRow.DefaultRowHeight * 16f;
+        private const float ListHeight = UIList.DefaultRowHeight * 16f;
 
         // Panel components.
         private readonly UIList _loadedList;

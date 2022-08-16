@@ -17,11 +17,6 @@ namespace BOB
     internal abstract class BOBPanelBase : StandalonePanel
     {
         /// <summary>
-        /// Layout margin.
-        /// </summary>
-        protected const float Margin = 5f;
-
-        /// <summary>
         /// Toggle button size.
         /// </summary>
         protected const float ToggleSize = 32f;
