@@ -20,7 +20,7 @@ namespace BOB
         public UUIKeymapping()
         {
             // Set label and button text.
-            Label = Translations.Translate("KEY_KEY");
+            Label = Translations.Translate("BOB_OPT_KEY");
             ButtonLabel = SavedInputKey.ToLocalizedString("KEYNAME", KeySetting);
         }
 

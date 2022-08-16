@@ -420,7 +420,7 @@ namespace BOB
                 foreach (LoadedPrefabItem loadedTree in PrefabLists.LoadedTreeItems)
                 {
                     // Apply vanilla filtering if selected.
-                    if (!m_hideVanilla.isChecked | loadedTree.IsVanilla)
+                    if (!m_hideVanilla.isChecked | !loadedTree.IsVanilla)
                     {
                         // Apply name filter.
                         if (!nameFilterActive || loadedTree.DisplayName.ToLower().Contains(SearchText.Trim().ToLower()))
@@ -439,7 +439,7 @@ namespace BOB
                 foreach (LoadedPrefabItem loadedProp in PrefabLists.LoadedPropItems)
                 {
                     // Apply vanilla filtering if selected.
-                    if (!m_hideVanilla.isChecked | loadedProp.IsVanilla)
+                    if (!m_hideVanilla.isChecked | !loadedProp.IsVanilla)
                     {
                         // Apply name filter.
                         if (!nameFilterActive || loadedProp.DisplayName.ToLower().Contains(SearchText.Trim().ToLower()))

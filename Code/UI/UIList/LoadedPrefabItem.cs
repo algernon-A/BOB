@@ -29,7 +29,7 @@ namespace BOB
         {
             // Initialise fields.
             _prefabInfo = prefabInfo;
-            _displayName = PrefabLists.GetDisplayName(prefabInfo.name);
+            _displayName = PrefabLists.GetDisplayName(prefabInfo);
             _creatorName = PrefabLists.GetCreator(prefabInfo);
             _isVanilla = !prefabInfo.m_isCustomContent;
         }
@@ -43,7 +43,7 @@ namespace BOB
             // Initialise fields.
             _prefabInfo = (PrefabInfo)randomPrefabInfo.Prop ?? randomPrefabInfo.Tree;
 
-            _displayName = PrefabLists.GetDisplayName(_prefabInfo.name);
+            _displayName = PrefabLists.GetDisplayName(_prefabInfo);
             _creatorName = string.Empty;
 
             // Grey this item if not all variants are loaded.

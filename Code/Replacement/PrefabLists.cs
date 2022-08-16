@@ -56,66 +56,50 @@ namespace BOB
         internal static void BuildLists()
         {
             // Initialise lists.
-            List<PropInfo> props = new List<PropInfo>();
-            List<TreeInfo> trees = new List<TreeInfo>();
+            List<LoadedPrefabItem> props = new List<LoadedPrefabItem>();
+            List<LoadedPrefabItem> trees = new List<LoadedPrefabItem>();
 
-            // Iterate through all loaded props.
+            // Generate target prop list.
             for (uint i = 0u; i < PrefabCollection<PropInfo>.LoadedCount(); ++i)
             {
                 // Get prop and add to our list, if it isn't null.
                 PropInfo prop = PrefabCollection<PropInfo>.GetLoaded(i);
                 if (prop?.name != null)
                 {
-                    props.Add(prop);
-
                     // Try to find random prop template if it isn't already there.
-                    if (RandomPropTemplate == null)
+                    if (RandomPropTemplate == null && prop.name.EndsWith("BOBRandomPropTemplate_Data"))
                     {
-                        if (prop.name.EndsWith("BOBRandomPropTemplate_Data"))
-                        {
-                            RandomPropTemplate = prop;
-                        }
+                        RandomPropTemplate = prop;
+                    }
+                    else
+                    {
+                        props.Add(new LoadedPrefabItem(prop));
                     }
                 }
             }
 
-            // Iterate through all loaded trees.
+            // Generate target tree list.
             for (uint i = 0u; i < PrefabCollection<TreeInfo>.LoadedCount(); ++i)
             {
                 // Get tree and add to our list, if it isn't null.
                 TreeInfo tree = PrefabCollection<TreeInfo>.GetLoaded(i);
                 if (tree?.name != null)
                 {
-                    trees.Add(tree);
-
                     // Try to find random tree template if it isn't already there.
-                    if (RandomTreeTemplate == null)
+                    if (RandomTreeTemplate == null && tree.name.EndsWith("BOBRandomTreeTemplate_Data"))
                     {
-                        if (tree.name.EndsWith("BOBRandomTreeTemplate_Data"))
-                        {
                             RandomTreeTemplate = tree;
-                        }
+                    }
+                    else
+                    {
+                        trees.Add(new LoadedPrefabItem(tree));
                     }
                 }
             }
 
-            // Generate target prop list.
-            props = props.OrderBy(prop => GetDisplayName(prop)).ToList();
-            LoadedPropItems = new LoadedPrefabItem[props.Count];
-            int index = 0;
-            foreach (PropInfo prop in props)
-            {
-                LoadedPropItems[index++] = new LoadedPrefabItem(prop);
-            }
-
-            // Generate target tree list.
-            trees = trees.OrderBy(tree => GetDisplayName(tree)).ToList();
-            LoadedTreeItems = new LoadedPrefabItem[trees.Count];
-            index = 0;
-            foreach (TreeInfo tree in trees)
-            {
-                LoadedTreeItems[index++] = new LoadedPrefabItem(tree);
-            }
+            // Order alphabetically.
+            LoadedPropItems = props.OrderBy(prop => prop.DisplayName).ToArray();
+            LoadedTreeItems = trees.OrderBy(tree => tree.DisplayName).ToArray();
 
             // Populate creators dictionary.
             GetCreators();
@@ -141,9 +125,8 @@ namespace BOB
                 return "[v] " + prefab.name;
             }
 
-            // Otherwise, omit the package number, and trim off any trailing _Data.
-            int index = prefab.name.IndexOf('.');
-            return prefab.name.Substring(index + 1).Replace("_Data", string.Empty);
+            // Otherwise, return the sanitised display name.
+            return GetDisplayName(prefab.name);
         }
 
         /// <summary>
