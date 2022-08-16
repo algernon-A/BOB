@@ -45,14 +45,8 @@ namespace BOB
         /// </summary>
         internal BOBPackPanel()
         {
-            // Pack list panel.
-            UIPanel packListPanel = AddUIComponent<UIPanel>();
-            packListPanel.width = ListWidth;
-            packListPanel.height = ListHeight;
-            packListPanel.relativePosition = new Vector3(Margin, TitleBarHeight);
-
             // Pack selection list.
-            _packSelectionList = UIList.AddUIList<PackRow>(packListPanel, 0f, 0f, ListWidth, ListHeight);
+            _packSelectionList = UIList.AddUIList<PackRow>(this, Margin, TitleBarHeight, ListWidth, ListHeight);
             _packSelectionList.EventSelectionChanged += (c, data) => SelectedPack = data as string;
 
             // Apply and revert button.

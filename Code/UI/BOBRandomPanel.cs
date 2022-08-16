@@ -73,27 +73,15 @@ namespace BOB
             m_propTreeChecks[(int)PropTreeModes.Both].Hide();
 
             // Selected random prop list.
-            UIPanel randomizerPanel = AddUIComponent<UIPanel>();
-            randomizerPanel.width = RandomizerWidth;
-            randomizerPanel.height = LeftListHeight;
-            randomizerPanel.relativePosition = new Vector2(RandomizerX, LeftListY);
-            _randomList = UIList.AddUIList<LoadedPrefabItem.DisplayRow>(randomizerPanel, 0f, 0f, RandomizerWidth, LeftListHeight);
+            _randomList = UIList.AddUIList<LoadedPrefabItem.DisplayRow>(this, RandomizerX, LeftListY, RandomizerWidth, LeftListHeight);
             _randomList.EventSelectionChanged += (c, data) => SelectedRandomPrefab = data as BOBRandomPrefab;
 
             // Variation selection list.
-            UIPanel selectedPanel = AddUIComponent<UIPanel>();
-            selectedPanel.width = SelectedWidth;
-            selectedPanel.height = ListHeight;
-            selectedPanel.relativePosition = new Vector2(SelectedX, ListY);
-            _variationsList = UIList.AddUIList<RandomComponentRow>(selectedPanel, 0f, 0f, SelectedWidth, ListHeight);
+            _variationsList = UIList.AddUIList<RandomComponentRow>(this, SelectedX, ListY, SelectedWidth, ListHeight);
             _randomList.EventSelectionChanged += (c, data) => SelectedVariation = data as BOBRandomPrefab.Variation;
 
             // Loaded prop list.
-            UIPanel loadedPanel = AddUIComponent<UIPanel>();
-            loadedPanel.width = LoadedWidth;
-            loadedPanel.height = ListHeight;
-            loadedPanel.relativePosition = new Vector2(LoadedX, ListY);
-            _loadedList = UIList.AddUIList<LoadedPrefabItem.DisplayRow>(loadedPanel, 0f, 0f, LoadedWidth, ListHeight);
+            _loadedList = UIList.AddUIList<LoadedPrefabItem.DisplayRow>(this, LoadedX, ListY, LoadedWidth, ListHeight);
             _randomList.EventSelectionChanged += (c, data) => SelectedLoadedPrefab = (data as LoadedPrefabItem)?.Prefab;
 
             // Name change textfield.
@@ -324,7 +312,8 @@ namespace BOB
         /// <summary>
         /// Performs any actions required before closing the panel.
         /// </summary>
-        protected override void PreClose()
+        /// <returns>True if the panel can close now, false otherwise.</returns>
+        protected override bool PreClose()
         {
             // Save configuration file.
             ConfigurationUtils.SaveConfig();
@@ -334,6 +323,8 @@ namespace BOB
 
             // Show previous window, if any.
             BOBPanelManager.Panel?.Show();
+
+            return true;
         }
 
         /// <summary>

@@ -96,7 +96,6 @@ namespace BOB
         // Private components.
         private readonly UIButton _targetNameSortButton;
         private readonly PreviewPanel _previewPanel;
-        private readonly UIPanel _rightPanel;
 
         // Current selections.
         private PrefabInfo _selectedParentPrefab;
@@ -134,19 +133,11 @@ namespace BOB
                 SetFgSprites(m_replacementNameSortButton, "IconUpArrow2");
 
                 // Target prop list.
-                UIPanel leftPanel = AddUIComponent<UIPanel>();
-                leftPanel.width = LeftWidth;
-                leftPanel.height = ListHeight;
-                leftPanel.relativePosition = new Vector2(Margin, ListY);
-                m_targetList = UIList.AddUIList<TargetListItem.DisplayRow>(leftPanel, 0f, 0f, LeftWidth, ListHeight);
+                m_targetList = UIList.AddUIList<TargetListItem.DisplayRow>(this, Margin, ListY, LeftWidth, ListHeight);
                 m_targetList.EventSelectionChanged += (c, data) => SelectedTargetItem = data as TargetListItem;
 
                 // Replacement prop list.
-                _rightPanel = AddUIComponent<UIPanel>();
-                _rightPanel.width = RightWidth;
-                _rightPanel.height = ListHeight;
-                _rightPanel.relativePosition = new Vector2(RightX, ListY);
-                m_replacementList = UIList.AddUIList<LoadedPrefabItem.DisplayRow>(_rightPanel, 0f, 0f, _rightPanel.width, _rightPanel.height);
+                m_replacementList = UIList.AddUIList<LoadedPrefabItem.DisplayRow>(this, RightX, ListY, RightWidth, ListHeight);
                 m_replacementList.EventSelectionChanged += (c, data) =>
                 {
                     if (data is BOBRandomPrefab randomPrefab)
@@ -160,7 +151,7 @@ namespace BOB
                 };
 
                 // 'No props' label (starts hidden).
-                m_noPropsLabel = leftPanel.AddUIComponent<UILabel>();
+                m_noPropsLabel = m_replacementList.AddUIComponent<UILabel>();
                 m_noPropsLabel.relativePosition = new Vector2(Margin, Margin);
                 m_noPropsLabel.text = Translations.Translate(PropTreeMode == PropTreeModes.Tree ? "BOB_PNL_NOT" : "BOB_PNL_NOP");
                 m_noPropsLabel.Hide();

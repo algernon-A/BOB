@@ -641,10 +641,13 @@ namespace BOB
         /// <summary>
         /// Performs any actions required before closing the panel.
         /// </summary>
-        protected override void PreClose()
+        /// <returns>True if the panel can close now, false otherwise.</returns>
+        protected override bool PreClose()
         {
             // Perform post-update tasks, such as saving the config file and refreshing renders.
             FinishUpdate();
+
+            return true;
         }
 
         /// <summary>
