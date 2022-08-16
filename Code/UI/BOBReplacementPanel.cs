@@ -100,11 +100,6 @@ namespace BOB
         /// </summary>
         protected bool m_ignoreSliderValueChange = true;
 
-        /// <summary>
-        /// Ignore selected parent prefab change events.
-        /// </summary>
-        protected bool m_ignoreSelectedPrefabChange = true;
-
         // Mode button strip relative Y-position.
         private const float ModeY = ToggleY;
         private const float FieldOffset = SliderHeight + Margin;
