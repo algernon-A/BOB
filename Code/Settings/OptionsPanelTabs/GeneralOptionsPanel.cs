@@ -29,7 +29,7 @@ namespace BOB
 
             // Language dropdown.
             UIDropDown languageDrop = UIDropDowns.AddPlainDropDown(panel, 0f, 0f, Translations.Translate("TRN_CHOICE"), Translations.LanguageList, Translations.Index);
-            languageDrop.eventSelectedIndexChanged += (control, index) =>
+            languageDrop.eventSelectedIndexChanged += (c, index) =>
             {
                 Translations.Index = index;
                 OptionsPanelManager<OptionsPanel>.LocaleChanged();
@@ -46,17 +46,17 @@ namespace BOB
                 Translations.Translate("BOB_PER_GRP"),
             };
             UIDropDown groupDropDown = UIDropDowns.AddPlainDropDown(panel, 0f, 0f, Translations.Translate("BOB_PER_IND"), groupItems, ModSettings.IndividualDefault, 350f);
-            groupDropDown.eventSelectedIndexChanged += (control, index) => ModSettings.IndividualDefault = index;
+            groupDropDown.eventSelectedIndexChanged += (c, index) => ModSettings.IndividualDefault = index;
 
             // Rember last position.
             UICheckBox rememberPosCheck = UICheckBoxes.AddPlainCheckBox(panel, Translations.Translate("BOB_OPT_POS"));
             rememberPosCheck.isChecked = ModSettings.RememberPosition;
-            rememberPosCheck.eventCheckChanged += (control, isChecked) => ModSettings.RememberPosition = isChecked;
+            rememberPosCheck.eventCheckChanged += (c, isChecked) => ModSettings.RememberPosition = isChecked;
 
             // Disable vanilla tree tool network tree replacement.
             UICheckBox disableTreeToolCheck = UICheckBoxes.AddPlainCheckBox(panel, Translations.Translate("BOB_OPT_DTT"));
             disableTreeToolCheck.isChecked = ModSettings.DisableTreeTool;
-            disableTreeToolCheck.eventCheckChanged += (control, isChecked) => ModSettings.DisableTreeTool = isChecked;
+            disableTreeToolCheck.eventCheckChanged += (c, isChecked) => ModSettings.DisableTreeTool = isChecked;
 
             // Tree tool control.
             OptionsKeymapping treeDisableKeyMapping = panel.gameObject.AddComponent<OptionsKeymapping>();

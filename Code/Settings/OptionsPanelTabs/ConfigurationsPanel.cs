@@ -81,7 +81,7 @@ namespace BOB
             // File name textfield.
             UILabel fileTextLabel = UILabels.AddLabel(panel, ControlPanelX, ListY, "New configuration name:");
             _fileNameField = UITextFields.AddTextField(panel, ControlPanelX, ListY + fileTextLabel.height);
-            _fileNameField.eventTextChanged += (control, text) => UpdateButtonStates();
+            _fileNameField.eventTextChanged += (c, text) => UpdateButtonStates();
 
             // Buttons.
             _activeCopyButton = UIButtons.AddButton(panel, ControlPanelX, ListY + 70f, Translations.Translate("BOB_CFG_SAC"), 300f, scale: 0.8f);
@@ -98,7 +98,7 @@ namespace BOB
             {
                 // Use custom check box.
                 _customCheck = UICheckBoxes.AddLabelledCheckBox(panel, Margin, ToolBarY, Translations.Translate("BOB_CFG_UCS"));
-                _customCheck.eventCheckChanged += (control, isChecked) =>
+                _customCheck.eventCheckChanged += (c, isChecked) =>
                 {
                     // If we've got a valid selection, set the current config name to this.
                     if (isChecked && !string.IsNullOrEmpty(s_selectedConfig))
@@ -118,11 +118,11 @@ namespace BOB
                 // Clean up config button.
                 UIButton cleanUpButton = UIButtons.AddButton(panel, Margin + 50f, FooterY + 150f, Translations.Translate("BOB_CFG_CLE"), 300f);
                 cleanUpButton.tooltip = Translations.Translate("BOB_CFG_CLE_TIP");
-                cleanUpButton.eventClicked += (control, clickEvent) => ConfigurationUtils.Cleanup();
+                cleanUpButton.eventClicked += (c, clickEvent) => ConfigurationUtils.Cleanup();
 
                 // Nuke all settings button.
                 UIButton nukeButton = UIButtons.AddButton(panel, Margin + 50f, FooterY + 200f, Translations.Translate("BOB_NUKE"), 300f);
-                nukeButton.eventClicked += (control, clickEvent) =>
+                nukeButton.eventClicked += (c, clickEvent) =>
                 {
                     // Revert all-building and building settings.
                     ReplacementUtils.NukeSettings();
@@ -130,7 +130,7 @@ namespace BOB
 
                 // Clean map data button.
                 UIButton cleanSaveButton = UIButtons.AddButton(panel, Margin + 50f, FooterY + 280f, Translations.Translate("BOB_CFG_CMD"), 300f, scale: 0.8f, tooltip: Translations.Translate("BOB_CFG_CMD_TIP"));
-                cleanSaveButton.eventClicked += (control, clickEvent) =>
+                cleanSaveButton.eventClicked += (c, clickEvent) =>
                 {
                     // Clean all map data.
                     MapTreeReplacement.Instance.Replacements.Clear();

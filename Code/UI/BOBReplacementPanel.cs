@@ -211,7 +211,7 @@ namespace BOB
 
                 // Random settings button.
                 UIButton randomButton = AddIconButton(this, RandomButtonX, ToggleY, ToggleSize, "BOB_PNL_RST", UITextures.LoadQuadSpriteAtlas("BOB-Random"));
-                randomButton.eventClicked += (control, clickEvent) => StandalonePanelManager<BOBRandomPanel>.Create();
+                randomButton.eventClicked += (c, clickEvent) => StandalonePanelManager<BOBRandomPanel>.Create();
 
                 // Set initial button states.
                 UpdateButtonStates();
@@ -219,11 +219,11 @@ namespace BOB
 
                 // Add button.
                 m_addButton = AddIconButton(this, MidControlX, ActionsY2, ActionSize, "BOB_PNL_ADD", UITextures.LoadQuadSpriteAtlas("BOB-RoundPlus"));
-                m_addButton.eventClicked += (control, clickEvent) => AddNew();
+                m_addButton.eventClicked += (c, clickEvent) => AddNew();
 
                 // Remove button.
                 m_removeButton = AddIconButton(this, MidControlX + ActionSize, ActionsY2, ActionSize, "BOB_PNL_REM", UITextures.LoadQuadSpriteAtlas("BOB-RoundMinus"));
-                m_removeButton.eventClicked += (control, clickEvent) => RemoveProp();
+                m_removeButton.eventClicked += (c, clickEvent) => RemoveProp();
 
                 // Add/remove button initial visibility.
                 bool eligibleMode = CurrentMode == ReplacementModes.Individual | CurrentMode == ReplacementModes.Grouped;

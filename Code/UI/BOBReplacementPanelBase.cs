@@ -172,7 +172,7 @@ namespace BOB
 
                 // Scale button.
                 UIButton scaleButton = AddIconButton(this, MiddleX, ToggleY, ToggleSize, "BOB_PNL_SCA", UITextures.LoadQuadSpriteAtlas("BOB-Scale"));
-                scaleButton.eventClicked += (control, clickEvent) => StandalonePanelManager<BOBScalePanel>.Create();
+                scaleButton.eventClicked += (c, clickEvent) => StandalonePanelManager<BOBScalePanel>.Create();
 
                 // Preview image.
                 _previewPanel = AddUIComponent<PreviewPanel>();

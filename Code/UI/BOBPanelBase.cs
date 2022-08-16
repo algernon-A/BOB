@@ -137,8 +137,8 @@ namespace BOB
             _textSearchField = UITextFields.AddSmallLabelledTextField(this, width - 200f - Margin, TitleHeight + Margin, Translations.Translate("BOB_FIL_NAME"));
 
             // Event handlers for text search field.
-            _textSearchField.eventTextChanged += (control, text) => RegenerateReplacementList();
-            _textSearchField.eventTextSubmitted += (control, text) => RegenerateReplacementList();
+            _textSearchField.eventTextChanged += (c, text) => RegenerateReplacementList();
+            _textSearchField.eventTextSubmitted += (c, text) => RegenerateReplacementList();
 
             // Vanilla filter.
             m_hideVanilla = UICheckBoxes.AddLabelledCheckBox((UIComponent)(object)this, _textSearchField.relativePosition.x, _textSearchField.relativePosition.y + _textSearchField.height + (Margin / 2f), Translations.Translate("BOB_PNL_HDV"), 12f, 0.7f);
