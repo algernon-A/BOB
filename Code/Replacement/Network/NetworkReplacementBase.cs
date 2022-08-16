@@ -80,7 +80,7 @@ namespace BOB
 
             // Record replacement prop.
             thisReplacement.ReplacementInfo = replacementInfo;
-            thisReplacement.Replacement = replacementInfo.name;
+            thisReplacement.ReplacementName = replacementInfo.name;
 
             // Apply replacement.
             ApplyReplacement(thisReplacement);
@@ -233,7 +233,7 @@ namespace BOB
                     replacement.TargetInfo = replacement.IsTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.Target) : PrefabCollection<PropInfo>.FindLoaded(replacement.Target);
 
                     // Try to find replacement prefab.
-                    replacement.ReplacementInfo = ConfigurationUtils.FindReplacementPrefab(replacement.Replacement, replacement.IsTree);
+                    replacement.ReplacementInfo = ConfigurationUtils.FindReplacementPrefab(replacement.ReplacementName, replacement.IsTree);
 
                     // Try to apply the replacement.
                     ApplyReplacement(replacement);

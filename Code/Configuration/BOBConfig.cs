@@ -210,7 +210,7 @@ namespace BOB
         /// <summary>
         /// Base replacement record XML format.
         /// </summary>
-        public class ReplacementBase
+        public abstract class Replacement
         {
             // Replacement name.
             [XmlIgnore]
@@ -232,7 +232,7 @@ namespace BOB
             /// Gets or sets the replacement prefab name.
             /// </summary>
             [XmlAttribute("replacement")]
-            public string Replacement
+            public string ReplacementName
             {
                 get => ReplacementInfo?.name ?? _replacementName ?? string.Empty;
                 set => _replacementName = value;
@@ -320,7 +320,7 @@ namespace BOB
         /// <summary>
         /// Building replacement record XML format.
         /// </summary>
-        public class BuildingReplacement : ReplacementBase
+        public class BuildingReplacement : Replacement
         {
             /// <summary>
             /// Gets or sets a value indicating whether this replacement has a custom height (Y-position offset).
@@ -338,7 +338,7 @@ namespace BOB
         /// <summary>
         /// Network replacement record XML format.
         /// </summary>
-        public class NetReplacement : ReplacementBase
+        public class NetReplacement : Replacement
         {
             /// <summary>
             /// Gets or sets the target lane index.

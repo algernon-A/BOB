@@ -455,7 +455,7 @@ namespace BOB
         /// </summary>
         /// <param name="replacementList">Replacement list to clean.</param>
         private static void CleanReplacements<T>(List<T> replacementList)
-            where T : BOBConfig.ReplacementBase
+            where T : BOBConfig.Replacement
         {
             // Iterate through replacements for this building and remove any that refer to unloaded props/trees.
             List<T> removeReplacementList = new List<T>();

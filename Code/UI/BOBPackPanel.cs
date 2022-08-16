@@ -119,7 +119,7 @@ namespace BOB
             // Update parent panel, if it's open.
             if (BOBPanelManager.Panel != null)
             {
-                BOBPanelManager.Panel.UpdateTargetList();
+                BOBPanelManager.Panel.RefreshTargetList();
             }
 
             // Update renders.

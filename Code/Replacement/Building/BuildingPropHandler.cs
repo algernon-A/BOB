@@ -255,12 +255,12 @@ namespace BOB
         /// Applies the specified replacement as a temporary preview.
         /// </summary>
         /// <param name="previewReplacement">Replacement to preview.</param>
-        public void PreviewReplacement(BOBConfig.BuildingReplacement previewReplacement) => ReplaceProp(previewReplacement);
+        public override void PreviewReplacement(BOBConfig.Replacement previewReplacement) => ReplaceProp(previewReplacement);
 
         /// <summary>
         /// Clears any temporary preview, restoring the permanent underlying state.
         /// </summary>
-        public void ClearPreview() => UpdateProp();
+        public override void ClearPreview() => UpdateProp();
 
         /// <summary>
         /// Updates the target prop according current active replacement status.
@@ -284,37 +284,40 @@ namespace BOB
         /// Replaces the target prop using the specified building replacement.
         /// </summary>
         /// <param name="replacement">Building replacement element to apply.</param>
-        private void ReplaceProp(BOBConfig.BuildingReplacement replacement)
+        private void ReplaceProp(BOBConfig.Replacement replacement)
         {
-            // Convert offset to Vector3.
-            Vector3 offset = new Vector3
+            if (replacement is BOBConfig.BuildingReplacement buildingReplacement)
             {
-                x = replacement.OffsetX,
-                y = replacement.OffsetY,
-                z = replacement.OffsetZ,
-            };
+                // Convert offset to Vector3.
+                Vector3 offset = new Vector3
+                {
+                    x = buildingReplacement.OffsetX,
+                    y = buildingReplacement.OffsetY,
+                    z = buildingReplacement.OffsetZ,
+                };
 
-            // Apply replacement.
-            _buildingInfo.m_props[PropIndex].m_prop = replacement.ReplacementProp;
-            _buildingInfo.m_props[PropIndex].m_finalProp = replacement.ReplacementProp;
-            _buildingInfo.m_props[PropIndex].m_tree = replacement.ReplacementTree;
-            _buildingInfo.m_props[PropIndex].m_finalTree = replacement.ReplacementTree;
+                // Apply replacement.
+                _buildingInfo.m_props[PropIndex].m_prop = buildingReplacement.ReplacementProp;
+                _buildingInfo.m_props[PropIndex].m_finalProp = buildingReplacement.ReplacementProp;
+                _buildingInfo.m_props[PropIndex].m_tree = buildingReplacement.ReplacementTree;
+                _buildingInfo.m_props[PropIndex].m_finalTree = buildingReplacement.ReplacementTree;
 
-            // Set m_fixedHeight.
-            _buildingInfo.m_props[PropIndex].m_fixedHeight = replacement.CustomHeight;
+                // Set m_fixedHeight.
+                _buildingInfo.m_props[PropIndex].m_fixedHeight = buildingReplacement.CustomHeight;
 
-            // Angle and offset.
-            _buildingInfo.m_props[PropIndex].m_radAngle = OriginalRadAngle + (replacement.Angle * Mathf.Deg2Rad);
-            _buildingInfo.m_props[PropIndex].m_position = OriginalPosition + offset;
+                // Angle and offset.
+                _buildingInfo.m_props[PropIndex].m_radAngle = OriginalRadAngle + (buildingReplacement.Angle * Mathf.Deg2Rad);
+                _buildingInfo.m_props[PropIndex].m_position = OriginalPosition + offset;
 
-            // Probability.
-            _buildingInfo.m_props[PropIndex].m_probability = replacement.Probability;
+                // Probability.
+                _buildingInfo.m_props[PropIndex].m_probability = buildingReplacement.Probability;
 
-            // Update building prop references.
-            _buildingInfo.CheckReferences();
+                // Update building prop references.
+                _buildingInfo.CheckReferences();
 
-            // Add building to dirty list.
-            BuildingData.DirtyList.Add(_buildingInfo);
+                // Add building to dirty list.
+                BuildingData.DirtyList.Add(_buildingInfo);
+            }
         }
     }
 }

@@ -232,7 +232,7 @@ namespace BOB
 
                 // Record replacement prop.
                 thisReplacement.ReplacementInfo = replacementInfo;
-                thisReplacement.Replacement = replacementInfo.name;
+                thisReplacement.ReplacementName = replacementInfo.name;
 
                 // Apply update to targeted prop.
                 NetLaneProps.Prop thisProp = lane.m_laneProps.m_props[propIndex];
@@ -460,7 +460,7 @@ namespace BOB
                     replacement.TargetInfo = replacement.IsTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.Target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.Target);
 
                     // Try to find replacement prefab.
-                    replacement.ReplacementInfo = ConfigurationUtils.FindReplacementPrefab(replacement.Replacement, replacement.IsTree);
+                    replacement.ReplacementInfo = ConfigurationUtils.FindReplacementPrefab(replacement.ReplacementName, replacement.IsTree);
 
                     // Try to apply the replacement.
                     replacement.PropIndex = AddProp(replacement);

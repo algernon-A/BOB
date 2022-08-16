@@ -90,7 +90,7 @@ namespace BOB
 
         // Layout constants - Y.
         private const float ListY = FilterY + FilterHeight;
-        private const float ListHeight = UIListRow.DefaultRowHeight * 18f;
+        private const float ListHeight = UIListRow.DefaultRowHeight * 20f;
         private const float ActionHeaderY = ActionsY - 15f;
 
         // Private components.
@@ -223,7 +223,7 @@ namespace BOB
                     PrefabInfo effectivePrefab = _selectedTargetItem.ActivePrefab;
 
                     // Select current replacement prefab.
-                    m_replacementList.FindItem(effectivePrefab);
+                    m_replacementList.FindItem<LoadedPrefabItem>(x => x.Prefab == effectivePrefab);
 
                     // Set current panel selection.
                     SelectedReplacementPrefab = effectivePrefab;
@@ -316,25 +316,6 @@ namespace BOB
         }
 
         /// <summary>
-        /// Updates all items in the target list.
-        /// </summary>
-        internal void UpdateTargetList()
-        {
-            // Iterate through each item in list.
-            foreach (object item in m_targetList.Data)
-            {
-                if (item is TargetListItem targetListItem)
-                {
-                    // Update status.
-                    UpdateTargetItem(targetListItem);
-                }
-            }
-
-            // Refresh list display.
-            m_targetList.Refresh();
-        }
-
-        /// <summary>
         /// Sets the target parent prefab.
         /// </summary>
         /// <param name="targetPrefabInfo">Target prefab to set.</param>
@@ -353,6 +334,13 @@ namespace BOB
                 // Update button states.
                 UpdateButtonStates();
             }
+        }
+
+        /// <summary>
+        /// Refreshes the panel's target list (called when external factors change, e.g. pack replacements).
+        /// </summary>
+        internal virtual void RefreshTargetList()
+        {
         }
 
         /// <summary>
@@ -378,14 +366,6 @@ namespace BOB
         /// <param name="c">Calling component.</param>
         /// <param name="p">Mouse event parameter.</param>
         protected abstract void Revert(UIComponent c, UIMouseEventParameter p);
-
-        /// <summary>
-        /// Updates the target item record for changes in replacement status (e.g. after applying or reverting changes).
-        /// </summary>
-        /// <param name="targetListItem">Target item.</param>
-        protected virtual void UpdateTargetItem(TargetListItem targetListItem)
-        {
-        }
 
         /// <summary>
         /// Performs actions required after a change to prop/tree mode.
@@ -486,7 +466,9 @@ namespace BOB
         {
             // Save configuration file and refresh target list (to reflect our changes).
             ConfigurationUtils.SaveConfig();
-            UpdateTargetList();
+
+            // Regenerate target list.
+            RegenerateTargetList();
 
             // Update button states.
             UpdateButtonStates();

@@ -23,32 +23,37 @@ namespace BOB
         /// <summary>
         /// Mode button strip relative X-position.
         /// </summary>
-        protected internal const float ModeX = Margin + (ToggleSize * 4f);
+        protected const float ModeX = Margin + (ToggleSize * 4f);
 
         /// <summary>
         /// Slider height.
         /// </summary>
-        protected internal const float SliderHeight = 38f;
+        protected const float SliderHeight = 38f;
 
         /// <summary>
         /// Repeat distance slider relative Y-position.
         /// </summary>
-        protected internal const float RepeatSliderY = ListBottom - FieldOffset;
+        protected const float RepeatSliderY = ListBottom - FieldOffset;
 
         /// <summary>
         /// 'Fixed height' checkbock relative Y position.
         /// </summary>
-        protected internal const float FixedHeightY = OffsetLabelY + 20f;
+        protected const float FixedHeightY = OffsetLabelY + 20f;
 
         /// <summary>
         /// Relatative Y-position of the bottom of the height slider panel.
         /// </summary>
-        protected internal const float HeightPanelBottomY = YOffsetY + SliderHeight;
+        protected const float HeightPanelBottomY = YOffsetY + SliderHeight;
 
         /// <summary>
         /// Relative X-position of the random panel button.
         /// </summary>
-        protected internal const float RandomButtonX = MiddleX + ToggleSize;
+        protected const float RandomButtonX = MiddleX + ToggleSize;
+
+        /// <summary>
+        /// Original prefab values (for reference when previewing).
+        /// </summary>
+        protected readonly List<PropHandler> m_originalValues = new List<PropHandler>();
 
         /// <summary>
         /// Probability slider.
@@ -271,12 +276,7 @@ namespace BOB
             set
             {
                 base.SelectedReplacementPrefab = value;
-
-                // If not ignoring events and value isn't null, apply live changes.
-                if (!m_ignoreSelectedPrefabChange && value != null)
-                {
-                    PreviewChange();
-                }
+                PreviewChange();
             }
         }
 
@@ -293,7 +293,7 @@ namespace BOB
                 _rotationPanel.isVisible = !(value?.ActivePrefab is TreeInfo);
 
                 // Record original stats for preview.
-                RecordOriginal();
+                RecordOriginals();
             }
         }
 
@@ -316,6 +316,25 @@ namespace BOB
         /// Gets the mode icon tooltip keys for tree modes.
         /// </summary>
         protected abstract string[] TreeModeTipKeys { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether there are currrently unapplied changes.
+        /// </summary>
+        protected virtual bool AreUnappliedChanges
+        {
+            get
+            {
+                return
+                SelectedTargetItem != null
+                &&
+                (m_xSlider.value != 0f
+                || m_ySlider.value != 0f
+                || m_zSlider.value != 0f
+                || m_rotationSlider.value != 0f
+                || m_probabilitySlider.value.RoundToNearest(1) != SelectedTargetItem.OriginalProbability
+                || SelectedReplacementPrefab != SelectedTargetItem.ActivePrefab);
+            }
+        }
 
         /// <summary>
         /// Gets the panel's title.
@@ -377,8 +396,8 @@ namespace BOB
                         RenderOverlays.Network = null;
                     }
 
-                    // Record original stats for preview.
-                    RecordOriginal();
+                    // Regenerate target list.
+                    RegenerateTargetList();
                 }
             }
         }
@@ -399,6 +418,11 @@ namespace BOB
         }
 
         /// <summary>
+        /// Refreshes the panel's target list (called when external factors change, e.g. pack replacements).
+        /// </summary>
+        internal override void RefreshTargetList() => RegenerateTargetList();
+
+        /// <summary>
         /// Refreshes the random prop/tree list.
         /// </summary>
         internal void RefreshRandom()
@@ -411,29 +435,88 @@ namespace BOB
         }
 
         /// <summary>
-        /// Reverts any previewed changes back to original prop/tree state.
-        /// </summary>
-        protected abstract void RevertPreview();
-
-        /// <summary>
-        /// Previews the current change.
-        /// </summary>
-        protected abstract void PreviewChange();
-
-        /// <summary>
         /// Adds a new tree or prop.
         /// </summary>
         protected abstract void AddNew();
 
         /// <summary>
-        /// Removes an added tree or prop.
-        /// </summary>
-        protected abstract void RemoveProp();
-
-        /// <summary>
         /// Record original prop values before previewing.
         /// </summary>
-        protected abstract void RecordOriginal();
+        protected abstract void RecordOriginals();
+
+        /// <summary>
+        /// Regenerate render and prefab data.
+        /// </summary>
+        protected abstract void UpdateData();
+
+        /// <summary>
+        /// Removes the currently selected added prop.
+        /// </summary>
+        protected abstract void RemoveAddedProp();
+
+        /// <summary>
+        /// Generates a new replacement record from current control settings.
+        /// </summary>
+        /// <returns>New replacement record.</returns>
+        protected abstract BOBConfig.Replacement GetReplacementFromControls();
+
+        /// <summary>
+        /// Previews the current change.
+        /// </summary>
+        protected virtual void PreviewChange()
+        {
+            // Don't do anything if no current selection.
+            if (SelectedTargetItem == null)
+            {
+                return;
+            }
+
+            // Don't do anything if no changes.
+            if (!AreUnappliedChanges)
+            {
+                // Reset apply button icon.
+                UnappliedChanges = false;
+
+                return;
+            }
+
+            // Update preview for each handler.
+            BOBConfig.Replacement previewReplacement = GetReplacementFromControls();
+
+            foreach (PropHandler handler in m_originalValues)
+            {
+                handler.PreviewReplacement(previewReplacement);
+            }
+
+            // Update renders.
+            UpdateData();
+
+            // Update highlighting target.
+            RenderOverlays.Prop = SelectedReplacementPrefab as PropInfo;
+            RenderOverlays.Tree = SelectedReplacementPrefab as TreeInfo;
+
+            // Update apply button icon to indicate change.
+            UnappliedChanges = true;
+        }
+
+        /// <summary>
+        /// Removes an added tree or prop.
+        /// </summary>
+        protected virtual void RemoveProp()
+        {
+            // First, revert any preview (to prevent any clobbering when preview is reverted).
+            RevertPreview();
+
+            // Create new props array with one fewer entry, and copy the old props to it.
+            // Remove prop reference and update other references as appropriate.
+            RemoveAddedProp();
+
+            // Regenerate original list to reflect new state.
+           // RecordOriginals();
+
+            // Post-action cleanup.
+            UpdateAddedProps();
+        }
 
         /// <summary>
         /// Event handler for ptop/tree checkbox changes.
@@ -570,10 +653,30 @@ namespace BOB
         }
 
         /// <summary>
+        /// Performs actions to be taken once an update (application or reversion) has been applied, including saving data, updating button states, and refreshing renders.
+        /// </summary>
+        protected override void FinishUpdate()
+        {
+            base.FinishUpdate();
+
+            // Update any dirty net renders.
+            UpdateData();
+        }
+
+        /// <summary>
+        /// Called after any added prop manipulations (addition or removal) to perform cleanup.
+        /// </summary>
+        protected virtual void UpdateAddedProps()
+        {
+            // Perform regular post-processing.
+            FinishUpdate();
+        }
+
+        /// <summary>
         /// Sets the sliders to the values specified in the given replacement record.
         /// </summary>
         /// <param name="replacement">Replacement record to use.</param>
-        protected virtual void SetSliders(BOBConfig.ReplacementBase replacement)
+        protected virtual void SetSliders(BOBConfig.Replacement replacement)
         {
             // Disable events.
             m_ignoreSliderValueChange = true;
@@ -600,6 +703,25 @@ namespace BOB
 
             // Re-enable events.
             m_ignoreSliderValueChange = false;
+        }
+
+        /// <summary>
+        /// Reverts any previewed changes back to original prop/tree state.
+        /// </summary>
+        protected void RevertPreview()
+        {
+            // Iterate through each original value.
+            foreach (PropHandler handler in m_originalValues)
+            {
+                // Restore original values.
+                handler.ClearPreview();
+            }
+
+            // Update prefabs.
+            UpdateData();
+
+            // Reset apply button icon
+            UnappliedChanges = false;
         }
 
         /// <summary>

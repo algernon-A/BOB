@@ -84,5 +84,16 @@ namespace BOB
         /// Gets the original probability.
         /// </summary>
         public int OriginalProbability => _originalProbability;
+
+        /// <summary>
+        /// Applies the specified replacement as a temporary preview.
+        /// </summary>
+        /// <param name="previewReplacement">Replacement to preview.</param>
+        public abstract void PreviewReplacement(BOBConfig.Replacement previewReplacement);
+
+        /// <summary>
+        /// Clears any temporary preview, restoring the permanent underlying state.
+        /// </summary>
+        public abstract void ClearPreview();
     }
 }

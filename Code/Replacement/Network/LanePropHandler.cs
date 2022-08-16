@@ -287,12 +287,12 @@ namespace BOB
         /// Applies the specified replacement as a temporary preview.
         /// </summary>
         /// <param name="previewReplacement">Replacement to preview.</param>
-        public void PreviewReplacement(BOBConfig.NetReplacement previewReplacement) => ReplaceProp(previewReplacement);
+        public override void PreviewReplacement(BOBConfig.Replacement previewReplacement) => ReplaceProp(previewReplacement);
 
         /// <summary>
         /// Clears any temporary preview, restoring the permanent underlying state.
         /// </summary>
-        public void ClearPreview() => UpdateProp();
+        public override void ClearPreview() => UpdateProp();
 
         /// <summary>
         /// Updates the target prop according current active replacement status.
@@ -316,48 +316,51 @@ namespace BOB
         /// Replaces the target prop using the specified building replacement.
         /// </summary>
         /// <param name="replacement">Network replacement element to apply.</param>
-        private void ReplaceProp(BOBConfig.NetReplacement replacement)
+        private void ReplaceProp(BOBConfig.Replacement replacement)
         {
-            // Convert offset to Vector3.
-            Vector3 offset = new Vector3
+            if (replacement is BOBConfig.NetReplacement netReplacement)
             {
-                x = replacement.OffsetX,
-                y = replacement.OffsetY,
-                z = replacement.OffsetZ,
-            };
+                // Convert offset to Vector3.
+                Vector3 offset = new Vector3
+                {
+                    x = netReplacement.OffsetX,
+                    y = netReplacement.OffsetY,
+                    z = netReplacement.OffsetZ,
+                };
 
-            // Apply replacement.
-            _laneInfo.m_laneProps.m_props[PropIndex].m_prop = replacement.ReplacementProp;
-            _laneInfo.m_laneProps.m_props[PropIndex].m_finalProp = replacement.ReplacementProp;
-            _laneInfo.m_laneProps.m_props[PropIndex].m_tree = replacement.ReplacementTree;
-            _laneInfo.m_laneProps.m_props[PropIndex].m_finalTree = replacement.ReplacementTree;
+                // Apply replacement.
+                _laneInfo.m_laneProps.m_props[PropIndex].m_prop = netReplacement.ReplacementProp;
+                _laneInfo.m_laneProps.m_props[PropIndex].m_finalProp = netReplacement.ReplacementProp;
+                _laneInfo.m_laneProps.m_props[PropIndex].m_tree = netReplacement.ReplacementTree;
+                _laneInfo.m_laneProps.m_props[PropIndex].m_finalTree = netReplacement.ReplacementTree;
 
-            // Invert x offset and angle to match original prop x position.
-            float angleMult = 1f;
-            if (_laneInfo.m_position + OriginalPosition.x < 0)
-            {
-                offset.x = 0 - offset.x;
-                angleMult = -1;
+                // Invert x offset and angle to match original prop x position.
+                float angleMult = 1f;
+                if (_laneInfo.m_position + OriginalPosition.x < 0)
+                {
+                    offset.x = 0 - offset.x;
+                    angleMult = -1;
+                }
+
+                // Angle and offset.
+                _laneInfo.m_laneProps.m_props[PropIndex].m_angle = OriginalAngle + (netReplacement.Angle * angleMult);
+                _laneInfo.m_laneProps.m_props[PropIndex].m_position = OriginalPosition + offset;
+
+                // Probability.
+                _laneInfo.m_laneProps.m_props[PropIndex].m_probability = netReplacement.Probability;
+
+                // Repeat distance, if a valid value is set.
+                if (netReplacement.RepeatDistance > 1)
+                {
+                    _laneInfo.m_laneProps.m_props[PropIndex].m_repeatDistance = netReplacement.RepeatDistance;
+                }
+
+                // Update network prop references.
+                _netInfo.CheckReferences();
+
+                // Add building to dirty list.
+                NetData.DirtyList.Add(_netInfo);
             }
-
-            // Angle and offset.
-            _laneInfo.m_laneProps.m_props[PropIndex].m_angle = OriginalAngle + (replacement.Angle * angleMult);
-            _laneInfo.m_laneProps.m_props[PropIndex].m_position = OriginalPosition + offset;
-
-            // Probability.
-            _laneInfo.m_laneProps.m_props[PropIndex].m_probability = replacement.Probability;
-
-            // Repeat distance, if a valid value is set.
-            if (replacement.RepeatDistance > 1)
-            {
-                _laneInfo.m_laneProps.m_props[PropIndex].m_repeatDistance = replacement.RepeatDistance;
-            }
-
-            // Update network prop references.
-            _netInfo.CheckReferences();
-
-            // Add building to dirty list.
-            NetData.DirtyList.Add(_netInfo);
         }
     }
 }

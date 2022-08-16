@@ -19,9 +19,6 @@ namespace BOB
     /// </summary>
     internal sealed class BOBBuildingPanel : BOBReplacementPanel
     {
-        // Original selection values.
-        private readonly List<BuildingPropHandler> _originalValues = new List<BuildingPropHandler>();
-
         // Panel components.
         private readonly UICheckBox _customHeightCheck;
         private UIPanel _subBuildingPanel;
@@ -68,16 +65,7 @@ namespace BOB
         {
             set
             {
-                // First, undo any preview.
-                RevertPreview();
-
-                // Call base, while ignoring replacement prefab change live application.
-                m_ignoreSelectedPrefabChange = true;
                 base.SelectedTargetItem = value;
-                m_ignoreSelectedPrefabChange = false;
-
-                // Clear original data and record new references.
-                RecordOriginal();
 
                 if (value is TargetBuildingItem targetBuildingItem)
                 {
@@ -252,11 +240,8 @@ namespace BOB
                 _subBuildingPanel?.Hide();
             }
 
-            // Regenerate target list and select target item.
+            // Regenerate target list.
             RegenerateTargetList();
-
-            // Record original stats for preview.
-            RecordOriginal();
 
             // Apply Harmony rendering patches.
             RenderOverlays.Building = _selectedSubBuilding;
@@ -264,32 +249,13 @@ namespace BOB
         }
 
         /// <summary>
-        /// Previews the current change.
+        /// Generates a new replacement record from current control settings.
         /// </summary>
-        protected override void PreviewChange()
+        /// <returns>New replacement record.</returns>
+        protected override BOBConfig.Replacement GetReplacementFromControls()
         {
-            // Don't do anything if no current selection.
-            if (SelectedTargetItem == null)
-            {
-                return;
-            }
-
-            // Don't do anything if no changes.
-            if (m_xSlider.value == 0f &&
-                m_ySlider.value == 0f &&
-                m_zSlider.value == 0f &&
-                m_rotationSlider.value == 0f &&
-                m_probabilitySlider.value.RoundToNearest(1) == SelectedTargetItem.OriginalProbability &&
-                SelectedReplacementPrefab == SelectedTargetItem.ActivePrefab)
-            {
-                // Reset apply button icon.
-                UnappliedChanges = false;
-
-                return;
-            }
-
             // Generate prevew record entry.
-            BOBConfig.BuildingReplacement previewReplacement = new BOBConfig.BuildingReplacement
+            return new BOBConfig.BuildingReplacement
             {
                 ReplacementInfo = SelectedReplacementPrefab ?? SelectedTargetItem.OriginalPrefab,
                 OffsetX = m_xSlider.TrueValue,
@@ -299,41 +265,6 @@ namespace BOB
                 Probability = (int)m_probabilitySlider.TrueValue.RoundToNearest(1),
                 CustomHeight = _customHeightCheck.isChecked,
             };
-
-            // Update preview for each handler.
-            foreach (BuildingPropHandler handler in _originalValues)
-            {
-                PreviewChange(handler, previewReplacement);
-            }
-
-            // Update renders.
-            BuildingData.Update();
-
-            // Update highlighting target.
-            RenderOverlays.Prop = SelectedReplacementPrefab as PropInfo;
-            RenderOverlays.Tree = SelectedReplacementPrefab as TreeInfo;
-
-            // Update apply button icon to indicate change.
-            UnappliedChanges = true;
-        }
-
-        /// <summary>
-        /// Reverts any previewed changes back to original prop/tree state.
-        /// </summary>
-        protected override void RevertPreview()
-        {
-            // Iterate through each original value.
-            foreach (BuildingPropHandler handler in _originalValues)
-            {
-                // Restore original values.
-                handler.ClearPreview();
-            }
-
-            // Update prefabs.
-            BuildingData.Update();
-
-            // Reset apply button icon.
-            UnappliedChanges = false;
         }
 
         /// <summary>
@@ -429,16 +360,6 @@ namespace BOB
                         }
                     }
 
-                    // Update any dirty building renders.
-                    BuildingData.Update();
-
-                    // Record updated original data.
-                    RecordOriginal();
-
-                    // Update target list and buttons.
-                    RegenerateTargetList();
-                    UpdateButtonStates();
-
                     // Update highlighting target.
                     RenderOverlays.Prop = SelectedReplacementPrefab as PropInfo;
                     RenderOverlays.Tree = SelectedReplacementPrefab as TreeInfo;
@@ -495,12 +416,6 @@ namespace BOB
                         }
                     }
 
-                    // Re-record originals (need to do this before updating controls).
-                    RecordOriginal();
-
-                    // Update target list.
-                    RegenerateTargetList();
-
                     // Perform post-replacement processing.
                     FinishUpdate();
                 }
@@ -509,41 +424,6 @@ namespace BOB
             {
                 // Log and report any exception.
                 Logging.LogException(e, "exception performing building reversion");
-            }
-        }
-
-        /// <summary>
-        /// Updates the target item record for changes in replacement status (e.g. after applying or reverting changes).
-        /// </summary>
-        /// <param name="targetListItem">Target item.</param>
-        protected override void UpdateTargetItem(TargetListItem targetListItem)
-        {
-            if (targetListItem is TargetBuildingItem targetBuildingItem)
-            {
-                // Determine index to test - if no individual index, just grab first one from list.
-                int propIndex = targetListItem.PropIndex;
-                if (propIndex < 0)
-                {
-                    propIndex = targetListItem.PropIndexes[0];
-                }
-
-                // Is this an added prop?
-                if (AddedBuildingProps.Instance.IsAdded(_selectedSubBuilding, propIndex))
-                {
-                    targetBuildingItem.PropIndex = propIndex;
-                    targetBuildingItem.IsAdded = true;
-                }
-                else
-                {
-                    // Non-added prop; update stored references.
-                    BuildingPropHandler handler = BuildingHandlers.GetHandler(_selectedSubBuilding, propIndex);
-                    if (handler != null)
-                    {
-                        targetBuildingItem.IndividualReplacement = handler.GetReplacement(ReplacementPriority.IndividualReplacement);
-                        targetBuildingItem.GroupedReplacement = handler.GetReplacement(ReplacementPriority.GroupedReplacement);
-                        targetBuildingItem.AllReplacement = handler.GetReplacement(ReplacementPriority.AllReplacement);
-                    }
-                }
             }
         }
 
@@ -712,17 +592,6 @@ namespace BOB
         }
 
         /// <summary>
-        /// Performs actions to be taken once an update (application or reversion) has been applied, including saving data, updating button states, and refreshing renders.
-        /// </summary>
-        protected override void FinishUpdate()
-        {
-            base.FinishUpdate();
-
-            // Update any dirty building renders.
-            BuildingData.Update();
-        }
-
-        /// <summary>
         /// Adds a new tree or prop.
         /// </summary>
         protected override void AddNew()
@@ -737,7 +606,7 @@ namespace BOB
                 BOBConfig.BuildingReplacement newProp = new BOBConfig.BuildingReplacement
                 {
                     IsTree = SelectedReplacementPrefab is TreeInfo,
-                    Replacement = SelectedReplacementPrefab.name,
+                    ReplacementName = SelectedReplacementPrefab.name,
                     Angle = m_rotationSlider.TrueValue,
                     OffsetX = m_xSlider.TrueValue,
                     OffsetY = m_ySlider.TrueValue,
@@ -755,6 +624,11 @@ namespace BOB
         }
 
         /// <summary>
+        /// Removes an added prop.
+        /// </summary>
+        protected override void RemoveAddedProp() => AddedBuildingProps.Instance.RemoveNew(_selectedSubBuilding, SelectedTargetItem.PropIndex);
+
+        /// <summary>
         /// Removes an added tree or prop.
         /// </summary>
         protected override void RemoveProp()
@@ -765,24 +639,16 @@ namespace BOB
                 return;
             }
 
-            // First, revert any preview (to prevent any clobbering when preview is reverted).
-            RevertPreview();
-
-            // Create new props array with one fewer entry, and copy the old props to it.
-            // Remove prop reference and update other references as appropriate.
-            AddedBuildingProps.Instance.RemoveNew(_selectedSubBuilding, SelectedTargetItem.PropIndex);
-
-            // Post-action cleanup.
-            UpdateAddedProps();
+            base.RemoveProp();
         }
 
         /// <summary>
         /// Record original prop values before previewing.
         /// </summary>
-        protected override void RecordOriginal()
+        protected override void RecordOriginals()
         {
             // Clear existing list.
-            _originalValues.Clear();
+            m_originalValues.Clear();
 
             // Don't do anything if no valid selection.
             if (SelectedTargetItem?.OriginalPrefab == null || _selectedSubBuilding == null)
@@ -803,7 +669,7 @@ namespace BOB
                         {
                             if (prefab.m_props[j].m_prop == SelectedTargetItem.ReplacementPrefab || prefab.m_props[j].m_tree == SelectedTargetItem.ReplacementPrefab)
                             {
-                                _originalValues.Add(GetOriginalData(prefab, j));
+                                m_originalValues.Add(GetOriginalData(prefab, j));
                             }
                         }
                     }
@@ -814,14 +680,30 @@ namespace BOB
                 // Grouped replacement - iterate through each instance and record values.
                 for (int i = 0; i < SelectedTargetItem.PropIndexes.Count; ++i)
                 {
-                    _originalValues.Add(GetOriginalData(_selectedSubBuilding, SelectedTargetItem.PropIndexes[i]));
+                    m_originalValues.Add(GetOriginalData(_selectedSubBuilding, SelectedTargetItem.PropIndexes[i]));
                 }
             }
             else
             {
                 // Individual replacement - record original values.
-                _originalValues.Add(GetOriginalData(_selectedSubBuilding, SelectedTargetItem.PropIndex));
+                m_originalValues.Add(GetOriginalData(_selectedSubBuilding, SelectedTargetItem.PropIndex));
             }
+        }
+
+        /// <summary>
+        /// Regenerate render and prefab data.
+        /// </summary>
+        protected override void UpdateData() => BuildingData.Update();
+
+        /// <summary>
+        /// Called after any added prop manipulations (addition or removal) to perform cleanup.
+        /// </summary>
+        protected override void UpdateAddedProps()
+        {
+            // Update building prop references.
+            _selectedSubBuilding.CheckReferences();
+
+            base.UpdateAddedProps();
         }
 
         /// <summary>
@@ -854,35 +736,6 @@ namespace BOB
             // Show/hide Y position slider based on value.
             m_ySlider.isVisible = isChecked;
             m_ySlider.ValueField.isVisible = isChecked;
-        }
-
-        /// <summary>
-        /// Called after any added prop manipulations (addition or removal) to perform cleanup.
-        /// </summary>
-        private void UpdateAddedProps()
-        {
-            // Update building prop references.
-            _selectedSubBuilding.CheckReferences();
-
-            // Perform regular post-processing.
-            FinishUpdate();
-            RegenerateTargetList();
-
-            // Rebuild recorded originals list.
-            RecordOriginal();
-        }
-
-        /// <summary>
-        /// Previews the change for the current target item.
-        /// </summary>
-        /// <param name="handler">Prop handler.</param>
-        /// <param name="previewReplacement">Replacement to preview.</param>
-        private void PreviewChange(BuildingPropHandler handler, BOBConfig.BuildingReplacement previewReplacement)
-        {
-            handler.PreviewReplacement(previewReplacement);
-
-            // Add building to dirty list.
-            BuildingData.DirtyList.Add(handler.BuildingInfo);
         }
 
         /// <summary>

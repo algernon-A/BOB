@@ -137,9 +137,9 @@ namespace BOB
         internal class DisplayRow : UIListRow
         {
             // Layout constants.
-            private const float IndexWidth = 20f;
-            private const float PackageMargin = 20f;
-            private const float IndexLabelX = Margin + PackageMargin;
+            private const float IndexWidth = 30f;
+            private const float SpriteMargin = 20f;
+            private const float IndexLabelX = Margin + SpriteMargin;
 
             // Row components.
             private UILabel _nameLabel;
@@ -169,7 +169,7 @@ namespace BOB
                 {
                     _lineSprite = AddUIComponent<UISprite>();
                     _lineSprite.size = new Vector2(17f, 17f);
-                    _lineSprite.relativePosition = new Vector2(3f, 3f);
+                    _lineSprite.relativePosition = new Vector2(3f, 1.5f);
                     _lineSprite.Hide();
                     _lineSprite.spriteName = "normal";
                 }
@@ -188,6 +188,9 @@ namespace BOB
 
                     // Set display text.
                     _nameLabel.text = targetItem.GenerateDisplayText();
+
+                    // Adjust name label to accomodate index label width.
+                    _nameLabel.relativePosition = new Vector2((targetItem.PropIndex >= 0 ? IndexWidth : 0) + IndexLabelX + Margin, 0f);
                 }
                 else
                 {
@@ -196,9 +199,6 @@ namespace BOB
                     _nameLabel.text = string.Empty;
                     _lineSprite.Hide();
                 }
-
-                // Adjust name label to accomodate index label width.
-                _nameLabel.relativePosition = new Vector2(IndexLabelX + _indexLabel.width + Margin, 0f);
 
                 // Set initial background as deselected state.
                 Deselect(rowIndex);

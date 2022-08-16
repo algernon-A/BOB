@@ -23,9 +23,6 @@ namespace BOB
         private const float PackButtonX = RandomButtonX + ToggleSize;
         private const float LaneX = ModeX + (ToggleSize * 3f) + Margin;
 
-        // Original selection values.
-        private readonly List<LanePropHandler> _originalValues = new List<LanePropHandler>();
-
         // Panel components.
         private readonly UIDropDown _laneMenu;
         private readonly BOBSlider _repeatSlider;
@@ -47,6 +44,7 @@ namespace BOB
                 _laneMenu.tooltip = Translations.Translate("BOB_PNL_LAN_TIP");
                 _laneMenu.eventSelectedIndexChanged += LaneIndexChanged;
                 _laneMenu.isVisible = CurrentMode == ReplacementModes.Individual;
+                _laneMenu.BringToFront();
 
                 // Add pack button.
                 UIButton packButton = AddIconButton(this, PackButtonX, ToggleY, ToggleSize, "BOB_PNL_PKB", UITextures.LoadQuadSpriteAtlas("BOB-PropPack"));
@@ -76,16 +74,7 @@ namespace BOB
         {
             set
             {
-                // First, undo any preview.
-                RevertPreview();
-
-                // Call base, while ignoring replacement prefab change live application.
-                m_ignoreSelectedPrefabChange = true;
                 base.SelectedTargetItem = value;
-                m_ignoreSelectedPrefabChange = false;
-
-                // Clear original data and record new references.
-                RecordOriginal();
 
                 if (value is TargetNetItem targetNetItem)
                 {
@@ -162,6 +151,23 @@ namespace BOB
         };
 
         /// <summary>
+        /// Gets a value indicating whether there are currrently unapplied changes.
+        /// </summary>
+        protected override bool AreUnappliedChanges
+        {
+            get
+            {
+                if (SelectedTargetItem is TargetNetItem targetNetItem)
+                {
+                    return base.AreUnappliedChanges || _repeatSlider.TrueValue != targetNetItem.OriginalRepeat;
+                }
+
+                // Invalid selection.
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Sets the current replacement mode.
         /// </summary>
         protected override ReplacementModes CurrentMode
@@ -232,11 +238,8 @@ namespace BOB
             _laneMenu.selectedIndex = 0;
             _ignoreIndexChange = false;
 
-            // Populate target list and select target item.
+            // Populate target list.
             RegenerateTargetList();
-
-            // Record original stats for preview.
-            RecordOriginal();
 
             // Apply Harmony rendering patches.
             RenderOverlays.Network = SelectedNet;
@@ -244,75 +247,22 @@ namespace BOB
         }
 
         /// <summary>
-        /// Previews the current change.
+        /// Generates a new replacement record from current control settings.
         /// </summary>
-        protected override void PreviewChange()
+        /// <returns>New replacement record.</returns>
+        protected override BOBConfig.Replacement GetReplacementFromControls()
         {
-            // Don't do anything if no current selection.
-            if (SelectedTargetItem is TargetNetItem targetNetItem)
+            // Generate prevew record entry.
+            return new BOBConfig.NetReplacement
             {
-                // Don't do anything if no changes.
-                if (m_xSlider.TrueValue == 0f &&
-                    m_ySlider.TrueValue == 0f &&
-                    m_zSlider.TrueValue == 0f &&
-                    m_rotationSlider.TrueValue == 0f &&
-                    m_probabilitySlider.TrueValue.RoundToNearest(1) == targetNetItem.OriginalProbability &&
-                    SelectedReplacementPrefab == targetNetItem.ActivePrefab &&
-                    _repeatSlider.TrueValue == targetNetItem.OriginalRepeat)
-                {
-                    // Reset apply button icon.
-                    UnappliedChanges = false;
-
-                    return;
-                }
-
-                // Generate prevew record entry.
-                BOBConfig.NetReplacement previewReplacement = new BOBConfig.NetReplacement
-                {
-                    ReplacementInfo = SelectedReplacementPrefab ?? targetNetItem.OriginalPrefab,
-                    OffsetX = m_xSlider.TrueValue,
-                    OffsetY = m_ySlider.TrueValue,
-                    OffsetZ = m_zSlider.TrueValue,
-                    Angle = m_rotationSlider.TrueValue,
-                    Probability = (int)m_probabilitySlider.TrueValue.RoundToNearest(1),
-                    RepeatDistance = _repeatSlider.TrueValue,
-                };
-
-                // Update preview for each handler.
-                foreach (LanePropHandler handler in _originalValues)
-                {
-                    PreviewChange(handler, previewReplacement);
-                }
-
-                // Update renders.
-                NetData.Update();
-
-                // Update highlighting target.
-                RenderOverlays.Prop = SelectedReplacementPrefab as PropInfo;
-                RenderOverlays.Tree = SelectedReplacementPrefab as TreeInfo;
-
-                // Update apply button icon to indicate change.
-                UnappliedChanges = true;
-            }
-        }
-
-        /// <summary>
-        /// Reverts any previewed changes back to original prop/tree state.
-        /// </summary>
-        protected override void RevertPreview()
-        {
-            // Iterate through each original value.
-            foreach (LanePropHandler handler in _originalValues)
-            {
-                // Restore original values.
-                handler.ClearPreview();
-            }
-
-            // Update prefabs.
-            NetData.Update();
-
-            // Reset apply button icon
-            UnappliedChanges = false;
+                ReplacementInfo = SelectedReplacementPrefab ?? SelectedTargetItem.OriginalPrefab,
+                OffsetX = m_xSlider.TrueValue,
+                OffsetY = m_ySlider.TrueValue,
+                OffsetZ = m_zSlider.TrueValue,
+                Angle = m_rotationSlider.TrueValue,
+                Probability = (int)m_probabilitySlider.TrueValue.RoundToNearest(1),
+                RepeatDistance = _repeatSlider.TrueValue,
+            };
         }
 
         /// <summary>
@@ -412,16 +362,6 @@ namespace BOB
                         }
                     }
 
-                    // Update any dirty network renders.
-                    NetData.Update();
-
-                    // Record updated original data.
-                    RecordOriginal();
-
-                    // Update target list and buttons.
-                    RegenerateTargetList();
-                    UpdateButtonStates();
-
                     // Update highlighting target.
                     RenderOverlays.Prop = SelectedReplacementPrefab as PropInfo;
                     RenderOverlays.Tree = SelectedReplacementPrefab as TreeInfo;
@@ -478,12 +418,6 @@ namespace BOB
                         }
                     }
 
-                    // Re-record originals (need to do this before updating controls).
-                    RecordOriginal();
-
-                    // Update target list.
-                    RegenerateTargetList();
-
                     // Perform post-replacement processing.
                     FinishUpdate();
                 }
@@ -492,48 +426,6 @@ namespace BOB
             {
                 // Log and report any exception.
                 Logging.LogException(e, "exception perforiming network reversion");
-            }
-        }
-
-        /// <summary>
-        /// Updates the target item record for changes in replacement status (e.g. after applying or reverting changes).
-        /// </summary>
-        /// <param name="targetListItem">Target item.</param>
-        protected override void UpdateTargetItem(TargetListItem targetListItem)
-        {
-            if (targetListItem is TargetNetItem targetNetItem)
-            {
-                // Determine index to test - if no individual index, just grab first one from list.
-                int propIndex = targetNetItem.LaneIndex;
-                if (propIndex < 0)
-                {
-                    propIndex = targetNetItem.LaneIndexes[0];
-                }
-
-                // Determine lane to test - if no individual lane, just grab first one from list.
-                int lane = targetNetItem.LaneIndex;
-                if (lane < 0)
-                {
-                    lane = targetNetItem.LaneIndexes[0];
-                }
-
-                // Is this an added prop?
-                if (AddedNetworkProps.Instance.IsAdded(SelectedNet, lane, propIndex))
-                {
-                    targetNetItem.PropIndex = propIndex;
-                    targetNetItem.IsAdded = true;
-                }
-                else
-                {
-                    // Non-added prop; update stored references.
-                    LanePropHandler handler = NetHandlers.GetHandler(SelectedNet.m_lanes[lane], propIndex);
-                    if (handler != null)
-                    {
-                        targetNetItem.IndividualReplacement = handler.GetReplacement(ReplacementPriority.IndividualReplacement);
-                        targetNetItem.GroupedReplacement = handler.GetReplacement(ReplacementPriority.GroupedReplacement);
-                        targetNetItem.AllReplacement = handler.GetReplacement(ReplacementPriority.AllReplacement);
-                    }
-                }
             }
         }
 
@@ -736,17 +628,6 @@ namespace BOB
         }
 
         /// <summary>
-        /// Performs actions to be taken once an update (application or reversion) has been applied, including saving data, updating button states, and refreshing renders.
-        /// </summary>
-        protected override void FinishUpdate()
-        {
-            base.FinishUpdate();
-
-            // Update any dirty net renders.
-            NetData.Update();
-        }
-
-        /// <summary>
         /// Adds a new tree or prop.
         /// </summary>
         protected override void AddNew()
@@ -762,7 +643,7 @@ namespace BOB
                 {
                     LaneIndex = SelectedLaneIndex,
                     IsTree = SelectedReplacementPrefab is TreeInfo,
-                    Replacement = SelectedReplacementPrefab.name,
+                    ReplacementName = SelectedReplacementPrefab.name,
                     Angle = m_rotationSlider.TrueValue,
                     OffsetX = m_xSlider.TrueValue,
                     OffsetY = m_ySlider.TrueValue,
@@ -775,9 +656,14 @@ namespace BOB
                 AddedNetworkProps.Instance.AddNew(newProp);
 
                 // Post-action cleanup.
-                UpdateAddedPops();
+                UpdateAddedProps();
             }
         }
+
+        /// <summary>
+        /// Removes an added prop.
+        /// </summary>
+        protected override void RemoveAddedProp() => AddedNetworkProps.Instance.RemoveNew(SelectedNet, ((TargetNetItem)SelectedTargetItem).LaneIndex, SelectedTargetItem.PropIndex);
 
         /// <summary>
         /// Removes an added tree or prop.
@@ -792,25 +678,17 @@ namespace BOB
                     return;
                 }
 
-                // First, revert any preview (to prevent any clobbering when preview is reverted).
-                RevertPreview();
-
-                // Create new props array with one fewer entry, and copy the old props to it.
-                // Remove prop reference and update other references as appropriate.
-                AddedNetworkProps.Instance.RemoveNew(SelectedNet, targetNetItem.LaneIndex, targetNetItem.PropIndex);
-
-                // Post-action cleanup.
-                UpdateAddedPops();
+                base.RemoveProp();
             }
         }
 
         /// <summary>
         /// Record original prop values before previewing.
         /// </summary>
-        protected override void RecordOriginal()
+        protected override void RecordOriginals()
         {
             // Clear existing list.
-            _originalValues.Clear();
+            m_originalValues.Clear();
 
             if (SelectedTargetItem is TargetNetItem targetNetItem)
             {
@@ -839,7 +717,7 @@ namespace BOB
                                     {
                                         if (laneProps[k].m_prop == targetNetItem.ReplacementPrefab || laneProps[k].m_tree == targetNetItem.ReplacementPrefab)
                                         {
-                                            _originalValues.Add(GetOriginalData(prefab, j, k));
+                                            m_originalValues.Add(GetOriginalData(prefab, j, k));
                                         }
                                     }
                                 }
@@ -852,16 +730,21 @@ namespace BOB
                     // Grouped replacement - iterate through each instance and record values.
                     for (int i = 0; i < targetNetItem.PropIndexes.Count; ++i)
                     {
-                        _originalValues.Add(GetOriginalData(SelectedNet, targetNetItem.LaneIndexes[i], targetNetItem.PropIndexes[i]));
+                        m_originalValues.Add(GetOriginalData(SelectedNet, targetNetItem.LaneIndexes[i], targetNetItem.PropIndexes[i]));
                     }
                 }
                 else
                 {
                     // Individual replacement - record original values.
-                    _originalValues.Add(GetOriginalData(SelectedNet, targetNetItem.LaneIndex, targetNetItem.PropIndex));
+                    m_originalValues.Add(GetOriginalData(SelectedNet, targetNetItem.LaneIndex, targetNetItem.PropIndex));
                 }
             }
         }
+
+        /// <summary>
+        /// Regenerate render and prefab data.
+        /// </summary>
+        protected override void UpdateData() => NetData.Update();
 
         /// <summary>
         /// Updates button states (enabled/disabled) according to current control states.
@@ -883,7 +766,7 @@ namespace BOB
         /// Sets the sliders to the values specified in the given replacement record.
         /// </summary>
         /// <param name="replacement">Replacement record to use.</param>
-        protected override void SetSliders(BOBConfig.ReplacementBase replacement)
+        protected override void SetSliders(BOBConfig.Replacement replacement)
         {
             // Disable events.
             m_ignoreSliderValueChange = true;
@@ -914,32 +797,6 @@ namespace BOB
             }
 
             base.SetSliders(replacement);
-        }
-
-        /// <summary>
-        /// Called after any added prop manipulations (addition or removal) to perform cleanup.
-        /// </summary>
-        private void UpdateAddedPops()
-        {
-            // Perform regular post-processing.
-            FinishUpdate();
-            RegenerateTargetList();
-
-            // Rebuild recorded originals list.
-            RecordOriginal();
-        }
-
-        /// <summary>
-        /// Previews the change for the current target item.
-        /// </summary>
-        /// <param name="handler">Prop handler.</param>
-        /// <param name="previewReplacement">Replacement to preview.</param>
-        private void PreviewChange(LanePropHandler handler, BOBConfig.NetReplacement previewReplacement)
-        {
-            handler.PreviewReplacement(previewReplacement);
-
-            // Add network to dirty list.
-            NetData.DirtyList.Add(handler.NetInfo);
         }
 
         /// <summary>

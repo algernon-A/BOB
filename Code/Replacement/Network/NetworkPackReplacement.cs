@@ -414,7 +414,7 @@ namespace BOB
 
             // Record replacement prop.
             _replacements[target].ReplacementInfo = replacement;
-            _replacements[target].Replacement = replacement.name;
+            _replacements[target].ReplacementName = replacement.name;
 
             // Don't do anything if prefabs can't be found.
             if (_replacements[target]?.TargetInfo == null || _replacements[target].ReplacementInfo == null)
