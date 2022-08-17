@@ -19,7 +19,6 @@ namespace BOB
         private readonly string _displayName;
         private readonly string _creatorName;
         private readonly bool _isVanilla = false;
-        private readonly bool _greyed = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LoadedPrefabItem"/> class.
@@ -32,22 +31,6 @@ namespace BOB
             _displayName = PrefabLists.GetDisplayName(prefabInfo);
             _creatorName = PrefabLists.GetCreator(prefabInfo);
             _isVanilla = !prefabInfo.m_isCustomContent;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LoadedPrefabItem"/> class.
-        /// </summary>
-        /// <param name="randomPrefabInfo">BOB random prefab for this item.</param>
-        internal LoadedPrefabItem(BOBRandomPrefab randomPrefabInfo)
-        {
-            // Initialise fields.
-            _prefabInfo = (PrefabInfo)randomPrefabInfo.Prop ?? randomPrefabInfo.Tree;
-
-            _displayName = PrefabLists.GetDisplayName(_prefabInfo);
-            _creatorName = string.Empty;
-
-            // Grey this item if not all variants are loaded.
-            _greyed = randomPrefabInfo.MissingVariant;
         }
 
         /// <summary>
@@ -111,7 +94,13 @@ namespace BOB
                 {
                     _nameLabel.text = loadedPrefabItem._displayName;
                     _creatorLabel.text = loadedPrefabItem._creatorName;
-                    _nameLabel.textColor = loadedPrefabItem._greyed ? Color.gray : Color.white;
+                    _nameLabel.textColor = Color.white;
+                }
+                else if (data is BOBRandomPrefab randomPrefab)
+                {
+                    _nameLabel.text = randomPrefab.Name;
+                    _creatorLabel.text = string.Empty;
+                    _nameLabel.textColor = randomPrefab.MissingVariant ? Color.gray : Color.white;
                 }
                 else
                 {
