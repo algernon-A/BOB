@@ -11,7 +11,7 @@ namespace BOB
     /// <summary>
     /// BOB options panel.
     /// </summary>
-    internal class OptionsPanel : UIPanel
+    public class OptionsPanel : UIPanel
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="OptionsPanel"/> class.

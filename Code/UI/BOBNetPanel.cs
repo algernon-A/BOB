@@ -9,6 +9,7 @@ namespace BOB
     using System.Collections.Generic;
     using System.Linq;
     using AlgernonCommons;
+    using AlgernonCommons.Patching;
     using AlgernonCommons.Translation;
     using AlgernonCommons.UI;
     using ColossalFramework;
@@ -243,7 +244,7 @@ namespace BOB
 
             // Apply Harmony rendering patches.
             RenderOverlays.Network = SelectedNet;
-            Patcher.Instance.PatchNetworkOverlays(true);
+            PatcherManager<Patcher>.Instance.PatchNetworkOverlays(true);
         }
 
         /// <summary>
@@ -575,8 +576,10 @@ namespace BOB
                         bool matched = false;
 
                         // Iterate through each item in our existing list of props.
-                        foreach (TargetNetItem item in itemList)
+                        for (int i = 0; i < itemList.Count; i++)
                         {
+                            TargetNetItem item = (TargetNetItem)itemList[i];
+
                             // Check to see if we already have this in the list - matching original prefab, individual replacement prefab, network replacement prefab, all-network replacement prefab, and probability.
                             if (item.OriginalPrefab == targetNetItem.OriginalPrefab
                                 && item.IndividualReplacement == targetNetItem.IndividualReplacement

@@ -202,6 +202,7 @@ namespace BOB
                     _probSlider.Show();
                     _probSlider.value = value.Probability;
                 }
+
                 _ignoreValueChange = false;
 
                 // Update button states.

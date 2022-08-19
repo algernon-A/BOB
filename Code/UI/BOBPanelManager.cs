@@ -8,6 +8,7 @@ namespace BOB
     using System;
     using AlgernonCommons;
     using AlgernonCommons.Notifications;
+    using AlgernonCommons.Patching;
     using ColossalFramework.UI;
     using UnityEngine;
 
@@ -231,9 +232,9 @@ namespace BOB
             RenderOverlays.ClearHighlighting();
 
             // Revert overlay patches.
-            Patcher.Instance.PatchBuildingOverlays(false);
-            Patcher.Instance.PatchNetworkOverlays(false);
-            Patcher.Instance.PatchMapOverlays(false);
+            PatcherManager<Patcher>.Instance.PatchBuildingOverlays(false);
+            PatcherManager<Patcher>.Instance.PatchNetworkOverlays(false);
+            PatcherManager<Patcher>.Instance.PatchMapOverlays(false);
 
             // Clear tool lane overlay list.
             BOBTool.Instance.LaneOverlays.Clear();

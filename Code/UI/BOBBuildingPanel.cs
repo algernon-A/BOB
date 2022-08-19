@@ -9,6 +9,7 @@ namespace BOB
     using System.Collections.Generic;
     using System.Linq;
     using AlgernonCommons;
+    using AlgernonCommons.Patching;
     using AlgernonCommons.Translation;
     using AlgernonCommons.UI;
     using ColossalFramework.UI;
@@ -245,7 +246,7 @@ namespace BOB
 
             // Apply Harmony rendering patches.
             RenderOverlays.Building = _selectedSubBuilding;
-            Patcher.Instance.PatchBuildingOverlays(true);
+            PatcherManager<Patcher>.Instance.PatchBuildingOverlays(true);
         }
 
         /// <summary>

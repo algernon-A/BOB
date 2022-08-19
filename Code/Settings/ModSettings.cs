@@ -10,6 +10,7 @@ namespace BOB
     using System.Xml.Serialization;
     using AlgernonCommons;
     using AlgernonCommons.Keybinding;
+    using AlgernonCommons.Patching;
     using AlgernonCommons.XML;
     using UnityEngine;
 
@@ -147,7 +148,7 @@ namespace BOB
             set
             {
                 _disableTreeTool = value;
-                Patcher.Instance.DisableTreeTool(value);
+                PatcherManager<Patcher>.Instance.DisableTreeTool(value);
             }
         }
 

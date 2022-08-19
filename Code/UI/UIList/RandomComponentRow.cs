@@ -41,7 +41,7 @@ namespace BOB
                 _probLabel.textAlignment = UIHorizontalAlignment.Right;
 
                 // Add sprite.
-                _lockSprite = AddUIComponent<UISprite>(); 
+                _lockSprite = AddUIComponent<UISprite>();
                 _lockSprite.size = new Vector2(17f, 17f);
                 _lockSprite.atlas = UITextures.LoadQuadSpriteAtlas("BOB-Padlock");
 

@@ -7,6 +7,7 @@ namespace BOB
 {
     using AlgernonCommons;
     using AlgernonCommons.Notifications;
+    using AlgernonCommons.Patching;
     using AlgernonCommons.Translation;
     using AlgernonCommons.UI;
     using ICities;
@@ -14,38 +15,16 @@ namespace BOB
     /// <summary>
     /// Main loading class: the mod runs from here.
     /// </summary>
-    public class Loading : LoadingExtensionBase
+    public sealed class Loading : PatcherLoadingBase<OptionsPanel, Patcher>
     {
-        // Internal flags.
-        private static bool s_isLoaded = false;
-        private bool _isModEnabled = false;
-
         /// <summary>
-        /// Gets a value indicating whether the mod has finished loading.
+        /// Performs any actions upon successful creation of the mod.
+        /// E.g. Can be used to patch any other mods.
         /// </summary>
-        internal static bool IsLoaded => s_isLoaded;
-
-        /// <summary>
-        /// Called by the game when the mod is initialised at the start of the loading process.
-        /// </summary>
-        /// <param name="loading">Loading mode (e.g. game, editor, scenario, etc.)</param>
-        public override void OnCreated(ILoading loading)
+        /// <param name="loading">Loading mode (e.g. game or editor).</param>
+        protected override void CreatedActions(ILoading loading)
         {
-            Logging.KeyMessage("version ", AssemblyUtils.TrimmedCurrentVersion, " loading");
-
-            // Don't do anything if not in game (e.g. if we're going into an editor).
-            if (loading.currentMode != AppMode.Game && loading.currentMode != AppMode.MapEditor)
-            {
-                _isModEnabled = false;
-                Logging.KeyMessage("not loading into game, skipping activation");
-
-                // Unload Harmony patches and exit before doing anything further.
-                Patcher.Instance.UnpatchAll();
-                return;
-            }
-
-            // All good to go at this point.
-            _isModEnabled = true;
+            base.CreatedActions(loading);
 
             // Initialise data sets prior to savegame load.
             new AllBuildingReplacement();
@@ -61,52 +40,16 @@ namespace BOB
             new AddedNetworkProps();
 
             // Reflect overlay methods.
-            Patcher.Instance.ReflectOverlays();
-
-            base.OnCreated(loading);
+            PatcherManager<Patcher>.Instance.ReflectOverlays();
         }
 
         /// <summary>
-        /// Called by the game when level loading is complete.
+        /// Performs any actions upon successful level loading completion.
         /// </summary>
-        /// <param name="mode">Loading mode (e.g. game, editor, scenario, etc.)</param>
-        public override void OnLevelLoaded(LoadMode mode)
+        /// <param name="mode">Loading mode (e.g. game, editor, scenario, etc.).</param>
+        protected override void LoadedActions(LoadMode mode)
         {
-            Logging.Message("commencing loading checks");
-
-            base.OnLevelLoaded(mode);
-
-            // Don't do anything further if we're not operating.
-            if (!_isModEnabled)
-            {
-                Logging.Message("exiting");
-                return;
-            }
-
-            // Check to see that Harmony 2 was properly loaded.
-            if (!Patcher.Instance.Patched)
-            {
-                // Harmony 2 wasn't loaded; abort.
-                Logging.Error("Harmony patches not applied; aborting");
-                _isModEnabled = false;
-
-                // Display warning message.
-                ListNotification harmonyNotification = NotificationBase.ShowNotification<ListNotification>();
-
-                // Key text items.
-                harmonyNotification.AddParas(Translations.Translate("ERR_HAR0"), Translations.Translate("BOB_ERR_HAR"), Translations.Translate("BOB_ERR_FAT"), Translations.Translate("ERR_HAR1"));
-
-                // List of dot points.
-                harmonyNotification.AddList(Translations.Translate("ERR_HAR2"), Translations.Translate("ERR_HAR3"));
-
-                // Closing para.
-                harmonyNotification.AddParas(Translations.Translate("MES_PAGE"));
-
-                // Don't do anything further.
-                return;
-            }
-
-            Logging.Message("loading checks passed");
+            base.LoadedActions(mode);
 
             // Build lists of loaded prefabs.
             PrefabLists.BuildLists();
@@ -119,9 +62,6 @@ namespace BOB
 
             // Set up BOB tool.
             ToolsModifierControl.toolController.gameObject.AddComponent<BOBTool>();
-
-            // Display update notification.
-            WhatsNew.ShowWhatsNew();
 
             // Set up Network Skins 2 reflection.
             ModUtils.NS2Reflection();
@@ -137,26 +77,11 @@ namespace BOB
             BuildingData.Update();
             NetData.Update();
 
-            // Set up options panel event handler.
-            OptionsPanelManager<OptionsPanel>.OptionsEventHook();
-
             // Display any exception message that occured during load.
             BOBPanelManager.CheckException();
 
             // Activate tool hotkey.
             HotkeyThreading.Operating = true;
-
-            s_isLoaded = true;
-            Logging.Message("loading complete");
-        }
-
-        /// <summary>
-        /// Called by the game when exiting loaded leve.
-        /// </summary>
-        public override void OnLevelUnloading()
-        {
-            base.OnLevelUnloading();
-            s_isLoaded = false;
         }
     }
 }

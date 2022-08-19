@@ -175,8 +175,8 @@ namespace BOB
             // Layout constants.
             private const float SpriteSize = 20f;
             private const float StatusSpriteX = Margin;
-            private const float NotLoadedSpriteX = SpriteSize + Margin;
-            private const float LabelX = StatusSpriteX + SpriteSize + Margin;
+            private const float NotLoadedSpriteX = StatusSpriteX + SpriteSize + Margin;
+            private const float LabelX = NotLoadedSpriteX + SpriteSize + Margin;
 
             // Panel components.
             private UILabel _nameLabel;
