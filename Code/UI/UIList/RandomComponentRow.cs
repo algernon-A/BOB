@@ -41,11 +41,9 @@ namespace BOB
                 _probLabel.textAlignment = UIHorizontalAlignment.Right;
 
                 // Add sprite.
-                _lockSprite = AddUIComponent<UISprite>();
+                _lockSprite = AddUIComponent<UISprite>(); 
                 _lockSprite.size = new Vector2(17f, 17f);
-                _lockSprite.relativePosition = new Vector2(width - LockSpriteSpace, 3f);
                 _lockSprite.atlas = UITextures.LoadQuadSpriteAtlas("BOB-Padlock");
-                SetLockSprite();
 
                 // Lock sprite event handler.
                 _lockSprite.eventClicked += (c, p) =>
@@ -69,10 +67,13 @@ namespace BOB
 
                 _probLabel.text = (variation?.Probability.ToString() ?? "0") + "%";
                 _probLabel.relativePosition = new Vector2(width - LockSpriteSpace - Margin - _probLabel.width, 0f);
-
-                // Set initial background as deselected state.
-                Deselect(rowIndex);
             }
+
+            // Set lock sprite.
+            SetLockSprite();
+
+            // Set initial background as deselected state.
+            Deselect(rowIndex);
         }
 
         /// <summary>
@@ -80,8 +81,12 @@ namespace BOB
         /// </summary>
         private void SetLockSprite()
         {
+            // Ensure valid data.
             if (_thisVariation != null & _lockSprite != null)
             {
+                // Valid data - show sprite and set state according to data.
+                _lockSprite.Show();
+                _lockSprite.relativePosition = new Vector2(width - LockSpriteSpace, 3f);
                 if (_thisVariation.ProbLocked)
                 {
                     _lockSprite.spriteName = "disabled";
@@ -90,6 +95,11 @@ namespace BOB
                 {
                     _lockSprite.spriteName = "pressed";
                 }
+            }
+            else
+            {
+                // No valid data - hide sprite.
+                _lockSprite.Hide();
             }
         }
     }

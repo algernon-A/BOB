@@ -17,6 +17,9 @@ namespace BOB
     /// </summary>
     public static class PackUtils
     {
+        // Replacement pack directory.
+        private static readonly string PackDirectory = Path.Combine(AssemblyUtils.AssemblyPath, "ReplacementPacks");
+
         /// <summary>
         /// Finds and loads XML replacement pack files.
         /// </summary>
@@ -32,7 +35,7 @@ namespace BOB
                 HashSet<string> parsedDirectories = new HashSet<string>();
 
                 // Iterate through each xml file in directory.
-                string[] fileNames = Directory.GetFiles(AssemblyUtils.AssemblyPath, "*.xml", SearchOption.AllDirectories);
+                string[] fileNames = Directory.GetFiles(PackDirectory, "*.xml", SearchOption.TopDirectoryOnly);
 
                 foreach (string fileName in fileNames)
                 {
@@ -101,14 +104,14 @@ namespace BOB
                     using (StreamReader reader = new StreamReader(filename))
                     {
                         XmlSerializer xmlSerializer = new XmlSerializer(typeof(BOBPackFile));
-                        if (!(xmlSerializer.Deserialize(reader) is BOBPackFile configurationFile))
+                        if (!(xmlSerializer.Deserialize(reader) is BOBPackFile packFile))
                         {
                             Logging.Error("couldn't deserialize pack file");
                         }
                         else
                         {
                             // Success - add file to list.
-                            fileList.Add(configurationFile);
+                            fileList.Add(packFile);
                         }
                     }
                 }

@@ -112,10 +112,12 @@ namespace BOB
         /// <returns>FastList of installed prop packs.</returns>
         internal FastList<object> GetPackFastList()
         {
+            Logging.Message("packrecord count is ", _packRecords.Count);
+
             // Create return list from signPacks array.
             FastList<object> fastList = new FastList<object>()
             {
-                m_buffer = _packRecords.Keys.OrderBy(x => x).ToArray(),
+                m_buffer = _packRecords.Keys.ToArray(),
                 m_size = _packRecords.Count(),
             };
             return fastList;
@@ -308,6 +310,8 @@ namespace BOB
 
             foreach (BOBPackFile packFile in packFiles)
             {
+                Logging.Message("reading ", packFile.PropPacks.Count, " pack records from file");
+
                 // Iterate through each prop pack loaded from the settings file.
                 foreach (BOBPackFile.PropPack propPack in packFile.PropPacks)
                 {
@@ -320,6 +324,7 @@ namespace BOB
                     else
                     {
                         // No - add pack to our records.
+                        Logging.Message("adding prop pack ", propPack.Name, " with ", propPack.PropReplacements.Count, " replacements");
                         _packRecords.Add(propPack.Name, new Dictionary<PrefabInfo, BOBPackFile.PropReplacement>());
                         _packEnabled.Add(propPack.Name, false);
                     }
@@ -329,6 +334,8 @@ namespace BOB
                     {
                         // Get reference.
                         BOBPackFile.PropReplacement propReplacement = propPack.PropReplacements[i];
+
+                        Logging.Message("looking for replacement ", propReplacement.ReplacementName);
 
                         // Can we find both target and replacment?
                         PrefabInfo targetInfo = propReplacement.IsTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(propReplacement.TargetName) : PrefabCollection<PropInfo>.FindLoaded(propReplacement.TargetName);
@@ -362,10 +369,13 @@ namespace BOB
                     // Check to make sure we have at least one replacement; if not, remove the pack from our records.
                     if (_packRecords[propPack.Name].Count == 0)
                     {
+                        Logging.Message(propPack.Name, " has no replacements; removing");
                         _packRecords.Remove(propPack.Name);
                         _packEnabled.Remove(propPack.Name);
                     }
                 }
+
+                Logging.Message("finished reading packs; ", _packRecords, " packs in database");
             }
         }
 

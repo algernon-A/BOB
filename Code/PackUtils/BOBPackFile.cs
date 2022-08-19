@@ -19,6 +19,7 @@ namespace BOB
         /// <summary>
         /// The list of prop packs.
         /// </summary>
+        [XmlArray("propPacks")]
         public List<PropPack> PropPacks;
 
         /// <summary>
@@ -37,6 +38,7 @@ namespace BOB
             /// <summary>
             /// The list of replacements.
             /// </summary>
+            [XmlArray("propReplacements")]
             public List<PropReplacement> PropReplacements;
         }
 

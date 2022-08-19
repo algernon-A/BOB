@@ -18,7 +18,7 @@ namespace BOB
         /// <summary>
         /// List row height.
         /// </summary>
-        internal const float RowHeight = 30f;
+        internal const float CustomRowHeight = 30f;
 
         /// <summary>
         /// Listwidth.
@@ -45,7 +45,7 @@ namespace BOB
         internal BOBPackPanel()
         {
             // Pack selection list.
-            _packSelectionList = UIList.AddUIList<PackRow>(this, Margin, TitleBarHeight, ListWidth, ListHeight);
+            _packSelectionList = UIList.AddUIList<PackRow>(this, Margin, TitleBarHeight, ListWidth, ListHeight, CustomRowHeight);
             _packSelectionList.EventSelectionChanged += (c, data) => SelectedPack = data as string;
 
             // Apply and revert button.
@@ -174,6 +174,9 @@ namespace BOB
         {
             // Layout constants.
             private const float SpriteSize = 20f;
+            private const float StatusSpriteX = Margin;
+            private const float NotLoadedSpriteX = SpriteSize + Margin;
+            private const float LabelX = StatusSpriteX + SpriteSize + Margin;
 
             // Panel components.
             private UILabel _nameLabel;
@@ -183,7 +186,7 @@ namespace BOB
             /// <summary>
             /// Gets the height for this row.
             /// </summary>
-            public override float RowHeight => BOBPackPanel.RowHeight;
+            public override float RowHeight => BOBPackPanel.CustomRowHeight;
 
             /// <summary>
             /// Generates and displays a list row.
@@ -195,15 +198,15 @@ namespace BOB
                 // Perform initial setup for new rows.
                 if (_nameLabel == null)
                 {
-                    _nameLabel = AddLabel(Margin, parent.width - Margin - Margin);
+                    _nameLabel = AddLabel(LabelX, parent.width - LabelX - Margin);
 
                     _statusSprite = AddUIComponent<UISprite>();
                     _statusSprite.size = new Vector2(SpriteSize, SpriteSize);
-                    _statusSprite.relativePosition = new Vector3(Margin, Margin);
+                    _statusSprite.relativePosition = new Vector2(StatusSpriteX, Margin);
 
                     _notLoadedSprite = AddUIComponent<UISprite>();
                     _notLoadedSprite.size = new Vector2(SpriteSize, SpriteSize);
-                    _notLoadedSprite.relativePosition = new Vector3(SpriteSize + Margin + Margin, Margin);
+                    _notLoadedSprite.relativePosition = new Vector2(NotLoadedSpriteX, Margin);
                     _notLoadedSprite.spriteName = "NotificationIconNotHappy";
                 }
 

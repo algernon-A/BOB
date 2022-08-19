@@ -49,6 +49,8 @@ namespace BOB
         private readonly UIList _loadedList;
         private readonly UIButton _removeRandomButton;
         private readonly UIButton _renameButton;
+        private readonly UIButton _addVariationButton;
+        private readonly UIButton _removeVariationButton;
         private readonly UITextField _nameField;
         private readonly BOBSlider _probSlider;
         private readonly PreviewPanel _previewPanel;
@@ -78,11 +80,11 @@ namespace BOB
 
             // Variation selection list.
             _variationsList = UIList.AddUIList<RandomComponentRow>(this, SelectedX, ListY, SelectedWidth, ListHeight);
-            _randomList.EventSelectionChanged += (c, data) => SelectedVariation = data as BOBRandomPrefab.Variation;
+            _variationsList.EventSelectionChanged += (c, data) => SelectedVariation = data as BOBRandomPrefab.Variation;
 
             // Loaded prop list.
             _loadedList = UIList.AddUIList<LoadedPrefabItem.DisplayRow>(this, LoadedX, ListY, LoadedWidth, ListHeight);
-            _randomList.EventSelectionChanged += (c, data) => SelectedLoadedPrefab = (data as LoadedPrefabItem)?.Prefab;
+            _loadedList.EventSelectionChanged += (c, data) => SelectedLoadedPrefab = (data as LoadedPrefabItem)?.Prefab;
 
             // Name change textfield.
             _nameField = UITextFields.AddTextField(this, Margin, NameFieldY, RandomizerWidth);
@@ -100,12 +102,12 @@ namespace BOB
             _renameButton.eventClicked += RenameRandomPrefab;
 
             // Add variation button.
-            UIButton addVariationButton = AddIconButton(this, MidControlX, ListY, ToggleSize, "BOB_RND_ADD", UITextures.LoadQuadSpriteAtlas("BOB-ArrowPlus"));
-            addVariationButton.eventClicked += AddVariation;
+            _addVariationButton = AddIconButton(this, MidControlX, ListY, ToggleSize, "BOB_RND_ADD", UITextures.LoadQuadSpriteAtlas("BOB-ArrowPlus"));
+            _addVariationButton.eventClicked += AddVariation;
 
             // Remove variation button.
-            UIButton removeVariationButton = AddIconButton(this, MidControlX, ListY + ToggleSize, ToggleSize, "BOB_RND_SUB", UITextures.LoadQuadSpriteAtlas("BOB-ArrowMinus"));
-            removeVariationButton.eventClicked += RemoveVariation;
+            _removeVariationButton = AddIconButton(this, MidControlX, ListY + ToggleSize, ToggleSize, "BOB_RND_SUB", UITextures.LoadQuadSpriteAtlas("BOB-ArrowMinus"));
+            _removeVariationButton.eventClicked += RemoveVariation;
 
             // Order button.
             m_replacementNameSortButton = ArrowButton(this, LoadedX + 10f, ListY - 20f);
@@ -113,6 +115,7 @@ namespace BOB
 
             // Probability slider.
             _probSlider = AddBOBSlider(this, SelectedX + Margin, ToolY + Margin, SelectedWidth - (Margin * 2f), "BOB_PNL_PRB", 0, 100, 1, "Probability");
+            _probSlider.Hide();
             _probSlider.EventTrueValueChanged += (c, value) =>
             {
                 if (_selectedVariation != null)
@@ -172,6 +175,9 @@ namespace BOB
             {
                 _selectedLoadedPrefab = value;
                 _previewPanel.SetTarget(value);
+
+                // Update button states.
+                UpdateButtonStates();
             }
         }
 
@@ -186,8 +192,20 @@ namespace BOB
 
                 // Disable events while updating value.
                 _ignoreValueChange = true;
-                _probSlider.value = value.Probability;
+                if (value == null)
+                {
+                    // Hide slider if no valid selection.
+                    _probSlider.Hide();
+                }
+                else
+                {
+                    _probSlider.Show();
+                    _probSlider.value = value.Probability;
+                }
                 _ignoreValueChange = false;
+
+                // Update button states.
+                UpdateButtonStates();
             }
         }
 
@@ -206,10 +224,6 @@ namespace BOB
 
                 // Set selection.
                 _selectedRandomPrefab = value;
-
-                // Reset variation lists.
-                _selectedVariation = null;
-                _variationsList.SelectedIndex = -1;
 
                 // Regenerate variation UI fastlist.
                 VariationsList();
@@ -332,10 +346,13 @@ namespace BOB
         /// </summary>
         private void UpdateButtonStates()
         {
-            // Toggle enabled state based on whether or not there's a valid current selection.
+            // Toggle enabled states based on whether or not there's a valid current selection.
             bool buttonState = _selectedRandomPrefab != null;
             _removeRandomButton.isEnabled = buttonState;
             _renameButton.isEnabled = buttonState;
+
+            _addVariationButton.isEnabled = _selectedLoadedPrefab != null;
+            _removeVariationButton.isEnabled = _selectedVariation != null;
         }
 
         /// <summary>
@@ -499,7 +516,6 @@ namespace BOB
 
             // Select variation.
             _variationsList.FindItem(newVariant);
-            _selectedVariation = newVariant;
 
             // Update the random prefab with the new variation.
             UpdateCurrentRandomPrefab();
