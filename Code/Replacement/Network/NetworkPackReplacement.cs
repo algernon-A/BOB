@@ -490,7 +490,7 @@ namespace BOB
                             // Match!  Create new handler if there wasn't an existing one.
                             if (handler == null)
                             {
-                                handler = NetHandlers.GetOrAddHandler(_replacements[target].NetInfo, thisLane, propIndex);
+                                handler = NetHandlers.GetOrAddHandler(netInfo, thisLane, propIndex);
                             }
 
                             // Set the new replacement.

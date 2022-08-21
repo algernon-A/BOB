@@ -255,9 +255,10 @@ namespace BOB
 
             bool nameFilterActive = !SearchText.IsNullOrWhiteSpace();
 
-            if (IsTree)
+            // Add trees, if applicable.
+            if (PropTreeMode == PropTreeModes.Tree || PropTreeMode == PropTreeModes.Both)
             {
-                // Tree - iterate through each prop in our list of loaded prefabs.
+                // Tree - iterate through each tree in our list of loaded prefabs.
                 foreach (LoadedPrefabItem loadedTree in PrefabLists.LoadedTreeItems)
                 {
                     // Apply vanilla filtering if selected.
@@ -272,17 +273,13 @@ namespace BOB
                     }
                 }
             }
-            else
+
+            // Add props, if applicable.
+            if (PropTreeMode == PropTreeModes.Prop || PropTreeMode == PropTreeModes.Both)
             {
-                // Prop - iterate through each prop in our list of loaded prefabs.
+                // Iterate through each prop in our list of loaded prefabs.
                 foreach (LoadedPrefabItem loadedProp in PrefabLists.LoadedPropItems)
                 {
-                    // Skip any props that require height or water maps.
-                    if (loadedProp.Prop.m_requireHeightMap | !loadedProp.IsVanilla)
-                    {
-                        continue;
-                    }
-
                     // Apply vanilla filtering if selected.
                     if (!m_hideVanilla.isChecked | !loadedProp.IsVanilla)
                     {
@@ -294,6 +291,13 @@ namespace BOB
                         }
                     }
                 }
+            }
+
+            // If we're combining trees and props, sort by name to combine them.
+            if (PropTreeMode == PropTreeModes.Both)
+            {
+                Logging.Message("ordering lists");
+                list = list.OrderBy(x => x.DisplayName.ToLower()).ToList();
             }
 
             // Master lists should already be sorted by display name so no need to sort again here.
@@ -309,6 +313,12 @@ namespace BOB
                 m_buffer = list.ToArray(),
                 m_size = list.Count,
             };
+
+            // Select current replacement prefab, if any.
+            if (_selectedLoadedPrefab != null)
+            {
+                _loadedList.FindItem<LoadedPrefabItem>(x => x.Prefab == _selectedLoadedPrefab);
+            }
         }
 
         /// <summary>

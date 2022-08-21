@@ -151,7 +151,7 @@ namespace BOB
                 };
 
                 // 'No props' label (starts hidden).
-                m_noPropsLabel = m_replacementList.AddUIComponent<UILabel>();
+                m_noPropsLabel = m_targetList.AddUIComponent<UILabel>();
                 m_noPropsLabel.relativePosition = new Vector2(Margin, Margin);
                 m_noPropsLabel.text = Translations.Translate(PropTreeMode == PropTreeModes.Tree ? "BOB_PNL_NOT" : "BOB_PNL_NOP");
                 m_noPropsLabel.Hide();

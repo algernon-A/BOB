@@ -14,6 +14,7 @@ namespace BOB
     using ColossalFramework;
     using ColossalFramework.UI;
     using EManagersLib.API;
+    using static BOB.BOBConfig;
 
     /// <summary>
     /// BOB map tree/prop replacement panel.
@@ -64,7 +65,7 @@ namespace BOB
 
             // Regenerate target list and select target item.
             RegenerateTargetList();
-            m_targetList.FindItem<LoadedPrefabItem>(x => x.Prefab == targetPrefabInfo);
+            m_targetList.FindItem<TargetListItem>(x => x.ActivePrefab == targetPrefabInfo);
 
             // Regenerate replacement list.
             RegenerateReplacementList();
@@ -85,15 +86,29 @@ namespace BOB
                 // Apply replacement.
                 if (!m_propTreeChecks[(int)PropTreeModes.Prop].isChecked && SelectedReplacementPrefab is TreeInfo replacementTree)
                 {
-                    MapTreeReplacement.Instance.Apply(SelectedTargetItem.ActivePrefab as TreeInfo, replacementTree);
+                    // Revert any active replacment first.
+                    if (SelectedTargetItem.ReplacementPrefab is TreeInfo activeReplacement)
+                    {
+
+                        MapTreeReplacement.Instance.Revert(activeReplacement);
+                    }
+
+                    MapTreeReplacement.Instance.Apply(SelectedTargetItem.OriginalPrefab as TreeInfo, replacementTree);
                 }
                 else if (!m_propTreeChecks[(int)PropTreeModes.Tree].isChecked && SelectedReplacementPrefab is PropInfo replacementProp)
                 {
-                    MapPropReplacement.Instance.Apply(SelectedTargetItem.ActivePrefab as PropInfo, replacementProp);
+                    // Revert any active replacment first.
+                    if (SelectedTargetItem.ReplacementPrefab is PropInfo activeReplacement)
+                    {
+
+                        MapPropReplacement.Instance.Revert(activeReplacement);
+                    }
+
+                    MapPropReplacement.Instance.Apply(SelectedTargetItem.OriginalPrefab as PropInfo, replacementProp);
                 }
 
                 // Update current target.
-                SelectedTargetItem.ReplacementPrefab = SelectedReplacementPrefab;
+                SetTargetParent(SelectedTargetItem.ReplacementPrefab);
 
                 // Perform post-replacment updates.
                 FinishUpdate();
@@ -129,6 +144,9 @@ namespace BOB
 
                     // Clear current target replacement prefab.
                     SelectedTargetItem.ReplacementPrefab = null;
+
+                    // Update current target.
+                    SetTargetParent(SelectedTargetItem.OriginalPrefab);
                 }
 
                 // Perform post-replacment updates.

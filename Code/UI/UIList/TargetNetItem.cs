@@ -6,11 +6,9 @@
 namespace BOB
 {
     using System.Collections.Generic;
-    using System.Text;
     using AlgernonCommons.Translation;
     using AlgernonCommons.UI;
     using ColossalFramework.UI;
-    using UnityEngine;
 
     /// <summary>
     /// Data record for UIList line items for building props.
@@ -102,8 +100,8 @@ namespace BOB
             else if (PackReplacement != null)
             {
                 // All- replacement.
-                lineSprite.atlas = UITextures.LoadQuadSpriteAtlas("BOB-RoadsSmall");
-                lineSprite.tooltip = Translations.Translate("BOB_SPR_ANT");
+                lineSprite.atlas = UITextures.LoadQuadSpriteAtlas("BOB-PropPackSmall");
+                lineSprite.tooltip = Translations.Translate("BOB_SPR_PCK");
                 lineSprite.Show();
             }
             else
