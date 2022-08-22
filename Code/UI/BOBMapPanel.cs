@@ -89,7 +89,6 @@ namespace BOB
                     // Revert any active replacment first.
                     if (SelectedTargetItem.ReplacementPrefab is TreeInfo activeReplacement)
                     {
-
                         MapTreeReplacement.Instance.Revert(activeReplacement);
                     }
 
@@ -100,7 +99,6 @@ namespace BOB
                     // Revert any active replacment first.
                     if (SelectedTargetItem.ReplacementPrefab is PropInfo activeReplacement)
                     {
-
                         MapPropReplacement.Instance.Revert(activeReplacement);
                     }
 

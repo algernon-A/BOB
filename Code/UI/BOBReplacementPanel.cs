@@ -644,6 +644,9 @@ namespace BOB
         /// <returns>True if the panel can close now, false otherwise.</returns>
         protected override bool PreClose()
         {
+            // Revert any preview.
+            RevertPreview();
+
             // Perform post-update tasks, such as saving the config file and refreshing renders.
             FinishUpdate();
 

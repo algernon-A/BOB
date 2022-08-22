@@ -6,10 +6,7 @@
 namespace BOB
 {
     using AlgernonCommons;
-    using AlgernonCommons.Notifications;
     using AlgernonCommons.Patching;
-    using AlgernonCommons.Translation;
-    using AlgernonCommons.UI;
     using ICities;
 
     /// <summary>
