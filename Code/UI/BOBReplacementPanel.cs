@@ -282,6 +282,9 @@ namespace BOB
         {
             set
             {
+                // Revert any preview before doing anything.
+                RevertPreview();
+
                 base.SelectedTargetItem = value;
 
                 // Don't show rotation slider for trees.
