@@ -87,24 +87,32 @@ namespace BOB
         /// </summary>
         /// <param name="network">Network prefab.</param>
         /// <param name="lane">Lane index.</param>
-        internal static void CloneLanePropInstance(NetInfo network, int lane)
+        internal static void CloneLanePropInstance(NetInfo network, int lane) => CloneLanePropInstance(network, network.m_lanes[lane]);
+
+        /// <summary>
+        /// Creates a new NetInfo.Lane instance for the specified network and lane index.
+        /// Used to 'separate' target networks for individual and network prop replacement when the network uses shared m_laneProps (e.g. vanilla roads).
+        /// </summary>
+        /// <param name="network">Network prefab.</param>
+        /// <param name="laneInfo">Lane info.</param>
+        internal static void CloneLanePropInstance(NetInfo network, NetInfo.Lane laneInfo)
         {
-            // Don't do anything if we've previously converted this one.
-            if (network.m_lanes[lane].m_laneProps is NewNetLaneProps)
+            // Don't do anything if we've previously converted this one, or if it's custom content.
+            if (network.m_isCustomContent || laneInfo.m_laneProps is NewNetLaneProps)
             {
                 return;
             }
 
-            Logging.Message("creating new m_laneProps instance for network ", network.name, " at lane ", lane);
+            Logging.Message("creating new m_laneProps instance for network ", network.name);
 
             // Create new m_laneProps instance with new props list, using our custom class instead of NetLaneProps as a flag that we've already done this one.
             NewNetLaneProps newLaneProps = ScriptableObject.CreateInstance<NewNetLaneProps>();
-            newLaneProps.m_props = new NetLaneProps.Prop[network.m_lanes[lane].m_laneProps.m_props.Length];
+            newLaneProps.m_props = new NetLaneProps.Prop[laneInfo.m_laneProps.m_props.Length];
 
             // Iterate through each  in the existing instance
             for (int i = 0; i < newLaneProps.m_props.Length; ++i)
             {
-                NetLaneProps.Prop existingNetLaneProp = network.m_lanes[lane].m_laneProps.m_props[i];
+                NetLaneProps.Prop existingNetLaneProp = laneInfo.m_laneProps.m_props[i];
 
                 newLaneProps.m_props[i] = new NetLaneProps.Prop
                 {
@@ -131,7 +139,7 @@ namespace BOB
             }
 
             // Replace network laneProps with our new instance.
-            network.m_lanes[lane].m_laneProps = newLaneProps;
+            laneInfo.m_laneProps = newLaneProps;
         }
 
         /// <summary>

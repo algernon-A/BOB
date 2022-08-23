@@ -51,6 +51,9 @@ namespace BOB
             _laneInfo = laneInfo;
             _originalAngle = laneProp.m_angle;
             _originalRepeatDistance = laneProp.m_repeatDistance;
+
+            // Clone NetLaneProp if required.
+            NetData.CloneLanePropInstance(prefab, laneInfo);
         }
 
         /// <summary>
