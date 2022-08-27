@@ -216,9 +216,6 @@ namespace BOB
                     // Select current replacement prefab.
                     m_replacementList.FindItem<LoadedPrefabItem>(x => x.Prefab == effectivePrefab);
 
-                    // Set current panel selection.
-                    SelectedReplacementPrefab = effectivePrefab;
-
                     // Set highlighting.
                     RenderOverlays.PropIndex = _selectedTargetItem.PropIndex;
                     RenderOverlays.Prop = effectivePrefab as PropInfo;

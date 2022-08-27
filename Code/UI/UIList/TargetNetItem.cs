@@ -79,7 +79,7 @@ namespace BOB
             else if (IndividualReplacement != null)
             {
                 // Individual replacement.
-                lineSprite.atlas = UITextures.LoadQuadSpriteAtlas("BOB-BOB-RoadSmall");
+                lineSprite.atlas = UITextures.LoadQuadSpriteAtlas("BOB-RoadSmall");
                 lineSprite.tooltip = Translations.Translate("BOB_SPR_SNT");
                 lineSprite.Show();
             }

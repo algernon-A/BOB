@@ -126,6 +126,7 @@ namespace BOB
 
         // Status flags.
         private bool _ignoreModeCheckChanged = false;
+        private bool _ignoreReplacementSelection = false;
         private bool _unappliedChanges = false;
 
         // Current replacement mode.
@@ -271,7 +272,12 @@ namespace BOB
             set
             {
                 base.SelectedReplacementPrefab = value;
-                PreviewChange();
+
+                // Don't preview change if we're just updating the replacement on a target change.
+                if (!_ignoreReplacementSelection)
+                {
+                    PreviewChange();
+                }
             }
         }
 
@@ -285,7 +291,10 @@ namespace BOB
                 // Revert any preview before doing anything.
                 RevertPreview();
 
+                // Suspend replacement events while we update the target (which automatically changes the selected replacement).
+                _ignoreReplacementSelection = true;
                 base.SelectedTargetItem = value;
+                _ignoreReplacementSelection = false;
 
                 // Don't show rotation slider for trees.
                 _rotationPanel.isVisible = !(value?.ActivePrefab is TreeInfo);
