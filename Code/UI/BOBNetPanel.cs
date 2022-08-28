@@ -101,6 +101,8 @@ namespace BOB
                         {
                             // Set sliders according to highest active replacement (will be null if none).
                             SetSliders(targetNetItem.IndividualReplacement ?? targetNetItem.GroupedReplacement ?? targetNetItem.AllReplacement ?? targetNetItem.PackReplacement);
+
+                            // All done here.
                             return;
                         }
                     }

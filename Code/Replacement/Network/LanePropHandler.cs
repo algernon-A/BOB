@@ -295,7 +295,14 @@ namespace BOB
         /// <summary>
         /// Clears any temporary preview, restoring the permanent underlying state.
         /// </summary>
-        public override void ClearPreview() => UpdateProp();
+        public override void ClearPreview()
+        {
+            // Previews may be for now removed added props - perform index check first.
+            if (PropIndex < _laneInfo.m_laneProps.m_props.Length)
+            {
+                UpdateProp();
+            }
+        }
 
         /// <summary>
         /// Updates the target prop according current active replacement status.

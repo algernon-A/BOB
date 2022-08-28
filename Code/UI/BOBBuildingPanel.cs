@@ -81,11 +81,16 @@ namespace BOB
                         {
                             // Yes - set sliders from replacement record.
                             SetSliders(AddedBuildingProps.Instance.ReplacementRecord(_selectedSubBuilding, IndividualIndex));
+
+                            // All done here.
+                            return;
                         }
                         else
                         {
                             // Set sliders according to highest active replacement (will be null if none).
                             SetSliders(targetBuildingItem.IndividualReplacement ?? targetBuildingItem.GroupedReplacement ?? targetBuildingItem.AllReplacement);
+
+                            // All done here.
                             return;
                         }
                     }
@@ -544,21 +549,24 @@ namespace BOB
                     bool matched = false;
 
                     // Iterate through each item in our existing list of props.
-                    foreach (TargetBuildingItem item in itemList)
+                    foreach (TargetListItem item in itemList)
                     {
-                        // Check to see if we already have this in the list - matching original prefab, replacements, and probability.
-                        if (item.OriginalPrefab == targetBuildingItem.OriginalPrefab &&
-                            item.IndividualReplacement == targetBuildingItem.IndividualReplacement &&
-                            item.GroupedReplacement == targetBuildingItem.GroupedReplacement &&
-                            item.AllReplacement == targetBuildingItem.AllReplacement &&
-                            item.OriginalProbability == targetBuildingItem.OriginalProbability)
+                        if (item is TargetBuildingItem buildingItem)
                         {
-                            // We've already got an identical grouped instance of this item - add this index and lane to the lists of indexes and lanes under that item and set the flag to indicate that we've done so.
-                            item.PropIndexes.Add(propIndex);
-                            matched = true;
+                            // Check to see if we already have this in the list - matching original prefab, replacements, and probability.
+                            if (buildingItem.OriginalPrefab == targetBuildingItem.OriginalPrefab &&
+                                buildingItem.IndividualReplacement == targetBuildingItem.IndividualReplacement &&
+                                buildingItem.GroupedReplacement == targetBuildingItem.GroupedReplacement &&
+                                buildingItem.AllReplacement == targetBuildingItem.AllReplacement &&
+                                buildingItem.OriginalProbability == targetBuildingItem.OriginalProbability)
+                            {
+                                // We've already got an identical grouped instance of this item - add this index and lane to the lists of indexes and lanes under that item and set the flag to indicate that we've done so.
+                                buildingItem.PropIndexes.Add(propIndex);
+                                matched = true;
 
-                            // No point going any further through the list, since we've already found our match.
-                            break;
+                                // No point going any further through the list, since we've already found our match.
+                                break;
+                            }
                         }
                     }
 

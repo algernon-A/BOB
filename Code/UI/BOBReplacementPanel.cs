@@ -518,9 +518,6 @@ namespace BOB
             // Remove prop reference and update other references as appropriate.
             RemoveAddedProp();
 
-            // Regenerate original list to reflect new state.
-           // RecordOriginals();
-
             // Post-action cleanup.
             UpdateAddedProps();
         }
