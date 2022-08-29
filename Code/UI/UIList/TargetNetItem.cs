@@ -27,6 +27,11 @@ namespace BOB
         internal List<int> LaneIndexes = new List<int>();
 
         /// <summary>
+        /// The active added prop record, if any, for this item.
+        /// </summary>
+        internal BOBConfig.NetReplacement AddedProp;
+
+        /// <summary>
         /// The active individual replacement, if any, for this item.
         /// </summary>
         internal BOBConfig.NetReplacement IndividualReplacement;
@@ -54,7 +59,12 @@ namespace BOB
         /// <summary>
         /// Gets a value indicating whether there's a currently active replacement for this item.
         /// </summary>
-        internal override bool HasActiveReplacement => IndividualReplacement != null | GroupedReplacement != null | AllReplacement != null | PackReplacement != null;
+        internal override bool HasActiveReplacement => AddedProp != null | IndividualReplacement != null | GroupedReplacement != null | AllReplacement != null | PackReplacement != null;
+
+        /// <summary>
+        /// Gets a value indicating whether or not this is an added prop.
+        /// </summary>
+        internal override bool IsAdded => AddedProp != null;
 
         /// <summary>
         /// Configures the given line sprite instance to match this item.
@@ -69,7 +79,7 @@ namespace BOB
             }
 
             // Check for replacement status to set sprite.
-            if (IsAdded)
+            if (AddedProp != null)
             {
                 // Added prop.
                 lineSprite.atlas = UITextures.LoadQuadSpriteAtlas("BOB-RoundPlus");

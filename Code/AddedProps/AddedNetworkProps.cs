@@ -210,15 +210,6 @@ namespace BOB
 
             if (thisReplacement != null)
             {
-                // Invert x offset and angle to match original prop x position.
-                float angleMult = 1f;
-                float xOffset = offsetX;
-                if (lane.m_position < 0)
-                {
-                    xOffset = 0 - xOffset;
-                    angleMult = -1;
-                }
-
                 // Update replacment entry.
                 thisReplacement.LaneIndex = laneIndex;
                 thisReplacement.PropIndex = propIndex;
@@ -234,16 +225,9 @@ namespace BOB
                 thisReplacement.ReplacementInfo = replacementInfo;
                 thisReplacement.ReplacementName = replacementInfo.name;
 
-                // Apply update to targeted prop.
-                NetLaneProps.Prop thisProp = lane.m_laneProps.m_props[propIndex];
-                thisProp.m_prop = replacementInfo as PropInfo;
-                thisProp.m_tree = replacementInfo as TreeInfo;
-                thisProp.m_finalProp = replacementInfo as PropInfo;
-                thisProp.m_finalTree = replacementInfo as TreeInfo;
-                thisProp.m_angle = angle * angleMult;
-                thisProp.m_position = new Vector3(xOffset, offsetY, offsetZ);   // Use mirrored X to apply.
-                thisProp.m_probability = probability;
-                thisProp.m_repeatDistance = repeatDistance;
+                // Update handler.
+                LanePropHandler thisHandler = NetHandlers.GetOrAddHandler(netInfo, netInfo.m_lanes[laneIndex], propIndex);
+                thisHandler.SetReplacement(thisReplacement, ReplacementPriority.AddedReplacement);
             }
         }
 
@@ -366,17 +350,9 @@ namespace BOB
                 // Update reference with new index.
                 replacement.PropIndex = newIndex;
 
-                // Add new prop.
-                Logging.Message("adding new prop for network ", netInfo.name, " at lane ", replacement.LaneIndex, " and index ", newIndex);
 
-                // Invert x offset and angle to match original prop x position.
-                float angleMult = 1f;
-                float xOffset = replacement.OffsetX;
-                if (lane.m_position < 0)
-                {
-                    xOffset = 0 - xOffset;
-                    angleMult = -1;
-                }
+                // Add new prop - position and angle are at zero to start with as the 'original' coordinates.
+                Logging.Message("adding new prop for network ", netInfo.name, " at lane ", replacement.LaneIndex, " and index ", newIndex);
 
                 lane.m_laneProps.m_props[newIndex] = new NetLaneProps.Prop
                 {
@@ -387,7 +363,7 @@ namespace BOB
                     m_endFlagsRequired = NetNode.Flags.None,
                     m_endFlagsForbidden = NetNode.Flags.None,
                     m_colorMode = NetLaneProps.ColorMode.Default,
-                    m_angle = replacement.Angle * angleMult,
+                    m_angle = 0,
                     m_prop = replacement.ReplacementInfo as PropInfo,
                     m_tree = replacement.ReplacementInfo as TreeInfo,
                     m_finalProp = replacement.ReplacementInfo as PropInfo,
@@ -397,12 +373,12 @@ namespace BOB
                     m_minLength = 0f,
                     m_cornerAngle = 0f,
                     m_upgradable = false,
-                    m_position = new Vector3(xOffset, replacement.OffsetY, replacement.OffsetZ),
+                    m_position = Vector3.zero,
                     m_probability = replacement.Probability,
                 };
 
-                // Add network to dirty list.
-                NetData.DirtyList.Add(netInfo);
+                // Ensure a handler is generated and add the replacement to it (this will update the prop and the renderer)Apol.
+                NetHandlers.GetOrAddHandler(netInfo, lane, newIndex).SetReplacement(replacement, ReplacementPriority.AddedReplacement);
 
                 return newIndex;
             }

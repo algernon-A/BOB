@@ -88,23 +88,11 @@ namespace BOB
                             RenderOverlays.Lane = SelectedNet.m_lanes[targetNetItem.LaneIndex];
                         }
 
-                        // Is this an added prop?
-                        if (targetNetItem.IsAdded)
-                        {
-                            // Yes - set sliders from replacement record.
-                            SetSliders(AddedNetworkProps.Instance.ReplacementRecord(SelectedNet, IndividualLane, IndividualIndex));
+                        // Set sliders according to highest active replacement (will be null if none).
+                        SetSliders(targetNetItem.AddedProp ?? targetNetItem.IndividualReplacement ?? targetNetItem.GroupedReplacement ?? targetNetItem.AllReplacement ?? targetNetItem.PackReplacement);
 
-                            // All done here.
-                            return;
-                        }
-                        else
-                        {
-                            // Set sliders according to highest active replacement (will be null if none).
-                            SetSliders(targetNetItem.IndividualReplacement ?? targetNetItem.GroupedReplacement ?? targetNetItem.AllReplacement ?? targetNetItem.PackReplacement);
-
-                            // All done here.
-                            return;
-                        }
+                        // All done here.
+                        return;
                     }
                 }
 
@@ -284,7 +272,7 @@ namespace BOB
                 if (SelectedTargetItem is TargetNetItem targetNetItem && SelectedReplacementPrefab != null)
                 {
                     // Check for added prop - instead of replacing, we update the original added prop reference.
-                    if (targetNetItem.IsAdded)
+                    if (targetNetItem.AddedProp != null)
                     {
                         AddedNetworkProps.Instance.Update(
                             SelectedNet,
@@ -505,11 +493,11 @@ namespace BOB
                     targetNetItem.OriginalRepeat = laneProps[propIndex].m_repeatDistance;
 
                     // Is this an added prop?
-                    if (AddedNetworkProps.Instance.IsAdded(lanes[lane], propIndex))
+                    if (AddedNetworkProps.Instance.ReplacementRecord(SelectedNet, lane, propIndex) is BOBConfig.NetReplacement addedItem)
                     {
                         targetNetItem.PropIndex = propIndex;
                         targetNetItem.LaneIndex = lane;
-                        targetNetItem.IsAdded = true;
+                        targetNetItem.AddedProp = addedItem;
                     }
                     else
                     {
@@ -777,7 +765,7 @@ namespace BOB
             m_ignoreSliderValueChange = true;
 
             // Are we eligible for repeat distance (eligibile target and in individual mode).
-            if (CurrentMode == ReplacementModes.Individual && SelectedTargetItem is TargetNetItem targetNetItem && (targetNetItem.OriginalRepeat > 1f || targetNetItem.IsAdded))
+            if (CurrentMode == ReplacementModes.Individual && SelectedTargetItem is TargetNetItem targetNetItem && (targetNetItem.OriginalRepeat > 1f || targetNetItem.AddedProp != null))
             {
                 // Yes - do we have a replacement?
                 if (replacement is BOBConfig.NetReplacement netReplacement && netReplacement.RepeatDistance > 1f)

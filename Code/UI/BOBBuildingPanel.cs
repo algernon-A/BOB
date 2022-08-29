@@ -76,23 +76,11 @@ namespace BOB
                         // Set custom height checkbox.
                         _customHeightCheck.isChecked = _selectedSubBuilding.m_props[IndividualIndex].m_fixedHeight;
 
-                        // Is this an added prop?
-                        if (targetBuildingItem.IsAdded)
-                        {
-                            // Yes - set sliders from replacement record.
-                            SetSliders(AddedBuildingProps.Instance.ReplacementRecord(_selectedSubBuilding, IndividualIndex));
+                        // Set sliders according to highest active replacement (will be null if none).
+                        SetSliders(targetBuildingItem.AddedProp ?? targetBuildingItem.IndividualReplacement ?? targetBuildingItem.GroupedReplacement ?? targetBuildingItem.AllReplacement);
 
-                            // All done here.
-                            return;
-                        }
-                        else
-                        {
-                            // Set sliders according to highest active replacement (will be null if none).
-                            SetSliders(targetBuildingItem.IndividualReplacement ?? targetBuildingItem.GroupedReplacement ?? targetBuildingItem.AllReplacement);
-
-                            // All done here.
-                            return;
-                        }
+                        // All done here.
+                        return;
                     }
                 }
 
@@ -289,7 +277,7 @@ namespace BOB
                 if (SelectedTargetItem is TargetBuildingItem targetBuildingItem && SelectedReplacementPrefab != null)
                 {
                     // Check for added prop - instead of replacing, we update the original added prop reference.
-                    if (targetBuildingItem.IsAdded)
+                    if (targetBuildingItem.AddedProp != null)
                     {
                         AddedBuildingProps.Instance.Update(
                             _selectedSubBuilding,
@@ -482,10 +470,10 @@ namespace BOB
                 targetBuildingItem.OriginalProbability = _selectedSubBuilding.m_props[propIndex].m_probability;
 
                 // Is this an added prop?
-                if (AddedBuildingProps.Instance.IsAdded(_selectedSubBuilding, propIndex))
+                if (AddedBuildingProps.Instance.ReplacementRecord(_selectedSubBuilding, propIndex) is BOBConfig.BuildingReplacement addedItem)
                 {
                     targetBuildingItem.PropIndex = propIndex;
-                    targetBuildingItem.IsAdded = true;
+                    targetBuildingItem.AddedProp = addedItem;
                 }
                 else
                 {

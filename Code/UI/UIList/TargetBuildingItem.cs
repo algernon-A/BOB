@@ -5,11 +5,9 @@
 
 namespace BOB
 {
-    using System.Text;
     using AlgernonCommons.Translation;
     using AlgernonCommons.UI;
     using ColossalFramework.UI;
-    using UnityEngine;
 
     /// <summary>
     /// Data record for UIList line items for building props.
@@ -17,6 +15,11 @@ namespace BOB
     [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:Fields should be private", Justification = "Internal data class")]
     internal class TargetBuildingItem : TargetListItem
     {
+        /// <summary>
+        /// The active added prop record, if any, for this item.
+        /// </summary>
+        internal BOBConfig.BuildingReplacement AddedProp;
+
         /// <summary>
         /// The active individual replacement, if any, for this item.
         /// </summary>
@@ -35,7 +38,12 @@ namespace BOB
         /// <summary>
         /// Gets a value indicating whether there's a currently active replacement for this item.
         /// </summary>
-        internal override bool HasActiveReplacement => IndividualReplacement != null | GroupedReplacement != null | AllReplacement != null;
+        internal override bool HasActiveReplacement => AddedProp != null | IndividualReplacement != null | GroupedReplacement != null | AllReplacement != null;
+
+        /// <summary>
+        /// Gets a value indicating whether or not this is an added prop.
+        /// </summary>
+        internal override bool IsAdded => AddedProp != null;
 
         /// <summary>
         /// Configures the given line sprite instance to match this item.
@@ -50,7 +58,7 @@ namespace BOB
             }
 
             // Check for replacement status to set sprite.
-            if (IsAdded)
+            if (AddedProp != null)
             {
                 // Added prop.
                 lineSprite.atlas = UITextures.LoadQuadSpriteAtlas("BOB-RoundPlus");

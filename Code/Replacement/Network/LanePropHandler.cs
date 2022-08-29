@@ -24,6 +24,7 @@ namespace BOB
         private readonly float _originalRepeatDistance;
 
         // Active replacement references.
+        private BOBConfig.NetReplacement _addedReplacement;
         private BOBConfig.NetReplacement _individualReplacement;
         private BOBConfig.NetReplacement _groupedReplacement;
         private BOBConfig.NetReplacement _allReplacement;
@@ -84,6 +85,11 @@ namespace BOB
             get
             {
                 // Check highest priorities first.
+                if (_addedReplacement != null)
+                {
+                    return ReplacementPriority.AddedReplacement;
+                }
+
                 if (_individualReplacement != null)
                 {
                     return ReplacementPriority.IndividualReplacement;
@@ -117,6 +123,12 @@ namespace BOB
             get
             {
                 // Check highest priorities first.
+                // Check highest priorities first.
+                if (_addedReplacement != null)
+                {
+                    return _addedReplacement;
+                }
+
                 if (_individualReplacement != null)
                 {
                     return _individualReplacement;
@@ -151,6 +163,8 @@ namespace BOB
         {
             switch (priority)
             {
+                case ReplacementPriority.AddedReplacement:
+                    return _addedReplacement;
                 case ReplacementPriority.IndividualReplacement:
                     return _individualReplacement;
                 case ReplacementPriority.GroupedReplacement:
@@ -185,6 +199,10 @@ namespace BOB
 
             switch (priority)
             {
+                case ReplacementPriority.AddedReplacement:
+                    _addedReplacement = replacement;
+                    break;
+
                 case ReplacementPriority.IndividualReplacement:
                     _individualReplacement = replacement;
                     break;
@@ -271,14 +289,23 @@ namespace BOB
             NetLaneProps.Prop thisProp = _laneInfo?.m_laneProps?.m_props[PropIndex];
             if (thisProp != null)
             {
-                thisProp.m_prop = OriginalProp;
-                thisProp.m_finalProp = OriginalFinalProp;
-                thisProp.m_tree = OriginalTree;
-                thisProp.m_finalTree = OriginalFinalTree;
-                thisProp.m_angle = _originalAngle;
-                thisProp.m_position = OriginalPosition;
-                thisProp.m_probability = OriginalProbability;
-                thisProp.m_repeatDistance = _originalRepeatDistance;
+                // Added prop?
+                if (_addedReplacement != null)
+                {
+                    // Added prop - revert to original means reverting to the original replacement values.
+                    ReplaceProp(_addedReplacement);
+                }
+                else
+                {
+                    thisProp.m_prop = OriginalProp;
+                    thisProp.m_finalProp = OriginalFinalProp;
+                    thisProp.m_tree = OriginalTree;
+                    thisProp.m_finalTree = OriginalFinalTree;
+                    thisProp.m_angle = _originalAngle;
+                    thisProp.m_position = OriginalPosition;
+                    thisProp.m_probability = OriginalProbability;
+                    thisProp.m_repeatDistance = _originalRepeatDistance;
+                }
 
                 // Update network.
                 _netInfo.CheckReferences();

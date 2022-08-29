@@ -34,11 +34,6 @@ namespace BOB
         internal bool ShowProbs = false;
 
         /// <summary>
-        /// Whether or not this is an added prop.
-        /// </summary>
-        internal bool IsAdded = false;
-
-        /// <summary>
         /// The replacent prefab for this item (null if none).
         /// </summary>
         internal PrefabInfo ReplacementPrefab;
@@ -77,6 +72,11 @@ namespace BOB
         /// Gets a value indicating whether there's a currently active replacement for this item.
         /// </summary>
         internal virtual bool HasActiveReplacement => false;
+
+        /// <summary>
+        /// Gets a value indicating whether or not this is an added prop.
+        /// </summary>
+        internal virtual bool IsAdded => false;
 
         /// <summary>
         /// Configures the given line sprite instance to match this item.

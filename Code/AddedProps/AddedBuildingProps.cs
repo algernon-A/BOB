@@ -205,14 +205,9 @@ namespace BOB
                 thisReplacement.ReplacementInfo = replacementInfo;
                 thisReplacement.ReplacementName = replacementInfo.name;
 
-                // Apply update to targeted prop.
-                BuildingInfo.Prop thisProp = buildingInfo.m_props[propIndex];
-                thisProp.m_prop = replacementInfo as PropInfo;
-                thisProp.m_tree = replacementInfo as TreeInfo;
-                thisProp.m_radAngle = angle * Mathf.Deg2Rad;
-                thisProp.m_position = new Vector3(offsetX, offsetY, offsetZ);
-                thisProp.m_probability = probability;
-                thisProp.m_fixedHeight = customHeight;
+                // Update handler.
+                BuildingPropHandler thisHandler = BuildingHandlers.GetOrAddHandler(buildingInfo, propIndex);
+                thisHandler.SetReplacement(thisReplacement, ReplacementPriority.AddedReplacement);
             }
         }
 
@@ -297,23 +292,23 @@ namespace BOB
                 // Update reference with new index.
                 replacement.PropIndex = newIndex;
 
-                // Add new prop.
+                // Add new prop - position and angle are at zero to start with as the 'original' coordinates.
                 Logging.Message("adding new prop for building ", buildingInfo.name, " at index ", newIndex);
                 buildingInfo.m_props[newIndex] = new BuildingInfo.Prop
                 {
-                    m_radAngle = replacement.Angle * Mathf.Deg2Rad,
+                    m_radAngle = 0,
                     m_prop = replacement.ReplacementInfo as PropInfo,
                     m_tree = replacement.ReplacementInfo as TreeInfo,
                     m_finalProp = replacement.ReplacementInfo as PropInfo,
                     m_finalTree = replacement.ReplacementInfo as TreeInfo,
                     m_fixedHeight = replacement.CustomHeight,
-                    m_position = new Vector3(replacement.OffsetX, replacement.OffsetY, replacement.OffsetZ),
+                    m_position = Vector3.zero,
                     m_probability = replacement.Probability,
                     m_index = newIndex,
                 };
 
-                // Add building to dirty list.
-                BuildingData.DirtyList.Add(buildingInfo);
+                // Ensure a handler is generated and add the replacement to it (this will update the prop and the renderer).
+                BuildingHandlers.GetOrAddHandler(buildingInfo, newIndex).SetReplacement(replacement, ReplacementPriority.AddedReplacement);
 
                 return newIndex;
             }

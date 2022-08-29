@@ -21,6 +21,7 @@ namespace BOB
         private readonly bool _originalFixedHeight;
 
         // Active replacement references.
+        private BOBConfig.BuildingReplacement _addedReplacement;
         private BOBConfig.BuildingReplacement _individualReplacement;
         private BOBConfig.BuildingReplacement _groupedReplacement;
         private BOBConfig.BuildingReplacement _allReplacement;
@@ -70,6 +71,11 @@ namespace BOB
             get
             {
                 // Check highest priorities first.
+                if (_addedReplacement != null)
+                {
+                    return ReplacementPriority.AddedReplacement;
+                }
+
                 if (_individualReplacement != null)
                 {
                     return ReplacementPriority.IndividualReplacement;
@@ -98,6 +104,11 @@ namespace BOB
             get
             {
                 // Check highest priorities first.
+                if (_addedReplacement != null)
+                {
+                    return _addedReplacement;
+                }
+
                 if (_individualReplacement != null)
                 {
                     return _individualReplacement;
@@ -127,6 +138,8 @@ namespace BOB
         {
             switch (priority)
             {
+                case ReplacementPriority.AddedReplacement:
+                    return _addedReplacement;
                 case ReplacementPriority.IndividualReplacement:
                     return _individualReplacement;
                 case ReplacementPriority.GroupedReplacement:
@@ -159,6 +172,10 @@ namespace BOB
 
             switch (priority)
             {
+                case ReplacementPriority.AddedReplacement:
+                    _addedReplacement = replacement;
+                    break;
+
                 case ReplacementPriority.IndividualReplacement:
                     _individualReplacement = replacement;
                     break;
@@ -236,14 +253,24 @@ namespace BOB
             BuildingInfo.Prop thisProp = _buildingInfo?.m_props?[PropIndex];
             if (thisProp != null)
             {
-                thisProp.m_prop = OriginalProp;
-                thisProp.m_finalProp = OriginalFinalProp;
-                thisProp.m_tree = OriginalTree;
-                thisProp.m_finalTree = OriginalFinalTree;
-                thisProp.m_radAngle = _originalRadAngle;
-                thisProp.m_fixedHeight = _originalFixedHeight;
-                thisProp.m_position = OriginalPosition;
-                thisProp.m_probability = OriginalProbability;
+                // Added prop?
+                if (_addedReplacement != null)
+                {
+                    // Added prop - revert to original means reverting to the original replacement values.
+                    ReplaceProp(_addedReplacement);
+                }
+                else
+                {
+                    // Non-added prop.
+                    thisProp.m_prop = OriginalProp;
+                    thisProp.m_finalProp = OriginalFinalProp;
+                    thisProp.m_tree = OriginalTree;
+                    thisProp.m_finalTree = OriginalFinalTree;
+                    thisProp.m_radAngle = _originalRadAngle;
+                    thisProp.m_fixedHeight = _originalFixedHeight;
+                    thisProp.m_position = OriginalPosition;
+                    thisProp.m_probability = OriginalProbability;
+                }
 
                 // Update building.
                 _buildingInfo.CheckReferences();

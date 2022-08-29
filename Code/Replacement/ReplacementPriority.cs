@@ -35,5 +35,10 @@ namespace BOB
         /// Individual replacements.
         /// </summary>
         IndividualReplacement,
+
+        /// <summary>
+        /// Added props
+        /// </summary>
+        AddedReplacement,
     }
 }
