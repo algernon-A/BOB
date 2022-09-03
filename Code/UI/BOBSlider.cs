@@ -160,7 +160,7 @@ namespace BOB
         }
 
         /// <summary>
-        /// Called by game when slidr visibility is changed.
+        /// Called by game when slider visibility is changed.
         /// </summary>
         protected override void OnVisibilityChanged()
         {
