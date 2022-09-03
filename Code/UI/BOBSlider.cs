@@ -160,6 +160,18 @@ namespace BOB
         }
 
         /// <summary>
+        /// Called by game when slidr visibility is changed.
+        /// </summary>
+        protected override void OnVisibilityChanged()
+        {
+            // Ensure value field visibility matches this.
+            if (_valueTextField != null)
+            {
+                _valueTextField.isVisible = isVisible;
+            }
+        }
+
+        /// <summary>
         /// Called by game when mousewheel is scrolled.
         /// </summary>
         /// <param name="p">Mouse event parameter.</param>
