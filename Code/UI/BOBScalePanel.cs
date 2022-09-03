@@ -75,7 +75,7 @@ namespace BOB
 
             // Loaded prop list.
             _loadedList = UIList.AddUIList<LoadedPrefabItem.DisplayRow>(this, LoadedX, ListY, LoadedWidth, ListHeight);
-            _loadedList.EventSelectionChanged += (c, data) => _selectedLoadedPrefab = (data as LoadedPrefabItem)?.Prefab;
+            _loadedList.EventSelectionChanged += (c, data) => SelectedLoadedPrefab = (data as LoadedPrefabItem)?.Prefab;
 
             // Order button.
             m_replacementNameSortButton = ArrowButton(this, LoadedX + 10f, ListY - 20f);
