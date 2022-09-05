@@ -290,7 +290,7 @@ namespace BOB
         public override void ClearPreview()
         {
             // Previews may be for now removed added props - perform index check first.
-            if (PropIndex < _buildingInfo.m_props.Length)
+            if (_buildingInfo?.m_props != null && PropIndex < _buildingInfo.m_props.Length)
             {
                 UpdateProp();
             }

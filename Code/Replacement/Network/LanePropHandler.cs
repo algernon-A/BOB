@@ -325,7 +325,7 @@ namespace BOB
         public override void ClearPreview()
         {
             // Previews may be for now removed added props - perform index check first.
-            if (PropIndex < _laneInfo.m_laneProps.m_props.Length)
+            if (_laneInfo?.m_laneProps?.m_props != null && PropIndex < _laneInfo.m_laneProps.m_props.Length)
             {
                 UpdateProp();
             }
