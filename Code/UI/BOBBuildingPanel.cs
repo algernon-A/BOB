@@ -274,15 +274,20 @@ namespace BOB
             try
             {
                 // Make sure we have valid a target and replacement.
-                if (SelectedTargetItem is TargetBuildingItem targetBuildingItem && SelectedReplacementPrefab != null)
+                if (SelectedTargetItem is TargetBuildingItem targetBuildingItem)
                 {
+                    // Determine applicable replacement prefab.
+                    PrefabInfo replacementPrefab = SelectedReplacementPrefab ?? targetBuildingItem.ActivePrefab;
+
                     // Check for added prop - instead of replacing, we update the original added prop reference.
                     if (targetBuildingItem.AddedProp != null)
                     {
+                        Logging.Message("updating added prop");
+
                         AddedBuildingProps.Instance.Update(
                             _selectedSubBuilding,
                             targetBuildingItem.OriginalPrefab,
-                            SelectedReplacementPrefab,
+                            replacementPrefab,
                             targetBuildingItem.PropIndex,
                             m_rotationSlider.TrueValue,
                             m_xSlider.TrueValue,
@@ -305,7 +310,7 @@ namespace BOB
                                 IndividualBuildingReplacement.Instance.Replace(
                                     _selectedSubBuilding,
                                     targetBuildingItem.OriginalPrefab,
-                                    SelectedReplacementPrefab,
+                                    replacementPrefab,
                                     IndividualIndex,
                                     m_rotationSlider.TrueValue,
                                     m_xSlider.TrueValue,
@@ -321,7 +326,7 @@ namespace BOB
                                 GroupedBuildingReplacement.Instance.Replace(
                                     _selectedSubBuilding,
                                     targetBuildingItem.OriginalPrefab,
-                                    SelectedReplacementPrefab,
+                                    replacementPrefab,
                                     -1,
                                     m_rotationSlider.TrueValue,
                                     m_xSlider.TrueValue,
@@ -337,7 +342,7 @@ namespace BOB
                                 AllBuildingReplacement.Instance.Replace(
                                     null,
                                     targetBuildingItem.OriginalPrefab,
-                                    SelectedReplacementPrefab,
+                                    replacementPrefab,
                                     -1,
                                     m_rotationSlider.TrueValue,
                                     m_xSlider.TrueValue,
@@ -355,8 +360,8 @@ namespace BOB
                     }
 
                     // Update highlighting target.
-                    RenderOverlays.Prop = SelectedReplacementPrefab as PropInfo;
-                    RenderOverlays.Tree = SelectedReplacementPrefab as TreeInfo;
+                    RenderOverlays.Prop = replacementPrefab as PropInfo;
+                    RenderOverlays.Tree = replacementPrefab as TreeInfo;
 
                     // Perform post-replacement processing.
                     FinishUpdate();

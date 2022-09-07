@@ -551,12 +551,6 @@ namespace BOB
             // Buttons are only enabled if a current target item is selected.
             if (SelectedTargetItem != null)
             {
-                // Replacement requires a valid replacement selection.
-                if (SelectedReplacementPrefab != null)
-                {
-                    m_applyButton.Enable();
-                }
-
                 // Reversion requires a currently active replacement.
                 if (SelectedTargetItem.HasActiveReplacement)
                 {
@@ -572,9 +566,10 @@ namespace BOB
                 _hideButton.Enable();
             }
 
-            // Show revert button if unapplied changes.
+            // Show apply and revert button if unapplied changes.
             if (UnappliedChanges)
             {
+                m_applyButton.Enable();
                 m_revertButton.Enable();
                 m_revertButton.tooltip = Translations.Translate("BOB_PNL_REV_UND");
             }

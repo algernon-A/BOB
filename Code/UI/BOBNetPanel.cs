@@ -269,15 +269,18 @@ namespace BOB
                 RevertPreview();
 
                 // Make sure we have valid a target and replacement.
-                if (SelectedTargetItem is TargetNetItem targetNetItem && SelectedReplacementPrefab != null)
+                if (SelectedTargetItem is TargetNetItem targetNetItem)
                 {
+                    // Determine applicable replacement prefab.
+                    PrefabInfo replacementPrefab = SelectedReplacementPrefab ?? targetNetItem.ActivePrefab;
+
                     // Check for added prop - instead of replacing, we update the original added prop reference.
                     if (targetNetItem.AddedProp != null)
                     {
                         AddedNetworkProps.Instance.Update(
                             SelectedNet,
                             targetNetItem.OriginalPrefab,
-                            SelectedReplacementPrefab,
+                            replacementPrefab,
                             targetNetItem.LaneIndex,
                             targetNetItem.PropIndex,
                             m_rotationSlider.TrueValue,
@@ -301,7 +304,7 @@ namespace BOB
                                 IndividualNetworkReplacement.Instance.Replace(
                                     SelectedNet,
                                     targetNetItem.OriginalPrefab,
-                                    SelectedReplacementPrefab,
+                                    replacementPrefab,
                                     IndividualLane,
                                     IndividualIndex,
                                     m_rotationSlider.TrueValue,
@@ -318,7 +321,7 @@ namespace BOB
                                 GroupedNetworkReplacement.Instance.Replace(
                                     SelectedNet,
                                     targetNetItem.OriginalPrefab,
-                                    SelectedReplacementPrefab,
+                                    replacementPrefab,
                                     -1,
                                     -1,
                                     m_rotationSlider.TrueValue,
@@ -335,7 +338,7 @@ namespace BOB
                                 AllNetworkReplacement.Instance.Replace(
                                     null,
                                     targetNetItem.OriginalPrefab,
-                                    SelectedReplacementPrefab,
+                                    replacementPrefab,
                                     -1,
                                     -1,
                                     m_rotationSlider.TrueValue,
