@@ -5,6 +5,7 @@
 
 namespace BOB
 {
+    using System.Collections.Generic;
     using AlgernonCommons;
     using AlgernonCommons.Patching;
     using ICities;
@@ -14,6 +15,11 @@ namespace BOB
     /// </summary>
     public sealed class Loading : PatcherLoadingBase<OptionsPanel, Patcher>
     {
+        /// <summary>
+        /// Gets a list of permitted loading modes.
+        /// </summary>
+        protected override List<AppMode> PermittedModes => new List<AppMode> { AppMode.Game, AppMode.MapEditor, AppMode.AssetEditor, AppMode.ScenarioEditor, AppMode.AssetEditor };
+
         /// <summary>
         /// Performs any actions upon successful creation of the mod.
         /// E.g. Can be used to patch any other mods.
