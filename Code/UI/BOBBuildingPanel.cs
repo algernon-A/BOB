@@ -661,6 +661,15 @@ namespace BOB
             // Check current mode.
             if (CurrentMode == ReplacementModes.All)
             {
+                // Need a valid target for this to work.
+                if (SelectedTargetItem?.OriginalPrefab == null)
+                {
+                    return;
+                }
+
+                // Tree or prop?
+                bool isTree = SelectedTargetItem.OriginalPrefab is TreeInfo;
+
                 // All-building replacement; iterate through all prefabs and find matching prop references.
                 for (uint i = 0; i < PrefabCollection<BuildingInfo>.LoadedCount(); ++i)
                 {
@@ -669,7 +678,7 @@ namespace BOB
                     {
                         for (int j = 0; j < prefab.m_props.Length; ++j)
                         {
-                            if (prefab.m_props[j].m_prop == SelectedTargetItem.ReplacementPrefab || prefab.m_props[j].m_tree == SelectedTargetItem.ReplacementPrefab)
+                            if ((!isTree && prefab.m_props[j].m_prop == SelectedTargetItem.OriginalPrefab) || (isTree && prefab.m_props[j].m_tree == SelectedTargetItem.OriginalPrefab))
                             {
                                 m_originalValues.Add(GetOriginalData(prefab, j));
                             }
