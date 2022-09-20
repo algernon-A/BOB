@@ -73,7 +73,6 @@ namespace BOB
         /// <summary>
         /// Gets or sets a value indicating whether the last panel position should be rememembered.
         /// </summary>
-        [XmlIgnore]
         [XmlElement("RememberPos")]
         public bool XMLRememberPos { get => RememberPosition; set => RememberPosition = value; }
 
