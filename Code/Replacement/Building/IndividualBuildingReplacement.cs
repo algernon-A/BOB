@@ -1,105 +1,85 @@
-﻿using System.Collections.Generic;
-
+﻿// <copyright file="IndividualBuildingReplacement.cs" company="algernon (K. Algernon A. Sheppard)">
+// Copyright (c) algernon (K. Algernon A. Sheppard). All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// </copyright>
 
 namespace BOB
 {
-	/// <summary>
-	/// Class to manage individual building prop and tree replacements.
-	/// </summary>
-	internal class IndividualBuildingReplacement : BuildingReplacementBase
-	{
-		/// <summary>
-		/// Constructor - initializes instance reference.
-		/// </summary>
-		internal IndividualBuildingReplacement()
-		{
-			Instance = this;
-		}
+    using System.Collections.Generic;
+    using AlgernonCommons;
 
+    /// <summary>
+    /// Class to manage individual building prop and tree replacements.
+    /// </summary>
+    internal class IndividualBuildingReplacement : BuildingReplacementBase
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IndividualBuildingReplacement"/> class.
+        /// </summary>
+        internal IndividualBuildingReplacement()
+        {
+            Instance = this;
+        }
 
-		/// <summary>
-		/// Instance reference.
-		/// </summary>
-		internal static IndividualBuildingReplacement Instance { get; private set; }
+        /// <summary>
+        /// Gets the active instance.
+        /// </summary>
+        internal static IndividualBuildingReplacement Instance { get; private set; }
 
+        /// <summary>
+        /// Gets the config file list of building elements relevant to the current replacement type.
+        /// </summary>
+        protected override List<BOBConfig.BuildingElement> BuildingElementList => ConfigurationUtils.CurrentConfig.IndBuildings;
 
-		/// <summary>
-		/// Returns the config file list of building elements relevant to the current replacement type.
-		/// </summary>
-		protected override List<BOBBuildingElement> BuildingElementList => ConfigurationUtils.CurrentConfig.indBuildings;
+        /// <summary>
+        /// Gets the priority level of this replacmeent type.
+        /// </summary>
+        protected override ReplacementPriority ThisPriority => ReplacementPriority.IndividualReplacement;
 
+        /// <summary>
+        /// Finds any existing replacement relevant to the provided arguments.
+        /// </summary>
+        /// <param name="buildingInfo">Building prefab.</param>
+        /// <param name="propIndex">Prop index.</param>
+        /// <param name="targetInfo">Target prop/tree prefab (ignored).</param>
+        /// <returns>Existing replacement entry, if one was found, otherwise null.</returns>
+        protected override BOBConfig.BuildingReplacement FindReplacement(BuildingInfo buildingInfo, int propIndex, PrefabInfo targetInfo) =>
+            ReplacementList(buildingInfo)?.Find(x => x.PropIndex == propIndex);
 
-		/// <summary>
-		/// Retrieves any currently-applied replacement entry for the given building prefab, target prefab and prop index.
-		/// </summary>
-		/// <param name="buildingInfo">Building prefab</param>
-		/// <param name="targetInfo">Target prop/tree prefab</param>
-		/// <param name="propIndex">Target prop/tree index</param>
-		/// <returns>Currently-applied replacement (null if none)</returns>
-		internal override BOBBuildingReplacement ActiveReplacement(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex) => ReplacementList(buildingInfo)?.Find(x => x.propIndex == propIndex);
-
-
-		/// <summary>
-		/// Applies a replacement.
-		/// </summary>
-		/// <param name="replacement">Replacement record to apply</param>
-		protected override void ApplyReplacement(BOBBuildingReplacement replacement)
-		{
-			// Don't do anything if prefabs can't be found.
-			if (replacement?.targetInfo == null || replacement.replacementInfo == null || replacement.BuildingInfo == null)
-			{
-				return;
-			}
-			
-			// Check index bounds.
-			if (replacement.BuildingInfo.m_props == null || replacement.propIndex >= replacement.BuildingInfo.m_props.Length)
+        /// <summary>
+        /// Applies a replacement.
+        /// </summary>
+        /// <param name="replacement">Replacement record to apply.</param>
+        protected override void ApplyReplacement(BOBConfig.BuildingReplacement replacement)
+        {
+            // Don't do anything if prefabs can't be found.
+            if (replacement?.TargetInfo == null || replacement.ReplacementInfo == null || replacement.BuildingInfo == null)
             {
-				Logging.Message("ignoring invalid individual building replacement index ", replacement.propIndex, " for building ", replacement.BuildingInfo.name);
-				return;
-			}
+                return;
+            }
 
-			// Don't apply replacement if this is an added prop.
-			if (AddedBuildingProps.Instance.IsAdded(replacement.BuildingInfo, replacement.propIndex))
-			{
-				return;
-			}
-
-			// Check prop index.
-			BuildingInfo.Prop thisProp = replacement.BuildingInfo.m_props[replacement.propIndex];
-			if (thisProp == null)
+            // Check index bounds.
+            if (replacement.BuildingInfo.m_props == null || replacement.PropIndex < 0 || replacement.PropIndex >= replacement.BuildingInfo.m_props.Length)
             {
-				return;
-			}
+                Logging.Message("ignoring invalid individual building replacement index ", replacement.PropIndex, " for building ", replacement.BuildingInfo.name);
+                return;
+            }
 
-			// Reset any building or all-building replacements first.
-			BuildingReplacement.Instance.RemoveEntry(replacement.BuildingInfo, replacement.targetInfo, replacement.propIndex);
-			AllBuildingReplacement.Instance.RemoveEntry(replacement.BuildingInfo, replacement.targetInfo, replacement.propIndex);
+            // Don't apply replacement if this is an added prop.
+            if (AddedBuildingProps.Instance.IsAdded(replacement.BuildingInfo, replacement.PropIndex))
+            {
+                return;
+            }
 
-			// Create replacment entry.
-			BuildingPropReference newPropReference = CreateReference(replacement.BuildingInfo, replacement.targetInfo, replacement.propIndex, replacement.isTree);
+            // Check prop for null.
+            BuildingInfo.Prop thisProp = replacement.BuildingInfo.m_props[replacement.PropIndex];
+            if (thisProp == null)
+            {
+                return;
+            }
 
-			// Reset replacement list to be only our new replacement entry.
-			replacement.references = new List<BuildingPropReference> { newPropReference };
-
-			// Apply the replacement.
-			ReplaceProp(replacement, newPropReference);
-		}
-
-
-		/// <summary>
-		/// Restores any replacements from lower-priority replacements after a reversion.
-		/// </summary>
-		/// <param name="buildingInfo">Building prefab</param>
-		/// <param name="targetInfo">Target prop info</param>
-		/// <param name="propIndex">Prop index</param>
-		protected override void RestoreLower(BuildingInfo buildingInfo, PrefabInfo targetInfo, int propIndex)
-		{
-			// Restore any building replacement.
-			if (!BuildingReplacement.Instance.Restore(buildingInfo, targetInfo, propIndex))
-			{
-				// No building restoration occured - restore any all-building replacement.
-				AllBuildingReplacement.Instance.Restore(buildingInfo, targetInfo, propIndex);
-			}
-		}
-	}
+            // Set the new replacement.
+            BuildingHandlers.GetOrAddHandler(replacement.BuildingInfo, replacement.PropIndex).SetReplacement(replacement, ThisPriority);
+        }
+    }
 }

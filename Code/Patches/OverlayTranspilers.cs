@@ -1,21 +1,26 @@
-﻿using System.Collections.Generic;
-using System.Reflection.Emit;
-using HarmonyLib;
-
+﻿// <copyright file="OverlayTranspilers.cs" company="algernon (K. Algernon A. Sheppard)">
+// Copyright (c) algernon (K. Algernon A. Sheppard). All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// </copyright>
 
 namespace BOB
 {
+    using System.Collections.Generic;
+    using System.Reflection.Emit;
+    using AlgernonCommons;
+    using HarmonyLib;
+
     /// <summary>
     /// Harmony transpilers for registering overlays to render.
     /// </summary>
     public static class OverlayTranspilers
     {
         /// <summary>
-        /// Harmony transpiler for BuildingAI.RenderProps, to insert calls to highlight selected props/trees
+        /// Harmony transpiler for BuildingAI.RenderProps, to insert calls to highlight selected props/trees.
         /// </summary>
-        /// <param name="instructions">Original ILCode</param>
-        /// <param name="generator">IL generator</param>
-        /// <returns>Patched ILCode</returns>
+        /// <param name="instructions">Original ILCode.</param>
+        /// <param name="generator">IL generator.</param>
+        /// <returns>Patched ILCode.</returns>
         public static IEnumerable<CodeInstruction> BuildingTranspiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
             // ILCode local variable indexes.
@@ -36,7 +41,6 @@ namespace BOB
             bool foundTreeInfo = false;
             LocalBuilder originalTreeInfo = generator.DeclareLocal(typeof(TreeInfo));
 
-
             // Iterate through all instructions in original method.
             while (instructionsEnumerator.MoveNext())
             {
@@ -51,13 +55,13 @@ namespace BOB
                     if (localBuilder.LocalIndex == 17)
                     {
                         // Yes - insert call to RenderOverlays.HighlightBuildingProp(i, prop, ref building)
-                        Logging.KeyMessage("adding building HighlightBuildingProp call after stloc.s 17");
                         yield return new CodeInstruction(OpCodes.Ldarg_1);
                         yield return new CodeInstruction(OpCodes.Ldloc_S, IVarIndex);
                         yield return new CodeInstruction(OpCodes.Ldloc_S, BuildingInfoPropIndex);
                         yield return new CodeInstruction(OpCodes.Ldarg_S, BuildingArg);
                         yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(RenderOverlays), nameof(RenderOverlays.HighlightBuildingProp)));
                     }
+
                     // Otherwise, is this the first instance of stloc.s 15?
                     else if (!foundTreeInfo && localBuilder.LocalIndex == TreeVarIndex)
                     {
@@ -94,12 +98,11 @@ namespace BOB
             }
         }
 
-
         /// <summary>
         /// Harmony transpiler for NetLane.RenderInstance, to insert calls to highlight selected props/tree.
         /// </summary>
-        /// <param name="instructions">Original ILCode</param>
-        /// <returns>Patched ILCode</returns>
+        /// <param name="instructions">Original ILCode.</param>
+        /// <returns>Patched ILCode.</returns>
         public static IEnumerable<CodeInstruction> NetTranspiler(IEnumerable<CodeInstruction> instructions)
         {
             // ILCode local variable indexes.
@@ -117,9 +120,8 @@ namespace BOB
             IEnumerator<CodeInstruction> instructionsEnumerator = instructions.GetEnumerator();
             CodeInstruction instruction;
             bool foundPropCandidate = false, foundTreeCandidate = false;
-            string candidateName, methodName;
+            string methodName;
             int prefabIndex, positionIndex;
-
 
             // Iterate through all instructions in original method.
             while (instructionsEnumerator.MoveNext())
@@ -162,7 +164,6 @@ namespace BOB
                             if (foundPropCandidate)
                             {
                                 // Prop.
-                                candidateName = "Prop";
                                 prefabIndex = PropVarIndex;
                                 positionIndex = PropPositionVarIndex;
                                 methodName = nameof(RenderOverlays.HighlightNetworkProp);
@@ -170,14 +171,12 @@ namespace BOB
                             else
                             {
                                 // Tree.
-                                candidateName = "Tree";
                                 prefabIndex = TreeVarIndex;
                                 positionIndex = TreePositionVarIndex;
                                 methodName = nameof(RenderOverlays.HighlightNetworkTree);
                             }
 
                             // Insert call to PropOverlays.Highlight method after original call.
-                            Logging.KeyMessage("adding network Highlight", candidateName, " call after RenderInstance");
                             yield return new CodeInstruction(OpCodes.Ldloc_S, prefabIndex);
                             yield return new CodeInstruction(OpCodes.Ldloc_S, positionIndex);
                             yield return new CodeInstruction(OpCodes.Ldarg_2); // segment ID
@@ -194,19 +193,17 @@ namespace BOB
             }
         }
 
-
         /// <summary>
         /// Harmony transpiler for TreeInstance.RenderInstance, to insert calls to highlight selected props/tree.
         /// </summary>
-        /// <param name="instructions">Original ILCode</param>
-        /// <returns>Patched ILCode</returns>
+        /// <param name="instructions">Original ILCode.</param>
+        /// <returns>Patched ILCode.</returns>
         public static IEnumerable<CodeInstruction> TreeTranspiler(IEnumerable<CodeInstruction> instructions)
         {
             // ILCode local variable indexes.
             const int TreeVarIndex = 0;
             const int TreePositionVarIndex = 1;
             const int DefaultColorLocationVarIndex = 5;
-
 
             // Instruction parsing.
             IEnumerator<CodeInstruction> instructionsEnumerator = instructions.GetEnumerator();
@@ -230,11 +227,9 @@ namespace BOB
                         yield return instruction;
 
                         // Is this new instruction a call to Void RenderInstance?
-
                         if (instruction.opcode == OpCodes.Call && instruction.operand.ToString().StartsWith("Void RenderInstance"))
                         {
                             // Yes - insert call to PropOverlays.Highlight method after original call.
-                            Logging.KeyMessage("adding tree Highlight call after RenderInstance");
                             yield return new CodeInstruction(OpCodes.Ldloc_S, TreeVarIndex);
                             yield return new CodeInstruction(OpCodes.Ldloc_S, TreePositionVarIndex);
                             yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(RenderOverlays), nameof(RenderOverlays.HighlightTree)));
@@ -244,18 +239,16 @@ namespace BOB
             }
         }
 
-
         /// <summary>
         /// Harmony transpiler for PropInstance.RenderInstance, to insert calls to highlight selected map prop.
         /// </summary>
-        /// <param name="instructions">Original ILCode</param>
-        /// <returns>Patched ILCode</returns>
+        /// <param name="instructions">Original ILCode.</param>
+        /// <returns>Patched ILCode.</returns>
         public static IEnumerable<CodeInstruction> PropTranspiler(IEnumerable<CodeInstruction> instructions)
         {
             // ILCode local variable indexes.
             const int PropVarIndex = 0;
             const int PropPositionVarIndex = 1;
-
 
             // Instruction parsing.
             IEnumerator<CodeInstruction> instructionsEnumerator = instructions.GetEnumerator();
@@ -272,7 +265,6 @@ namespace BOB
                 if (instruction.opcode == OpCodes.Call && instruction.operand.ToString().StartsWith("Void RenderInstance"))
                 {
                     // Yes - insert call to PropOverlays.Highlight method after original call.
-                    Logging.KeyMessage("adding prop Highlight call after RenderInstance");
                     yield return new CodeInstruction(OpCodes.Ldloc_S, PropVarIndex);
                     yield return new CodeInstruction(OpCodes.Ldloc_S, PropPositionVarIndex);
                     yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(RenderOverlays), nameof(RenderOverlays.HighlightProp)));

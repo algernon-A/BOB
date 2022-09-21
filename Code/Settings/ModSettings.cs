@@ -1,19 +1,25 @@
-﻿using System;
-using System.IO;
-using System.Xml.Serialization;
-using UnityEngine;
-using ColossalFramework;
-
+﻿// <copyright file="ModSettings.cs" company="algernon (K. Algernon A. Sheppard)">
+// Copyright (c) algernon (K. Algernon A. Sheppard). All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// </copyright>
 
 namespace BOB
 {
-	/// <summary>
-	/// Global mod settings.
-	/// </summary>
-	/// 
-	[XmlRoot("TreePropReplacer")]
-	public class ModSettings
-	{
+    using System;
+    using System.IO;
+    using System.Xml.Serialization;
+    using AlgernonCommons;
+    using AlgernonCommons.Keybinding;
+    using AlgernonCommons.Patching;
+    using AlgernonCommons.XML;
+    using UnityEngine;
+
+    /// <summary>
+    /// Global mod settings.
+    /// </summary>
+    [XmlRoot("TreePropReplacer")]
+    public class ModSettings : SettingsXMLBase
+    {
         // BOB settings file name (old).
         [XmlIgnore]
         private static readonly string OldSettingsFileName = "TreePropReplacer-settings.xml";
@@ -26,51 +32,112 @@ namespace BOB
         [XmlIgnore]
         private static readonly string UserSettingsDir = ColossalFramework.IO.DataLocation.localApplicationData;
 
-        // Default behaviour of the show individual props setting.
+        /// <summary>
+        /// UUI key.
+        /// </summary>
         [XmlIgnore]
-        internal static int indDefault;
+        private static readonly UnsavedInputKey UUIKey = new UnsavedInputKey(name: "BOB hotkey", keyCode: KeyCode.B, control: false, shift: false, alt: true);
 
-        [XmlIgnore]
-        // Last selected vanilla filter state.
-        internal static bool hideVanilla = false;
-
-        [XmlIgnore]
-        // Last selected tree-or-prop state.
-        internal static BOBPanelBase.PropTreeModes lastPropTreeMode = BOBPanelBase.PropTreeModes.Prop;
-
-        [XmlIgnore]
-        // Remember last panel position.
-        internal static bool rememberPosition = false;
-        
-        // What's new notification version.
-        [XmlIgnore]
-        internal static string whatsNewVersion = "0.0";
-
-        // What's new beta notification version.
-        [XmlIgnore]
-        internal static int whatsNewBetaVersion = 0;
-
-        // UUI hotkey.
-        [XmlIgnore]
-        private static readonly UnsavedInputKey uuiKey = new UnsavedInputKey("BOB hotkey", keyCode: KeyCode.B, control: false, shift: false, alt: true);
-
+        // Private functional flags.
+        private static bool _disableTreeTool = false;
+        private static bool _thinnerWires = false;
 
         /// <summary>
-        /// Disable tree ruining (true means ruining is disabled).
+        /// Gets or sets the tool hotkey.
+        /// </summary>
+        [XmlElement("PanelKey")]
+        public Keybinding XMLToolKey
+        {
+            get => UUIKey.Keybinding;
+
+            set => UUIKey.Keybinding = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the hotkey to toggle suppression of the vanilla network tree replacement tool.
+        /// </summary>
+        [XmlElement("TreeToolKey")]
+        public Keybinding TreeToolKey
+        {
+            get => HotkeyThreading.TreeDisableKey;
+
+            set => HotkeyThreading.TreeDisableKey = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the default grouping behaviour.
+        /// </summary>
+        [XmlElement("GroupDefault")]
+        public int XMLGroupDefault { get => IndividualDefault; set => IndividualDefault = value; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the last panel position should be rememembered.
+        /// </summary>
+        [XmlElement("RememberPos")]
+        public bool XMLRememberPos { get => RememberPosition; set => RememberPosition = value; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether tree ruining is disabled (true means ruining is disabled).
+        /// </summary>
+        [XmlElement("StopTreeRuining")]
+        public bool XMLNoTreeRuining { get => StopTreeRuining; set => StopTreeRuining = value; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether prop ruining is disabled (true means ruining is disabled).
+        /// </summary>
+        [XmlElement("StopPropRuining")]
+        public bool XMLNoPropRuining { get => StopPropRuining; set => StopPropRuining = value; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether thinner electrical wires are enabled (true means wires are made thinner).
+        /// </summary>
+        [XmlElement("ThinnerWires")]
+        public bool XMLThinnerWires { get => _thinnerWires; set => _thinnerWires = value; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the vanilla tree network replacement tool is disabled (true means disable).
+        /// </summary>
+        [XmlElement("DisableNetworkTreeTool")]
+        public bool XMLDisableTreeTool { get => DisableTreeTool; set => DisableTreeTool = value; }
+
+        /// <summary>
+        /// Gets or sets the default grouping behaviour.
+        /// </summary>
+        [XmlIgnore]
+        internal static int IndividualDefault { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the last selected vanilla filter state was active.
+        /// </summary>
+        [XmlIgnore]
+        internal static bool HideVanilla { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets the last selected tree-or-prop state.
+        /// </summary>
+        [XmlIgnore]
+        internal static BOBPanelBase.PropTreeModes LastPropTreeMode { get; set; } = BOBPanelBase.PropTreeModes.Prop;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the last panel position should be rememembered.
+        /// </summary>
+        [XmlIgnore]
+        internal static bool RememberPosition { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether tree ruining is disabled (true means ruining is disabled).
         /// </summary>
         [XmlIgnore]
         internal static bool StopTreeRuining { get; set; } = false;
 
-
         /// <summary>
-        /// Disable prop ruining (true means ruining is disabled).
+        /// Gets or sets a value indicating whether prop ruining is disabled (true means ruining is disabled).
         /// </summary>
         [XmlIgnore]
         internal static bool StopPropRuining { get; set; } = false;
 
-
         /// <summary>
-        /// Disable/enable vanilla tree network replacement tool (true means disable).
+        /// Gets or sets a value indicating whether the vanilla tree network replacement tool is disabled (true means disable).
         /// </summary>
         [XmlIgnore]
         internal static bool DisableTreeTool
@@ -80,14 +147,12 @@ namespace BOB
             set
             {
                 _disableTreeTool = value;
-                Patcher.DisableTreeTool(value);
+                PatcherManager<Patcher>.Instance.DisableTreeTool(value);
             }
         }
-        private static bool _disableTreeTool = false;
-
 
         /// <summary>
-        /// Enable thinner electrical wires (true means wires are made thinner).
+        /// Gets or sets a value indicating whether thinner electrical wires are enabled (true means wires are made thinner).
         /// </summary>
         [XmlIgnore]
         internal static bool ThinnerWires
@@ -114,100 +179,12 @@ namespace BOB
                 }
             }
         }
-        private static bool _thinnerWires = false;
-
 
         /// <summary>
-        /// Current hotkey as UUI UnsavedInputKey.
+        /// Gets the current hotkey as a UUI UnsavedInputKey.
         /// </summary>
         [XmlIgnore]
-        internal static UnsavedInputKey UUIKey => uuiKey;
-
-
-        /// <summary>
-        /// Tool hotkey as ColossalFramework SavedInputKey.
-        /// </summary>
-        [XmlIgnore]
-        internal static InputKey ToolKey
-        {
-            get => uuiKey.value;
-
-            set => uuiKey.value = value;
-        }
-
-
-        // "What's new" notification last notified version.
-        [XmlElement("WhatsNewVersion")]
-		public string XMLWhatsNewVersion { get => whatsNewVersion; set => whatsNewVersion = value; }
-
-
-		// Language.
-		[XmlElement("Language")]
-		public string XMLLanguage
-		{
-			get => Translations.CurrentLanguage;
-
-			set => Translations.CurrentLanguage = value;
-        }
-
-        // Hotkey element.
-        [XmlElement("PanelKey")]
-        public KeyBinding XMLPanelKey
-        {
-            get => uuiKey.KeyBinding;
-
-            set => uuiKey.KeyBinding = value;
-        }
-
-
-        // Hotkey element.
-        [XmlElement("TreeToolKey")]
-        public KeyBinding TreeToolKey
-        {
-            get
-            {
-                return new KeyBinding
-                {
-                    keyCode = (int)UIThreading.treeDisableKey,
-                    control = UIThreading.treeDisableCtrl,
-                    shift = UIThreading.treeDisableShift,
-                    alt = UIThreading.treeDisableAlt
-                };
-            }
-            set
-            {
-                UIThreading.treeDisableKey = (KeyCode)value.keyCode;
-                UIThreading.treeDisableCtrl = value.control;
-                UIThreading.treeDisableShift = value.shift;
-                UIThreading.treeDisableAlt = value.alt;
-            }
-        }
-
-
-        // Grouping behaviour.
-        [XmlElement("GroupDefault")]
-		public int XMLGroupDefault { get => indDefault; set => indDefault = value; }
-
-		// Remember position.
-		[XmlElement("RememberPos")]
-		public bool XMLRememberPos { get => rememberPosition; set => rememberPosition = value; }
-
-        // Disable tree ruining.
-        [XmlElement("StopTreeRuining")]
-        public bool XMLNoTreeRuining { get => StopTreeRuining; set => StopTreeRuining = value; }
-
-        // Disable prop ruining.
-        [XmlElement("StopPropRuining")]
-        public bool XMLNoPropRuining { get => StopPropRuining; set => StopPropRuining = value; }
-
-        // Thinner wires.
-        [XmlElement("ThinnerWires")]
-        public bool XMLThinnerWires { get => _thinnerWires; set => _thinnerWires = value; }
-
-        // Disable vanilla tree tool network replacement.
-        [XmlElement("DisableNetworkTreeTool")]
-        public bool XMLDisableTreeTool { get => DisableTreeTool; set => DisableTreeTool = value; }
-
+        internal static UnsavedInputKey ToolKey => UUIKey;
 
         /// <summary>
         /// Load settings from XML file.
@@ -252,7 +229,6 @@ namespace BOB
             }
         }
 
-
         /// <summary>
         /// Save settings to XML file.
         /// </summary>
@@ -282,69 +258,6 @@ namespace BOB
             {
                 Logging.LogException(e, "exception saving XML settings file");
             }
-        }
-    }
-
-
-    /// <summary>
-    /// Basic keybinding class - code and modifiers.
-    /// </summary>
-    public class KeyBinding
-    {
-        [XmlAttribute("KeyCode")]
-        public int keyCode;
-
-        [XmlAttribute("Control")]
-        public bool control;
-
-        [XmlAttribute("Shift")]
-        public bool shift;
-
-        [XmlAttribute("Alt")]
-        public bool alt;
-
-
-        /// <summary>
-        /// Encode keybinding as saved input key for UUI.
-        /// </summary>
-        /// <returns></returns>
-        internal InputKey Encode() => SavedInputKey.Encode((KeyCode)keyCode, control, shift, alt);
-    }
-
-
-    /// <summary>
-    /// UUI unsaved input key.
-    /// </summary>
-    public class UnsavedInputKey : UnifiedUI.Helpers.UnsavedInputKey
-    {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="name">Reference name</param>
-        /// <param name="keyCode">Keycode</param>
-        /// <param name="control">Control modifier key status</param>
-        /// <param name="shift">Shift modifier key status</param>
-        /// <param name="alt">Alt modifier key status</param>
-        public UnsavedInputKey(string name, KeyCode keyCode, bool control, bool shift, bool alt) :
-            base(keyName: name, modName: "Repaint", Encode(keyCode, control: control, shift: shift, alt: alt))
-        {
-        }
-
-
-        /// <summary>
-        /// Called by UUI when a key conflict is resolved.
-        /// Used here to save the new key setting.
-        /// </summary>
-        public override void OnConflictResolved() => ModSettings.Save();
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public KeyBinding KeyBinding
-        {
-            get => new KeyBinding { keyCode = (int)Key, control = Control, shift = Shift, alt = Alt };
-            set => this.value = value.Encode();
         }
     }
 }

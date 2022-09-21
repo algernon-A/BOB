@@ -1,44 +1,28 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using ColossalFramework;
-
+﻿// <copyright file="NetData.cs" company="algernon (K. Algernon A. Sheppard)">
+// Copyright (c) algernon (K. Algernon A. Sheppard). All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// </copyright>
 
 namespace BOB
 {
-    /// <summary>
-    /// 'Dummy' class for new NetLaneProps.Prop instances to overcome network NetLaneProps sharing.
-    /// </summary>
-    public class NewNetLaneProps : NetLaneProps
-    {
-    }
-
+    using System.Collections.Generic;
+    using AlgernonCommons;
+    using ColossalFramework;
+    using UnityEngine;
 
     /// <summary>
     /// Class to handle centralised network data.
     /// </summary>
     internal static class NetData
     {
-        // List of dirty net prefabs.
-        private static HashSet<NetInfo> dirtyList;
-
+        // List of dirty network prefabs.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.NamingRules", "SA1311:Static readonly fields should begin with upper-case letter", Justification = "Private static readonly field")]
+        private static readonly HashSet<NetInfo> s_dirtyList = new HashSet<NetInfo>();
 
         /// <summary>
-        /// Dirty prefabs list.
+        /// Gets the dirty prefabs list.
         /// </summary>
-        internal static HashSet<NetInfo> DirtyList
-        {
-            get
-            {
-                // Initialise list if it isn't already.
-                if (dirtyList == null)
-                {
-                    dirtyList = new HashSet<NetInfo>();
-                }
-
-                return dirtyList;
-            }
-        }
-
+        internal static HashSet<NetInfo> DirtyList => s_dirtyList;
 
         /// <summary>
         /// Refreshes network prefab renders for all 'dirty' networks and calls a recalculation of any Network Skins 2 skins.
@@ -57,9 +41,9 @@ namespace BOB
             // Need to do this for each segment instance, so iterate through all segments.
             for (ushort i = 0; i < segments.Length; ++i)
             {
-				// Check that this is a valid network in the dirty list.
-				if (segments[i].m_flags != NetSegment.Flags.None && DirtyList.Contains(segments[i].Info))
-				{
+                // Check that this is a valid network in the dirty list.
+                if (segments[i].m_flags != NetSegment.Flags.None && DirtyList.Contains(segments[i].Info))
+                {
                     // Update segment instance.
                     renderManager.UpdateInstance((uint)(49152 + i));
 
@@ -69,8 +53,8 @@ namespace BOB
                     Vector3 position = nodes[startNode].m_position;
                     Vector3 position2 = nodes[endNode].m_position;
                     Vector3 vector = (position + position2) * 0.5f;
-                    int num = Mathf.Clamp((int)(vector.x / 64f + 135f), 0, 269);
-                    int num2 = Mathf.Clamp((int)(vector.z / 64f + 135f), 0, 269);
+                    int num = Mathf.Clamp((int)((vector.x / 64f) + 135f), 0, 269);
+                    int num2 = Mathf.Clamp((int)((vector.z / 64f) + 135f), 0, 269);
                     int x = num * 45 / 270;
                     int z = num2 * 45 / 270;
 
@@ -79,52 +63,56 @@ namespace BOB
                 }
             }
 
-            // Update render groups via simulation thread.
-            Singleton<SimulationManager>.instance.AddAction(delegate
+            // Update render groups.
+            // Iterate through each key in group.
+            foreach (KeyValuePair<int, int> keyPair in groupHash)
             {
-                // Iterate through each key in group.
-                foreach (KeyValuePair<int, int> keyPair in groupHash)
+                // Update group render (all 31 layers, since we've got all kinds of mismatches with replacements).
+                for (int i = 0; i < 31; ++i)
                 {
-                    // Update group render (all 31 layers, since we've got all kinds of mismatches with replacements).
-                    for (int i = 0; i < 31; ++i)
-                    {
-                        Singleton<RenderManager>.instance.UpdateGroup(keyPair.Key, keyPair.Value, i);
-                    }
+                    Singleton<RenderManager>.instance.UpdateGroup(keyPair.Key, keyPair.Value, i);
                 }
-            });
+            }
 
             // Recalculate any Network Skins 2 applied skins.
-            AssemblyUtils.NS2Recalculate();
+            ModUtils.NS2Recalculate();
 
             // Clear dirty prefabs list.
-            DirtyList.Clear();
+            s_dirtyList.Clear();
         }
-
 
         /// <summary>
         /// Creates a new NetInfo.Lane instance for the specified network and lane index.
         /// Used to 'separate' target networks for individual and network prop replacement when the network uses shared m_laneProps (e.g. vanilla roads).
         /// </summary>
-        /// <param name="network">Network prefab</param>
-        /// <param name="lane">Lane index</param>
-        internal static void CloneLanePropInstance(NetInfo network, int lane)
+        /// <param name="network">Network prefab.</param>
+        /// <param name="lane">Lane index.</param>
+        internal static void CloneLanePropInstance(NetInfo network, int lane) => CloneLanePropInstance(network, network.m_lanes[lane]);
+
+        /// <summary>
+        /// Creates a new NetInfo.Lane instance for the specified network and lane index.
+        /// Used to 'separate' target networks for individual and network prop replacement when the network uses shared m_laneProps (e.g. vanilla roads).
+        /// </summary>
+        /// <param name="network">Network prefab.</param>
+        /// <param name="laneInfo">Lane info.</param>
+        internal static void CloneLanePropInstance(NetInfo network, NetInfo.Lane laneInfo)
         {
-            // Don't do anything if we've previously converted this one.
-            if (network.m_lanes[lane].m_laneProps is NewNetLaneProps)
+            // Don't do anything if we've previously converted this one, or if it's custom content.
+            if (network.m_isCustomContent || laneInfo.m_laneProps is NewNetLaneProps)
             {
                 return;
             }
 
-            Logging.Message("creating new m_laneProps instance for network ", network.name, " at lane ", lane);
+            Logging.Message("creating new m_laneProps instance for network ", network.name);
 
             // Create new m_laneProps instance with new props list, using our custom class instead of NetLaneProps as a flag that we've already done this one.
             NewNetLaneProps newLaneProps = ScriptableObject.CreateInstance<NewNetLaneProps>();
-            newLaneProps.m_props = new NetLaneProps.Prop[network.m_lanes[lane].m_laneProps.m_props.Length];
+            newLaneProps.m_props = new NetLaneProps.Prop[laneInfo.m_laneProps.m_props.Length];
 
             // Iterate through each  in the existing instance
             for (int i = 0; i < newLaneProps.m_props.Length; ++i)
             {
-                NetLaneProps.Prop existingNetLaneProp = network.m_lanes[lane].m_laneProps.m_props[i];
+                NetLaneProps.Prop existingNetLaneProp = laneInfo.m_laneProps.m_props[i];
 
                 newLaneProps.m_props[i] = new NetLaneProps.Prop
                 {
@@ -146,12 +134,19 @@ namespace BOB
                     m_probability = existingNetLaneProp.m_probability,
                     m_finalProp = existingNetLaneProp.m_finalProp,
                     m_finalTree = existingNetLaneProp.m_finalTree,
-                    m_upgradable = existingNetLaneProp.m_upgradable
+                    m_upgradable = existingNetLaneProp.m_upgradable,
                 };
             }
 
             // Replace network laneProps with our new instance.
-            network.m_lanes[lane].m_laneProps = newLaneProps;
+            laneInfo.m_laneProps = newLaneProps;
+        }
+
+        /// <summary>
+        /// 'Dummy' class for new NetLaneProps.Prop instances to overcome network NetLaneProps sharing.
+        /// </summary>
+        public class NewNetLaneProps : NetLaneProps
+        {
         }
     }
 }

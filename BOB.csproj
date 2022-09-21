@@ -3,7 +3,7 @@
 		<TargetFramework>net35</TargetFramework>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Description>A Cities: Skylines mod.</Description>
-		<Version>0.9.5.1</Version>
+		<Version>0.9.6</Version>
 		<LibrariesPath>$(ProjectDir)/Libraries</LibrariesPath>
 		<ManagedDLLPath>$(MSBuildProgramFiles32)/Steam/steamapps/common/Cities_Skylines/Cities_Data/Managed</ManagedDLLPath>
 		<TreeAnarchyPath>$(MSBuildProgramFiles32)/Steam/steamapps/workshop/content/255710/2527486462</TreeAnarchyPath>
@@ -15,9 +15,14 @@
 			$(TreeAnarchyPath);
 			$(TreeAnarchyBetaPath);
 		</AssemblySearchPaths>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="CitiesHarmony.API" Version="2.1.0" />
+		<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="UnifiedUILib" Version="2.2.12" />
 		<Reference Include="Assembly-CSharp" />
 		<Reference Include="ColossalManaged" />
@@ -46,4 +51,5 @@
 		<Copy SourceFiles="@(_PrefabTemplates)" DestinationFolder="$(DeployDir)" />
 		<Copy SourceFiles="@(_ReplacementPacks)" DestinationFolder="$(DeployDir)/ReplacementPacks" />
 	</Target>
+	<Import Project="..\AlgernonCommons\AlgernonCommonsPatchingShared.projitems" Label="Shared" />
 </Project>

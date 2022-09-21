@@ -1,45 +1,39 @@
-﻿using ICities;
-using BOB.MessageBox;
-
+﻿// <copyright file="Loading.cs" company="algernon (K. Algernon A. Sheppard)">
+// Copyright (c) algernon (K. Algernon A. Sheppard). All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// </copyright>
 
 namespace BOB
 {
+    using System.Collections.Generic;
+    using AlgernonCommons;
+    using AlgernonCommons.Patching;
+    using ICities;
+
     /// <summary>
     /// Main loading class: the mod runs from here.
     /// </summary>
-    public class Loading : LoadingExtensionBase
+    public sealed class Loading : PatcherLoadingBase<OptionsPanel, Patcher>
     {
-        // Internal flags.
-        internal static bool isModEnabled = false;
-        internal static bool isLoaded = false;
+        /// <summary>
+        /// Gets a list of permitted loading modes.
+        /// </summary>
+        protected override List<AppMode> PermittedModes => new List<AppMode> { AppMode.Game, AppMode.MapEditor, AppMode.AssetEditor, AppMode.ScenarioEditor, AppMode.AssetEditor };
 
         /// <summary>
-        /// Called by the game when the mod is initialised at the start of the loading process.
+        /// Performs any actions upon successful creation of the mod.
+        /// E.g. Can be used to patch any other mods.
         /// </summary>
-        /// <param name="loading">Loading mode (e.g. game, editor, scenario, etc.)</param>
-        public override void OnCreated(ILoading loading)
+        /// <param name="loading">Loading mode (e.g. game or editor).</param>
+        protected override void CreatedActions(ILoading loading)
         {
-            Logging.KeyMessage("version ", Mod.Version, " loading");
-
-            // Don't do anything if not in game (e.g. if we're going into an editor).
-            if (loading.currentMode != AppMode.Game && loading.currentMode != AppMode.MapEditor)
-            {
-                isModEnabled = false;
-                Logging.KeyMessage("not loading into game, skipping activation");
-
-                // Unload Harmony patches and exit before doing anything further.
-                Patcher.UnpatchAll();
-                return;
-            }
-
-            // All good to go at this point.
-            isModEnabled = true;
+            base.CreatedActions(loading);
 
             // Initialise data sets prior to savegame load.
             new AllBuildingReplacement();
             new AllNetworkReplacement();
-            new BuildingReplacement();
-            new NetworkReplacement();
+            new GroupedBuildingReplacement();
+            new GroupedNetworkReplacement();
             new IndividualBuildingReplacement();
             new IndividualNetworkReplacement();
             new MapTreeReplacement();
@@ -49,53 +43,16 @@ namespace BOB
             new AddedNetworkProps();
 
             // Reflect overlay methods.
-            Patcher.ReflectOverlays();
-
-            base.OnCreated(loading);
+            PatcherManager<Patcher>.Instance.ReflectOverlays();
         }
 
-
         /// <summary>
-        /// Called by the game when level loading is complete.
+        /// Performs any actions upon successful level loading completion.
         /// </summary>
-        /// <param name="mode">Loading mode (e.g. game, editor, scenario, etc.)</param>
-        public override void OnLevelLoaded(LoadMode mode)
+        /// <param name="mode">Loading mode (e.g. game, editor, scenario, etc.).</param>
+        protected override void LoadedActions(LoadMode mode)
         {
-            Logging.Message("commencing loading checks");
-
-            base.OnLevelLoaded(mode);
-
-            // Don't do anything further if we're not operating.
-            if (!isModEnabled)
-            {
-                Logging.Message("exiting");
-                return;
-            }
-
-            // Check to see that Harmony 2 was properly loaded.
-            if (!Patcher.Patched)
-            {
-                // Harmony 2 wasn't loaded; abort.
-                Logging.Error("Harmony patches not applied; aborting");
-                isModEnabled = false;
-
-                // Display warning message.
-                ListMessageBox harmonyBox = MessageBoxBase.ShowModal<ListMessageBox>();
-
-                // Key text items.
-                harmonyBox.AddParas(Translations.Translate("ERR_HAR0"), Translations.Translate("BOB_ERR_HAR"), Translations.Translate("BOB_ERR_FAT"), Translations.Translate("ERR_HAR1"));
-
-                // List of dot points.
-                harmonyBox.AddList(Translations.Translate("ERR_HAR2"), Translations.Translate("ERR_HAR3"));
-
-                // Closing para.
-                harmonyBox.AddParas(Translations.Translate("MES_PAGE"));
-
-                // Don't do anything further.
-                return;
-            }
-
-            Logging.Message("loading checks passed");
+            base.LoadedActions(mode);
 
             // Build lists of loaded prefabs.
             PrefabLists.BuildLists();
@@ -109,11 +66,8 @@ namespace BOB
             // Set up BOB tool.
             ToolsModifierControl.toolController.gameObject.AddComponent<BOBTool>();
 
-            // Display update notification.
-            WhatsNew.ShowWhatsNew();
-
             // Set up Network Skins 2 reflection.
-            AssemblyUtils.NS2Reflection();
+            ModUtils.NS2Reflection();
 
             // Enable thin wires, if applicable.
             if (ModSettings.ThinnerWires)
@@ -126,27 +80,11 @@ namespace BOB
             BuildingData.Update();
             NetData.Update();
 
-            // Set up options panel event handler.
-            OptionsPanel.OptionsEventHook();
-
             // Display any exception message that occured during load.
-            InfoPanelManager.CheckException();
+            BOBPanelManager.CheckException();
 
             // Activate tool hotkey.
-            UIThreading.Operating = true;
-
-            isLoaded = true;
-            Logging.Message("loading complete");
-        }
-
-
-        /// <summary>
-        /// Called by the game when exiting loaded leve.
-        /// </summary>
-        public override void OnLevelUnloading()
-        {
-            base.OnLevelUnloading();
-            isLoaded = false;
+            HotkeyThreading.Operating = true;
         }
     }
 }

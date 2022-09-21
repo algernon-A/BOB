@@ -1,9 +1,16 @@
-﻿using UnityEngine;
-using ColossalFramework.UI;
-
+﻿// <copyright file="ConfigurationsPanel.cs" company="algernon (K. Algernon A. Sheppard)">
+// Copyright (c) algernon (K. Algernon A. Sheppard). All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// </copyright>
 
 namespace BOB
 {
+    using AlgernonCommons;
+    using AlgernonCommons.Translation;
+    using AlgernonCommons.UI;
+    using ColossalFramework.UI;
+    using UnityEngine;
+
     /// <summary>
     /// Options panel for setting basic mod options.
     /// </summary>
@@ -13,8 +20,8 @@ namespace BOB
         private const float Margin = 5f;
 
         // Layout constants - Y values.
-        internal const float RowHeight = 30f;
-        private const float ListHeight = 300f;
+        private const float RowHeight = 30f;
+        private const float ListHeight = RowHeight * 10;
         private const float TitleBarHeight = 40f;
         private const float ToolBarHeight = 30f;
         private const float ListY = TitleBarHeight;
@@ -22,53 +29,42 @@ namespace BOB
         private const float FooterY = ToolBarY + ToolBarHeight + Margin;
 
         // Layout constants - X values.
-        internal const float ListWidth = 400f;
+        private const float ListWidth = 400f;
         private const float ControlPanelX = ListWidth + (Margin * 2f);
 
+        // Instance reference.
+        private static ConfigurationsPanel s_instance;
+
+        // Current configuration file name.
+        private static string s_selectedConfig;
 
         // Panel components.
-        private readonly UIFastList configList;
-        private readonly UICheckBox customCheck;
-        private readonly UITextField fileNameField;
-        private readonly UIButton activeCopyButton, selectedCopyButton, newCleanButton, deleteButton;
+        private readonly UIList _configList;
+        private readonly UICheckBox _customCheck;
+        private readonly UITextField _fileNameField;
+        private readonly UIButton _activeCopyButton;
+        private readonly UIButton _selectedCopyButton;
+        private readonly UIButton _newCleanButton;
+        private readonly UIButton _deleteButton;
 
         // Status flag.
-        private readonly bool inGame;
-
-        // Instance reference.
-        private static ConfigurationsPanel instance;
-
-
-        // Current selection.
-        private static string selectedConfig;
-        internal static string SelectedConfig
-        {
-            set
-            {
-                if (value != selectedConfig)
-                {
-                    selectedConfig = value;
-                    instance?.UpdateButtonStates();
-                }
-            }
-        }
-
+        private readonly bool _inGame;
 
         /// <summary>
-        /// Adds configurations panel tab to tabstrip.
+        /// Initializes a new instance of the <see cref="ConfigurationsPanel"/> class.
         /// </summary>
-        /// <param name="tabStrip">Tab strip to add to</param>
-        /// <param name="tabIndex">Index number of tab</param>
+        /// <param name="tabStrip">Tab strip to add to.</param>
+        /// <param name="tabIndex">Index number of tab.</param>
         internal ConfigurationsPanel(UITabstrip tabStrip, int tabIndex)
         {
             // Set reference.
-            instance = this;
+            s_instance = this;
 
             // Determine if we're in-game or not; use status of replacer managers to determine.
-            inGame = BuildingReplacement.Instance != null && NetworkReplacement.Instance != null;
+            _inGame = GroupedBuildingReplacement.Instance != null && GroupedNetworkReplacement.Instance != null;
 
             // Add tab and helper.
-            UIPanel panel = PanelUtils.AddTab(tabStrip, Translations.Translate("BOB_OPT_CFG"), tabIndex);
+            UIPanel panel = UITabstrips.AddTextTab(tabStrip, Translations.Translate("BOB_OPT_CFG"), tabIndex, out _);
             UIHelper helper = new UIHelper(panel);
             panel.autoLayout = false;
 
@@ -79,73 +75,66 @@ namespace BOB
             configListPanel.relativePosition = new Vector2(Margin, ListY);
 
             // Config selection list.
-            configList = UIFastList.Create<UIConfigRow>(configListPanel);
-            configList.backgroundSprite = "UnlockingPanel";
-            configList.width = configListPanel.width;
-            configList.height = configListPanel.height;
-            configList.canSelect = true;
-            configList.rowHeight = RowHeight;
-            configList.autoHideScrollbar = true;
-            configList.relativePosition = Vector2.zero;
-            configList.rowsData = new FastList<object>();
+            _configList = UIList.AddUIList<ConfigRow>(configListPanel, 0f, 0f, ListWidth, ListHeight);
+            _configList.EventSelectionChanged += (c, data) => SelectedConfig = data as string;
 
             // File name textfield.
-            UILabel fileTextLabel = UIControls.AddLabel(panel, ControlPanelX, ListY, "New configuration name:");
-            fileNameField = UIControls.AddTextField(panel, ControlPanelX, ListY + fileTextLabel.height);
-            fileNameField.eventTextChanged += (control, text) => UpdateButtonStates();
+            UILabel fileTextLabel = UILabels.AddLabel(panel, ControlPanelX, ListY, "New configuration name:");
+            _fileNameField = UITextFields.AddTextField(panel, ControlPanelX, ListY + fileTextLabel.height);
+            _fileNameField.eventTextChanged += (c, text) => UpdateButtonStates();
 
             // Buttons.
-            activeCopyButton = UIControls.AddButton(panel, ControlPanelX, ListY + 70f, Translations.Translate("BOB_CFG_SAC"), 300f, scale: 0.8f);
-            activeCopyButton.eventClicked += NewCurrent;
-            selectedCopyButton = UIControls.AddButton(panel, ControlPanelX, ListY + 105f, Translations.Translate("BOB_CFG_SSC"), 300f, scale: 0.8f);
-            selectedCopyButton.eventClicked += CopySelected;
-            newCleanButton = UIControls.AddButton(panel, ControlPanelX, ListY + 140f, Translations.Translate("BOB_CFG_SEC"), 300f, scale: 0.8f);
-            newCleanButton.eventClicked += NewClean;
-            deleteButton = UIControls.AddButton(panel, ControlPanelX, ListY + 210f, Translations.Translate("BOB_CFG_DEL"), 300f, scale: 0.8f);
-            deleteButton.eventClicked += Delete;
+            _activeCopyButton = UIButtons.AddButton(panel, ControlPanelX, ListY + 70f, Translations.Translate("BOB_CFG_SAC"), 300f, scale: 0.8f);
+            _activeCopyButton.eventClicked += NewCurrent;
+            _selectedCopyButton = UIButtons.AddButton(panel, ControlPanelX, ListY + 105f, Translations.Translate("BOB_CFG_SSC"), 300f, scale: 0.8f);
+            _selectedCopyButton.eventClicked += CopySelected;
+            _newCleanButton = UIButtons.AddButton(panel, ControlPanelX, ListY + 140f, Translations.Translate("BOB_CFG_SEC"), 300f, scale: 0.8f);
+            _newCleanButton.eventClicked += NewClean;
+            _deleteButton = UIButtons.AddButton(panel, ControlPanelX, ListY + 210f, Translations.Translate("BOB_CFG_DEL"), 300f, scale: 0.8f);
+            _deleteButton.eventClicked += Delete;
 
             // Ingame buttons - 'use custom' check and apply and nuke buttons.
-            if (inGame)
+            if (_inGame)
             {
                 // Use custom check box.
-                customCheck = UIControls.LabelledCheckBox(panel, Margin, ToolBarY, Translations.Translate("BOB_CFG_UCS"));
-                customCheck.eventCheckChanged += (control, isChecked) =>
+                _customCheck = UICheckBoxes.AddLabelledCheckBox(panel, Margin, ToolBarY, Translations.Translate("BOB_CFG_UCS"));
+                _customCheck.eventCheckChanged += (c, isChecked) =>
                 {
                     // If we've got a valid selection, set the current config name to this.
-                    if (isChecked && !string.IsNullOrEmpty(selectedConfig))
+                    if (isChecked && !string.IsNullOrEmpty(s_selectedConfig))
                     {
-                        ConfigurationUtils.CurrentSavedConfigName = selectedConfig;
+                        ConfigurationUtils.CurrentSavedConfigName = s_selectedConfig;
                     }
                 };
 
                 // Apply button.
-                UIButton applyButton = UIControls.AddButton(panel, Margin, FooterY, Translations.Translate("BOB_CFG_LAA"), 400f, scale: 0.8f);
+                UIButton applyButton = UIButtons.AddButton(panel, Margin, FooterY, Translations.Translate("BOB_CFG_LAA"), 400f, scale: 0.8f);
                 applyButton.eventClicked += Apply;
 
                 // Use global configuration button.
-                UIButton globalButton = UIControls.AddButton(panel, Margin, FooterY + 50f, Translations.Translate("BOB_CFG_LGL"), 400f, scale: 0.8f);
+                UIButton globalButton = UIButtons.AddButton(panel, Margin, FooterY + 50f, Translations.Translate("BOB_CFG_LGL"), 400f, scale: 0.8f);
                 globalButton.eventClicked += UseGlobal;
 
                 // Clean up config button.
-                UIButton cleanUpButton = UIControls.AddButton(panel, Margin + 50f, FooterY + 150f, Translations.Translate("BOB_CFG_CLE"), 300f);
+                UIButton cleanUpButton = UIButtons.AddButton(panel, Margin + 50f, FooterY + 150f, Translations.Translate("BOB_CFG_CLE"), 300f);
                 cleanUpButton.tooltip = Translations.Translate("BOB_CFG_CLE_TIP");
-                cleanUpButton.eventClicked += (control, clickEvent) => ConfigurationUtils.Cleanup();
+                cleanUpButton.eventClicked += (c, clickEvent) => ConfigurationUtils.Cleanup();
 
                 // Nuke all settings button.
-                UIButton nukeButton = UIControls.AddButton(panel, Margin + 50f, FooterY + 200f, Translations.Translate("BOB_NUKE"), 300f);
-                nukeButton.eventClicked += (control, clickEvent) =>
+                UIButton nukeButton = UIButtons.AddButton(panel, Margin + 50f, FooterY + 200f, Translations.Translate("BOB_NUKE"), 300f);
+                nukeButton.eventClicked += (c, clickEvent) =>
                 {
                     // Revert all-building and building settings.
                     ReplacementUtils.NukeSettings();
                 };
 
                 // Clean map data button.
-                UIButton cleanSaveButton = UIControls.AddButton(panel, Margin + 50f, FooterY + 280f, Translations.Translate("BOB_CFG_CMD"), 300f, scale: 0.8f, tooltip: Translations.Translate("BOB_CFG_CMD_TIP"));
-                cleanSaveButton.eventClicked += (control, clickEvent) =>
+                UIButton cleanSaveButton = UIButtons.AddButton(panel, Margin + 50f, FooterY + 280f, Translations.Translate("BOB_CFG_CMD"), 300f, scale: 0.8f, tooltip: Translations.Translate("BOB_CFG_CMD_TIP"));
+                cleanSaveButton.eventClicked += (c, clickEvent) =>
                 {
                     // Clean all map data.
-                    MapTreeReplacement.instance.Setup();
-                    MapPropReplacement.instance.Setup();
+                    MapTreeReplacement.Instance.Replacements.Clear();
+                    MapPropReplacement.Instance.Replacements.Clear();
                 };
             }
 
@@ -153,16 +142,16 @@ namespace BOB
             RefreshList();
 
             // Select current pack if we've got one.
-            if (customCheck != null && customCheck.isChecked)
+            if (_customCheck != null && _customCheck.isChecked)
             {
                 // Try to select current config name.
-                selectedConfig = configList.FindItem(ConfigurationUtils.CurrentSavedConfigName);
+                _configList.FindItem(ConfigurationUtils.CurrentSavedConfigName);
 
                 // Did we find it?
-                if (selectedConfig == null)
+                if (_configList.SelectedIndex == -1)
                 {
                     // Not found; uncheck the use custom check.
-                    customCheck.isChecked = false;
+                    _customCheck.isChecked = false;
                 }
             }
 
@@ -170,38 +159,50 @@ namespace BOB
             UpdateButtonStates();
         }
 
+        /// <summary>
+        /// Sets the selected configuration file.
+        /// </summary>
+        internal static string SelectedConfig
+        {
+            set
+            {
+                if (value != s_selectedConfig)
+                {
+                    s_selectedConfig = value;
+                    s_instance?.UpdateButtonStates();
+                }
+            }
+        }
 
         /// <summary>
         /// Repopulates the config list and clears current selection.
         /// </summary>
         private void RefreshList()
         {
-            configList.selectedIndex = -1;
-            configList.rowsData = ConfigurationUtils.GetConfigFastList();
-            selectedConfig = null;
+            _configList.Data = ConfigurationUtils.GetConfigFastList();
+            s_selectedConfig = null;
 
             // Update button states.
             UpdateButtonStates();
         }
 
-
         /// <summary>
         /// 'Copy selected configuration' button event handler.
         /// </summary>
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="mouseEvent">Mouse event (unused)</param>
-        private void CopySelected(UIComponent control, UIMouseEventParameter mouseEvent)
+        /// <param name="c">Calling component.</param>
+        /// <param name="p">Mouse event parameter.</param>
+        private void CopySelected(UIComponent c, UIMouseEventParameter p)
         {
             // Ensure valid current selection and new filename before proceeding.
-            if (!string.IsNullOrEmpty(selectedConfig) && !string.IsNullOrEmpty(fileNameField.text))
+            if (!string.IsNullOrEmpty(s_selectedConfig) && !string.IsNullOrEmpty(_fileNameField.text))
             {
                 // Copy file, capturing any error message.
-                string message = ConfigurationUtils.CopyCurrent(selectedConfig, fileNameField.text);
+                string message = ConfigurationUtils.CopyCurrent(s_selectedConfig, _fileNameField.text);
                 if (message == null)
                 {
                     // Successful copy - clear text field, clear selection, and refresh config list.
                     RefreshList();
-                    fileNameField.text = "";
+                    _fileNameField.text = string.Empty;
                 }
                 else
                 {
@@ -210,67 +211,63 @@ namespace BOB
             }
         }
 
-
         /// <summary>
         /// 'Create new configuration' button event handler.
         /// </summary>
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="mouseEvent">Mouse event (unused)</param>
-        private void NewClean(UIComponent control, UIMouseEventParameter mouseEvent)
+        /// <param name="c">Calling component.</param>
+        /// <param name="p">Mouse event parameter.</param>
+        private void NewClean(UIComponent c, UIMouseEventParameter p)
         {
             // Ensure valid current selection and new filename before proceeding.
-            if (!string.IsNullOrEmpty(fileNameField.text))
+            if (!string.IsNullOrEmpty(_fileNameField.text))
             {
-                ConfigurationUtils.BlankConfig(fileNameField.text);
+                ConfigurationUtils.BlankConfig(_fileNameField.text);
                 RefreshList();
             }
         }
-
 
         /// <summary>
         /// 'Save current configuration' button event handler.
         /// </summary>
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="mouseEvent">Mouse event (unused)</param>
-        private void NewCurrent(UIComponent control, UIMouseEventParameter mouseEvent)
+        /// <param name="c">Calling component.</param>
+        /// <param name="p">Mouse event parameter.</param>
+        private void NewCurrent(UIComponent c, UIMouseEventParameter p)
         {
             // Ensure valid current selection and new filename before proceeding.
-            if (!string.IsNullOrEmpty(fileNameField.text))
+            if (!string.IsNullOrEmpty(_fileNameField.text))
             {
-                ConfigurationUtils.SaveConfig(fileNameField.text);
+                ConfigurationUtils.SaveConfig(_fileNameField.text);
                 RefreshList();
             }
         }
-
 
         /// <summary>
         /// 'Delete selected configuration' button event handler.
         /// </summary>
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="mouseEvent">Mouse event (unused)</param>
-        private void Delete(UIComponent control, UIMouseEventParameter mouseEvent)
+        /// <param name="c">Calling component.</param>
+        /// <param name="p">Mouse event parameter.</param>
+        private void Delete(UIComponent c, UIMouseEventParameter p)
         {
             // Ensure valid selection before deletion.
-            if (!string.IsNullOrEmpty(selectedConfig))
+            if (!string.IsNullOrEmpty(s_selectedConfig))
             {
-                ConfigurationUtils.DeleteConfig(selectedConfig);
+                ConfigurationUtils.DeleteConfig(s_selectedConfig);
                 RefreshList();
             }
         }
 
-
         /// <summary>
         /// 'Save and apply' button event handler.  Should only be called ingame.
         /// </summary>
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="mouseEvent">Mouse event (unused)</param>
-        private void Apply(UIComponent control, UIMouseEventParameter mouseEvent)
+        /// <param name="c">Calling component.</param>
+        /// <param name="p">Mouse event parameter.</param>
+        private void Apply(UIComponent c, UIMouseEventParameter p)
         {
             // Are we in-game, and do we have a valid current selection?
-            if (inGame && !string.IsNullOrEmpty(selectedConfig))
+            if (_inGame && !string.IsNullOrEmpty(s_selectedConfig))
             {
                 // Yes - set current configuration file.
-                ConfigurationUtils.CurrentSavedConfigName = selectedConfig;
+                ConfigurationUtils.CurrentSavedConfigName = s_selectedConfig;
 
                 Logging.KeyMessage("current configuration set to ", ConfigurationUtils.CurrentSavedConfigName);
 
@@ -279,16 +276,15 @@ namespace BOB
             }
         }
 
-
         /// <summary>
         /// 'Load global settings' button event handler.  Should only be called ingame.
         /// </summary>
-		/// <param name="control">Calling component (unused)</param>
-		/// <param name="mouseEvent">Mouse event (unused)</param>
-        private void UseGlobal(UIComponent control, UIMouseEventParameter mouseEvent)
+        /// <param name="c">Calling component.</param>
+        /// <param name="p">Mouse event parameter.</param>
+        private void UseGlobal(UIComponent c, UIMouseEventParameter p)
         {
             // Are we in-game, and do we have a valid current selection?
-            if (inGame)
+            if (_inGame)
             {
                 // Yes - clear currently selected configuration file.
                 ConfigurationUtils.CurrentSavedConfigName = null;
@@ -299,7 +295,6 @@ namespace BOB
                 LoadConfig();
             }
         }
-
 
         /// <summary>
         /// (Re-)loads the current config (per ConfigurationUtils.CurrentSavedConfigName).
@@ -322,87 +317,65 @@ namespace BOB
             NetData.Update();
         }
 
-
         /// <summary>
         /// Updates the control button states based on current panel state.
         /// </summary>
         private void UpdateButtonStates()
         {
             // See if there's a valid filename string.
-            bool validFile = !string.IsNullOrEmpty(fileNameField.text);
-            bool validSelection = !string.IsNullOrEmpty(selectedConfig);
+            bool validFile = !string.IsNullOrEmpty(_fileNameField.text);
+            bool validSelection = !string.IsNullOrEmpty(s_selectedConfig);
 
             // Need a valid filename to enable creating new files, and 'current selction' is only valid when in-game.
-            activeCopyButton.isEnabled = validFile & Loading.isLoaded;
-            newCleanButton.isEnabled = validFile;
+            _activeCopyButton.isEnabled = validFile & Loading.IsLoaded;
+            _newCleanButton.isEnabled = validFile;
 
             // Selected copy button requires both a valid filename and valid current selection.
-            selectedCopyButton.isEnabled = validFile && validSelection;
+            _selectedCopyButton.isEnabled = validFile && validSelection;
 
             // Delete button requires a valid current selection.
-            deleteButton.isEnabled = validSelection;
+            _deleteButton.isEnabled = validSelection;
 
             // Set 'use selected config as default' check.
-            if (customCheck != null)
+            if (_customCheck != null)
             {
-                customCheck.isChecked = validSelection && selectedConfig == ConfigurationUtils.CurrentSavedConfigName;
+                _customCheck.isChecked = validSelection && s_selectedConfig == ConfigurationUtils.CurrentSavedConfigName;
             }
         }
-    }
-
-
-    /// <summary>
-    /// An individual row in the list of config files.
-    /// </summary>
-    public class UIConfigRow : UIBasicRow
-    {
-        // Layout constants.
-        protected override float TextX => 10f;
-
-
-        // Panel components.
-        private string thisConfigName;
-
 
         /// <summary>
-        /// Mouse click event handler - updates the selection to what was clicked.
+        /// UIList row item for config file names.
         /// </summary>
-        /// <param name="p">Mouse event parameter</param>
-        protected override void OnClick(UIMouseEventParameter p)
+        private class ConfigRow : UIListRow
         {
-            base.OnClick(p);
+            // Display label.
+            private UILabel _nameLabel;
 
-            ConfigurationsPanel.SelectedConfig = thisConfigName;
-        }
+            /// <summary>
+            /// Gets the height for this row.
+            /// </summary>
+            public override float RowHeight => ConfigurationsPanel.RowHeight;
 
-
-        /// <summary>
-        /// Generates and displays a pack row.
-        /// </summary>
-        /// <param name="data">Object to list</param>
-        /// <param name="isRowOdd">If the row is an odd-numbered row (for background banding)</param>
-        public override void Display(object data, bool isRowOdd)
-        {
-            // Perform initial setup for new rows.
-            if (rowLabel == null)
+            /// <summary>
+            /// Generates and displays a list row.
+            /// </summary>
+            /// <param name="data">Object data to display.</param>
+            /// <param name="rowIndex">Row index number (for background banding).</param>
+            public override void Display(object data, int rowIndex)
             {
-                isVisible = true;
-                canFocus = true;
-                isInteractive = true;
-                width = parent.width;
-                height = BOBPackPanel.RowHeight;
+                // Perform initial setup for new rows.
+                if (_nameLabel == null)
+                {
+                    // Add name labels.
+                    _nameLabel = AddLabel(Margin, parent.width - Margin - Margin, 1.0f);
+                }
 
-                rowLabel = AddUIComponent<UILabel>();
-                rowLabel.width = ConfigurationsPanel.ListWidth;
-                rowLabel.relativePosition = new Vector2(TextX, 6f);
+                // Set display text.
+                _nameLabel.text = data as string ?? "Null";
+
+                // Set initial background as deselected state.
+                Deselect(rowIndex);
             }
-
-            // Set selected config.
-            thisConfigName = data as string;
-            rowLabel.text = thisConfigName ?? "Null";
-
-            // Set initial background as deselected state.
-            Deselect(isRowOdd);
         }
     }
 }

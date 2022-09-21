@@ -1,65 +1,29 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Xml.Serialization;
-using System.Collections.Generic;
-using ICities;
-using ColossalFramework.Plugins;
-using ColossalFramework.Packaging;
-
+﻿// <copyright file="PackUtils.cs" company="algernon (K. Algernon A. Sheppard)">
+// Copyright (c) algernon (K. Algernon A. Sheppard). All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// </copyright>
 
 namespace BOB
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Xml.Serialization;
+    using AlgernonCommons;
+    using ColossalFramework.Packaging;
+
     /// <summary>
     /// Static utility class for managing prop replacement pack files.
     /// </summary>
     public static class PackUtils
     {
-        internal static readonly string PackFileName = "BOBPacks.xml";
-
-
-        /// <summary>
-        /// Returns the path of the current assembly.
-        /// </summary>
-        private static string AssemblyPath
-        {
-            get
-            {
-                // Step through each plugin, looking for a match for this one.
-                PluginManager pluginManager = PluginManager.instance;
-                IEnumerable<PluginManager.PluginInfo> plugins = pluginManager.GetPluginsInfo();
-
-                foreach (PluginManager.PluginInfo plugin in plugins)
-                {
-                    try
-                    {
-                        IUserMod[] instances = plugin.GetInstances<IUserMod>();
-
-                        if (!(instances.FirstOrDefault() is Mod))
-                        {
-                            continue;
-                        }
-
-                        // Got it!  Return.
-                        return plugin.modPath + Path.DirectorySeparatorChar + "ReplacementPacks" + Path.DirectorySeparatorChar;
-                    }
-                    catch
-                    {
-                        // Don't care.
-                    }
-                }
-
-                // If we got here, we didn't find it.
-                Logging.Error("couldn't find assembly path");
-                throw new DllNotFoundException("BOB assembly not found.");
-            }
-        }
-
+        // Replacement pack directory.
+        private static readonly string PackDirectory = Path.Combine(AssemblyUtils.AssemblyPath, "ReplacementPacks");
 
         /// <summary>
         /// Finds and loads XML replacement pack files.
         /// </summary>
-        /// <returns>Loaded XML configuration file instance (null if failed)</returns>
+        /// <returns>Loaded XML configuration file instance (null if failed).</returns>
         internal static List<BOBPackFile> LoadPackFiles()
         {
             try
@@ -71,7 +35,7 @@ namespace BOB
                 HashSet<string> parsedDirectories = new HashSet<string>();
 
                 // Iterate through each xml file in directory.
-                string[] fileNames = Directory.GetFiles(AssemblyPath, "*.xml", SearchOption.AllDirectories);
+                string[] fileNames = Directory.GetFiles(PackDirectory, "*.xml", SearchOption.TopDirectoryOnly);
 
                 foreach (string fileName in fileNames)
                 {
@@ -121,13 +85,11 @@ namespace BOB
             }
         }
 
-
         /// <summary>
         /// Attempts to read a BOB pack file.
         /// </summary>
-        /// <param name="filename">Filename to read</param>
-        /// <param name="fileList">List to add sucessfully parsed files to</param>
-        /// <returns>Loaded XML configuration file instance (null if failed)</returns>
+        /// <param name="filename">Filename to read.</param>
+        /// <param name="fileList">List to add sucessfully parsed files to.</param>
         private static void ReadPackFile(string filename, List<BOBPackFile> fileList)
         {
             // Make sure file exists.
@@ -142,14 +104,14 @@ namespace BOB
                     using (StreamReader reader = new StreamReader(filename))
                     {
                         XmlSerializer xmlSerializer = new XmlSerializer(typeof(BOBPackFile));
-                        if (!(xmlSerializer.Deserialize(reader) is BOBPackFile configurationFile))
+                        if (!(xmlSerializer.Deserialize(reader) is BOBPackFile packFile))
                         {
                             Logging.Error("couldn't deserialize pack file");
                         }
                         else
                         {
                             // Success - add file to list.
-                            fileList.Add(configurationFile);
+                            fileList.Add(packFile);
                         }
                     }
                 }

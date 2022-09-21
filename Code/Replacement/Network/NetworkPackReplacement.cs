@@ -1,655 +1,504 @@
-﻿using System.Linq;
-using System.Collections.Generic;
-
+﻿// <copyright file="NetworkPackReplacement.cs" company="algernon (K. Algernon A. Sheppard)">
+// Copyright (c) algernon (K. Algernon A. Sheppard). All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// </copyright>
 
 namespace BOB
 {
-	/// <summary>
-	/// Class to manage replacement packs.
-	/// </summary>
-	internal class NetworkPackReplacement : NetworkReplacementBase
-	{
-		// Master dictionary of prop pack replacements.
-		private Dictionary<string, Dictionary<PrefabInfo, PropReplacement>> packRecords;
+    using System.Collections.Generic;
+    using System.Linq;
+    using AlgernonCommons;
 
-		// Master dictionary of replaced prop references.
-		internal Dictionary<PrefabInfo, BOBNetReplacement> replacements;
+    /// <summary>
+    /// Class to manage replacement packs.
+    /// </summary>
+    internal class NetworkPackReplacement : NetworkReplacementBase
+    {
+        // Master dictionary of prop pack replacements.
+        private Dictionary<string, Dictionary<PrefabInfo, BOBPackFile.PropReplacement>> _packRecords;
 
-		// Pack status dictionaries.
-		private Dictionary<string, bool> packEnabled;
-		private Dictionary<string, bool> packNotAllLoaded;
+        // Master dictionary of replaced prop references.
+        private Dictionary<PrefabInfo, BOBConfig.NetReplacement> _replacements;
 
+        // Pack status dictionaries.
+        private Dictionary<string, bool> _packEnabled;
+        private Dictionary<string, bool> _packNotAllLoaded;
 
-		/// <summary>
-		/// Constructor - initializes instance reference.
-		/// </summary>
-		internal NetworkPackReplacement()
-		{
-			Instance = this;
-			Setup();
-		}
-
-
-		/// <summary>
-		/// Instance reference.
-		/// </summary>
-		internal static NetworkPackReplacement Instance { get; private set; }
-
-
-		/// <summary>
-		/// Returns the config file list of elements relevant to the current replacement type.
-		/// </summary>
-		protected override List<BOBNetworkElement> NetworkElementList => null;
-
-
-		/// <summary>
-		/// Retrieves a currently-applied replacement entry for the given network, lane and prop index.
-		/// </summary>
-		/// <param name="networkInfo">Network prefab</param>
-		/// <param name="targetInfo">Target prop/tree prefab</param>
-		/// <param name="laneIndex">Lane number</param>
-		/// <param name="propIndex">Prop index number</param>
-		/// <returns>Currently-applied individual network replacement (null if none)</returns>
-		internal override BOBNetReplacement ActiveReplacement(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex) => ActiveReplacement(netInfo, laneIndex, propIndex, out _);
-
-
-		/// <summary>
-		/// Returns the current status of the named replacement pack.
-		/// </summary>
-		/// <param name="packName">Replacement pack name</param>
-		/// <returns>True if enabled, false otherwise</returns>
-		internal bool GetPackStatus(string packName)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NetworkPackReplacement"/> class.
+        /// Constructor - initializes instance reference.
+        /// </summary>
+        internal NetworkPackReplacement()
         {
-			if (packEnabled.ContainsKey(packName))
-            {
-				return packEnabled[packName];
-            }
-
-			return false;
+            Instance = this;
+            Setup();
         }
 
+        /// <summary>
+        /// Gets the active instance.
+        /// </summary>
+        internal static NetworkPackReplacement Instance { get; private set; }
 
-		/// <summary>
-		/// Sets the status of the named replacement pack.
-		/// </summary>
-		/// <param name="packName">Replacement pack name</param>
-		/// <param name="status">True to enable, false to disable</param>
-		internal void SetPackStatus (string packName, bool status)
+        /// <summary>
+        /// Gets the config file list of elements relevant to the current replacement type.
+        /// </summary>
+        protected override List<BOBConfig.NetworkElement> NetworkElementList => null;
+
+        /// <summary>
+        /// Gets the priority level of this replacmeent type.
+        /// </summary>
+        protected override ReplacementPriority ThisPriority => ReplacementPriority.PackReplacement;
+
+        /// <summary>
+        /// Returns the current status of the named replacement pack.
+        /// </summary>
+        /// <param name="packName">Replacement pack name.</param>
+        /// <returns>True if enabled, false otherwise.</returns>
+        internal bool GetPackStatus(string packName)
         {
-			// Only do stuff if there's an actual change.
-			if (status != packEnabled[packName])
+            if (_packEnabled.ContainsKey(packName))
             {
-				// Enabling or disabling?
-				if (status == true)
+                return _packEnabled[packName];
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Sets the status of the named replacement pack.
+        /// </summary>
+        /// <param name="packName">Replacement pack name.</param>
+        /// <param name="status">True to enable, false to disable.</param>
+        internal void SetPackStatus(string packName, bool status)
+        {
+            // Only do stuff if there's an actual change.
+            if (status != _packEnabled[packName])
+            {
+                // Enabling or disabling?
+                if (status == true)
                 {
-					// Enable the pack; leave packStatus as false if application wasn't successful.
-					packEnabled[packName] = ApplyPack(packName);
+                    // Enable the pack; leave packStatus as false if application wasn't successful.
+                    _packEnabled[packName] = ApplyPack(packName);
                 }
-				else
-				{
-					// Disable the pack.
-					RevertPack(packName);
-					packEnabled[packName] = false;
-				}
-			}
+                else
+                {
+                    // Disable the pack.
+                    RevertPack(packName);
+                    _packEnabled[packName] = false;
+                }
+            }
         }
 
-
-		/// <summary>
-		/// Checks to see if all replacement props are currently loaded for the specified pack.
-		/// </summary>
-		/// <param name="packName">Replacement pack name</param>
-		/// <returns>True if all replacement props are NOT loaded, false otherwise</returns>
-		internal bool PackNotAllLoaded(string packName)
+        /// <summary>
+        /// Checks to see if all replacement props are currently loaded for the specified pack.
+        /// </summary>
+        /// <param name="packName">Replacement pack name.</param>
+        /// <returns>True if all replacement props are NOT loaded, false otherwise.</returns>
+        internal bool PackNotAllLoaded(string packName)
         {
-			// Return dictionary entry, if we have one.
-			if (packNotAllLoaded.ContainsKey(packName))
+            // Return dictionary entry, if we have one.
+            if (_packNotAllLoaded.ContainsKey(packName))
             {
-				return packNotAllLoaded[packName];
+                return _packNotAllLoaded[packName];
             }
 
-			// If we got here, no 'not all loaded' flag was found.
-			return false;
+            // If we got here, no 'not all loaded' flag was found.
+            return false;
         }
 
-
-		/// <summary>
-		/// Returns a list of currently installed packs as a FastList for display.
-		/// </summary>
-		/// <returns>FastList of installed prop packs</returns>
-		internal FastList<object> GetPackFastList()
-		{
-			// Create return list from signPacks array.
-			FastList<object> fastList = new FastList<object>()
-			{
-				m_buffer = packRecords.Keys.OrderBy(x => x).ToArray(),
-				m_size = packRecords.Count()
-			};
-			return fastList;
-		}
-
-
-		/// <summary>
-		/// Checks to see if the given replacement pack conflicts with an active pack.
-		/// </summary>
-		/// <param name="packName">Pack name to check</param>
-		/// <returns>True if the pack conflicts with an active pack, false if no conflicts</returns>
-		internal bool Conflicts(string packName)
-		{
-			// Check for conflicts - iterate through all prefabs in this pack.
-			foreach (PrefabInfo prefab in packRecords[packName].Keys)
-			{
-				// Check for a currently applied replacement of the same prefab.
-				if (replacements.ContainsKey(prefab))
-				{
-					// Found one!  Log message and return true to indicate conflict.
-					Logging.Message("replacement pack conflict with ", packName, " for prefab ", prefab.name);
-					return true;
-				}
-			}
-
-			// If we got here, then no conflict was detected.
-			return false;
-		}
-
-
-		/// <summary>
-		/// Dummy entry - DO NOT USE
-		/// </summary>
-		/// <param name="replacement">Replacement record to apply</param>
-		protected override void ApplyReplacement(BOBNetReplacement replacement) { }
-
-
-		/// <summary>
-		/// Applies a replacement pack.
-		/// </summary>
-		/// <returns>True if the pack was successfully applied, false otherwise</returns>
-		private bool ApplyPack(string packName)
-		{
-			// Check for valid value.
-			if (!string.IsNullOrEmpty(packName) && packRecords.ContainsKey(packName))
-			{
-				// Check for conflicts with a currently applied replacement.
-				if (Conflicts(packName))
-				{
-					// Conflict detected - do nothing and return false to indicate no application.
-					return false;
-				}
-
-				Logging.Message("applying pack ", packName);
-
-				// Iterate through each entry in pack and apply.
-				foreach (KeyValuePair<PrefabInfo, PropReplacement> entry in packRecords[packName])
-				{
-					Apply(entry.Key, entry.Value.replacementInfo, entry.Value.rotation, entry.Value.xOffset, entry.Value.yOffset, entry.Value.zOffset, entry.Value.hide ? 0 : 100);
-				}
-
-				// Return true to indicate sucessful application.
-				return true;
-			}
-
-			// If we got here, then application wasn't successful.
-			return false;
-		}
-
-
-		/// <summary>
-		/// Reverts a replacement pack.
-		/// </summary>
-		private void RevertPack(string packName)
-		{
-			// Check for valid value.
-			if (!string.IsNullOrEmpty(packName) && packRecords.ContainsKey(packName))
-			{
-				// Iterate through each entry in pack and revert.
-				foreach (KeyValuePair<PrefabInfo, PropReplacement> entry in packRecords[packName])
-				{
-					Revert(entry.Key);
-				}
-			}
-		}
-
-
-		/// <summary>
-		/// Serializes the list of active replacement packs into a string list suitable for XML serialization.
-		/// </summary>
-		/// <returns>New string list of active replacement pack names</returns>
-		internal List<string> SerializeActivePacks()
+        /// <summary>
+        /// Returns a list of currently installed packs as a FastList for display.
+        /// </summary>
+        /// <returns>FastList of installed prop packs.</returns>
+        internal FastList<object> GetPackFastList()
         {
-			// Return list.
-			List<string> activePacks = new List<string>();
+            Logging.Message("packrecord count is ", _packRecords.Count);
 
-			// Iterate through all pack settings.
-			foreach (KeyValuePair<string, bool> entry in packEnabled)
+            // Create return list from signPacks array.
+            FastList<object> fastList = new FastList<object>()
             {
-				// Look for enabled packs (value is true).
-				if (entry.Value)
+                m_buffer = _packRecords.Keys.ToArray(),
+                m_size = _packRecords.Count(),
+            };
+            return fastList;
+        }
+
+        /// <summary>
+        /// Checks to see if the given replacement pack conflicts with an active pack.
+        /// </summary>
+        /// <param name="packName">Pack name to check.</param>
+        /// <returns>True if the pack conflicts with an active pack, false if no conflicts.</returns>
+        internal bool Conflicts(string packName)
+        {
+            // Check for conflicts - iterate through all prefabs in this pack.
+            foreach (PrefabInfo prefab in _packRecords[packName].Keys)
+            {
+                // Check for a currently applied replacement of the same prefab.
+                if (_replacements.ContainsKey(prefab))
                 {
-					// Add to list.
-					activePacks.Add(entry.Key);
+                    // Found one!  Log message and return true to indicate conflict.
+                    Logging.Message("replacement pack conflict with ", packName, " for prefab ", prefab.name);
+                    return true;
                 }
             }
 
-			return activePacks;
-		}
+            // If we got here, then no conflict was detected.
+            return false;
+        }
 
+        /// <summary>
+        /// Serializes the list of active replacement packs into a string list suitable for XML serialization.
+        /// </summary>
+        /// <returns>New string list of active replacement pack names.</returns>
+        internal List<string> SerializeActivePacks()
+        {
+            // Return list.
+            List<string> activePacks = new List<string>();
 
-		/// <summary>
-		/// Deserializes a list of active replacement packs into a list of active
-		/// </summary>
-		/// <param name="activePacks">List of pack names to deserialize</param>
-		internal void DeserializeActivePacks(List<string> activePacks)
-		{
-			// Iterate through the list of active packs.
-			foreach (string packName in activePacks)
-			{
-				// See if we currently have this pack loaded.
-				if (packEnabled.ContainsKey(packName))
+            // Iterate through all pack settings.
+            foreach (KeyValuePair<string, bool> entry in _packEnabled)
+            {
+                // Look for enabled packs (value is true).
+                if (entry.Value)
                 {
-					// Yes - activate it.
-					SetPackStatus(packName, true);
+                    // Add to list.
+                    activePacks.Add(entry.Key);
                 }
-				else
+            }
+
+            return activePacks;
+        }
+
+        /// <summary>
+        /// Deserializes a list of active replacement packs.
+        /// </summary>
+        /// <param name="activePacks">List of pack names to deserialize.</param>
+        internal void DeserializeActivePacks(List<string> activePacks)
+        {
+            // Iterate through the list of active packs.
+            foreach (string packName in activePacks)
+            {
+                // See if we currently have this pack loaded.
+                if (_packEnabled.ContainsKey(packName))
                 {
-					Logging.Message("couldn't find replacement pack ", packName);
+                    // Yes - activate it.
+                    SetPackStatus(packName, true);
                 }
-			}
-		}
+                else
+                {
+                    Logging.Message("couldn't find replacement pack ", packName);
+                }
+            }
+        }
 
+        /// <summary>
+        /// Reverts all active pack replacements and re-initialises the master dictionaries.
+        /// </summary>
+        internal override void RevertAll()
+        {
+            // Iterate through each entry in the master pack dictionary.
+            foreach (string packName in _packEnabled.Keys)
+            {
+                // Directly revert any applied packs (don't worry about properly processing dictionaries since we'll be wiping them anyway, and besides, if we try to change them while doing this it'll lead to out-of-sync errors).
+                if (_packEnabled[packName])
+                {
+                    RevertPack(packName);
+                }
+            }
 
-		/// <summary>
-		/// Reverts all active pack replacements and re-initialises the master dictionaries.
-		/// </summary>
-		internal override void RevertAll()
-		{
-			// Iterate through each entry in the master pack dictionary.
-			foreach (string packName in packEnabled.Keys)
-			{
-				// Directly revert any applied packs (don't worry about properly processing dictionaries since we'll be wiping them anyway, and besides, if we try to change them while doing this it'll lead to out-of-sync errors).
-				if (packEnabled[packName])
-				{
-					RevertPack(packName);
-				}
-			}
+            // Re-initialise the dictionaries.
+            Setup();
+        }
 
-			// Re-initialise the dictionaries.
-			Setup();
-		}
+        /// <summary>
+        /// Dummy entry - DO NOT USE.
+        /// </summary>
+        /// <param name="replacement">Replacement record to apply.</param>
+        protected override void ApplyReplacement(BOBConfig.NetReplacement replacement)
+        {
+        }
 
+        /// <summary>
+        /// Finds any existing replacement relevant to the provided arguments.
+        /// </summary>
+        /// <param name="netInfo">Network info.</param>
+        /// <param name="laneIndex">Lane index.</param>
+        /// <param name="propIndex">Prop index.</param>
+        /// <param name="targetInfo">Target prop/tree prefab.</param>
+        /// <returns>Existing replacement entry, if one was found, otherwise null.</returns>
+        protected override BOBConfig.NetReplacement FindReplacement(NetInfo netInfo, int laneIndex, int propIndex, PrefabInfo targetInfo) =>
+            ReplacementList(netInfo)?.Find(x => x.TargetInfo == targetInfo);
 
-		/// <summary>
-		/// Reverts a pack replacement.
-		/// </summary>
-		/// <param name="target">Targeted (original) tree/prop prefab</param>
-		/// <returns>True if the entire network record was removed from the dictionary (due to no remaining replacements for that prefab), false if the prefab remains in the dictionary (has other active replacements)</returns>
-		private void Revert(PrefabInfo target)
-		{
-			// Don't revert if there's no entry for this reference.
-			if (replacements.ContainsKey(target))
-			{
-				// Iterate through each entry in our dictionary.
-				foreach (NetPropReference propReference in replacements[target].references)
-				{
-					// Revert entry.
-					if (target is PropInfo propTarget)
-					{
-						propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = propTarget;
-					}
-					else
-					{
-						propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = (TreeInfo)target;
-					}
-					propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_angle = propReference.angle;
-					propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_position = propReference.position;
-					propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_probability = propReference.probability;
+        /// <summary>
+        /// Applies a replacement pack.
+        /// </summary>
+        /// <returns>True if the pack was successfully applied, false otherwise.</returns>
+        private bool ApplyPack(string packName)
+        {
+            // Check for valid value.
+            if (!string.IsNullOrEmpty(packName) && _packRecords.ContainsKey(packName))
+            {
+                // Check for conflicts with a currently applied replacement.
+                if (Conflicts(packName))
+                {
+                    // Conflict detected - do nothing and return false to indicate no application.
+                    return false;
+                }
 
-					// Add network to dirty list.
-					NetData.DirtyList.Add(propReference.netInfo);
-				}
+                Logging.Message("applying pack ", packName);
 
-				// Remove entry from dictionary.
-				replacements.Remove(target);
-			}
-		}
+                // Iterate through each entry in pack and apply.
+                foreach (KeyValuePair<PrefabInfo, BOBPackFile.PropReplacement> entry in _packRecords[packName])
+                {
+                    Apply(entry.Key, entry.Value.ReplacementInfo, entry.Value.Rotation, entry.Value.Xoffset, entry.Value.Yoffset, entry.Value.Zoffset, entry.Value.Hide ? 0 : 100);
+                }
 
+                // Return true to indicate sucessful application.
+                return true;
+            }
 
-		/// <summary>
-		/// Removes an entry from the master dictionary of all-network replacements currently applied to networks.
-		/// </summary>
-		/// <param name="netPrefab">Network prefab</param>
-		/// <param name="target">Target prop info</param>
-		/// <param name="laneIndex">Lane index</param>
-		/// <param name="propIndex">Prop index</param>
-		internal new void RemoveEntry(NetInfo netPrefab, PrefabInfo target, int laneIndex, int propIndex)
-		{
-			// Check to see if we have an entry for this prefab.
-			if (replacements.ContainsKey(target))
-			{
-				// Yes - iterate through each recorded prop reference.
-				for (int i = 0; i < replacements[target].references.Count; ++i)
-				{
-					// Look for a network, lane and index match.
-					NetPropReference propReference = replacements[target].references[i];
-					if (propReference.netInfo == netPrefab && propReference.laneIndex == laneIndex && propReference.propIndex == propIndex)
-					{
-						// Got a match!  Revert instance.
-						if (target is PropInfo propTarget)
-						{
-							propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalProp = propTarget;
-						}
-						else
-						{
-							propReference.netInfo.m_lanes[propReference.laneIndex].m_laneProps.m_props[propReference.propIndex].m_finalTree = (TreeInfo)target;
-						}
-						netPrefab.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_angle = propReference.angle;
-						netPrefab.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_position = propReference.position;
-						netPrefab.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_probability = propReference.probability;
+            // If we got here, then application wasn't successful.
+            return false;
+        }
 
-						// Remove this reference and return.
-						replacements[target].references.Remove(replacements[target].references[i]);
-						return;
-					}
-				}
-			}
-		}
+        /// <summary>
+        /// Reverts a replacement pack.
+        /// </summary>
+        private void RevertPack(string packName)
+        {
+            // Check for valid value.
+            if (!string.IsNullOrEmpty(packName) && _packRecords.ContainsKey(packName))
+            {
+                // Iterate through each entry in pack and revert.
+                foreach (KeyValuePair<PrefabInfo, BOBPackFile.PropReplacement> entry in _packRecords[packName])
+                {
+                    Revert(entry.Key);
+                }
+            }
+        }
 
+        /// <summary>
+        /// Reverts a pack replacement.
+        /// </summary>
+        /// <param name="target">Targeted (original) tree/prop prefab.</param>
+        private void Revert(PrefabInfo target)
+        {
+            // Don't revert if there's no entry for this reference.
+            if (_replacements.TryGetValue(target, out BOBConfig.NetReplacement packReplacement))
+            {
+                // Revert the replacement.
+                NetHandlers.RemoveReplacement(packReplacement);
 
-		/// <summary>
-		/// Performs setup, loads pack files, and initialises the dictionaries.  Must be called prior to use.
-		/// </summary>
-		private void Setup()
-		{
-			// Initialise dictionaries.
-			packRecords = new Dictionary<string, Dictionary<PrefabInfo, PropReplacement>>();
-			replacements = new Dictionary<PrefabInfo, BOBNetReplacement>();
-			packEnabled = new Dictionary<string, bool>();
-			packNotAllLoaded = new Dictionary<string, bool>();
+                // Remove entry from dictionary.
+                _replacements.Remove(target);
+            }
+        }
 
-			// Read config files.
-			List<BOBPackFile> packFiles = PackUtils.LoadPackFiles();
+        /// <summary>
+        /// Performs setup, loads pack files, and initialises the dictionaries.  Must be called prior to use.
+        /// </summary>
+        private void Setup()
+        {
+            // Initialise dictionaries.
+            _packRecords = new Dictionary<string, Dictionary<PrefabInfo, BOBPackFile.PropReplacement>>();
+            _replacements = new Dictionary<PrefabInfo, BOBConfig.NetReplacement>();
+            _packEnabled = new Dictionary<string, bool>();
+            _packNotAllLoaded = new Dictionary<string, bool>();
 
-			foreach (BOBPackFile packFile in packFiles)
-			{
-				// Iterate through each prop pack loaded from the settings file.
-				foreach (PropPack propPack in packFile.propPacks)
-				{
-					// Check to see if we already have a record for this pack.
-					if (packRecords.ContainsKey(propPack.name))
-					{
-						// Yes - log the message and carry on.
-						Logging.Message("duplicate record for replacement pack with name", propPack.name);
-					}
-					else
-					{
-						// No - add pack to our records.
-						packRecords.Add(propPack.name, new Dictionary<PrefabInfo, PropReplacement>());
-						packEnabled.Add(propPack.name, false);
-					}
+            // Read config files.
+            List<BOBPackFile> packFiles = PackUtils.LoadPackFiles();
 
-					// Iterate through each replacement in the pack.
-					for (int i = 0; i < propPack.propReplacements.Count; ++i)
-					{
-						// Get reference.
-						PropReplacement propReplacement = propPack.propReplacements[i];
+            foreach (BOBPackFile packFile in packFiles)
+            {
+                Logging.Message("reading ", packFile.PropPacks.Count, " pack records from file");
 
-						// Can we find both target and replacment?
-						PrefabInfo targetInfo = propReplacement.isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(propReplacement.targetName) : PrefabCollection<PropInfo>.FindLoaded(propReplacement.targetName);
-						propReplacement.replacementInfo = propReplacement.isTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(propReplacement.replacementName) : PrefabCollection<PropInfo>.FindLoaded(propReplacement.replacementName);
-						if (targetInfo != null)
-						{
-							if (propReplacement.replacementInfo == null)
-							{
-								// Replacement prop not found - flag that pack wasn't all loaded.
-								if (!packNotAllLoaded.ContainsKey(propPack.name))
-								{
-									packNotAllLoaded.Add(propPack.name, true);
-								}
-							}
-							else
-							{
-								// Target and replacment both found - add this replacmeent to our pack dictionary entry.
-								if (packRecords[propPack.name].ContainsKey(targetInfo))
-								{
-									// Skip any duplicates.
-									Logging.Error("duplicate replacement ", targetInfo.name, " in replacement pack ", propPack.name);
-								}
-								else
-								{
-									packRecords[propPack.name].Add(targetInfo, propReplacement);
-								}
-							}
-						}
-					}
+                // Iterate through each prop pack loaded from the settings file.
+                foreach (BOBPackFile.PropPack propPack in packFile.PropPacks)
+                {
+                    // Check to see if we already have a record for this pack.
+                    if (_packRecords.ContainsKey(propPack.Name))
+                    {
+                        // Yes - log the message and carry on.
+                        Logging.Message("duplicate record for replacement pack with name", propPack.Name);
+                    }
+                    else
+                    {
+                        // No - add pack to our records.
+                        Logging.Message("adding prop pack ", propPack.Name, " with ", propPack.PropReplacements.Count, " replacements");
+                        _packRecords.Add(propPack.Name, new Dictionary<PrefabInfo, BOBPackFile.PropReplacement>());
+                        _packEnabled.Add(propPack.Name, false);
+                    }
 
-					// Check to make sure we have at least one replacement; if not, remove the pack from our records.
-					if (packRecords[propPack.name].Count == 0)
-					{
-						packRecords.Remove(propPack.name);
-						packEnabled.Remove(propPack.name);
-					}
-				}
-			}
-		}
+                    // Iterate through each replacement in the pack.
+                    for (int i = 0; i < propPack.PropReplacements.Count; ++i)
+                    {
+                        // Get reference.
+                        BOBPackFile.PropReplacement propReplacement = propPack.PropReplacements[i];
 
+                        Logging.Message("looking for replacement ", propReplacement.ReplacementName);
 
-		/// <summary>
-		/// Applies a new (or updated) pack replacement; basically an all-network replacement.
-		/// </summary>
-		/// <param name="target">Targeted (original) prop prefab</param>
-		/// <param name="replacement">Replacment prop prefab</param>
-		/// <param name="angle">Replacment prop angle adjustment</param>
-		/// <param name="offsetX">Replacment X position offset</param>
-		/// <param name="offsetY">Replacment Y position offset</param>
-		/// <param name="offsetZ">Replacment Z position offset</param>
-		/// <param name="probability">Replacement probability</param>
-		private void Apply(PrefabInfo target, PrefabInfo replacement, float angle, float offsetX, float offsetY, float offsetZ, int probability)
-		{
-			// Make sure that target and replacement are the same type before doing anything.
-			if (target == null || replacement == null || (target is TreeInfo && !(replacement is TreeInfo)) || (target is PropInfo) && !(replacement is PropInfo))
-			{
-				return;
-			}
+                        // Can we find both target and replacment?
+                        PrefabInfo targetInfo = propReplacement.IsTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(propReplacement.TargetName) : PrefabCollection<PropInfo>.FindLoaded(propReplacement.TargetName);
+                        propReplacement.ReplacementInfo = propReplacement.IsTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(propReplacement.ReplacementName) : PrefabCollection<PropInfo>.FindLoaded(propReplacement.ReplacementName);
+                        if (targetInfo != null)
+                        {
+                            if (propReplacement.ReplacementInfo == null)
+                            {
+                                // Replacement prop not found - flag that pack wasn't all loaded.
+                                if (!_packNotAllLoaded.ContainsKey(propPack.Name))
+                                {
+                                    _packNotAllLoaded.Add(propPack.Name, true);
+                                }
+                            }
+                            else
+                            {
+                                // Target and replacment both found - add this replacmeent to our pack dictionary entry.
+                                if (_packRecords[propPack.Name].ContainsKey(targetInfo))
+                                {
+                                    // Skip any duplicates.
+                                    Logging.Error("duplicate replacement ", targetInfo.name, " in replacement pack ", propPack.Name);
+                                }
+                                else
+                                {
+                                    _packRecords[propPack.Name].Add(targetInfo, propReplacement);
+                                }
+                            }
+                        }
+                    }
 
-			Logging.Message("applying pack replacement for ", target.name);
+                    // Check to make sure we have at least one replacement; if not, remove the pack from our records.
+                    if (_packRecords[propPack.Name].Count == 0)
+                    {
+                        Logging.Message(propPack.Name, " has no replacements; removing");
+                        _packRecords.Remove(propPack.Name);
+                        _packEnabled.Remove(propPack.Name);
+                    }
+                }
 
-			// Check to see if we already have a replacement entry for this prop - if so, revert the replacement first.
-			if (replacements.ContainsKey(target))
-			{
-				Revert(target);
-			}
+                Logging.Message("finished reading packs; ", _packRecords, " packs in database");
+            }
+        }
 
-			// Create new dictionary entry if none already exists.
-			if (!replacements.ContainsKey(target))
-			{
-				replacements.Add(target, new BOBNetReplacement());
-			}
+        /// <summary>
+        /// Applies a new (or updated) pack replacement; basically an all-network replacement.
+        /// </summary>
+        /// <param name="target">Targeted (original) prop prefab.</param>
+        /// <param name="replacement">Replacment prop prefab.</param>
+        /// <param name="angle">Replacment prop angle adjustment.</param>
+        /// <param name="offsetX">Replacment X position offset.</param>
+        /// <param name="offsetY">Replacment Y position offset.</param>
+        /// <param name="offsetZ">Replacment Z position offset.</param>
+        /// <param name="probability">Replacement probability.</param>
+        private void Apply(PrefabInfo target, PrefabInfo replacement, float angle, float offsetX, float offsetY, float offsetZ, int probability)
+        {
+            // Make sure that target and replacement are the same type before doing anything.
+            if (target == null || replacement == null || (target is TreeInfo && !(replacement is TreeInfo)) || ((target is PropInfo) && !(replacement is PropInfo)))
+            {
+                return;
+            }
 
-			// Add/replace dictionary replacement data.
-			replacements[target].references = new List<NetPropReference>();
-			replacements[target].isTree = target is TreeInfo;
-			replacements[target].targetInfo = target;
-			replacements[target].target = target.name;
-			replacements[target].angle = angle;
-			replacements[target].offsetX = offsetX;
-			replacements[target].offsetY = offsetY;
-			replacements[target].offsetZ = offsetZ;
-			replacements[target].probability = probability;
-			replacements[target].repeatDistance = -1;
+            Logging.Message("applying pack replacement for ", target.name);
 
-			// Record replacement prop.
-			replacements[target].replacementInfo = replacement;
-			replacements[target].Replacement = replacement.name;
+            // Check to see if we already have a replacement entry for this prop - if so, revert the replacement first.
+            if (_replacements.ContainsKey(target))
+            {
+                Revert(target);
+            }
 
-			// Iterate through each loaded network and record props to be replaced.
-			for (int i = 0; i < PrefabCollection<NetInfo>.LoadedCount(); ++i)
-			{
-				// Get local reference.
-				NetInfo network = PrefabCollection<NetInfo>.GetLoaded((uint)i);
+            // Create new dictionary entry if none already exists.
+            if (!_replacements.ContainsKey(target))
+            {
+                _replacements.Add(target, new BOBConfig.NetReplacement());
+            }
 
-				// Skip any netorks without lanes.
-				if (network.m_lanes == null)
-				{
-					continue;
-				}
+            // Add/replace dictionary replacement data.
+            _replacements[target].IsTree = target is TreeInfo;
+            _replacements[target].TargetInfo = target;
+            _replacements[target].Target = target.name;
+            _replacements[target].Angle = angle;
+            _replacements[target].OffsetX = offsetX;
+            _replacements[target].OffsetY = offsetY;
+            _replacements[target].OffsetZ = offsetZ;
+            _replacements[target].Probability = probability;
+            _replacements[target].RepeatDistance = -1;
 
-				// Iterate through each lane.
-				for (int laneIndex = 0; laneIndex < network.m_lanes.Length; ++laneIndex)
-				{
-					// If no props in this lane, skip it and go to the next one.
-					if (network.m_lanes[laneIndex].m_laneProps?.m_props == null)
-					{
-						continue;
-					}
+            // Record replacement prop.
+            _replacements[target].ReplacementInfo = replacement;
+            _replacements[target].ReplacementName = replacement.name;
 
-					// Iterate through each prop in lane.
-					for (int propIndex = 0; propIndex < network.m_lanes[laneIndex].m_laneProps.m_props.Length; ++propIndex)
-					{
-						// Check for any currently active conflicting replacements..
-						if (IndividualNetworkReplacement.Instance.ActiveReplacement(network, laneIndex, propIndex, out _) != null)
-						{
-							// Active individual network replacement; skip this one.
-							continue;
-						}
-						else if (NetworkReplacement.Instance.ActiveReplacement(network, laneIndex, propIndex, out _) != null)
-						{
-							// Active grouped network replacement; skip this one.
-							continue;
-						}
-						else if (AllNetworkReplacement.Instance.ActiveReplacement(network, laneIndex, propIndex, out _) != null)
-						{
-							// Active all-network replacement; skip this one.
-							continue;
-						}
-						else
-						{
-							// Active pack replacement; skip this one.
-							PrefabInfo original = GetOriginal(network, laneIndex, propIndex);
+            // Don't do anything if prefabs can't be found.
+            if (_replacements[target]?.TargetInfo == null || _replacements[target].ReplacementInfo == null)
+            {
+                return;
+            }
 
-							if (original != null)
-							{
-								continue;
-							}
-						}
+            // Iterate through each loaded network and record props to be replaced.
+            for (int i = 0; i < PrefabCollection<NetInfo>.LoadedCount(); ++i)
+            {
+                // Get local reference.
+                NetInfo netInfo = PrefabCollection<NetInfo>.GetLoaded((uint)i);
 
-						// Get this prop from network.
-						PrefabInfo thisProp = replacements[target].isTree ? (PrefabInfo)network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_finalTree : (PrefabInfo)network.m_lanes[laneIndex].m_laneProps.m_props[propIndex].m_finalProp;
+                // Skip any null networks, or netorks without lanes.
+                if (netInfo?.m_lanes == null)
+                {
+                    continue;
+                }
 
-						// See if this prop matches our replacement.
-						if (thisProp != null && thisProp == target)
-						{
-							// Match!  Add reference data to the list.
-							replacements[target].references.Add(CreateReference(network, thisProp, laneIndex, propIndex, replacements[target].isTree));
-						}
-					}
-				}
-			}
+                // Iterate through each lane.
+                for (int laneIndex = 0; laneIndex < netInfo.m_lanes.Length; ++laneIndex)
+                {
+                    // Local references.
+                    NetInfo.Lane thisLane = netInfo.m_lanes[laneIndex];
+                    NetLaneProps.Prop[] theseLaneProps = thisLane?.m_laneProps?.m_props;
 
-			// Now, iterate through each entry found and apply the replacement to each one.
-			foreach (NetPropReference propReference in replacements[target].references)
-			{
-				ReplaceProp(replacements[target], propReference);
-			}
-		}
+                    // If no props in this lane, skip it and go to the next one.
+                    if (theseLaneProps == null)
+                    {
+                        continue;
+                    }
 
+                    // Iterate through each prop in lane.
+                    for (int propIndex = 0; propIndex < theseLaneProps.Length; ++propIndex)
+                    {
+                        // Local reference.
+                        NetLaneProps.Prop thisLaneProp = theseLaneProps[propIndex];
 
-		/// <summary>
-		/// Checks if there's a currently active pack replacement applied to the given network prop index, and if so, returns the *original* prefab..
-		/// </summary>
-		/// <param name="netPrefab">Network prefab to check</param>
-		/// <param name="laneIndex">Lane index to check</param>
-		/// <param name="propIndex">Prop index to check</param>
-		/// <returns>Replacement record if an all-network replacement is currently applied, null if no all-network replacement is currently applied</returns>
-		internal PrefabInfo GetOriginal(NetInfo netPrefab, int laneIndex, int propIndex)
-		{
-			// Iterate through each entry in master dictionary.
-			foreach (PrefabInfo target in replacements.Keys)
-			{
-				BOBNetReplacement reference = replacements[target];
-				// Iterate through each network in this entry.
-				foreach (NetPropReference propRef in reference.references)
-				{
-					// Check for a network, lane, and prop index match.
-					if (propRef.netInfo == netPrefab && propRef.laneIndex == laneIndex && propRef.propIndex == propIndex)
-					{
-						// Match!  Return the original prefab.
-						return target;
-					}
-				}
-			}
+                        // If invalid entry, skip this one.
+                        if (thisLaneProp == null)
+                        {
+                            continue;
+                        }
 
-			// If we got here, no entry was found - return null to indicate no active replacement.
-			return null;
-		}
+                        // Note current props.
+                        TreeInfo thisTree = thisLaneProp.m_tree;
+                        PropInfo thisProp = thisLaneProp.m_prop;
 
+                        // Get any active handler.
+                        LanePropHandler handler = NetHandlers.GetHandler(thisLane, propIndex);
+                        if (handler != null)
+                        {
+                            // Active handler found - use original values for checking eligibility (instead of currently active values).
+                            thisTree = handler.OriginalTree;
+                            thisProp = handler.OriginalProp;
+                        }
 
-		/// <summary>
-		/// Checks if there's a currently active pack replacement applied to the given network prop index, and if so, returns the replacement record.
-		/// </summary>
-		/// <param name="netPrefab">Network prefab to check</param>
-		/// <param name="laneIndex">Lane index to check</param>
-		/// <param name="propIndex">Prop index to check</param>
-		/// <param name="propReference">Original prop reference record (null if none)</param>
-		/// <returns>Replacement record if a all-network replacement is currently applied, null if no all-network replacement is currently applied</returns>
-		internal override BOBNetReplacement ActiveReplacement(NetInfo netPrefab, int laneIndex, int propIndex, out NetPropReference propReference)
-		{
-			// Iterate through each entry in master dictionary.
-			foreach (PrefabInfo target in replacements.Keys)
-			{
-				BOBNetReplacement reference = replacements[target];
-				// Iterate through each network in this entry.
-				foreach (NetPropReference propRef in reference.references)
-				{
-					// Check for a network, lane, and prop index match.
-					if (propRef.netInfo == netPrefab && propRef.laneIndex == laneIndex && propRef.propIndex == propIndex)
-					{
-						// Match!  Return the replacement record.
-						propReference = propRef;
-						return replacements[target];
-					}
-				}
-			}
+                        // See if this prop matches our replacement.
+                        bool treeMatch = _replacements[target].IsTree && thisTree != null && thisTree == _replacements[target].TargetInfo;
+                        bool propMatch = !_replacements[target].IsTree && thisProp != null && thisProp == _replacements[target].TargetInfo;
+                        if (treeMatch | propMatch)
+                        {
+                            // Match!  Create new handler if there wasn't an existing one.
+                            if (handler == null)
+                            {
+                                handler = NetHandlers.GetOrAddHandler(netInfo, thisLane, propIndex);
+                            }
 
-			// If we got here, no entry was found - return null to indicate no active replacement.
-			propReference = null;
-			return null;
-		}
-
-
-		/// <summary>
-		/// Restores a pack replacement, if any (e.g. after a network replacement has been reverted).
-		/// </summary>
-		/// <param name="netPrefab">Network prefab</param>
-		/// <param name="target">Target prop info</param>
-		/// <param name="laneIndex">Lane index</param>
-		/// <param name="propIndex">Prop index</param>
-		/// <returns>True if a restoration was made, false otherwise</returns>
-		internal new bool Restore(NetInfo netPrefab, PrefabInfo target, int laneIndex, int propIndex)
-		{
-			// Check to see if we have an entry for this prefab.
-			if (replacements.ContainsKey(target))
-			{
-				// Yes - add reference data to the list.
-				NetPropReference newReference = CreateReference(netPrefab, target, laneIndex, propIndex, target is TreeInfo);
-
-				replacements[target].references.Add(newReference);
-
-				// Apply replacement and return true to indicate restoration.
-				ReplaceProp(replacements[target], newReference);
-				return true;
-			}
-
-			// If we got here, no restoration was made.
-			return false;
-		}
-
-
-		/// <summary>
-		/// Restores any replacements from lower-priority replacements after a reversion.
-		/// </summary>
-		/// <param name="netInfo">Network prefab</param>
-		/// <param name="targetInfo">Target prop info</param>
-		/// <param name="laneIndex">Lane index</param>
-		/// <param name="propIndex">Prop index</param>
-		protected override void RestoreLower(NetInfo netInfo, PrefabInfo targetInfo, int laneIndex, int propIndex) { }
-	}
+                            // Set the new replacement.
+                            handler.SetReplacement(_replacements[target], ThisPriority);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
