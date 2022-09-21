@@ -350,7 +350,6 @@ namespace BOB
                 // Update reference with new index.
                 replacement.PropIndex = newIndex;
 
-
                 // Add new prop - position and angle are at zero to start with as the 'original' coordinates.
                 Logging.Message("adding new prop for network ", netInfo.name, " at lane ", replacement.LaneIndex, " and index ", newIndex);
 
