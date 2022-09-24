@@ -36,8 +36,8 @@ namespace BOB
 
             // Pause simulation.
             SimulationManager simulationManager = Singleton<SimulationManager>.instance;
-            int currentSimulationSpeed = simulationManager.SelectedSimulationSpeed;
-            simulationManager.SelectedSimulationSpeed = 0;
+            bool simulationWasPaused = simulationManager.SimulationPaused;
+            simulationManager.SimulationPaused = true;
 
             // Hashset of render group coordinates to update.
             HashSet<KeyValuePair<int, int>> groupHash = new HashSet<KeyValuePair<int, int>>();
@@ -97,7 +97,7 @@ namespace BOB
             s_dirtyList.Clear();
 
             // Restore simulation speed.
-            simulationManager.SelectedSimulationSpeed = currentSimulationSpeed;
+            simulationManager.SimulationPaused = simulationWasPaused;
         }
     }
 }

@@ -1,4 +1,7 @@
-﻿Version 0.9.6.1 -
+﻿- Fix regression causing building prop modification to unpause games
+
+
+Version 0.9.6.1 -
 
 - Add CheckReferences call when modifying building props to catch situations where final SpecialPlace prop has been replaced
 
