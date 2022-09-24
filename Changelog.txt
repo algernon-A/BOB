@@ -1,4 +1,6 @@
-﻿- Fix regression causing building prop modification to unpause games
+﻿Version 0.9.6.2 -
+
+- Fix regression causing building prop modification to unpause games
 
 
 Version 0.9.6.1 -
