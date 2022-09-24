@@ -1,4 +1,7 @@
-﻿Version 0.9.6 -
+﻿- Add CheckReferences call when modifying building props to catch situations where final SpecialPlace prop has been replaced
+
+
+Version 0.9.6 -
 
 - Major refactor of building and network replacement
 - Increase offset slider displayed maximum to 32

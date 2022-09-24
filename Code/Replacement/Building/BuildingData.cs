@@ -24,59 +24,6 @@ namespace BOB
         internal static HashSet<BuildingInfo> DirtyList => s_dirtyList;
 
         /// <summary>
-        /// Refreshes building prefabs and renders for the specified building prefab.
-        /// </summary>
-        /// <param name="prefab">Building prefab to update.</param>
-        internal static void UpdateBuilding(BuildingInfo prefab)
-        {
-            // Hashset of render group coordinates to update.
-            HashSet<KeyValuePair<int, int>> groupHash = new HashSet<KeyValuePair<int, int>>();
-
-            // Local references.
-            BuildingManager buildingManager = Singleton<BuildingManager>.instance;
-            RenderManager renderManager = Singleton<RenderManager>.instance;
-            Building[] buildings = buildingManager.m_buildings.m_buffer;
-
-            // Need to do this for each building instance, so iterate through all buildings.
-            for (ushort i = 0; i < buildings.Length; ++i)
-            {
-                // Check that this is a valid building in the dirty list.
-                if (buildings[i].m_flags != Building.Flags.None && buildings[i].Info == prefab)
-                {
-                    // Update building instance.
-                    renderManager.UpdateInstance(i);
-
-                    // Update parking spaces in simulation thread.
-                    if (buildings[i].Info.m_hasParkingSpaces != 0)
-                    {
-                        ushort buildingID = i;
-                        Singleton<SimulationManager>.instance.AddAction(() => buildingManager.UpdateParkingSpaces(buildingID, ref buildings[buildingID]));
-                    }
-
-                    // Calculate building render group.
-                    Vector3 position = buildings[i].m_position;
-                    int num = Mathf.Clamp((int)((position.x / 64f) + 135f), 0, 269);
-                    int num2 = Mathf.Clamp((int)((position.z / 64f) + 135f), 0, 269);
-                    int x = num * 45 / 270;
-                    int z = num2 * 45 / 270;
-
-                    // Add render group coordinates to hashlist (ignore if already there).
-                    groupHash.Add(new KeyValuePair<int, int>(x, z));
-                }
-            }
-
-            // Iterate through each key in group.
-            foreach (KeyValuePair<int, int> keyPair in groupHash)
-            {
-                // Update group render (all 31 layers, since we've got all kinds of mismatches with replacements).
-                for (int i = 0; i < 31; ++i)
-                {
-                    Singleton<RenderManager>.instance.UpdateGroup(keyPair.Key, keyPair.Value, i);
-                }
-            }
-        }
-
-        /// <summary>
         /// Refreshes building prefabs and renders for all 'dirty' buildings.
         /// </summary>
         internal static void Update()
@@ -86,6 +33,11 @@ namespace BOB
             {
                 return;
             }
+
+            // Pause simulation.
+            SimulationManager simulationManager = Singleton<SimulationManager>.instance;
+            int currentSimulationSpeed = simulationManager.SelectedSimulationSpeed;
+            simulationManager.SelectedSimulationSpeed = 0;
 
             // Hashset of render group coordinates to update.
             HashSet<KeyValuePair<int, int>> groupHash = new HashSet<KeyValuePair<int, int>>();
@@ -101,13 +53,22 @@ namespace BOB
                 // Check that this is a valid building in the dirty list.
                 if (buildings[i].m_flags != Building.Flags.None && DirtyList.Contains(buildings[i].Info))
                 {
+                    // Update prop references.
+                    BuildingInfo thisInfo = buildings[i].Info;
+                    simulationManager.AddAction(() =>
+                    {
+                        thisInfo.m_specialPlaces = null;
+                        thisInfo.CheckReferences();
+                    });
+
+                    // Update render instance.
                     renderManager.UpdateInstance(i);
 
                     // Update parking spaces in simulation thread.
                     if (buildings[i].Info.m_hasParkingSpaces != 0)
                     {
                         ushort buildingID = i;
-                        Singleton<SimulationManager>.instance.AddAction(() => buildingManager.UpdateParkingSpaces(buildingID, ref buildings[buildingID]));
+                        simulationManager.AddAction(() => buildingManager.UpdateParkingSpaces(buildingID, ref buildings[buildingID]));
                     }
 
                     // Calculate building render group.
@@ -134,6 +95,9 @@ namespace BOB
 
             // Clear dirty prefabs list.
             s_dirtyList.Clear();
+
+            // Restore simulation speed.
+            simulationManager.SelectedSimulationSpeed = currentSimulationSpeed;
         }
     }
 }
