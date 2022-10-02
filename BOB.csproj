@@ -1,8 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net35</TargetFramework>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Title>BOB, the tree and prop replacer</Title>
+		<AssemblyTitle>$(Title)</AssemblyTitle>
 		<Description>A Cities: Skylines mod.</Description>
+		<Authors>algernon</Authors>
+		<Copyright>Copyright © 2021-22 algernon</Copyright>
+		<Product>$(Title)</Product>
 		<Version>0.9.6.2</Version>
 		<LibrariesPath>$(ProjectDir)/Libraries</LibrariesPath>
 		<ManagedDLLPath>$(MSBuildProgramFiles32)/Steam/steamapps/common/Cities_Skylines/Cities_Data/Managed</ManagedDLLPath>
