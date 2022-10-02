@@ -14,7 +14,6 @@ namespace BOB
     using ColossalFramework;
     using ColossalFramework.UI;
     using EManagersLib.API;
-    using static BOB.BOBConfig;
 
     /// <summary>
     /// BOB map tree/prop replacement panel.

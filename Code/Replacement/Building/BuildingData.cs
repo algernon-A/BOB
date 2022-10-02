@@ -57,7 +57,10 @@ namespace BOB
                     BuildingInfo thisInfo = buildings[i].Info;
                     simulationManager.AddAction(() =>
                     {
+                        thisInfo.m_enterDoors = null;
+                        thisInfo.m_exitDoors = null;
                         thisInfo.m_specialPlaces = null;
+                        thisInfo.m_animalPlaces = null;
                         thisInfo.CheckReferences();
                     });
 
