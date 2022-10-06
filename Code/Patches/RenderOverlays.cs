@@ -197,7 +197,7 @@ namespace BOB
         /// <param name="index">Prop index.</param>
         public static void HighlightNetworkProp(PropInfo prop, Vector3 position, ushort segmentID, NetInfo.Lane lane, int index)
         {
-            if (BOBPanelManager.Panel != null & s_prop != null & s_prop == prop && (s_network == null || s_network == Singleton<NetManager>.instance.m_segments.m_buffer[segmentID].Info) & (s_propIndex < 0 | (s_lane == lane & s_propIndex == index)))
+            if ((BOBPanelManager.Panel != null & s_prop != null & s_prop == prop) && (s_network == null || s_network == Singleton<NetManager>.instance.m_segments.m_buffer[segmentID].Info) & (s_propIndex < 0 | (s_lane == lane & s_propIndex == index)))
             {
                 // Calculate radius of effect - largest of x and z size of props (minimum of 1 in any case).
                 Vector3 size = prop.m_mesh.bounds.size;

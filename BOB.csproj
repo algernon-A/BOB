@@ -20,6 +20,7 @@
 			$(TreeAnarchyBetaPath);
 		</AssemblySearchPaths>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="CitiesHarmony.API" Version="2.1.0" />
