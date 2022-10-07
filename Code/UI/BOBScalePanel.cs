@@ -61,12 +61,14 @@ namespace BOB
             m_propTreeChecks[(int)PropTreeModes.Both].Hide();
 
             // Minimum scale slider.
-            _minScaleSlider = AddBOBSlider(this, ControlX, MinOffsetY, ControlWidth - (Margin * 2f), "BOB_SCA_MIN", 0.5f, 2f, 0.5f, "MinScale");
+            _minScaleSlider = AddBOBSlider(this, ControlX, MinOffsetY, ControlWidth - (Margin * 2f), "BOB_SCA_MIN", BOBScalingElement.MinimumScale, BOBScalingElement.MaximumScale, 0.1f, "MinScale");
             _minScaleSlider.EventTrueValueChanged += MinScaleValue;
             _minScaleSlider.value = 1f;
-            _maxScaleSlider = AddBOBSlider(this, ControlX, MaxOffsetY + 40f, ControlWidth - (Margin * 2f), "BOB_SCA_MAX", 0.5f, 2f, 0.5f, "MaxScale");
+            _minScaleSlider.LimitToVisible = true;
+            _maxScaleSlider = AddBOBSlider(this, ControlX, MaxOffsetY + 40f, ControlWidth - (Margin * 2f), "BOB_SCA_MAX", BOBScalingElement.MinimumScale, BOBScalingElement.MaximumScale, 0.1f, "MaxScale");
             _maxScaleSlider.EventTrueValueChanged += MaxScaleValue;
             _maxScaleSlider.value = 1f;
+            _maxScaleSlider.LimitToVisible = true;
 
             // Revert button.
             _revertButton = UIButtons.AddSmallerButton(this, ControlX, RevertY, Translations.Translate("BOB_PNL_REV"), ControlWidth);

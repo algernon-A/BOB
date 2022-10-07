@@ -48,6 +48,9 @@ namespace BOB
                     // Copy element struct.
                     BOBScalingElement scalingElement = element;
 
+                    // Catch and correct any invalid data.
+                    scalingElement.EnsureBounds();
+
                     // Try to find prefab in loaded collection.
                     PropInfo thisProp = PrefabCollection<PropInfo>.FindLoaded(scalingElement.PrefabName);
                     if (thisProp != null)
@@ -85,6 +88,9 @@ namespace BOB
                 {
                     // Copy element struct.
                     BOBScalingElement scalingElement = element;
+
+                    // Catch and correct any invalid data.
+                    scalingElement.EnsureBounds();
 
                     // Try to find prefab in loaded collection, and if so, apply the recorded scaling.
                     TreeInfo thisTree = PrefabCollection<TreeInfo>.FindLoaded(scalingElement.PrefabName);
@@ -254,24 +260,11 @@ namespace BOB
             }
 
             // Update record with new scale values.
-            scalingElement.MinScale = minScale;
-            scalingElement.MaxScale = maxScale;
+            UpdateScalingElement(ref scalingElement, minScale, maxScale, prop.name, _propScales);
 
-            // Remove record if minimum and maximum scales both match the default.
-            if (scalingElement.MinScale == scalingElement.OriginalMin && scalingElement.MaxScale == scalingElement.OriginalMax)
-            {
-                _propScales.Remove(prop.name);
-            }
-            else
-            {
-                // Otherwise, save our new/updated record.
-                _propScales[prop.name] = scalingElement;
-            }
-
-            // Apply new scales and save updated configuration.
-            prop.m_minScale = minScale;
-            prop.m_maxScale = maxScale;
-            ConfigurationUtils.SaveConfig();
+            // Apply new scales.
+            prop.m_minScale = scalingElement.MinScale;
+            prop.m_maxScale = scalingElement.MaxScale;
         }
 
         /// <summary>
@@ -293,23 +286,39 @@ namespace BOB
             }
 
             // Update record with new scale values.
-            scalingElement.MinScale = minScale;
-            scalingElement.MaxScale = maxScale;
+            UpdateScalingElement(ref scalingElement, minScale, maxScale, tree.name, _treeScales);
+
+            // Apply new scales.
+            tree.m_minScale = scalingElement.MinScale;
+            tree.m_maxScale = scalingElement.MaxScale;
+        }
+
+        /// <summary>
+        /// Updates a scaling element and the associated dictionary.
+        /// </summary>
+        /// <param name="scalingElement">Scaling element to update.</param>
+        /// <param name="minScale">Minimum scale to apply.</param>
+        /// <param name="maxScale">Maximum scale to apply.</param>
+        /// <param name="prefabName">Target prefab name.</param>
+        /// <param name="dict">Relevant scaling dictionary.</param>
+        private void UpdateScalingElement(ref BOBScalingElement scalingElement, float minScale, float maxScale, string prefabName, Dictionary<string, BOBScalingElement> dict)
+        {
+            // Update record with new scale values.
+            scalingElement.SetMinScale(minScale);
+            scalingElement.SetMaxScale(maxScale);
 
             // Remove record if minimum and maximum scales both match the default.
             if (scalingElement.MinScale == scalingElement.OriginalMin && scalingElement.MaxScale == scalingElement.OriginalMax)
             {
-                _treeScales.Remove(tree.name);
+                dict.Remove(prefabName);
             }
             else
             {
                 // Otherwise, save our new/updated record.
-                _treeScales[tree.name] = scalingElement;
+                dict[prefabName] = scalingElement;
             }
 
-            // Apply new scales and save updated configuration.
-            tree.m_minScale = minScale;
-            tree.m_maxScale = maxScale;
+            // Save updated configuration.
             ConfigurationUtils.SaveConfig();
         }
     }

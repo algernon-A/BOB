@@ -6,12 +6,23 @@
 namespace BOB
 {
     using System.Xml.Serialization;
+    using UnityEngine;
 
     /// <summary>
     /// Tree or prop scaling record XML format.
     /// </summary>
     public struct BOBScalingElement
     {
+        /// <summary>
+        /// Minimum permitted scale factor.
+        /// </summary>
+        public const float MinimumScale = 0.5f;
+
+        /// <summary>
+        /// Maximum permitted scale factor.
+        /// </summary>
+        public const float MaximumScale = 2.0f;
+
         /// <summary>
         /// Target prefab name.
         /// </summary>
@@ -47,5 +58,32 @@ namespace BOB
         /// </summary>
         [XmlIgnore]
         public float OriginalMax;
+
+        /// <summary>
+        /// Sets the minimum scale, including a minimum bounds check.
+        /// </summary>
+        /// <param name="scale">Minimum scaling factor to set.</param>
+        public void SetMinScale(float scale)
+        {
+            MinScale = Mathf.Clamp(scale, MinimumScale, MaximumScale);
+        }
+
+        /// <summary>
+        /// Sets the maximum scale, including a minimum bounds check.
+        /// </summary>
+        /// <param name="scale">Maximum scaling factor to set.</param>
+        public void SetMaxScale(float scale)
+        {
+            MaxScale = Mathf.Clamp(scale, MinimumScale, MaximumScale);
+        }
+
+        /// <summary>
+        /// Ensures that scaling values are within acceptible bounds.
+        /// </summary>
+        public void EnsureBounds()
+        {
+            SetMinScale(MinScale);
+            SetMaxScale(MaxScale);
+        }
     }
 }

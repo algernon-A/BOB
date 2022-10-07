@@ -1,4 +1,7 @@
-﻿Version 0.9.6.2 -
+﻿- Add bounds checks to scaling factors
+
+
+Version 0.9.6.2 -
 
 - Fix regression causing building prop modification to unpause games
 
