@@ -212,7 +212,11 @@ namespace BOB
 
                 // Random settings button.
                 UIButton randomButton = AddIconButton(this, RandomButtonX, ToggleY, ToggleSize, "BOB_PNL_RST", UITextures.LoadQuadSpriteAtlas("BOB-Random"));
-                randomButton.eventClicked += (c, clickEvent) => StandalonePanelManager<BOBRandomPanel>.Create();
+                randomButton.eventClicked += (c, clickEvent) =>
+                {
+                    StandalonePanelManager<BOBRandomPanel>.Create();
+                    StandalonePanelManager<BOBRandomPanel>.Panel.SelectRandomPrefab(SelectedReplacementPrefab);
+                };
 
                 // Set initial button states.
                 UpdateButtonStates();

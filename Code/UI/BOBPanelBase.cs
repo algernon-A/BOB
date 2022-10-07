@@ -227,6 +227,9 @@ namespace BOB
                 if (_propTreeMode != value)
                 {
                     _propTreeMode = value;
+
+                    // Perform post-change actions.
+                    PropTreeChange();
                 }
             }
         }
@@ -288,9 +291,6 @@ namespace BOB
 
                         // Set current mode.
                         PropTreeMode = (PropTreeModes)index;
-
-                        // Perform post-change actions.
-                        PropTreeChange();
                     }
                 }
                 else

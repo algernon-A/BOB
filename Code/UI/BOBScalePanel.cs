@@ -5,10 +5,8 @@
 
 namespace BOB
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
-    using AlgernonCommons;
     using AlgernonCommons.Translation;
     using AlgernonCommons.UI;
     using ColossalFramework;
@@ -112,10 +110,12 @@ namespace BOB
         /// <summary>
         /// Sets the currently selected loaded prefab.
         /// </summary>
-        internal PrefabInfo SelectedLoadedPrefab
+        private PrefabInfo SelectedLoadedPrefab
         {
             set
             {
+                AlgernonCommons.Logging.Message("setting scale prefab");
+
                 // Disable events, otherwise slider value changes will mess things up.
                 _disableEvents = true;
 
@@ -172,6 +172,12 @@ namespace BOB
 
         // Trees or props?
         private bool IsTree => PropTreeMode == PropTreeModes.Tree;
+
+        /// <summary>
+        /// Sets the selected prefab to the one (if any) representing the given tree or prop prefab.
+        /// </summary>
+        /// <param name="prefab">Tree or prop prefab.</param>
+        internal void SelectPrefab(PrefabInfo prefab) => _loadedList.FindItem<LoadedPrefabItem>(x => x.Prefab == prefab);
 
         /// <summary>
         /// Populates the replacement UIList with a filtered list of eligible relacement trees or props.

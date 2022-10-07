@@ -246,6 +246,24 @@ namespace BOB
         private bool IsTree => PropTreeMode == PropTreeModes.Tree;
 
         /// <summary>
+        /// Sets the selected BOB random prefab to the one (if any) representing the given tree or prop prefab.
+        /// </summary>
+        /// <param name="prefab">Tree or prop prefab.</param>
+        internal void SelectRandomPrefab(PrefabInfo prefab)
+        {
+            if (prefab is TreeInfo tree)
+            {
+                PropTreeMode = PropTreeModes.Tree;
+                _randomList.FindItem<BOBRandomPrefab>(x => x.Tree == tree);
+            }
+            else
+            {
+                PropTreeMode = PropTreeModes.Prop;
+                _randomList.FindItem<BOBRandomPrefab>(x => x.Prop == prefab);
+            }
+        }
+
+        /// <summary>
         /// Populates the replacement UIList with a filtered list of eligible relacement trees or props.
         /// </summary>
         protected override void RegenerateReplacementList()
