@@ -408,6 +408,7 @@ namespace BOB
             button.relativePosition = new Vector2(posX, posY);
 
             // Appearance.
+            button.atlas = UITextures.InGameAtlas;
             SetFgSprites(button, "IconUpArrow2");
             button.canFocus = false;
 

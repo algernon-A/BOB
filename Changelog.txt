@@ -1,4 +1,6 @@
 ﻿- Move prop detection triggers from initial to final props
+- Fix panel backgrounds appearing transparent in editors
+- Update AlgernonCommons
 
 
 Version 0.9.6.3 -
