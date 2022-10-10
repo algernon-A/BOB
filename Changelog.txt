@@ -1,4 +1,6 @@
-﻿- Move prop detection triggers from initial to final props
+﻿Version 0.9.7 -
+
+- Move prop detection triggers from initial to final props
 - Fix panel backgrounds appearing transparent in editors
 - Update AlgernonCommons
 
