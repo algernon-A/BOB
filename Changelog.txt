@@ -1,4 +1,7 @@
-﻿Version 0.9.6.3 -
+﻿- Move prop detection triggers from initial to final props
+
+
+Version 0.9.6.3 -
 
 - Add bounds checks to scaling factors
 - Automatically pass current selection to scaling and random panels

@@ -457,11 +457,11 @@ namespace BOB
                 PrefabInfo originalInfo = null;
                 if (PropTreeMode == PropTreeModes.Tree)
                 {
-                    originalInfo = (PrefabInfo)_selectedSubBuilding.m_props[propIndex]?.m_tree ?? _selectedSubBuilding.m_props[propIndex]?.m_prop;
+                    originalInfo = (PrefabInfo)_selectedSubBuilding.m_props[propIndex]?.m_finalTree ?? _selectedSubBuilding.m_props[propIndex]?.m_finalProp;
                 }
                 else
                 {
-                    originalInfo = (PrefabInfo)_selectedSubBuilding.m_props[propIndex]?.m_prop ?? _selectedSubBuilding.m_props[propIndex]?.m_tree;
+                    originalInfo = (PrefabInfo)_selectedSubBuilding.m_props[propIndex]?.m_finalProp ?? _selectedSubBuilding.m_props[propIndex]?.m_finalTree;
                 }
 
                 // Check to see if we were succesful - if not (e.g. we only want trees and this is a prop), continue on to next building prop.
@@ -678,7 +678,7 @@ namespace BOB
                     {
                         for (int j = 0; j < prefab.m_props.Length; ++j)
                         {
-                            if ((!isTree && prefab.m_props[j].m_prop == SelectedTargetItem.OriginalPrefab) || (isTree && prefab.m_props[j].m_tree == SelectedTargetItem.OriginalPrefab))
+                            if ((!isTree && prefab.m_props[j].m_finalProp == SelectedTargetItem.OriginalPrefab) || (isTree && prefab.m_props[j].m_finalTree == SelectedTargetItem.OriginalPrefab))
                             {
                                 m_originalValues.Add(GetOriginalData(prefab, j));
                             }

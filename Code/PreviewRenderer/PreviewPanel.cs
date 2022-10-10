@@ -152,10 +152,10 @@ namespace BOB
 
                         if (prop.m_material?.mainTexture == null)
                         {
-                            if (prop.m_variations != null && prop.m_variations.Length > 0 && prop.m_variations[0].m_prop != null)
+                            if (prop.m_variations != null && prop.m_variations.Length > 0 && prop.m_variations[0].m_finalProp != null)
                             {
-                                _renderer.Mesh = prop.m_variations[0].m_prop.m_mesh;
-                                _renderer.Material = prop.m_variations[0].m_prop.m_material;
+                                _renderer.Mesh = prop.m_variations[0].m_finalProp.m_mesh;
+                                _renderer.Material = prop.m_variations[0].m_finalProp.m_material;
                             }
                         }
 

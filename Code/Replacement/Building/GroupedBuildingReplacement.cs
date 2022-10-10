@@ -73,8 +73,8 @@ namespace BOB
                 }
 
                 // Note current props.
-                TreeInfo thisTree = thisBuildingProp.m_tree;
-                PropInfo thisProp = thisBuildingProp.m_prop;
+                TreeInfo thisTree = thisBuildingProp.m_finalTree;
+                PropInfo thisProp = thisBuildingProp.m_finalProp;
 
                 // Get any active handler.
                 BuildingPropHandler handler = BuildingHandlers.GetHandler(replacement.BuildingInfo, propIndex);

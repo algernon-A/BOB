@@ -477,11 +477,11 @@ namespace BOB
                     PrefabInfo originalInfo = null;
                     if (PropTreeMode == PropTreeModes.Tree)
                     {
-                        originalInfo = (PrefabInfo)laneProps[propIndex]?.m_tree ?? laneProps[propIndex]?.m_prop;
+                        originalInfo = (PrefabInfo)laneProps[propIndex]?.m_finalTree ?? laneProps[propIndex]?.m_finalProp;
                     }
                     else
                     {
-                        originalInfo = (PrefabInfo)laneProps[propIndex]?.m_prop ?? laneProps[propIndex]?.m_tree;
+                        originalInfo = (PrefabInfo)laneProps[propIndex]?.m_finalProp ?? laneProps[propIndex]?.m_finalTree;
                     }
 
                     // Check to see if we were succesful - if not (e.g. we only want trees and this is a prop), continue on to next building prop.
@@ -711,7 +711,7 @@ namespace BOB
                                 {
                                     for (int k = 0; k < laneProps.Length; ++k)
                                     {
-                                        if (laneProps[k].m_prop == targetNetItem.ReplacementPrefab || laneProps[k].m_tree == targetNetItem.ReplacementPrefab)
+                                        if (laneProps[k].m_finalProp == targetNetItem.ReplacementPrefab || laneProps[k].m_finalTree == targetNetItem.ReplacementPrefab)
                                         {
                                             m_originalValues.Add(GetOriginalData(prefab, j, k));
                                         }

@@ -148,8 +148,8 @@ namespace BOB
                         }
 
                         // Note current props.
-                        TreeInfo thisTree = thisLaneProp.m_tree;
-                        PropInfo thisProp = thisLaneProp.m_prop;
+                        TreeInfo thisTree = thisLaneProp.m_finalTree;
+                        PropInfo thisProp = thisLaneProp.m_finalProp;
 
                         // Get any active handler.
                         LanePropHandler handler = NetHandlers.GetHandler(thisLane, propIndex);
