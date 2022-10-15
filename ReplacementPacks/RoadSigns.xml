@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <BOBPackFile>
   <propPacks>
   	  <replacementpack name="Sign Pack - Slovak by NameInvalid">
@@ -250,57 +250,57 @@
 			  <replacement target="Motorway Sign" replacement="2540523220.R6-AR1 Freeway Start Assembly_Data" rotation="-90" />
 		  </propReplacements>
 	  </replacementpack>
-    <replacementpack name="Japanese Traffic Speed Signs by Krakow131">
-      <propReplacements>
-        <replacement target="30 Speed Limit" replacement="2567402949.JPTS Speed limit 30km/h_Data" rotation="0" />
-        <replacement target="40 Speed Limit" replacement="2567402949.JPTS Speed limit 40km/h_Data" rotation="0" />
-        <replacement target="50 Speed Limit" replacement="2567402949.JPTS Speed limit 50km/h_Data" rotation="0" />
-        <replacement target="60 Speed Limit" replacement="2567402949.JPTS Speed limit 60km/h_Data" rotation="0" />
-        <replacement target="100 Speed Limit" replacement="2567402949.JPTS Minimum speed 50km/h_Data" rotation="0" />
-      </propReplacements>
-    </replacementpack>
-    <replacementpack name="Japanese Traffic Signs by Krakow131">
-      <propReplacements>
-        <replacement target="Stop Sign" replacement="2567402949.JPTS Stop (2017~)_Data" rotation="0" />
-        <replacement target="No Parking Sign" replacement="2567402949.JPJPTS No parking_Data" rotation="0" />
-        <replacement target="No Right Turn Sign" replacement="2567402949.JPTS Straight ahead or left turn_Data" rotation="0" />
-        <replacement target="No Left Turn Sign" replacement="2567402949.JPTS Straight or right turn_Data" rotation="0" />
-      </propReplacements>
-    </replacementpack>
-    <replacementpack name="BIG Urban (US DOT) regulatory signs by hockenheim95">
-      <propReplacements>
-        <replacement target="Stop Sign" replacement="2228643473.BIG Roads R2 R1-1 Stop Sign_Data" rotation="0" />
-        <replacement target="No Parking Sign" replacement="2228643473.BIG Roads R2 R-3A No Parking_Data" rotation="0" />
-        <replacement target="No Right Turn Sign" replacement="2228643473.BIG Roads R2 R3-1 No Right Turn_Data" rotation="0" />
-        <replacement target="No Left Turn Sign" replacement="2228643473.BIG Roads R2 R3-2 No Left Turn _Data" rotation="0" />
-      </propReplacements>
-    </replacementpack>
-    <replacementpack name="BIG Urban (US DOT) speed signs by hockenheim95">
-      <propReplacements>
-        <replacement target="30 Speed Limit" replacement="2228643473.BIG Roads R2 R2-1 Speed Limit 15_Data" rotation="0" />
-        <replacement target="40 Speed Limit" replacement="2228643473.BIG Roads R2 R2-1 Speed Limit 25_Data" rotation="0" />
-        <replacement target="50 Speed Limit" replacement="2228643473.BIG Roads R2 R2-1 Speed Limit 30_Data" rotation="0" />
-        <replacement target="60 Speed Limit" replacement="2228643473.BIG Roads R2 R2-1 Speed Limit 35_Data" rotation="0" />
-        <replacement target="100 Speed Limit" replacement="2228643473.BIG Roads R2 R2-1 Speed Limit 65_Data" rotation="0" />
-      </propReplacements>
-    </replacementpack>
-	  <replacementpack name="Hong Kong Traffic Signs [香港交通標誌] by yauaa - regulatory">
+	  <replacementpack name="Japanese Traffic Speed Signs by Krakow131">
 		  <propReplacements>
+			  <replacement target="30 Speed Limit" replacement="2567402949.JPTS Speed limit 30km/h_Data" rotation="0" />
+			  <replacement target="40 Speed Limit" replacement="2567402949.JPTS Speed limit 40km/h_Data" rotation="0" />
+			  <replacement target="50 Speed Limit" replacement="2567402949.JPTS Speed limit 50km/h_Data" rotation="0" />
+			  <replacement target="60 Speed Limit" replacement="2567402949.JPTS Speed limit 60km/h_Data" rotation="0" />
+			  <replacement target="100 Speed Limit" replacement="2567402949.JPTS Minimum speed 50km/h_Data" rotation="0" />
+		  </propReplacements>
+      </replacementpack>
+      <replacementpack name="Japanese Traffic Signs by Krakow131">
+		  <propReplacements>
+		 	  <replacement target="Stop Sign" replacement="2567402949.JPTS Stop (2017~)_Data" rotation="0" />
+		 	  <replacement target="No Parking Sign" replacement="2567402949.JPJPTS No parking_Data" rotation="0" />
+		 	  <replacement target="No Right Turn Sign" replacement="2567402949.JPTS Straight ahead or left turn_Data" rotation="0" />
+		 	  <replacement target="No Left Turn Sign" replacement="2567402949.JPTS Straight or right turn_Data" rotation="0" />
+		  </propReplacements>
+      </replacementpack>
+      <replacementpack name="BIG Urban (US DOT) regulatory signs by hockenheim95">
+		  <propReplacements>
+			  <replacement target="Stop Sign" replacement="2228643473.BIG Roads R2 R1-1 Stop Sign_Data" rotation="0" />
+			  <replacement target="No Parking Sign" replacement="2228643473.BIG Roads R2 R-3A No Parking_Data" rotation="0" />
+			  <replacement target="No Right Turn Sign" replacement="2228643473.BIG Roads R2 R3-1 No Right Turn_Data" rotation="0" />
+			  <replacement target="No Left Turn Sign" replacement="2228643473.BIG Roads R2 R3-2 No Left Turn _Data" rotation="0" />
+		  </propReplacements>
+      </replacementpack>
+      <replacementpack name="BIG Urban (US DOT) speed signs by hockenheim95">
+		  <propReplacements>
+		 	  <replacement target="30 Speed Limit" replacement="2228643473.BIG Roads R2 R2-1 Speed Limit 15_Data" rotation="0" />
+		 	  <replacement target="40 Speed Limit" replacement="2228643473.BIG Roads R2 R2-1 Speed Limit 25_Data" rotation="0" />
+		 	  <replacement target="50 Speed Limit" replacement="2228643473.BIG Roads R2 R2-1 Speed Limit 30_Data" rotation="0" />
+		 	  <replacement target="60 Speed Limit" replacement="2228643473.BIG Roads R2 R2-1 Speed Limit 35_Data" rotation="0" />
+		 	  <replacement target="100 Speed Limit" replacement="2228643473.BIG Roads R2 R2-1 Speed Limit 65_Data" rotation="0" />
+		  </propReplacements>
+      </replacementpack>
+      <replacementpack name="Hong Kong Traffic Signs [香港交通標誌] by yauaa - regulatory">
+    	  <propReplacements>
 			  <replacement target="Stop Sign" replacement="2689823866.HKTS_Stop_Data" rotation="0" />
 			  <replacement target="No Parking Sign" replacement="2689823866.HKTS_No_Parking_Data" rotation="0" />
 			  <replacement target="No Right Turn Sign" replacement="2689823866.HKTS_No_R_Turn_Data" rotation="0" />
 			  <replacement target="No Left Turn Sign" replacement="2689823866.HKTS_No_L_Turn_Data" rotation="0" />
 			  <replacement target="Motorway Sign" replacement="2689823866.HKTS_No_Parking_Data" rotation="0" />
 		  </propReplacements>
-	  </replacementpack>
-	  <replacementpack name="Hong Kong Traffic Signs [香港交通標誌] by yauaa - speed limits">
-		  <propReplacements>
-			  <replacement target="30 Speed Limit" replacement="2689823866.HKTS_Spd_30_Data" rotation="0" />
-			  <replacement target="40 Speed Limit" replacement="2689823866.HKTS_Spd_50_Data" rotation="0" />
-			  <replacement target="50 Speed Limit" replacement="2689823866.HKTS_Spd_50_Data" rotation="0" />
-			  <replacement target="60 Speed Limit" replacement="2689823866.HKTS_Spd_70_Data" rotation="0" />
-			  <replacement target="100 Speed Limit" replacement="2689823866.HKTS_Spd_100_Data" rotation="0" />
-		  </propReplacements>
-	  </replacementpack>
+      </replacementpack>
+      <replacementpack name="Hong Kong Traffic Signs [香港交通標誌] by yauaa - speed limits">
+    	  <propReplacements>
+   	 		  <replacement target="30 Speed Limit" replacement="2689823866.HKTS_Spd_30_Data" rotation="0" />
+    			  <replacement target="40 Speed Limit" replacement="2689823866.HKTS_Spd_50_Data" rotation="0" />
+    			  <replacement target="50 Speed Limit" replacement="2689823866.HKTS_Spd_50_Data" rotation="0" />
+    			  <replacement target="60 Speed Limit" replacement="2689823866.HKTS_Spd_70_Data" rotation="0" />
+    			  <replacement target="100 Speed Limit" replacement="2689823866.HKTS_Spd_100_Data" rotation="0" />
+    	 </propReplacements>
+      </replacementpack>
   </propPacks>
 </BOBPackFile>
