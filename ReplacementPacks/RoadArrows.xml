@@ -34,6 +34,17 @@
         <replacement target="Road Arrow LFR" replacement="Road Arrow LFR" hide="true" />
       </propReplacements>
     </replacementpack>
+    <replacementpack name="Chinese Road Markings">
+      <propReplacements>
+        <replacement target="Road Arrow R" replacement="2874984865.KIT_CRM_GA_R_data" />
+        <replacement target="Road Arrow L" replacement="2874984865.KIT_CRM_GA_L_data" />
+        <replacement target="Road Arrow F" replacement="2874984865.KIT_CRM_GA_F_data" />
+        <replacement target="Road Arrow LF" replacement="2874984865.KIT_CRM_GA_FL_data" />
+        <replacement target="Road Arrow FR" replacement="2874984865.KIT_CRM_GA_FR_data" />
+        <replacement target="Road Arrow LR" replacement="2874984865.KIT_CRM_GA_LR_data" />
+        <replacement target="Road Arrow LFR" replacement="Road Arrow LFR" hide="true" />
+      </propReplacements>
+    </replacementpack>
     <replacementpack name="clus Americana Road Arrows">
       <propReplacements>
         <replacement target="Road Arrow R" replacement="2128887855.Arrow Right 2_Data" />
