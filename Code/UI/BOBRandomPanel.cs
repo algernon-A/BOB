@@ -547,6 +547,7 @@ namespace BOB
             _variationsList.FindItem(newVariant);
 
             // Update the random prefab with the new variation.
+            _lastChangedVariant = null;
             UpdateCurrentRandomPrefab();
 
             // Update slider value.
@@ -571,6 +572,7 @@ namespace BOB
             VariationsList();
 
             // Update the random prefab to reflect the removal
+            _lastChangedVariant = null;
             UpdateCurrentRandomPrefab();
         }
 
@@ -581,7 +583,7 @@ namespace BOB
         {
             int variationCount = _selectedRandomPrefab.Variations.Count;
 
-            // Recalculate probabilities.
+            // Recalculate probabilities, ignoring previous change.
             RecalculateProbabilities();
 
             // Trees or props?

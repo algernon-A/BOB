@@ -1,4 +1,5 @@
 ﻿- Fix map replacement panel not opening with targeted prop already selected
+- Fix random prop probabilities not being properly calculated when adding a new variant
 
 
 Version 0.9.7 -
