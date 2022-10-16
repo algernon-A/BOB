@@ -7,6 +7,7 @@ namespace BOB
 {
     using System.Collections.Generic;
     using System.Xml.Serialization;
+    using UnityEngine;
 
     /// <summary>
     /// Random prefab XML record.
@@ -49,6 +50,9 @@ namespace BOB
         /// </summary>
         public class Variation
         {
+            [XmlIgnore]
+            private int _probability;
+
             /// <summary>
             /// Gets or sets the variation's name.
             /// </summary>
@@ -65,7 +69,7 @@ namespace BOB
             /// Gets or sets the variation probability.
             /// </summary>
             [XmlAttribute("probability")]
-            public int Probability { get; set; }
+            public int Probability { get => _probability; set => _probability = Mathf.Max(0, value); }
 
             /// <summary>
             /// Gets or sets the variation prefab info.
