@@ -62,12 +62,14 @@ namespace BOB
             m_propTreeChecks[(int)PropTreeMode].isChecked = true;
             m_ignorePropTreeCheckChanged = false;
 
-            // Regenerate target list and select target item.
+            // Regenerate target list.
             RegenerateTargetList();
-            m_targetList.FindItem<TargetListItem>(x => x.ActivePrefab == targetPrefabInfo);
 
             // Regenerate replacement list.
             RegenerateReplacementList();
+
+            // Select target item.
+            m_targetList.FindItem<TargetListItem>(x => x.ActivePrefab == targetPrefabInfo);
 
             // Apply Harmony rendering patches.
             PatcherManager<Patcher>.Instance.PatchMapOverlays(true);

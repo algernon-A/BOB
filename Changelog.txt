@@ -1,4 +1,7 @@
-﻿Version 0.9.7 -
+﻿- Fix map replacement panel not opening with targeted prop already selected
+
+
+Version 0.9.7 -
 
 - Move prop detection triggers from initial to final props
 - Fix panel backgrounds appearing transparent in editors

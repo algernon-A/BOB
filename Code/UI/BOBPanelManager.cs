@@ -183,6 +183,7 @@ namespace BOB
                         // Give it a unique name for easy finding with ModTools.
                         s_gameObject = new GameObject("BOBMapPanel");
                         s_gameObject.transform.parent = UIView.GetAView().transform;
+
                         s_panel = s_gameObject.AddComponent<BOBMapPanel>();
                     }
                     else
