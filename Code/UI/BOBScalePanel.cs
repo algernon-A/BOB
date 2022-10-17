@@ -108,6 +108,11 @@ namespace BOB
         public override float PanelHeight => ListY + ListHeight + Margin;
 
         /// <summary>
+        /// Gets the panel's title.
+        /// </summary>
+        protected override string PanelTitle => Translations.Translate("BOB_NAM") + " : " + Translations.Translate("BOB_SCA_TIT");
+
+        /// <summary>
         /// Sets the currently selected loaded prefab.
         /// </summary>
         private PrefabInfo SelectedLoadedPrefab
@@ -164,11 +169,6 @@ namespace BOB
                 _disableEvents = false;
             }
         }
-
-        /// <summary>
-        /// Gets the panel's title.
-        /// </summary>
-        protected override string PanelTitle => Translations.Translate("BOB_NAM") + " : " + Translations.Translate("BOB_SCA_TIT");
 
         // Trees or props?
         private bool IsTree => PropTreeMode == PropTreeModes.Tree;

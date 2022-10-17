@@ -9,8 +9,8 @@
 			  <replacement target="60 Speed Limit" replacement="2862241271.Prohibition Sign P-253D_Data" rotation="0" />
 			  <replacement target="100 Speed Limit" replacement="2862241271.Prohibition Sign P-253F_Data" rotation="0" />
 			  <replacement target="Stop Sign" replacement="2862793833.Additional Sign A-202 Stop_Data" rotation="0" />
-			  <replacement target="No Right Turn Sign" replacement="2862186213.Command Sign C-215B_Data" rotation="0" />
-			  <replacement target="No Left Turn Sign" replacement="2862186213.Command Sign C-215A_Data" rotation="0" />
+			  <replacement target="No Right Turn Sign" replacement="2862241271.Prohibition Sign P-215B_Data" rotation="0" />
+			  <replacement target="No Left Turn Sign" replacement="2862241271.Prohibition Sign P-215A_Data" rotation="0" />
 			  <replacement target="No Parking Sign" replacement="2862241271.Prohibition Sign P-270_Data" rotation="0" />
 			  <replacement target="Motorway Sign" replacement="2862553780.Information Sign I-309_Data" rotation="0" />
 		  </propReplacements>
@@ -37,8 +37,8 @@
 			  <replacement target="60 Speed Limit" replacement="2862241271.Prohibition Sign P-253D2_Data" rotation="0" />
 			  <replacement target="100 Speed Limit" replacement="2862241271.Prohibition Sign P-267_Data" rotation="0" />
 			  <replacement target="Stop Sign" replacement="2862793833.Additional Sign A-202 Stop_Data" rotation="0" />
-			  <replacement target="No Right Turn Sign" replacement="2862186213.Command Sign C-215B_Data" rotation="0" />
-			  <replacement target="No Left Turn Sign" replacement="2862186213.Command Sign C-215A_Data" rotation="0" />
+			  <replacement target="No Right Turn Sign" replacement="2862241271.Prohibition Sign P-215B_Data" rotation="0" />
+			  <replacement target="No Left Turn Sign" replacement="2862241271.Prohibition Sign P-215A_Data" rotation="0" />
 			  <replacement target="No Parking Sign" replacement="2862241271.Prohibition Sign P-270_Data" rotation="0" />
 			  <replacement target="Motorway Sign" replacement="2862553780.Information Sign I-309 (blue)_Data" rotation="0" />
 		  </propReplacements>
