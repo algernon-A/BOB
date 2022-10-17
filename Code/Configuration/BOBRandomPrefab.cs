@@ -69,7 +69,7 @@ namespace BOB
             /// Gets or sets the variation probability.
             /// </summary>
             [XmlAttribute("probability")]
-            public int Probability { get => _probability; set => _probability = Mathf.Max(0, value); }
+            public int Probability { get => _probability; set => _probability = Mathf.Max(1, value); }
 
             /// <summary>
             /// Gets or sets the variation prefab info.
