@@ -16,7 +16,7 @@ namespace BOB
         /// <summary>
         /// Minimum permitted scale factor.
         /// </summary>
-        public const float MinimumScale = 0.5f;
+        public const float MinimumScale = 0.2f;
 
         /// <summary>
         /// Maximum permitted scale factor.

@@ -1,4 +1,7 @@
-﻿Version 0.9.7.1 -
+﻿- Reduce minimum scaling to 0.2
+
+
+Version 0.9.7.1 -
 
 - Fix map replacement panel not opening with targeted prop already selected
 - Fix random prop probabilities not being properly calculated when adding a new variant
