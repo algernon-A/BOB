@@ -1,4 +1,7 @@
-﻿- Reduce minimum scaling to 0.2
+﻿Version 0.9.7.2 -
+
+- Reduce minimum scaling to 0.1
+= Update AlgernonCommons
 
 
 Version 0.9.7.1 -
