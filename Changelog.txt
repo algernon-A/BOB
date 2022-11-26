@@ -1,4 +1,7 @@
-﻿Version 0.9.7.2 -
+﻿- Fix map tree replacement resetting to prop mode after applying replacement
+
+
+Version 0.9.7.2 -
 
 - Reduce minimum scaling to 0.1
 - Update AlgernonCommons

@@ -84,8 +84,11 @@ namespace BOB
         {
             try
             {
+                // Record replacement (we need to keep this after refresh).
+                PrefabInfo replacement = SelectedReplacementPrefab;
+
                 // Apply replacement.
-                if (!m_propTreeChecks[(int)PropTreeModes.Prop].isChecked && SelectedReplacementPrefab is TreeInfo replacementTree)
+                if (!m_propTreeChecks[(int)PropTreeModes.Prop].isChecked && replacement is TreeInfo replacementTree)
                 {
                     // Revert any active replacment first.
                     if (SelectedTargetItem.ReplacementPrefab is TreeInfo activeReplacement)
@@ -95,7 +98,7 @@ namespace BOB
 
                     MapTreeReplacement.Instance.Apply(SelectedTargetItem.OriginalPrefab as TreeInfo, replacementTree);
                 }
-                else if (!m_propTreeChecks[(int)PropTreeModes.Tree].isChecked && SelectedReplacementPrefab is PropInfo replacementProp)
+                else if (!m_propTreeChecks[(int)PropTreeModes.Tree].isChecked && replacement is PropInfo replacementProp)
                 {
                     // Revert any active replacment first.
                     if (SelectedTargetItem.ReplacementPrefab is PropInfo activeReplacement)
@@ -106,11 +109,11 @@ namespace BOB
                     MapPropReplacement.Instance.Apply(SelectedTargetItem.OriginalPrefab as PropInfo, replacementProp);
                 }
 
-                // Update current target.
-                SetTargetParent(SelectedTargetItem.ReplacementPrefab);
-
-                // Perform post-replacment updates.
+                // Perform post-replacement updates.
                 FinishUpdate();
+
+                // Select updated target.
+                m_targetList.FindItem<TargetListItem>(x => x.ReplacementPrefab == replacement);
             }
             catch (Exception e)
             {
