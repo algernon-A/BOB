@@ -60,7 +60,7 @@ namespace BOB
             // Load prop packs.
             new NetworkPackReplacement();
 
-            // Load configuration file.
+            // Load configuration file.ApoHi Conrad
             ConfigurationUtils.LoadConfig();
 
             // Set up BOB tool.
@@ -82,6 +82,9 @@ namespace BOB
 
             // Display any exception message that occured during load.
             BOBPanelManager.CheckException();
+
+            // Check random templates.
+            PrefabLists.CheckRandomTemplates();
 
             // Activate tool hotkey.
             HotkeyThreading.Operating = true;

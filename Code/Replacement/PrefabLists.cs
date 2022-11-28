@@ -7,6 +7,8 @@ namespace BOB
 {
     using System.Collections.Generic;
     using System.Linq;
+    using AlgernonCommons.Notifications;
+    using AlgernonCommons.Translation;
     using ColossalFramework;
     using ColossalFramework.Packaging;
     using ColossalFramework.PlatformServices;
@@ -169,6 +171,36 @@ namespace BOB
 
             // If we got here, we didn't find a valid creator.
             return string.Empty;
+        }
+
+        /// <summary>
+        /// Checks to see that the random prop and tree templates have properly loaded, and if not, displays an error message.
+        /// </summary>
+        /// <returns>True if random templates were successfully loaded, false otherwise.</returns>
+        internal static bool CheckRandomTemplates()
+        {
+            bool randomPropTemplateMissing = RandomPropTemplate == null;
+            bool randomTreeTemplateMissing = RandomTreeTemplate == null;
+            if (randomPropTemplateMissing || randomTreeTemplateMissing)
+            {
+                ListNotification errorNotification = NotificationBase.ShowNotification<ListNotification>();
+                errorNotification.AddParas(Translations.Translate("RANDOM_TEMPLATE_MISSING"));
+                if (randomPropTemplateMissing)
+                {
+                    errorNotification.AddParas(Translations.Translate("PROP_TEMPLATE_MISSING"));
+                }
+
+                if (randomTreeTemplateMissing)
+                {
+                    errorNotification.AddParas(Translations.Translate("TREE_TEMPLATE_MISSING"));
+                }
+
+                errorNotification.Show();
+                return false;
+            }
+
+            // If we got here, everything was loaded properly.
+            return true;
         }
 
         /// <summary>
