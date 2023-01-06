@@ -198,7 +198,7 @@ namespace BOB
                     _nameLabel.relativePosition = new Vector2((targetItem.PropIndex >= 0 ? IndexWidth : 0) + IndexLabelX + Margin, 0f);
 
                     // Set tooltip.
-                    tooltip = targetItem.Position.x.ToString() + ":" + targetItem.Position.y.ToString() + ":" + targetItem.Position.z.ToString();
+                    tooltip = "X: " + targetItem.Position.x.ToString() + " Y:" + targetItem.Position.y.ToString() + " Z:" + targetItem.Position.z.ToString();
                 }
                 else
                 {
