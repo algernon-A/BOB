@@ -7,6 +7,7 @@ namespace BOB
 {
     using System.Collections.Generic;
     using AlgernonCommons;
+    using UnityEngine;
 
     /// <summary>
     /// Class to manage individual building prop and tree replacements.
@@ -53,13 +54,69 @@ namespace BOB
         protected override void ApplyReplacement(BOBConfig.BuildingReplacement replacement)
         {
             // Don't do anything if prefabs can't be found.
-            if (replacement?.TargetInfo == null || replacement.ReplacementInfo == null || replacement.BuildingInfo == null)
+            if (replacement?.TargetInfo == null || replacement.ReplacementInfo == null || replacement.BuildingInfo?.m_props == null)
             {
                 return;
             }
 
+            // Find propIndex.
+            if (replacement.PropIndex < 0)
+            {
+                Logging.Message("looking for individual index match for target prop ", replacement.TargetInfo?.name);
+                BuildingInfo.Prop[] props = replacement.BuildingInfo.m_props;
+                for (int i = 0; i < props.Length; ++i)
+                {
+                    BuildingInfo.Prop prop = props[i];
+
+                    // Get prefab values.
+                    PropInfo originalProp = prop.m_finalProp;
+                    TreeInfo originalTree = prop.m_finalTree;
+                    Vector3 originalPosition = prop.m_position;
+
+                    // Check for any active replacements; if there are any, retrieve the original prop info.
+                    if (BuildingHandlers.GetHandler(replacement.BuildingInfo, i) is BuildingPropHandler handler)
+                    {
+                        originalProp = handler.OriginalFinalProp;
+                        originalTree = handler.OriginalFinalTree;
+                        originalPosition = handler.OriginalPosition;
+                    }
+
+                    if (prop != null)
+                    {
+                        if ((replacement.IsTree && originalTree == replacement.TargetTree) || (!replacement.IsTree && originalProp == replacement.TargetProp))
+                        {
+                            if (replacement.Xpos == originalPosition.x && replacement.Ypos == originalPosition.y && replacement.Zpos == originalPosition.z)
+                            {
+                                Logging.Message("found index match at ", i);
+                                replacement.PropIndex = i;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // Legacy index found; ensure we record the prop position.
+
+
+                // Get current position.
+                Vector3 originalPosition = replacement.BuildingInfo.m_props[replacement.PropIndex].m_position;
+
+                // Check for any active replacements; if there are any, retrieve the original prop position.
+                if (BuildingHandlers.GetHandler(replacement.BuildingInfo, replacement.PropIndex) is BuildingPropHandler handler)
+                {
+                    originalPosition = handler.OriginalPosition;
+                }
+
+                // Record original values.
+                replacement.Xpos = originalPosition.x;
+                replacement.Ypos = originalPosition.y;
+                replacement.Zpos = originalPosition.z;
+            }
+
             // Check index bounds.
-            if (replacement.BuildingInfo.m_props == null || replacement.PropIndex < 0 || replacement.PropIndex >= replacement.BuildingInfo.m_props.Length)
+            if (replacement.PropIndex < 0 || replacement.PropIndex >= replacement.BuildingInfo.m_props.Length)
             {
                 Logging.Message("ignoring invalid individual building replacement index ", replacement.PropIndex, " for building ", replacement.BuildingInfo.name);
                 return;

@@ -312,6 +312,7 @@ namespace BOB
                                     targetBuildingItem.OriginalPrefab,
                                     replacementPrefab,
                                     IndividualIndex,
+                                    targetBuildingItem.Position,
                                     m_rotationSlider.TrueValue,
                                     m_xSlider.TrueValue,
                                     m_ySlider.TrueValue,
@@ -328,6 +329,7 @@ namespace BOB
                                     targetBuildingItem.OriginalPrefab,
                                     replacementPrefab,
                                     -1,
+                                    Vector3.zero,
                                     m_rotationSlider.TrueValue,
                                     m_xSlider.TrueValue,
                                     m_ySlider.TrueValue,
@@ -344,6 +346,7 @@ namespace BOB
                                     targetBuildingItem.OriginalPrefab,
                                     replacementPrefab,
                                     -1,
+                                    Vector3.zero,
                                     m_rotationSlider.TrueValue,
                                     m_xSlider.TrueValue,
                                     m_ySlider.TrueValue,
@@ -514,6 +517,7 @@ namespace BOB
                     {
                         // Individual - set index to the current building prop indexes.
                         targetBuildingItem.PropIndex = propIndex;
+                        targetBuildingItem.Position = _selectedSubBuilding.m_props[propIndex].m_position;
                     }
                     else
                     {
@@ -610,6 +614,9 @@ namespace BOB
                     IsTree = SelectedReplacementPrefab is TreeInfo,
                     ReplacementName = SelectedReplacementPrefab.name,
                     Angle = m_rotationSlider.TrueValue,
+                    Xpos = m_xSlider.TrueValue,
+                    Ypos = m_ySlider.TrueValue,
+                    Zpos = m_zSlider.TrueValue,
                     OffsetX = m_xSlider.TrueValue,
                     OffsetY = m_ySlider.TrueValue,
                     OffsetZ = m_zSlider.TrueValue,

@@ -241,8 +241,32 @@ namespace BOB
             /// <summary>
             /// Gets or sets the target prop index.
             /// </summary>
-            [XmlAttribute("index")]
+            [XmlIgnore]
             public int PropIndex { get; set; } = -1;
+
+            /// <summary>
+            /// Gets or sets the target prop index (legacy conversion).
+            /// </summary>
+            [XmlAttribute("index")]
+            public int LegacyIndex { get => -1; set => PropIndex = value; }
+
+            /// <summary>
+            /// Gets or sets the target's original x-position.
+            /// </summary>
+            [XmlAttribute("xPos")]
+            public float Xpos { get; set; } = 0f;
+
+            /// <summary>
+            /// Gets or sets the target's original y-position.
+            /// </summary>
+            [XmlAttribute("yPos")]
+            public float Ypos { get; set; } = 0f;
+
+            /// <summary>
+            /// Gets or sets the target's original z-position.
+            /// </summary>
+            [XmlAttribute("zPos")]
+            public float Zpos { get; set; } = 0f;
 
             /// <summary>
             /// Gets or sets the angle (rotation) adjustment.

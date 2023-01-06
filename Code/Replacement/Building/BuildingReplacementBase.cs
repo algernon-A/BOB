@@ -8,6 +8,7 @@ namespace BOB
     using System;
     using System.Collections.Generic;
     using AlgernonCommons;
+    using UnityEngine;
 
     /// <summary>
     /// Base class for building replacement.
@@ -31,6 +32,7 @@ namespace BOB
         /// <param name="targetInfo">Targeted (original) prop prefab.</param>
         /// <param name="replacementInfo">Replacment prop prefab.</param>
         /// <param name="propIndex">Prop index to apply replacement to (ignored).</param>
+        /// <param name="position">Target prop position.</param>
         /// <param name="angle">Replacment prop angle adjustment.</param>
         /// <param name="offsetX">Replacment X position offset.</param>
         /// <param name="offsetY">Replacment Y position offset.</param>
@@ -38,7 +40,7 @@ namespace BOB
         /// <param name="probability">Replacement probability.</param>
         /// <param name="customHeight">Replacement custom height flag.</param>
         /// <param name="existingReplacement">Existing replacement record (null if none).</param>
-        internal void Replace(BuildingInfo buildingInfo, PrefabInfo targetInfo, PrefabInfo replacementInfo, int propIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability, bool customHeight, BOBConfig.BuildingReplacement existingReplacement)
+        internal void Replace(BuildingInfo buildingInfo, PrefabInfo targetInfo, PrefabInfo replacementInfo, int propIndex, Vector3 position, float angle, float offsetX, float offsetY, float offsetZ, int probability, bool customHeight, BOBConfig.BuildingReplacement existingReplacement)
         {
             // Null checks.
             if (targetInfo?.name == null || replacementInfo?.name == null)
@@ -62,6 +64,9 @@ namespace BOB
                         Target = targetInfo.name,
                         TargetInfo = targetInfo,
                         PropIndex = propIndex,
+                        Xpos = position.x,
+                        Ypos = position.y,
+                        Zpos = position.z,
                     };
                     ReplacementEntry(buildingInfo).Add(thisReplacement);
                 }

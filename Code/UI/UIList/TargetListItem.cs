@@ -29,6 +29,11 @@ namespace BOB
         internal List<int> PropIndexes = new List<int>();
 
         /// <summary>
+        /// The position of this item.
+        /// </summary>
+        internal Vector3 Position = Vector3.zero;
+
+        /// <summary>
         /// Whether or not to show probabilities.
         /// </summary>
         internal bool ShowProbs = false;
@@ -191,6 +196,9 @@ namespace BOB
 
                     // Adjust name label to accomodate index label width.
                     _nameLabel.relativePosition = new Vector2((targetItem.PropIndex >= 0 ? IndexWidth : 0) + IndexLabelX + Margin, 0f);
+
+                    // Set tooltip.
+                    tooltip = targetItem.Position.x.ToString() + ":" + targetItem.Position.y.ToString() + ":" + targetItem.Position.z.ToString();
                 }
                 else
                 {
@@ -198,6 +206,7 @@ namespace BOB
                     _indexLabel.text = string.Empty;
                     _nameLabel.text = string.Empty;
                     _lineSprite.Hide();
+                    tooltip = null;
                 }
 
                 // Set initial background as deselected state.
