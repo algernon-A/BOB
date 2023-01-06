@@ -1,6 +1,6 @@
 ﻿Version 0.9.8 -
 
-- Swtich to position- instead of index-based targeting for individual prop replacements
+- Swtich to position- instead of index-based targeting for individual building prop replacements
 - Fix map tree replacement resetting to prop mode after applying replacement
 - Add error notification when random prop or tree template can't be loadedS
 
