@@ -2,7 +2,7 @@
 
 - Swtich to position- instead of index-based targeting for individual building prop replacements
 - Fix map tree replacement resetting to prop mode after applying replacement
-- Add error notification when random prop or tree template can't be loadedS
+- Add error notification when random prop or tree template can't be loaded
 
 
 Version 0.9.7.2 -
