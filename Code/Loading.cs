@@ -75,6 +75,9 @@ namespace BOB
                 ElectricalWires.Instance.ApplyThinnerWires();
             }
 
+            // Ensure tree tool state.
+            PatcherManager<Patcher>.Instance.DisableTreeTool(ModSettings.DisableTreeTool);
+
             // Force update of any dirty net or building prefabs from replacement process.
             Logging.Message("updating dirty prefabs");
             BuildingData.Update();

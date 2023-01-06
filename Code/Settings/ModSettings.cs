@@ -147,7 +147,11 @@ namespace BOB
             set
             {
                 _disableTreeTool = value;
-                PatcherManager<Patcher>.Instance.DisableTreeTool(value);
+
+                if (PatcherManager<Patcher>.IsReady)
+                {
+                    PatcherManager<Patcher>.Instance?.DisableTreeTool(value);
+                }
             }
         }
 
