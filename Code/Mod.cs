@@ -37,6 +37,8 @@ namespace BOB
         {
             base.OnEnabled();
 
+            Logging.DetailLogging = true;
+
             // Set up exception notifications.
             Logging.EventExceptionOccured += BOBPanelManager.RecordException;
         }
