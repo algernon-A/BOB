@@ -97,10 +97,7 @@ namespace BOB
             }
             else
             {
-                // Legacy index found; ensure we record the prop position.
-
-
-                // Get current position.
+                // Legacy index found; ensure we record the currrent prop position.
                 Vector3 originalPosition = replacement.BuildingInfo.m_props[replacement.PropIndex].m_position;
 
                 // Check for any active replacements; if there are any, retrieve the original prop position.
