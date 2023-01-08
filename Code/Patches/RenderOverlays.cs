@@ -89,8 +89,8 @@ namespace BOB
             foreach (OverlayData data in Overlays)
             {
                 float yPos = data.Position.y;
-                float minY = yPos - 1f;
-                float maxY = yPos + data.Height + 1f;
+                float minY = yPos - 1024f;
+                float maxY = yPos + data.Height;
 
                 renderManager.OverlayEffect.DrawCircle(cameraInfo, circleColor, data.Position, data.Radius, minY, maxY, false, true);
                 renderManager.OverlayEffect.DrawCircle(cameraInfo, effectColor, data.Position, data.Radius + effectRadius, minY, maxY, false, true);
