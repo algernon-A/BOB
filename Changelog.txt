@@ -1,4 +1,9 @@
-﻿Version 0.9.8 -
+﻿Version 0.9.8.1 hotfix -
+
+- Fix indivdual network replacement saving (missed index override commit)
+
+
+Version 0.9.8 -
 
 - Swtich to position- instead of index-based targeting for individual building prop replacements
 - Fix map tree replacement resetting to prop mode after applying replacement
