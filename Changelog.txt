@@ -1,4 +1,5 @@
-﻿- Increase highlighting negative Y range (to better identify elevated props)
+﻿- Add additional index bounds check to building prop deserialization
+- Increase highlighting negative Y range (to better identify elevated props)
 
 
 Version 0.9.8.1 hotfix -

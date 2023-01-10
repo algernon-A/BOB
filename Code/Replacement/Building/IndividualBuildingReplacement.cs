@@ -97,19 +97,30 @@ namespace BOB
             }
             else
             {
-                // Legacy index found; ensure we record the currrent prop position.
-                Vector3 originalPosition = replacement.BuildingInfo.m_props[replacement.PropIndex].m_position;
-
-                // Check for any active replacements; if there are any, retrieve the original prop position.
-                if (BuildingHandlers.GetHandler(replacement.BuildingInfo, replacement.PropIndex) is BuildingPropHandler handler)
+                // Legacy index found - check bounds.
+                BuildingInfo.Prop[] props = replacement.BuildingInfo.m_props;
+                if (replacement.PropIndex < props.Length)
                 {
-                    originalPosition = handler.OriginalPosition;
-                }
+                    // Record the currrent (original) prop position.
+                    Vector3 originalPosition = props[replacement.PropIndex].m_position;
 
-                // Record original values.
-                replacement.Xpos = originalPosition.x;
-                replacement.Ypos = originalPosition.y;
-                replacement.Zpos = originalPosition.z;
+                    // Check for any active replacements; if there are any, retrieve the original prop position.
+                    if (BuildingHandlers.GetHandler(replacement.BuildingInfo, replacement.PropIndex) is BuildingPropHandler handler)
+                    {
+                        originalPosition = handler.OriginalPosition;
+                    }
+
+                    // Record original values.
+                    replacement.Xpos = originalPosition.x;
+                    replacement.Ypos = originalPosition.y;
+                    replacement.Zpos = originalPosition.z;
+                }
+                else
+                {
+                    // Invalid index - don't do anything.
+                    Logging.Error("invalid individual building prop index of ", replacement.PropIndex, " for building ", replacement.BuildingInfo.name, " with props length ", props.Length);
+                    return;
+                }
             }
 
             // Check index bounds.
