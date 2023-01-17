@@ -54,16 +54,22 @@ namespace BOB
         protected override void ApplyReplacement(BOBConfig.BuildingReplacement replacement)
         {
             // Don't do anything if prefabs can't be found.
-            if (replacement?.TargetInfo == null || replacement.ReplacementInfo == null || replacement.BuildingInfo?.m_props == null)
+            if (replacement?.TargetInfo == null || replacement.ReplacementInfo == null)
             {
+                return;
+            }
+
+            // Don't do anything if prop array can't be found.
+            BuildingInfo.Prop[] props = replacement.BuildingInfo.m_props;
+            if (props == null)
+            {
+                Logging.Error("attempt to apply individual building replacement with null building prop array for building ", replacement.BuildingInfo.name);
                 return;
             }
 
             // Find propIndex.
             if (replacement.PropIndex < 0)
             {
-                Logging.Message("looking for individual index match for target prop ", replacement.TargetInfo?.name);
-                BuildingInfo.Prop[] props = replacement.BuildingInfo.m_props;
                 for (int i = 0; i < props.Length; ++i)
                 {
                     BuildingInfo.Prop prop = props[i];
@@ -98,7 +104,6 @@ namespace BOB
             else
             {
                 // Legacy index found - check bounds.
-                BuildingInfo.Prop[] props = replacement.BuildingInfo.m_props;
                 if (replacement.PropIndex < props.Length)
                 {
                     // Record the currrent (original) prop position.

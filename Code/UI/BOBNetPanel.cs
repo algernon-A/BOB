@@ -14,6 +14,7 @@ namespace BOB
     using AlgernonCommons.UI;
     using ColossalFramework;
     using ColossalFramework.UI;
+    using UnityEngine;
 
     /// <summary>
     /// BOB network tree/prop replacement panel.
@@ -307,6 +308,7 @@ namespace BOB
                                     replacementPrefab,
                                     IndividualLane,
                                     IndividualIndex,
+                                    targetNetItem.Position,
                                     m_rotationSlider.TrueValue,
                                     m_xSlider.TrueValue,
                                     m_ySlider.TrueValue,
@@ -324,6 +326,7 @@ namespace BOB
                                     replacementPrefab,
                                     -1,
                                     -1,
+                                    Vector3.zero,
                                     m_rotationSlider.TrueValue,
                                     m_xSlider.TrueValue,
                                     m_ySlider.TrueValue,
@@ -341,6 +344,7 @@ namespace BOB
                                     replacementPrefab,
                                     -1,
                                     -1,
+                                    Vector3.zero,
                                     m_rotationSlider.TrueValue,
                                     m_xSlider.TrueValue,
                                     m_ySlider.TrueValue,
@@ -539,6 +543,7 @@ namespace BOB
                             // Individual - set index to the current prop indexes.
                             targetNetItem.PropIndex = propIndex;
                             targetNetItem.LaneIndex = lane;
+                            targetNetItem.Position = laneProps[propIndex].m_position;
                         }
                         else
                         {
@@ -641,6 +646,9 @@ namespace BOB
                     IsTree = SelectedReplacementPrefab is TreeInfo,
                     ReplacementName = SelectedReplacementPrefab.name,
                     Angle = m_rotationSlider.TrueValue,
+                    Xpos = m_xSlider.TrueValue,
+                    Ypos = m_ySlider.TrueValue,
+                    Zpos = m_zSlider.TrueValue,
                     OffsetX = m_xSlider.TrueValue,
                     OffsetY = m_ySlider.TrueValue,
                     OffsetZ = m_zSlider.TrueValue,

@@ -1,4 +1,7 @@
-﻿Version 0.9.8.2 -
+﻿- Switch to position- instead of index-based targeting for individual network prop replacements
+
+
+Version 0.9.8.2 -
 
 - Add additional index bounds check to building prop deserialization
 - Increase highlighting negative Y range (to better identify elevated props)
@@ -11,7 +14,7 @@ Version 0.9.8.1 hotfix -
 
 Version 0.9.8 -
 
-- Swtich to position- instead of index-based targeting for individual building prop replacements
+- Switch to position- instead of index-based targeting for individual building prop replacements
 - Fix map tree replacement resetting to prop mode after applying replacement
 - Add error notification when random prop or tree template can't be loaded
 

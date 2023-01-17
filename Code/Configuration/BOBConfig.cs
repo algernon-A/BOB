@@ -248,7 +248,7 @@ namespace BOB
             /// Gets or sets the target prop index (legacy conversion).
             /// </summary>
             [XmlAttribute("index")]
-            public virtual int LegacyIndex { get => -1; set => PropIndex = value; }
+            public int LegacyIndex { get => -1; set => PropIndex = value; }
 
             /// <summary>
             /// Gets or sets the target's original x-position.
@@ -364,12 +364,6 @@ namespace BOB
         /// </summary>
         public class NetReplacement : Replacement
         {
-            /// <summary>
-            /// Gets or sets the target prop index (legacy conversion).
-            /// </summary>
-            [XmlAttribute("index")]
-            public override int LegacyIndex { get => PropIndex; set => PropIndex = value; }
-
             /// <summary>
             /// Gets or sets the target lane index.
             /// </summary>

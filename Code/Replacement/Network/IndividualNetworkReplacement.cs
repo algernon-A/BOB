@@ -7,6 +7,7 @@ namespace BOB
 {
     using System.Collections.Generic;
     using AlgernonCommons;
+    using UnityEngine;
 
     /// <summary>
     /// Class to manage individual network prop and tree replacements.
@@ -74,10 +75,80 @@ namespace BOB
                 return;
             }
 
-            // Check prop index.
-            if (thisLane.m_laneProps?.m_props == null || replacement.PropIndex < 0 || replacement.PropIndex >= thisLane.m_laneProps.m_props.Length)
+            // Don't do anything if prop array can't be found.
+            NetLaneProps.Prop[] props = thisLane.m_laneProps?.m_props;
+            if (props == null)
             {
-                Logging.Message("ignoring invalid individual network replacement prop index ", replacement.PropIndex, " for network ", replacement.NetInfo.name);
+                Logging.Error("attempt to apply individual network replacement with null lane  prop array for network ", replacement.NetInfo.name, " on lane ", replacement.LaneIndex);
+                return;
+            }
+
+            // Find propIndex.
+            if (replacement.PropIndex < 0)
+            {
+                Logging.Message("looking for individual index network match for target prop ", replacement.TargetInfo?.name);
+                for (int i = 0; i < props.Length; ++i)
+                {
+                    NetLaneProps.Prop prop = props[i];
+
+                    // Get prefab values.
+                    PropInfo originalProp = prop.m_finalProp;
+                    TreeInfo originalTree = prop.m_finalTree;
+                    Vector3 originalPosition = prop.m_position;
+
+                    // Check for any active replacements; if there are any, retrieve the original prop info.
+                    if (NetHandlers.GetHandler(thisLane, i) is LanePropHandler handler)
+                    {
+                        originalProp = handler.OriginalFinalProp;
+                        originalTree = handler.OriginalFinalTree;
+                        originalPosition = handler.OriginalPosition;
+                    }
+
+                    if (prop != null)
+                    {
+                        if ((replacement.IsTree && originalTree == replacement.TargetTree) || (!replacement.IsTree && originalProp == replacement.TargetProp))
+                        {
+                            if (replacement.Xpos == originalPosition.x && replacement.Ypos == originalPosition.y && replacement.Zpos == originalPosition.z)
+                            {
+                                Logging.Message("found index match at ", i);
+                                replacement.PropIndex = i;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // Legacy index found - check bounds.
+                if (replacement.PropIndex < props.Length)
+                {
+                    // Record the currrent (original) prop position.
+                    Vector3 originalPosition = props[replacement.PropIndex].m_position;
+
+                    // Check for any active replacements; if there are any, retrieve the original prop position.
+                    if (NetHandlers.GetHandler(thisLane, replacement.PropIndex) is LanePropHandler handler)
+                    {
+                        originalPosition = handler.OriginalPosition;
+                    }
+
+                    // Record original values.
+                    replacement.Xpos = originalPosition.x;
+                    replacement.Ypos = originalPosition.y;
+                    replacement.Zpos = originalPosition.z;
+                }
+                else
+                {
+                    // Invalid index - don't do anything.
+                    Logging.Error("invalid individual network prop index of ", replacement.PropIndex, " for network ", replacement.NetInfo.name, " and lane ", replacement.LaneIndex, " with props length ", props.Length);
+                    return;
+                }
+            }
+
+            // Check index bounds.
+            if (replacement.PropIndex < 0 || replacement.PropIndex >= thisLane.m_laneProps.m_props.Length)
+            {
+                Logging.Message("ignoring invalid individual network replacement prop index ", replacement.PropIndex, " for network ", replacement.NetInfo.name, " on lane ", replacement.LaneIndex);
                 return;
             }
 
@@ -87,7 +158,7 @@ namespace BOB
                 return;
             }
 
-            // Check prop.
+            // Check prop for null.
             NetLaneProps.Prop thisLaneProp = thisLane.m_laneProps.m_props[replacement.PropIndex];
             if (thisLaneProp == null)
             {

@@ -8,6 +8,7 @@ namespace BOB
     using System;
     using System.Collections.Generic;
     using AlgernonCommons;
+    using UnityEngine;
 
     /// <summary>
     /// Base class for network replacement.
@@ -32,6 +33,7 @@ namespace BOB
         /// <param name="replacementInfo">Replacment prop prefab.</param>
         /// <param name="laneIndex">Targeted lane index (in parent network).</param>
         /// <param name="propIndex">Prop index to apply replacement to.</param>
+        /// <param name="position">Target prop position.</param>
         /// <param name="angle">Replacment prop angle adjustment.</param>
         /// <param name="offsetX">Replacment X position offset.</param>
         /// <param name="offsetY">Replacment Y position offset.</param>
@@ -39,7 +41,7 @@ namespace BOB
         /// <param name="probability">Replacement probability.</param>
         /// <param name="repeatDistance">Replacement repeat distance.</param>
         /// <param name="existingReplacement">Existing replacement record (null if none).</param>
-        internal void Replace(NetInfo netInfo, PrefabInfo targetInfo, PrefabInfo replacementInfo, int laneIndex, int propIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability, float repeatDistance, BOBConfig.NetReplacement existingReplacement)
+        internal void Replace(NetInfo netInfo, PrefabInfo targetInfo, PrefabInfo replacementInfo, int laneIndex, int propIndex, Vector3 position, float angle, float offsetX, float offsetY, float offsetZ, int probability, float repeatDistance, BOBConfig.NetReplacement existingReplacement)
         {
             // Null checks.
             if (targetInfo?.name == null || replacementInfo?.name == null)
@@ -64,6 +66,9 @@ namespace BOB
                         TargetInfo = targetInfo,
                         PropIndex = propIndex,
                         LaneIndex = laneIndex,
+                        Xpos = position.x,
+                        Ypos = position.y,
+                        Zpos = position.z,
                     };
                     ReplacementEntry(netInfo).Add(thisReplacement);
                 }
