@@ -5,7 +5,7 @@
 		<AssemblyTitle>$(Title)</AssemblyTitle>
 		<Description>A Cities: Skylines mod.</Description>
 		<Authors>algernon</Authors>
-		<Copyright>Copyright © 2021-22 algernon</Copyright>
+		<Copyright>Copyright © 2021-23 algernon</Copyright>
 		<Product>$(Title)</Product>
 		<Version>0.9.9</Version>
 		<LibrariesPath>$(ProjectDir)/Libraries</LibrariesPath>
