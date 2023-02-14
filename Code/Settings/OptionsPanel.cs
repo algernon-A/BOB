@@ -33,5 +33,14 @@ namespace BOB
             tabstrip.selectedIndex = -1;
             tabstrip.selectedIndex = 0;
         }
+
+        /// <summary>
+        /// Called by the game when the component is destroyed.
+        /// </summary>
+        public override void OnDestroy()
+        {
+            // Re-enable hotkey threading.
+            HotkeyThreading.Operating = true;
+        }
     }
 }

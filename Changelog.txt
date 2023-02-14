@@ -1,4 +1,7 @@
-﻿Version 0.9.9 -
+﻿- Fix vanilla network tree tool toggle hotkey not working after options panel is opened
+
+
+Version 0.9.9 -
 
 - Switch to position- instead of index-based targeting for individual network prop replacements
 - Update CitiesHarmony
