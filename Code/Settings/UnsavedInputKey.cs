@@ -22,7 +22,7 @@ namespace BOB
         /// <param name="shift">Shift modifier key status.</param>
         /// <param name="alt">Alt modifier key status.</param>
         public UnsavedInputKey(string name, KeyCode keyCode, bool control, bool shift, bool alt)
-            : base(keyName: name, modName: "TransferController", Encode(keyCode, control: control, shift: shift, alt: alt))
+            : base(keyName: name, modName: "BOB", Encode(keyCode, control: control, shift: shift, alt: alt))
         {
         }
 

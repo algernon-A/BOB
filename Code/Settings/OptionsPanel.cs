@@ -41,6 +41,8 @@ namespace BOB
         {
             // Re-enable hotkey threading.
             HotkeyThreading.Operating = true;
+
+            base.OnDestroy();
         }
     }
 }
