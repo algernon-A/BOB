@@ -7,17 +7,15 @@
 		<Authors>algernon</Authors>
 		<Copyright>Copyright © 2021-23 algernon</Copyright>
 		<Product>$(Title)</Product>
-		<Version>0.9.9.1</Version>
+		<Version>0.9.9.2</Version>
 		<LibrariesPath>$(ProjectDir)/Libraries</LibrariesPath>
 		<ManagedDLLPath>$(MSBuildProgramFiles32)/Steam/steamapps/common/Cities_Skylines/Cities_Data/Managed</ManagedDLLPath>
-		<TreeAnarchyPath>$(MSBuildProgramFiles32)/Steam/steamapps/workshop/content/255710/2527486462</TreeAnarchyPath>
-		<TreeAnarchyBetaPath>$(MSBuildProgramFiles32)/Steam/steamapps/workshop/content/255710/2584051448</TreeAnarchyBetaPath>
+		<TreeAnarchyPath>$(MSBuildProgramFiles32)/Steam/steamapps/workshop/content/255710/2949127622</TreeAnarchyPath>
 		<AssemblySearchPaths>
 			$(AssemblySearchPaths);
 			$(ManagedDLLPath);
 			$(LibrariesPath);
 			$(TreeAnarchyPath);
-			$(TreeAnarchyBetaPath);
 		</AssemblySearchPaths>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>

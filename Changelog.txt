@@ -1,4 +1,9 @@
-﻿Version 0.9.9.1 -
+﻿Version 0.9.9.2 -
+
+- Update EManagersLib.API
+
+
+Version 0.9.9.1 -
 
 - Fix vanilla network tree tool toggle hotkey not working after options panel is opened
 
