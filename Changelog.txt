@@ -1,4 +1,7 @@
-﻿Version 0.9.9.2 -
+﻿- Update overlay transpilers (fix tree overlays not working in game version 1.16.1)
+
+
+Version 0.9.9.2 -
 
 - Update EManagersLib.API
 
@@ -32,7 +35,7 @@ Version 0.9.8 -
 - Add error notification when random prop or tree template can't be loaded
 
 
-Version 0.9.7.2 -
+Version 0.9.7.2 -0
 
 - Reduce minimum scaling to 0.1
 - Update AlgernonCommons

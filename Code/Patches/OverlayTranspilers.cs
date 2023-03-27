@@ -5,10 +5,13 @@
 
 namespace BOB
 {
+    using System;
     using System.Collections.Generic;
+    using System.Reflection;
     using System.Reflection.Emit;
     using AlgernonCommons;
     using HarmonyLib;
+    using UnityEngine;
 
     /// <summary>
     /// Harmony transpilers for registering overlays to render.
@@ -28,24 +31,23 @@ namespace BOB
             const int BuildingInfoPropIndex = 12;
             const int TreeVarIndex = 15;
             const int TreePositionVarIndex = 29;
-            const int DataVector2VarIndex = 30;
 
             // ILCode argument indexes.
             const int BuildingArg = 3;
-
-            // Instruction parsing.
-            IEnumerator<CodeInstruction> instructionsEnumerator = instructions.GetEnumerator();
-            CodeInstruction instruction;
 
             // Original TreeInfo (pre-variations).
             bool foundTreeInfo = false;
             LocalBuilder originalTreeInfo = generator.DeclareLocal(typeof(TreeInfo));
 
+            // Tree renderer call.
+            MethodInfo renderTree = AccessTools.Method(
+                typeof(global::TreeInstance),
+                nameof(global::TreeInstance.RenderInstance),
+                new Type[] { typeof(RenderManager.CameraInfo), typeof(TreeInfo), typeof(Vector3), typeof(float), typeof(float), typeof(Vector4), typeof(bool) });
+
             // Iterate through all instructions in original method.
-            while (instructionsEnumerator.MoveNext())
+            foreach (CodeInstruction instruction in instructions)
             {
-                // Get next instruction and add it to output.
-                instruction = instructionsEnumerator.Current;
                 yield return instruction;
 
                 // Is this stloc.s?
@@ -72,28 +74,16 @@ namespace BOB
                     }
                 }
 
-                // Tree candidate - ldloc.s 2
-                if (instruction.opcode == OpCodes.Ldloc_S && instruction.operand is LocalBuilder localBuilder2 && localBuilder2.LocalIndex == DataVector2VarIndex)
+                // Is this new instruction a call to Void RenderInstance?
+                if (instruction.Calls(renderTree))
                 {
-                    // Found a possible candidate - are there following instructions?
-                    if (instructionsEnumerator.MoveNext())
-                    {
-                        // Yes - get the next instruction.
-                        instruction = instructionsEnumerator.Current;
-                        yield return instruction;
-
-                        // Is this new instruction a call to Void RenderInstance?
-                        if (instruction.opcode == OpCodes.Call && instruction.operand.ToString().StartsWith("Void RenderInstance"))
-                        {
-                            // Yes - insert call to PropOverlays.Highlight method after original call.
-                            Logging.KeyMessage("adding building HighlightTree call after RenderInstance");
-                            yield return new CodeInstruction(OpCodes.Ldloc_S, IVarIndex);
-                            yield return new CodeInstruction(OpCodes.Ldloc_S, originalTreeInfo);
-                            yield return new CodeInstruction(OpCodes.Ldarg_S, BuildingArg);
-                            yield return new CodeInstruction(OpCodes.Ldloc_S, TreePositionVarIndex);
-                            yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(RenderOverlays), nameof(RenderOverlays.HighlightBuildingTree)));
-                        }
-                    }
+                    // Yes - insert call to PropOverlays.Highlight method after original call.
+                    Logging.KeyMessage("adding building HighlightTree call after RenderInstance");
+                    yield return new CodeInstruction(OpCodes.Ldloc_S, IVarIndex);
+                    yield return new CodeInstruction(OpCodes.Ldloc_S, originalTreeInfo);
+                    yield return new CodeInstruction(OpCodes.Ldarg_S, BuildingArg);
+                    yield return new CodeInstruction(OpCodes.Ldloc_S, TreePositionVarIndex);
+                    yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(RenderOverlays), nameof(RenderOverlays.HighlightBuildingTree)));
                 }
             }
         }
@@ -106,89 +96,61 @@ namespace BOB
         public static IEnumerable<CodeInstruction> NetTranspiler(IEnumerable<CodeInstruction> instructions)
         {
             // ILCode local variable indexes.
-            const int SurfaceMapping2Index = 9;
             const int propLoopIndex = 11;
             const int PropVarIndex = 16;
             const int PropPositionVarIndex = 23;
             const int TreeVarIndex = 31;
-            const int TreePositionVarIndex = 39;
+            const int TreePositionVarIndex = 40;
 
             // ILCode argument indexes.
             const int LaneInfoArg = 4;
 
-            // Instruction parsing.
-            IEnumerator<CodeInstruction> instructionsEnumerator = instructions.GetEnumerator();
-            CodeInstruction instruction;
-            bool foundPropCandidate = false, foundTreeCandidate = false;
-            string methodName;
-            int prefabIndex, positionIndex;
+            // Prop renderer method 1.
+            MethodInfo renderProp1 = AccessTools.Method(
+                typeof(PropInstance),
+                nameof(PropInstance.RenderInstance),
+                new Type[] { typeof(RenderManager.CameraInfo), typeof(PropInfo), typeof(InstanceID), typeof(Vector3), typeof(float), typeof(float), typeof(Color), typeof(Vector4), typeof(bool) });
+
+            // Prop renderer method 2.
+            MethodInfo renderProp2 = AccessTools.Method(
+                typeof(PropInstance),
+                nameof(PropInstance.RenderInstance),
+                new Type[] { typeof(RenderManager.CameraInfo), typeof(PropInfo), typeof(InstanceID), typeof(Vector3), typeof(float), typeof(float), typeof(Color), typeof(Vector4), typeof(bool), typeof(Texture), typeof(Vector4), typeof(Vector4), typeof(Texture), typeof(Vector4), typeof(Vector4) });
+
+            // Tree renderer call.
+            MethodInfo renderTree = AccessTools.Method(
+                typeof(global::TreeInstance),
+                nameof(global::TreeInstance.RenderInstance),
+                new Type[] { typeof(RenderManager.CameraInfo), typeof(TreeInfo), typeof(Vector3), typeof(float), typeof(float), typeof(Vector4), typeof(bool) });
 
             // Iterate through all instructions in original method.
-            while (instructionsEnumerator.MoveNext())
+            foreach (CodeInstruction instruction in instructions)
             {
                 // Get next instruction and add it to output.
-                instruction = instructionsEnumerator.Current;
                 yield return instruction;
 
-                // Looking for possible precursor calls to "Void RenderInstance".
-                if (instruction.opcode == OpCodes.Ldloc_S && instruction.operand is LocalBuilder localBuilder && localBuilder.LocalIndex == SurfaceMapping2Index)
+                if (instruction.Calls(renderProp1) || instruction.Calls(renderProp2))
                 {
-                    // ldloc.s 9
-                    foundPropCandidate = true;
+                    // Insert call to PropOverlays.Highlight method after original call.
+                    Logging.KeyMessage("adding network HighlightProp call after RenderInstance");
+                    yield return new CodeInstruction(OpCodes.Ldloc_S, PropVarIndex);
+                    yield return new CodeInstruction(OpCodes.Ldloc_S, PropPositionVarIndex);
+                    yield return new CodeInstruction(OpCodes.Ldarg_2); // segment ID
+                    yield return new CodeInstruction(OpCodes.Ldarg_S, LaneInfoArg); // NetInfo.Lane
+                    yield return new CodeInstruction(OpCodes.Ldloc_S, propLoopIndex); // index
+                    yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(RenderOverlays), nameof(RenderOverlays.HighlightNetworkProp)));
                 }
-                else if (instruction.opcode == OpCodes.Ldc_I4_1)
+                else
+                if (instruction.Calls(renderTree))
                 {
-                    // ldc.i4.1.
-                    foundPropCandidate = true;
-                }
-                else if (instruction.opcode == OpCodes.Ldsfld)
-                {
-                    // Tree candidate - ldsfld
-                    foundTreeCandidate = true;
-                }
-
-                // Did we find a possible candidate?
-                if (foundPropCandidate || foundTreeCandidate)
-                {
-                    // Yes - are there following instructions?
-                    if (instructionsEnumerator.MoveNext())
-                    {
-                        // Yes - get the next instruction.
-                        instruction = instructionsEnumerator.Current;
-                        yield return instruction;
-
-                        // Is this new instruction a call to Void RenderInstance?
-                        if (instruction.opcode == OpCodes.Call && instruction.operand.ToString().StartsWith("Void RenderInstance"))
-                        {
-                            // Yes - prop or tree?
-                            if (foundPropCandidate)
-                            {
-                                // Prop.
-                                prefabIndex = PropVarIndex;
-                                positionIndex = PropPositionVarIndex;
-                                methodName = nameof(RenderOverlays.HighlightNetworkProp);
-                            }
-                            else
-                            {
-                                // Tree.
-                                prefabIndex = TreeVarIndex;
-                                positionIndex = TreePositionVarIndex;
-                                methodName = nameof(RenderOverlays.HighlightNetworkTree);
-                            }
-
-                            // Insert call to PropOverlays.Highlight method after original call.
-                            yield return new CodeInstruction(OpCodes.Ldloc_S, prefabIndex);
-                            yield return new CodeInstruction(OpCodes.Ldloc_S, positionIndex);
-                            yield return new CodeInstruction(OpCodes.Ldarg_2); // segment ID
-                            yield return new CodeInstruction(OpCodes.Ldarg_S, LaneInfoArg); // NetInfo.Lane
-                            yield return new CodeInstruction(OpCodes.Ldloc_S, propLoopIndex); // index
-                            yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(RenderOverlays), methodName));
-                        }
-                    }
-
-                    // Reset flags for next pass.
-                    foundPropCandidate = false;
-                    foundTreeCandidate = false;
+                    // Insert call to PropOverlays.Highlight method after original call.
+                    Logging.KeyMessage("adding network HighlightTree call after RenderInstance");
+                    yield return new CodeInstruction(OpCodes.Ldloc_S, TreeVarIndex);
+                    yield return new CodeInstruction(OpCodes.Ldloc_S, TreePositionVarIndex);
+                    yield return new CodeInstruction(OpCodes.Ldarg_2); // segment ID
+                    yield return new CodeInstruction(OpCodes.Ldarg_S, LaneInfoArg); // NetInfo.Lane
+                    yield return new CodeInstruction(OpCodes.Ldloc_S, propLoopIndex); // index
+                    yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(RenderOverlays), nameof(RenderOverlays.HighlightNetworkTree)));
                 }
             }
         }
@@ -203,38 +165,25 @@ namespace BOB
             // ILCode local variable indexes.
             const int TreeVarIndex = 0;
             const int TreePositionVarIndex = 1;
-            const int DefaultColorLocationVarIndex = 5;
 
-            // Instruction parsing.
-            IEnumerator<CodeInstruction> instructionsEnumerator = instructions.GetEnumerator();
-            CodeInstruction instruction;
+            // Tree renderer call.
+            MethodInfo renderTree = AccessTools.Method(
+                typeof(global::TreeInstance),
+                nameof(global::TreeInstance.RenderInstance),
+                new Type[] { typeof(RenderManager.CameraInfo), typeof(TreeInfo), typeof(Vector3), typeof(float), typeof(float), typeof(Vector4), typeof(bool) });
 
             // Iterate through all instructions in original method.
-            while (instructionsEnumerator.MoveNext())
+            foreach (CodeInstruction instruction in instructions)
             {
-                // Get next instruction and add it to output.
-                instruction = instructionsEnumerator.Current;
                 yield return instruction;
 
-                // Looking for possible precursor calls to "Void RenderInstance".
-                if (instruction.opcode == OpCodes.Ldloc_S && instruction.operand is LocalBuilder localBuilder && localBuilder.LocalIndex == DefaultColorLocationVarIndex)
+                // Does this instruction call TreeInstance.RenderTree?
+                if (instruction.Calls(renderTree))
                 {
-                    // Found ldloc.1 - are there following instructions?
-                    if (instructionsEnumerator.MoveNext())
-                    {
-                        // Yes - get the next instruction.
-                        instruction = instructionsEnumerator.Current;
-                        yield return instruction;
-
-                        // Is this new instruction a call to Void RenderInstance?
-                        if (instruction.opcode == OpCodes.Call && instruction.operand.ToString().StartsWith("Void RenderInstance"))
-                        {
-                            // Yes - insert call to PropOverlays.Highlight method after original call.
-                            yield return new CodeInstruction(OpCodes.Ldloc_S, TreeVarIndex);
-                            yield return new CodeInstruction(OpCodes.Ldloc_S, TreePositionVarIndex);
-                            yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(RenderOverlays), nameof(RenderOverlays.HighlightTree)));
-                        }
-                    }
+                    // Yes - insert call to PropOverlays.Highlight method after original call.
+                    yield return new CodeInstruction(OpCodes.Ldloc_S, TreeVarIndex);
+                    yield return new CodeInstruction(OpCodes.Ldloc_S, TreePositionVarIndex);
+                    yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(RenderOverlays), nameof(RenderOverlays.HighlightTree)));
                 }
             }
         }
@@ -250,19 +199,31 @@ namespace BOB
             const int PropVarIndex = 0;
             const int PropPositionVarIndex = 1;
 
-            // Instruction parsing.
-            IEnumerator<CodeInstruction> instructionsEnumerator = instructions.GetEnumerator();
-            CodeInstruction instruction;
+            // Prop renderer method 1.
+            MethodInfo renderProp1 = AccessTools.Method(
+                typeof(PropInstance),
+                nameof(PropInstance.RenderInstance),
+                new Type[] { typeof(RenderManager.CameraInfo), typeof(PropInfo), typeof(InstanceID), typeof(Vector3), typeof(float), typeof(float), typeof(Color), typeof(Vector4), typeof(bool) });
+
+            // Prop renderer method 2.
+            MethodInfo renderProp2 = AccessTools.Method(
+                typeof(PropInstance),
+                nameof(PropInstance.RenderInstance),
+                new Type[] { typeof(RenderManager.CameraInfo), typeof(PropInfo), typeof(InstanceID), typeof(Vector3), typeof(float), typeof(float), typeof(Color), typeof(Vector4), typeof(bool), typeof(Texture), typeof(Vector4), typeof(Vector4) });
+
+            // Prop renderer method 3.
+            MethodInfo renderProp3 = AccessTools.Method(
+                typeof(PropInstance),
+                nameof(PropInstance.RenderInstance),
+                new Type[] { typeof(RenderManager.CameraInfo), typeof(PropInfo), typeof(InstanceID), typeof(Vector3), typeof(float), typeof(float), typeof(Color), typeof(Vector4), typeof(bool), typeof(Texture), typeof(Vector4), typeof(Vector4), typeof(Texture), typeof(Vector4), typeof(Vector4) });
 
             // Iterate through all instructions in original method.
-            while (instructionsEnumerator.MoveNext())
+            foreach (CodeInstruction instruction in instructions)
             {
-                // Get next instruction and add it to output.
-                instruction = instructionsEnumerator.Current;
                 yield return instruction;
 
-                // Is this instruction a call to Void RenderInstance?
-                if (instruction.opcode == OpCodes.Call && instruction.operand.ToString().StartsWith("Void RenderInstance"))
+                // Is this instruction a call to PropInstance.RenderInstance?
+                if (instruction.Calls(renderProp1) || instruction.Calls(renderProp2) || instruction.Calls(renderProp3))
                 {
                     // Yes - insert call to PropOverlays.Highlight method after original call.
                     yield return new CodeInstruction(OpCodes.Ldloc_S, PropVarIndex);
