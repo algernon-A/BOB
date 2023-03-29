@@ -1,4 +1,6 @@
-﻿- Update overlay transpilers (fix tree overlays not working in game version 1.16.1)
+﻿Version 1.0 -
+
+- Update overlay transpilers (fix tree overlays not working in game version 1.16.1)
 
 
 Version 0.9.9.2 -
