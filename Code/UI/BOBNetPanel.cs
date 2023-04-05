@@ -26,48 +26,15 @@ namespace BOB
         private const float LaneX = ModeX + (ToggleSize * 3f) + Margin;
 
         // Panel components.
-        private readonly UIDropDown _laneMenu;
-        private readonly BOBSlider _repeatSlider;
+        private UIDropDown _laneMenu;
+        private BOBSlider _repeatSlider;
 
         // Event suppression.
         private bool _ignoreIndexChange = false;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BOBNetPanel"/> class.
-        /// </summary>
-        internal BOBNetPanel()
-        {
-            try
-            {
-                // Add lane menu
-                _laneMenu = UIDropDowns.AddDropDown(this, LaneX, ToggleY + 3f, MiddleX - LaneX);
-                UILabels.AddLabel(_laneMenu, 0f, -ToggleHeaderHeight - 3f, Translations.Translate("BOB_PNL_LAN"), textScale: 0.8f);
-                _laneMenu.tooltipBox = UIToolTips.WordWrapToolTip;
-                _laneMenu.tooltip = Translations.Translate("BOB_PNL_LAN_TIP");
-                _laneMenu.eventSelectedIndexChanged += LaneIndexChanged;
-                _laneMenu.isVisible = CurrentMode == ReplacementModes.Individual;
-                _laneMenu.BringToFront();
-
-                // Add pack button.
-                UIButton packButton = AddIconButton(this, PackButtonX, ToggleY, ToggleSize, "BOB_PNL_PKB", UITextures.LoadQuadSpriteAtlas("BOB-PropPack"));
-                packButton.eventClicked += (component, clickEvent) => StandalonePanelManager<BOBPackPanel>.Create();
-
-                // Add repeat slider.
-                UIPanel repeatPanel = Sliderpanel(this, MidControlX, RepeatSliderY + Margin, SliderHeight);
-                _repeatSlider = AddBOBSlider(repeatPanel, Margin, 0f, MidControlWidth - (Margin * 2f), "BOB_PNL_REP", 1.1f, 50f, 0.1f, "Repeat");
-                _repeatSlider.tooltip = Translations.Translate("BOB_PNL_REP_TIP");
-                _repeatSlider.parent.isVisible = CurrentMode == ReplacementModes.Individual;
-                _repeatSlider.EventTrueValueChanged += SliderChange;
-
-                // Regenerate replacement list.
-                RegenerateReplacementList();
-            }
-            catch (Exception e)
-            {
-                // Log and report any exception.
-                Logging.LogException(e, "exception creating network panel");
-            }
-        }
+        // Panel status.
+        private bool _panelReady = false;
+        private NetInfo _initialNetwork = null;
 
         /// <summary>
         /// Sets the current target item and updates button states accordingly.
@@ -200,6 +167,51 @@ namespace BOB
         private int SelectedLaneIndex => _laneMenu.selectedIndex - 1;
 
         /// <summary>
+        /// Called by Unity before the first frame is displayed.
+        /// Used to perform setup.
+        /// </summary>
+        public override void Start()
+        {
+            base.Start();
+            try
+            {
+                // Add lane menu
+                _laneMenu = UIDropDowns.AddDropDown(this, LaneX, ToggleY + 3f, MiddleX - LaneX);
+                UILabels.AddLabel(_laneMenu, 0f, -ToggleHeaderHeight - 3f, Translations.Translate("BOB_PNL_LAN"), textScale: 0.8f);
+                _laneMenu.tooltipBox = UIToolTips.WordWrapToolTip;
+                _laneMenu.tooltip = Translations.Translate("BOB_PNL_LAN_TIP");
+                _laneMenu.eventSelectedIndexChanged += LaneIndexChanged;
+                _laneMenu.isVisible = CurrentMode == ReplacementModes.Individual;
+                _laneMenu.BringToFront();
+
+                // Add pack button.
+                UIButton packButton = AddIconButton(this, PackButtonX, ToggleY, ToggleSize, "BOB_PNL_PKB", UITextures.LoadQuadSpriteAtlas("BOB-PropPack"));
+                packButton.eventClicked += (component, clickEvent) => StandalonePanelManager<BOBPackPanel>.Create();
+
+                // Add repeat slider.
+                UIPanel repeatPanel = Sliderpanel(this, MidControlX, RepeatSliderY + Margin, SliderHeight);
+                _repeatSlider = AddBOBSlider(repeatPanel, Margin, 0f, MidControlWidth - (Margin * 2f), "BOB_PNL_REP", 1.1f, 50f, 0.1f, "Repeat");
+                _repeatSlider.tooltip = Translations.Translate("BOB_PNL_REP_TIP");
+                _repeatSlider.parent.isVisible = CurrentMode == ReplacementModes.Individual;
+                _repeatSlider.EventTrueValueChanged += SliderChange;
+
+                // Activate panel.
+                _panelReady = true;
+
+                // Set initial parent.
+                SetTargetParent(_initialNetwork);
+
+                // Regenerate replacement list.
+                RegenerateReplacementList();
+            }
+            catch (Exception e)
+            {
+                // Log and report any exception.
+                Logging.LogException(e, "exception creating network panel");
+            }
+        }
+
+        /// <summary>
         /// Sets the target parent prefab.
         /// </summary>
         /// <param name="targetPrefabInfo">Target prefab to set.</param>
@@ -208,6 +220,13 @@ namespace BOB
             // Don't do anything if target hasn't changed.
             if (SelectedNet == targetPrefabInfo)
             {
+                return;
+            }
+
+            // Don't proceed further if panel isn't ready.
+            if (!_panelReady)
+            {
+                _initialNetwork = targetPrefabInfo as NetInfo;
                 return;
             }
 

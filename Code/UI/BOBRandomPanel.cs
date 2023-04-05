@@ -44,16 +44,16 @@ namespace BOB
         private const float NameFieldY = RandomButtonY - 22f - Margin;
 
         // Panel components.
-        private readonly UIList _randomList;
-        private readonly UIList _variationsList;
-        private readonly UIList _loadedList;
-        private readonly UIButton _removeRandomButton;
-        private readonly UIButton _renameButton;
-        private readonly UIButton _addVariationButton;
-        private readonly UIButton _removeVariationButton;
-        private readonly UITextField _nameField;
-        private readonly BOBSlider _probSlider;
-        private readonly PreviewPanel _previewPanel;
+        private UIList _randomList;
+        private UIList _variationsList;
+        private UIList _loadedList;
+        private UIButton _removeRandomButton;
+        private UIButton _renameButton;
+        private UIButton _addVariationButton;
+        private UIButton _removeVariationButton;
+        private UITextField _nameField;
+        private BOBSlider _probSlider;
+        private PreviewPanel _previewPanel;
 
         // Current selections.
         private BOBRandomPrefab _selectedRandomPrefab;
@@ -62,97 +62,9 @@ namespace BOB
         private BOBRandomPrefab.Variation _lastChangedVariant;
         private bool _ignoreValueChange = false;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BOBRandomPanel"/> class.
-        /// </summary>
-        internal BOBRandomPanel()
-        {
-            // Default position - centre in screen.
-            relativePosition = new Vector2(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
-
-            // Disable 'both' check.
-            m_propTreeChecks[(int)PropTreeModes.Both].Disable();
-            m_propTreeChecks[(int)PropTreeModes.Both].Hide();
-
-            // Selected random prop list.
-            _randomList = UIList.AddUIList<LoadedPrefabItem.DisplayRow>(this, RandomizerX, LeftListY, RandomizerWidth, LeftListHeight);
-            _randomList.EventSelectionChanged += (c, data) => SelectedRandomPrefab = data as BOBRandomPrefab;
-
-            // Variation selection list.
-            _variationsList = UIList.AddUIList<RandomComponentRow>(this, SelectedX, ListY, SelectedWidth, ListHeight);
-            _variationsList.EventSelectionChanged += (c, data) => SelectedVariation = data as BOBRandomPrefab.Variation;
-
-            // Loaded prop list.
-            _loadedList = UIList.AddUIList<LoadedPrefabItem.DisplayRow>(this, LoadedX, ListY, LoadedWidth, ListHeight);
-            _loadedList.EventSelectionChanged += (c, data) => SelectedLoadedPrefab = (data as LoadedPrefabItem)?.Prefab;
-
-            // Name change textfield.
-            _nameField = UITextFields.AddTextField(this, Margin, NameFieldY, RandomizerWidth);
-
-            // Add random prefab button.
-            UIButton addRandomButton = AddIconButton(this, Margin, RandomButtonY, ToggleSize, "BOB_RND_NEW", UITextures.LoadQuadSpriteAtlas("BOB-RoundPlus"));
-            addRandomButton.eventClicked += NewRandomPrefab;
-
-            // Remove random prefab button.
-            _removeRandomButton = AddIconButton(this, addRandomButton.relativePosition.x + ToggleSize, RandomButtonY, ToggleSize, "BOB_RND_DEL", UITextures.LoadQuadSpriteAtlas("BOB-RoundMinus"));
-            _removeRandomButton.eventClicked += RemoveRandomPrefab;
-
-            // Rename button.
-            _renameButton = UIButtons.AddEvenSmallerButton(this, RandomButtonX, RandomButtonY, Translations.Translate("BOB_RND_REN"), RandomButtonWidth);
-            _renameButton.eventClicked += RenameRandomPrefab;
-
-            // Add variation button.
-            _addVariationButton = AddIconButton(this, MidControlX, ListY, ToggleSize, "BOB_RND_ADD", UITextures.LoadQuadSpriteAtlas("BOB-ArrowPlus"));
-            _addVariationButton.eventClicked += AddVariation;
-
-            // Remove variation button.
-            _removeVariationButton = AddIconButton(this, MidControlX, ListY + ToggleSize, ToggleSize, "BOB_RND_SUB", UITextures.LoadQuadSpriteAtlas("BOB-ArrowMinus"));
-            _removeVariationButton.eventClicked += RemoveVariation;
-
-            // Order button.
-            m_replacementNameSortButton = ArrowButton(this, LoadedX + 10f, ListY - 20f);
-            m_replacementNameSortButton.eventClicked += SortReplacements;
-
-            // Probability slider.
-            _probSlider = AddBOBSlider(this, SelectedX + Margin, ToolY + Margin, SelectedWidth - (Margin * 2f), "BOB_PNL_PRB", 0, 100, 1, "Probability");
-            _probSlider.Hide();
-            _probSlider.EventTrueValueChanged += (c, value) =>
-            {
-                if (_selectedVariation != null)
-                {
-                    _selectedVariation.Probability = (int)value;
-                    _lastChangedVariant = _selectedVariation;
-
-                    if (!_ignoreValueChange)
-                    {
-                        UpdateCurrentRandomPrefab();
-                    }
-
-                    _variationsList.Refresh();
-                    ConfigurationUtils.SaveConfig();
-                }
-            };
-
-            // Default is name ascending.
-            SetFgSprites(m_replacementNameSortButton, "IconUpArrow2");
-
-            // Preview image.
-            _previewPanel = AddUIComponent<PreviewPanel>();
-            _previewPanel.relativePosition = new Vector2(this.width + Margin, ListY);
-
-            // Populate loaded lists.
-            RegenerateRandomList();
-            RegenerateReplacementList();
-
-            // Update button states.
-            UpdateButtonStates();
-
-            // Bring to front.
-            BringToFront();
-
-            // Hide previous window, if any.
-            BOBPanelManager.Panel?.Hide();
-        }
+        // Panel status.
+        private bool _panelReady = false;
+        private PrefabInfo _initialPrefab = null;
 
         /// <summary>
         /// Gets the panel width.
@@ -246,11 +158,119 @@ namespace BOB
         private bool IsTree => PropTreeMode == PropTreeModes.Tree;
 
         /// <summary>
+        /// Called by Unity before the first frame is displayed.
+        /// Used to perform setup.
+        /// </summary>
+        public override void Start()
+        {
+            base.Start();
+
+            // Default position - centre in screen.
+            relativePosition = new Vector2(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
+
+            // Disable 'both' check.
+            m_propTreeChecks[(int)PropTreeModes.Both].Disable();
+            m_propTreeChecks[(int)PropTreeModes.Both].Hide();
+
+            // Selected random prop list.
+            _randomList = UIList.AddUIList<LoadedPrefabItem.DisplayRow>(this, RandomizerX, LeftListY, RandomizerWidth, LeftListHeight);
+            _randomList.EventSelectionChanged += (c, data) => SelectedRandomPrefab = data as BOBRandomPrefab;
+
+            // Variation selection list.
+            _variationsList = UIList.AddUIList<RandomComponentRow>(this, SelectedX, ListY, SelectedWidth, ListHeight);
+            _variationsList.EventSelectionChanged += (c, data) => SelectedVariation = data as BOBRandomPrefab.Variation;
+
+            // Loaded prop list.
+            _loadedList = UIList.AddUIList<LoadedPrefabItem.DisplayRow>(this, LoadedX, ListY, LoadedWidth, ListHeight);
+            _loadedList.EventSelectionChanged += (c, data) => SelectedLoadedPrefab = (data as LoadedPrefabItem)?.Prefab;
+
+            // Name change textfield.
+            _nameField = UITextFields.AddTextField(this, Margin, NameFieldY, RandomizerWidth);
+
+            // Add random prefab button.
+            UIButton addRandomButton = AddIconButton(this, Margin, RandomButtonY, ToggleSize, "BOB_RND_NEW", UITextures.LoadQuadSpriteAtlas("BOB-RoundPlus"));
+            addRandomButton.eventClicked += NewRandomPrefab;
+
+            // Remove random prefab button.
+            _removeRandomButton = AddIconButton(this, addRandomButton.relativePosition.x + ToggleSize, RandomButtonY, ToggleSize, "BOB_RND_DEL", UITextures.LoadQuadSpriteAtlas("BOB-RoundMinus"));
+            _removeRandomButton.eventClicked += RemoveRandomPrefab;
+
+            // Rename button.
+            _renameButton = UIButtons.AddEvenSmallerButton(this, RandomButtonX, RandomButtonY, Translations.Translate("BOB_RND_REN"), RandomButtonWidth);
+            _renameButton.eventClicked += RenameRandomPrefab;
+
+            // Add variation button.
+            _addVariationButton = AddIconButton(this, MidControlX, ListY, ToggleSize, "BOB_RND_ADD", UITextures.LoadQuadSpriteAtlas("BOB-ArrowPlus"));
+            _addVariationButton.eventClicked += AddVariation;
+
+            // Remove variation button.
+            _removeVariationButton = AddIconButton(this, MidControlX, ListY + ToggleSize, ToggleSize, "BOB_RND_SUB", UITextures.LoadQuadSpriteAtlas("BOB-ArrowMinus"));
+            _removeVariationButton.eventClicked += RemoveVariation;
+
+            // Order button.
+            m_replacementNameSortButton = ArrowButton(this, LoadedX + 10f, ListY - 20f);
+            m_replacementNameSortButton.eventClicked += SortReplacements;
+
+            // Probability slider.
+            _probSlider = AddBOBSlider(this, SelectedX + Margin, ToolY + Margin, SelectedWidth - (Margin * 2f), "BOB_PNL_PRB", 0, 100, 1, "Probability");
+            _probSlider.Hide();
+            _probSlider.EventTrueValueChanged += (c, value) =>
+            {
+                if (_selectedVariation != null)
+                {
+                    _selectedVariation.Probability = (int)value;
+                    _lastChangedVariant = _selectedVariation;
+
+                    if (!_ignoreValueChange)
+                    {
+                        UpdateCurrentRandomPrefab();
+                    }
+
+                    _variationsList.Refresh();
+                    ConfigurationUtils.SaveConfig();
+                }
+            };
+
+            // Default is name ascending.
+            SetFgSprites(m_replacementNameSortButton, "IconUpArrow2");
+
+            // Preview image.
+            _previewPanel = AddUIComponent<PreviewPanel>();
+            _previewPanel.relativePosition = new Vector2(this.width + Margin, ListY);
+
+            // Activate panel.
+            _panelReady = true;
+
+            // Set initial parent.
+            SelectRandomPrefab(_initialPrefab);
+
+            // Populate loaded lists.
+            RegenerateRandomList();
+            RegenerateReplacementList();
+
+            // Update button states.
+            UpdateButtonStates();
+
+            // Bring to front.
+            BringToFront();
+
+            // Hide previous window, if any.
+            BOBPanelManager.Panel?.Hide();
+        }
+
+        /// <summary>
         /// Sets the selected BOB random prefab to the one (if any) representing the given tree or prop prefab.
         /// </summary>
         /// <param name="prefab">Tree or prop prefab.</param>
         internal void SelectRandomPrefab(PrefabInfo prefab)
         {
+            // Don't proceed further if panel isn't ready.
+            if (!_panelReady)
+            {
+                _initialPrefab = prefab;
+                return;
+            }
+
             if (prefab is TreeInfo tree)
             {
                 PropTreeMode = PropTreeModes.Tree;

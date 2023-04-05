@@ -32,39 +32,12 @@ namespace BOB
         private const float FooterHeight = 30f;
 
         // Panel components.
-        private readonly UIButton _applyButton;
-        private readonly UIButton _revertButton;
-        private readonly UIList _packSelectionList;
+        private UIButton _applyButton;
+        private UIButton _revertButton;
+        private UIList _packSelectionList;
 
         // Reference variables.
         private string selectedPack;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BOBPackPanel"/> class.
-        /// </summary>
-        internal BOBPackPanel()
-        {
-            // Pack selection list.
-            _packSelectionList = UIList.AddUIList<PackRow>(this, Margin, TitleBarHeight, ListWidth, ListHeight, CustomRowHeight);
-            _packSelectionList.EventSelectionChanged += (c, data) => SelectedPack = data as string;
-
-            // Apply and revert button.
-            _applyButton = UIButtons.AddButton(this, Margin, FooterY, Translations.Translate("BOB_PCK_APP"));
-            _revertButton = UIButtons.AddButton(this, (ListWidth / 2) + (Margin * 2), FooterY, Translations.Translate("BOB_PCK_RVT"));
-            _applyButton.eventClicked += (c, p) => SetPackStatus(true);
-            _revertButton.eventClicked += (c, p) => SetPackStatus(false);
-
-            // Buttons are disabled to start with.
-            _applyButton.Disable();
-            _revertButton.Disable();
-
-            // Populate list.
-            _packSelectionList.Data = NetworkPackReplacement.Instance.GetPackFastList();
-
-            // Focus.
-            BringToFront();
-            Focus();
-        }
 
         /// <summary>
         /// Gets the panel width.
@@ -94,6 +67,36 @@ namespace BOB
         /// Gets the panel's title.
         /// </summary>
         protected override string PanelTitle => Translations.Translate("BOB_NAM");
+
+        /// <summary>
+        /// Called by Unity before the first frame is displayed.
+        /// Used to perform setup.
+        /// </summary>
+        public override void Start()
+        {
+            base.Start();
+
+            // Pack selection list.
+            _packSelectionList = UIList.AddUIList<PackRow>(this, Margin, TitleBarHeight, ListWidth, ListHeight, CustomRowHeight);
+            _packSelectionList.EventSelectionChanged += (c, data) => SelectedPack = data as string;
+
+            // Apply and revert button.
+            _applyButton = UIButtons.AddButton(this, Margin, FooterY, Translations.Translate("BOB_PCK_APP"));
+            _revertButton = UIButtons.AddButton(this, (ListWidth / 2) + (Margin * 2), FooterY, Translations.Translate("BOB_PCK_RVT"));
+            _applyButton.eventClicked += (c, p) => SetPackStatus(true);
+            _revertButton.eventClicked += (c, p) => SetPackStatus(false);
+
+            // Buttons are disabled to start with.
+            _applyButton.Disable();
+            _revertButton.Disable();
+
+            // Populate list.
+            _packSelectionList.Data = NetworkPackReplacement.Instance.GetPackFastList();
+
+            // Focus.
+            BringToFront();
+            Focus();
+        }
 
         /// <summary>
         /// Sets the pack status of the currently selected pack.

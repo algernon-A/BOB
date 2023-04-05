@@ -117,46 +117,10 @@ namespace BOB
         };
 
         // Private components.
-        private readonly UITextField _textSearchField;
+        private UITextField _textSearchField;
 
         // Current replacement mode.
         private PropTreeModes _propTreeMode = PropTreeModes.Prop;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BOBPanelBase"/> class.
-        /// Constructor.
-        /// </summary>
-        internal BOBPanelBase()
-        {
-            // Text search field.
-            _textSearchField = UITextFields.AddSmallLabelledTextField(this, width - 200f - Margin, TitleHeight + Margin, Translations.Translate("BOB_FIL_NAME"));
-
-            // Event handlers for text search field.
-            _textSearchField.eventTextChanged += (c, text) => RegenerateReplacementList();
-            _textSearchField.eventTextSubmitted += (c, text) => RegenerateReplacementList();
-
-            // Vanilla filter.
-            m_hideVanilla = UICheckBoxes.AddLabelledCheckBox((UIComponent)(object)this, _textSearchField.relativePosition.x, _textSearchField.relativePosition.y + _textSearchField.height + (Margin / 2f), Translations.Translate("BOB_PNL_HDV"), 12f, 0.7f);
-            m_hideVanilla.isChecked = ModSettings.HideVanilla;
-            m_hideVanilla.eventCheckChanged += VanillaCheckChanged;
-
-            // Mode label.
-            m_modeLabel = UILabels.AddLabel(this, Margin, ToggleHeaderY, Translations.Translate("BOB_PNL_MOD"), textScale: 0.8f);
-
-            // Tree/Prop checkboxes.
-            for (int i = 0; i < (int)PropTreeModes.NumModes; ++i)
-            {
-                m_propTreeChecks[i] = IconToggleCheck(this, Margin + (i * ToggleSize), ToggleY, propTreepAtlas[i], propTreeTipKeys[i]);
-                m_propTreeChecks[i].objectUserData = i;
-                m_propTreeChecks[i].eventCheckChanged += PropTreeCheckChanged;
-            }
-
-            // Set initial mode state.
-            _propTreeMode = InitialPropTreeMode;
-            m_ignorePropTreeCheckChanged = true;
-            m_propTreeChecks[(int)PropTreeMode].isChecked = true;
-            m_ignorePropTreeCheckChanged = false;
-        }
 
         /// <summary>
         /// Prop/tree modes.
@@ -238,6 +202,44 @@ namespace BOB
         /// Gets the current search text.
         /// </summary>
         protected string SearchText => _textSearchField.text;
+
+        /// <summary>
+        /// Called by Unity before the first frame is displayed.
+        /// Used to perform setup.
+        /// </summary>
+        public override void Start()
+        {
+            base.Start();
+
+            // Text search field.
+            _textSearchField = UITextFields.AddSmallLabelledTextField(this, width - 200f - Margin, TitleHeight + Margin, Translations.Translate("BOB_FIL_NAME"));
+
+            // Event handlers for text search field.
+            _textSearchField.eventTextChanged += (c, text) => RegenerateReplacementList();
+            _textSearchField.eventTextSubmitted += (c, text) => RegenerateReplacementList();
+
+            // Vanilla filter.
+            m_hideVanilla = UICheckBoxes.AddLabelledCheckBox((UIComponent)(object)this, _textSearchField.relativePosition.x, _textSearchField.relativePosition.y + _textSearchField.height + (Margin / 2f), Translations.Translate("BOB_PNL_HDV"), 12f, 0.7f);
+            m_hideVanilla.isChecked = ModSettings.HideVanilla;
+            m_hideVanilla.eventCheckChanged += VanillaCheckChanged;
+
+            // Mode label.
+            m_modeLabel = UILabels.AddLabel(this, Margin, ToggleHeaderY, Translations.Translate("BOB_PNL_MOD"), textScale: 0.8f);
+
+            // Tree/Prop checkboxes.
+            for (int i = 0; i < (int)PropTreeModes.NumModes; ++i)
+            {
+                m_propTreeChecks[i] = IconToggleCheck(this, Margin + (i * ToggleSize), ToggleY, propTreepAtlas[i], propTreeTipKeys[i]);
+                m_propTreeChecks[i].objectUserData = i;
+                m_propTreeChecks[i].eventCheckChanged += PropTreeCheckChanged;
+            }
+
+            // Set initial mode state.
+            _propTreeMode = InitialPropTreeMode;
+            m_ignorePropTreeCheckChanged = true;
+            m_propTreeChecks[(int)PropTreeMode].isChecked = true;
+            m_ignorePropTreeCheckChanged = false;
+        }
 
         /// <summary>
         /// Populates the replacement UIList with a filtered list of eligible relacement trees or props.

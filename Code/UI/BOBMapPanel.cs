@@ -20,16 +20,33 @@ namespace BOB
     /// </summary>
     internal sealed class BOBMapPanel : BOBReplacementPanelBase
     {
+        // Panel status.
+        private bool _panelReady = false;
+        private PrefabInfo _initialPrefab = null;
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="BOBMapPanel"/> class.
+        /// Gets the panel's title.
         /// </summary>
-        internal BOBMapPanel()
+        protected override string PanelTitle => Translations.Translate("BOB_NAM");
+
+        /// <summary>
+        /// Called by Unity before the first frame is displayed.
+        /// Used to perform setup.
+        /// </summary>
+        public override void Start()
         {
+            base.Start();
             try
             {
                 // Disable 'both' check.
                 m_propTreeChecks[(int)PropTreeModes.Both].Disable();
                 m_propTreeChecks[(int)PropTreeModes.Both].Hide();
+
+                // Activate panel.
+                _panelReady = true;
+
+                // Set initial parent.
+                SetTargetParent(_initialPrefab);
 
                 // Set initial button states.
                 UpdateButtonStates();
@@ -42,16 +59,18 @@ namespace BOB
         }
 
         /// <summary>
-        /// Gets the panel's title.
-        /// </summary>
-        protected override string PanelTitle => Translations.Translate("BOB_NAM");
-
-        /// <summary>
         /// Sets the target parent prefab.
         /// </summary>
         /// <param name="targetPrefabInfo">Target prefab to set.</param>
         internal override void SetTargetParent(PrefabInfo targetPrefabInfo)
         {
+            // Don't proceed further if panel isn't ready.
+            if (!_panelReady)
+            {
+                _initialPrefab = targetPrefabInfo;
+                return;
+            }
+
             // Base setup.
             base.SetTargetParent(targetPrefabInfo);
 

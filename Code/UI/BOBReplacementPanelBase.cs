@@ -54,22 +54,22 @@ namespace BOB
         /// <summary>
         /// Apply changes button.
         /// </summary>
-        protected readonly UIButton m_applyButton;
+        protected UIButton m_applyButton;
 
         /// <summary>
         /// Target prefab selection list.
         /// </summary>
-        protected readonly UIList m_targetList;
+        protected UIList m_targetList;
 
         /// <summary>
         /// Replacement prefab selection list.
         /// </summary>
-        protected readonly UIList m_replacementList;
+        protected UIList m_replacementList;
 
         /// <summary>
         /// Label displayed when no props are eligible for current selection.
         /// </summary>
-        protected readonly UILabel m_noPropsLabel;
+        protected UILabel m_noPropsLabel;
 
         /// <summary>
         /// Target list sorting setting.
@@ -94,102 +94,13 @@ namespace BOB
         private const float ActionHeaderY = ActionsY - 15f;
 
         // Private components.
-        private readonly UIButton _targetNameSortButton;
-        private readonly PreviewPanel _previewPanel;
+        private UIButton _targetNameSortButton;
+        private PreviewPanel _previewPanel;
 
         // Current selections.
         private PrefabInfo _selectedParentPrefab;
         private TargetListItem _selectedTargetItem;
         private PrefabInfo _selectedReplacementPrefab;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BOBReplacementPanelBase"/> class.
-        /// </summary>
-        internal BOBReplacementPanelBase()
-        {
-            try
-            {
-                // Position - are we restoring the previous position?.
-                if (ModSettings.RememberPosition && (BOBPanelManager.PreviousX != 0f || BOBPanelManager.PreviousY != 0f))
-                {
-                    // 'Remember default position' is active and at least one of X and Y positions is non-zero.
-                    relativePosition = new Vector2(BOBPanelManager.PreviousX, BOBPanelManager.PreviousY);
-                }
-                else
-                {
-                    // Default position - centre in screen.
-                    relativePosition = new Vector2(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
-                }
-
-                // Order buttons.
-                _targetNameSortButton = ArrowButton(this, 30f, FilterY);
-                m_replacementNameSortButton = ArrowButton(this, RightX + 10f, FilterY);
-
-                _targetNameSortButton.eventClicked += SortTargets;
-                m_replacementNameSortButton.eventClicked += SortReplacements;
-
-                // Default is name ascending.
-                SetFgSprites(_targetNameSortButton, "IconUpArrow2");
-                SetFgSprites(m_replacementNameSortButton, "IconUpArrow2");
-
-                // Target prop list.
-                m_targetList = UIList.AddUIList<TargetListItem.DisplayRow>(this, Margin, ListY, LeftWidth, ListHeight);
-                m_targetList.EventSelectionChanged += (c, data) => SelectedTargetItem = data as TargetListItem;
-
-                // Replacement prop list.
-                m_replacementList = UIList.AddUIList<LoadedPrefabItem.DisplayRow>(this, RightX, ListY, RightWidth, ListHeight);
-                m_replacementList.EventSelectionChanged += (c, data) =>
-                {
-                    if (data is BOBRandomPrefab randomPrefab)
-                    {
-                        SelectedReplacementPrefab = (PrefabInfo)randomPrefab.Prop ?? randomPrefab.Tree;
-                    }
-                    else
-                    {
-                        SelectedReplacementPrefab = (data as LoadedPrefabItem)?.Prefab;
-                    }
-                };
-
-                // 'No props' label (starts hidden).
-                m_noPropsLabel = m_targetList.AddUIComponent<UILabel>();
-                m_noPropsLabel.relativePosition = new Vector2(Margin, Margin);
-                m_noPropsLabel.text = Translations.Translate(PropTreeMode == PropTreeModes.Tree ? "BOB_PNL_NOT" : "BOB_PNL_NOP");
-                m_noPropsLabel.Hide();
-
-                // Actions text label.
-                UILabel actionsLabel = UILabels.AddLabel(this, MidControlX, ActionHeaderY, Translations.Translate("BOB_PNL_ACT"), textScale: 0.8f);
-
-                // Apply button.
-                m_applyButton = AddIconButton(this, MidControlX, ActionsY, ActionSize, "BOB_PNL_APP", UITextures.LoadQuadSpriteAtlas("BOB-OkSmall"));
-                m_applyButton.eventClicked += Apply;
-
-                // Revert button.
-                m_revertButton = AddIconButton(this, MidControlX + ActionSize, ActionsY, ActionSize, "BOB_PNL_REV", UITextures.LoadQuadSpriteAtlas("BOB-Revert"));
-                m_revertButton.eventClicked += Revert;
-
-                // Extra functions label.
-                UILabel functionsLabel = UILabels.AddLabel(this, MiddleX, ToggleHeaderY, Translations.Translate("BOB_PNL_FUN"), textScale: 0.8f);
-
-                // Scale button.
-                UIButton scaleButton = AddIconButton(this, MiddleX, ToggleY, ToggleSize, "BOB_PNL_SCA", UITextures.LoadQuadSpriteAtlas("BOB-Scale"));
-                scaleButton.eventClicked += (c, clickEvent) =>
-                {
-                    StandalonePanelManager<BOBScalePanel>.Create();
-                    StandalonePanelManager<BOBScalePanel>.Panel.SelectPrefab(SelectedReplacementPrefab);
-                };
-
-                // Preview image.
-                _previewPanel = AddUIComponent<PreviewPanel>();
-                _previewPanel.relativePosition = new Vector2(this.width + Margin, ListY);
-
-                Logging.Message("InfoPanelBase constructor complete");
-            }
-            catch (Exception e)
-            {
-                // Log and report any exception.
-                Logging.LogException(e, "exception creating base info panel");
-            }
-        }
 
         /// <summary>
         /// Gets the panel width.
@@ -279,6 +190,97 @@ namespace BOB
         protected NetInfo SelectedNet => _selectedParentPrefab as NetInfo;
 
         /// <summary>
+        /// Called by Unity before the first frame is displayed.
+        /// Used to perform setup.
+        /// </summary>
+        public override void Start()
+        {
+            base.Start();
+            try
+            {
+                // Position - are we restoring the previous position?.
+                if (ModSettings.RememberPosition && (BOBPanelManager.PreviousX != 0f || BOBPanelManager.PreviousY != 0f))
+                {
+                    // 'Remember default position' is active and at least one of X and Y positions is non-zero.
+                    relativePosition = new Vector2(BOBPanelManager.PreviousX, BOBPanelManager.PreviousY);
+                }
+                else
+                {
+                    // Default position - centre in screen.
+                    relativePosition = new Vector2(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
+                }
+
+                // Order buttons.
+                _targetNameSortButton = ArrowButton(this, 30f, FilterY);
+                m_replacementNameSortButton = ArrowButton(this, RightX + 10f, FilterY);
+
+                _targetNameSortButton.eventClicked += SortTargets;
+                m_replacementNameSortButton.eventClicked += SortReplacements;
+
+                // Default is name ascending.
+                SetFgSprites(_targetNameSortButton, "IconUpArrow2");
+                SetFgSprites(m_replacementNameSortButton, "IconUpArrow2");
+
+                // Target prop list.
+                m_targetList = UIList.AddUIList<TargetListItem.DisplayRow>(this, Margin, ListY, LeftWidth, ListHeight);
+                m_targetList.EventSelectionChanged += (c, data) => SelectedTargetItem = data as TargetListItem;
+
+                // Replacement prop list.
+                m_replacementList = UIList.AddUIList<LoadedPrefabItem.DisplayRow>(this, RightX, ListY, RightWidth, ListHeight);
+                m_replacementList.EventSelectionChanged += (c, data) =>
+                {
+                    if (data is BOBRandomPrefab randomPrefab)
+                    {
+                        SelectedReplacementPrefab = (PrefabInfo)randomPrefab.Prop ?? randomPrefab.Tree;
+                    }
+                    else
+                    {
+                        SelectedReplacementPrefab = (data as LoadedPrefabItem)?.Prefab;
+                    }
+                };
+
+                // 'No props' label (starts hidden).
+                m_noPropsLabel = m_targetList.AddUIComponent<UILabel>();
+                m_noPropsLabel.relativePosition = new Vector2(Margin, Margin);
+                m_noPropsLabel.text = Translations.Translate(PropTreeMode == PropTreeModes.Tree ? "BOB_PNL_NOT" : "BOB_PNL_NOP");
+                m_noPropsLabel.Hide();
+
+                // Actions text label.
+                UILabel actionsLabel = UILabels.AddLabel(this, MidControlX, ActionHeaderY, Translations.Translate("BOB_PNL_ACT"), textScale: 0.8f);
+
+                // Apply button.
+                m_applyButton = AddIconButton(this, MidControlX, ActionsY, ActionSize, "BOB_PNL_APP", UITextures.LoadQuadSpriteAtlas("BOB-OkSmall"));
+                m_applyButton.eventClicked += Apply;
+
+                // Revert button.
+                m_revertButton = AddIconButton(this, MidControlX + ActionSize, ActionsY, ActionSize, "BOB_PNL_REV", UITextures.LoadQuadSpriteAtlas("BOB-Revert"));
+                m_revertButton.eventClicked += Revert;
+
+                // Extra functions label.
+                UILabel functionsLabel = UILabels.AddLabel(this, MiddleX, ToggleHeaderY, Translations.Translate("BOB_PNL_FUN"), textScale: 0.8f);
+
+                // Scale button.
+                UIButton scaleButton = AddIconButton(this, MiddleX, ToggleY, ToggleSize, "BOB_PNL_SCA", UITextures.LoadQuadSpriteAtlas("BOB-Scale"));
+                scaleButton.eventClicked += (c, clickEvent) =>
+                {
+                    StandalonePanelManager<BOBScalePanel>.Create();
+                    StandalonePanelManager<BOBScalePanel>.Panel.SelectPrefab(SelectedReplacementPrefab);
+                };
+
+                // Preview image.
+                _previewPanel = AddUIComponent<PreviewPanel>();
+                _previewPanel.relativePosition = new Vector2(this.width + Margin, ListY);
+
+                Logging.Message("InfoPanelBase constructor complete");
+            }
+            catch (Exception e)
+            {
+                // Log and report any exception.
+                Logging.LogException(e, "exception creating base info panel");
+            }
+        }
+
+        /// <summary>
         /// Called by the game every update cycle.
         /// Handles overlay intensity modifier keys, and checks for and displays any exception message.
         /// </summary>
@@ -320,8 +322,11 @@ namespace BOB
                 _selectedParentPrefab = targetPrefabInfo;
 
                 // Clear selection.
-                m_targetList.CurrentPosition = 0;
-                m_targetList.SelectedIndex = -1;
+                if (m_targetList != null)
+                {
+                    m_targetList.CurrentPosition = 0;
+                    m_targetList.SelectedIndex = -1;
+                }
 
                 // Update button states.
                 UpdateButtonStates();

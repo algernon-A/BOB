@@ -34,68 +34,19 @@ namespace BOB
         private const float ListHeight = UIList.DefaultRowHeight * 16f;
 
         // Panel components.
-        private readonly UIList _loadedList;
-        private readonly BOBSlider _minScaleSlider;
-        private readonly BOBSlider _maxScaleSlider;
-        private readonly UIButton _revertButton;
-        private readonly UIButton _loadedCreatorButton;
+        private UIList _loadedList;
+        private BOBSlider _minScaleSlider;
+        private BOBSlider _maxScaleSlider;
+        private UIButton _revertButton;
+        private UIButton _loadedCreatorButton;
 
         // Current selection.
         private PrefabInfo _selectedLoadedPrefab;
 
         // Status.
         private bool _disableEvents = false;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BOBScalePanel"/> class.
-        /// </summary>
-        internal BOBScalePanel()
-        {
-            // Default position - centre in screen.
-            relativePosition = new Vector2(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
-
-            // Disable 'both' check.
-            m_propTreeChecks[(int)PropTreeModes.Both].Disable();
-            m_propTreeChecks[(int)PropTreeModes.Both].Hide();
-
-            // Minimum scale slider.
-            _minScaleSlider = AddBOBSlider(this, ControlX, MinOffsetY, ControlWidth - (Margin * 2f), "BOB_SCA_MIN", BOBScalingElement.MinimumScale, BOBScalingElement.MaximumScale, 0.1f, "MinScale");
-            _minScaleSlider.EventTrueValueChanged += MinScaleValue;
-            _minScaleSlider.value = 1f;
-            _minScaleSlider.LimitToVisible = true;
-            _maxScaleSlider = AddBOBSlider(this, ControlX, MaxOffsetY + 40f, ControlWidth - (Margin * 2f), "BOB_SCA_MAX", BOBScalingElement.MinimumScale, BOBScalingElement.MaximumScale, 0.1f, "MaxScale");
-            _maxScaleSlider.EventTrueValueChanged += MaxScaleValue;
-            _maxScaleSlider.value = 1f;
-            _maxScaleSlider.LimitToVisible = true;
-
-            // Revert button.
-            _revertButton = UIButtons.AddSmallerButton(this, ControlX, RevertY, Translations.Translate("BOB_PNL_REV"), ControlWidth);
-            _revertButton.eventClicked += Revert;
-            _revertButton.Disable();
-
-            // Loaded prop list.
-            _loadedList = UIList.AddUIList<LoadedPrefabItem.DisplayRow>(this, LoadedX, ListY, LoadedWidth, ListHeight);
-            _loadedList.EventSelectionChanged += (c, data) => SelectedLoadedPrefab = (data as LoadedPrefabItem)?.Prefab;
-
-            // Order button.
-            m_replacementNameSortButton = ArrowButton(this, LoadedX + 10f, ListY - 20f);
-            m_replacementNameSortButton.eventClicked += SortReplacements;
-
-            _loadedCreatorButton = ArrowButton(this, LoadedX + LoadedPrefabItem.DisplayRow.CreatorLabelX + 10f, ListY - 20f);
-            _loadedCreatorButton.eventClicked += SortReplacements;
-
-            // Default is name ascending.
-            SetFgSprites(m_replacementNameSortButton, "IconUpArrow2");
-
-            // Regenerate replacement list.
-            RegenerateReplacementList();
-
-            // Bring to front.
-            BringToFront();
-
-            // Hide previous window, if any.
-            BOBPanelManager.Panel?.Hide();
-        }
+        private bool _panelReady = false;
+        private PrefabInfo _initialPrefab = null;
 
         /// <summary>
         /// Gets the panel width.
@@ -174,10 +125,80 @@ namespace BOB
         private bool IsTree => PropTreeMode == PropTreeModes.Tree;
 
         /// <summary>
+        /// Called by Unity before the first frame is displayed.
+        /// Used to perform setup.
+        /// </summary>
+        public override void Start()
+        {
+            base.Start();
+
+            // Default position - centre in screen.
+            relativePosition = new Vector2(Mathf.Floor((GetUIView().fixedWidth - width) / 2), Mathf.Floor((GetUIView().fixedHeight - height) / 2));
+
+            // Disable 'both' check.
+            m_propTreeChecks[(int)PropTreeModes.Both].Disable();
+            m_propTreeChecks[(int)PropTreeModes.Both].Hide();
+
+            // Minimum scale slider.
+            _minScaleSlider = AddBOBSlider(this, ControlX, MinOffsetY, ControlWidth - (Margin * 2f), "BOB_SCA_MIN", BOBScalingElement.MinimumScale, BOBScalingElement.MaximumScale, 0.1f, "MinScale");
+            _minScaleSlider.EventTrueValueChanged += MinScaleValue;
+            _minScaleSlider.value = 1f;
+            _minScaleSlider.LimitToVisible = true;
+            _maxScaleSlider = AddBOBSlider(this, ControlX, MaxOffsetY + 40f, ControlWidth - (Margin * 2f), "BOB_SCA_MAX", BOBScalingElement.MinimumScale, BOBScalingElement.MaximumScale, 0.1f, "MaxScale");
+            _maxScaleSlider.EventTrueValueChanged += MaxScaleValue;
+            _maxScaleSlider.value = 1f;
+            _maxScaleSlider.LimitToVisible = true;
+
+            // Revert button.
+            _revertButton = UIButtons.AddSmallerButton(this, ControlX, RevertY, Translations.Translate("BOB_PNL_REV"), ControlWidth);
+            _revertButton.eventClicked += Revert;
+            _revertButton.Disable();
+
+            // Loaded prop list.
+            _loadedList = UIList.AddUIList<LoadedPrefabItem.DisplayRow>(this, LoadedX, ListY, LoadedWidth, ListHeight);
+            _loadedList.EventSelectionChanged += (c, data) => SelectedLoadedPrefab = (data as LoadedPrefabItem)?.Prefab;
+
+            // Order button.
+            m_replacementNameSortButton = ArrowButton(this, LoadedX + 10f, ListY - 20f);
+            m_replacementNameSortButton.eventClicked += SortReplacements;
+
+            _loadedCreatorButton = ArrowButton(this, LoadedX + LoadedPrefabItem.DisplayRow.CreatorLabelX + 10f, ListY - 20f);
+            _loadedCreatorButton.eventClicked += SortReplacements;
+
+            // Default is name ascending.
+            SetFgSprites(m_replacementNameSortButton, "IconUpArrow2");
+
+            // Activate panel.
+            _panelReady = true;
+
+            // Regenerate replacement list.
+            RegenerateReplacementList();
+
+            // Set initial parent.
+            SelectPrefab(_initialPrefab);
+
+            // Bring to front.
+            BringToFront();
+
+            // Hide previous window, if any.
+            BOBPanelManager.Panel?.Hide();
+        }
+
+        /// <summary>
         /// Sets the selected prefab to the one (if any) representing the given tree or prop prefab.
         /// </summary>
         /// <param name="prefab">Tree or prop prefab.</param>
-        internal void SelectPrefab(PrefabInfo prefab) => _loadedList.FindItem<LoadedPrefabItem>(x => x.Prefab == prefab);
+        internal void SelectPrefab(PrefabInfo prefab)
+        {
+            // Don't proceed further if panel isn't ready.
+            if (!_panelReady)
+            {
+                _initialPrefab = prefab;
+                return;
+            }
+
+            _loadedList.FindItem<LoadedPrefabItem>(x => x.Prefab == prefab);
+        }
 
         /// <summary>
         /// Populates the replacement UIList with a filtered list of eligible relacement trees or props.

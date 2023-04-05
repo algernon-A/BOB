@@ -119,132 +119,19 @@ namespace BOB
         // Layout constants - other controls.
         private const float ActionsY2 = ActionsY + ActionSize;
 
-        private readonly UICheckBox _randomCheck;
-        private readonly UICheckBox[] _modeChecks;
-        private readonly UIPanel _rotationPanel;
-        private readonly UIButton _hideButton;
+        private UICheckBox _randomCheck;
+        private UICheckBox[] _modeChecks;
+        private UIPanel _rotationPanel;
+        private UIButton _hideButton;
 
         // Status flags.
+        private bool _created = false;
         private bool _ignoreModeCheckChanged = false;
         private bool _ignoreReplacementSelection = false;
         private bool _unappliedChanges = false;
 
         // Current replacement mode.
         private ReplacementModes _currentMode = ReplacementModes.Grouped;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BOBReplacementPanel"/> class.
-        /// </summary>
-        internal BOBReplacementPanel()
-        {
-            try
-            {
-                // Replacement mode buttons.
-                _modeChecks = new UICheckBox[(int)ReplacementModes.NumModes];
-                for (int i = 0; i < (int)ReplacementModes.NumModes; ++i)
-                {
-                    bool useTreeLabels = PropTreeMode == PropTreeModes.Tree;
-                    _modeChecks[i] = IconToggleCheck(this, ModeX + (i * ToggleSize), ModeY, useTreeLabels ? TreeModeAtlas[i] : PropModeAtlas[i], useTreeLabels ? TreeModeTipKeys[i] : PropModeTipKeys[i]);
-                    _modeChecks[i].objectUserData = i;
-                    _modeChecks[i].eventCheckChanged += ModeCheckChanged;
-                }
-
-                // Set initial mode state.
-                _modeChecks[(int)CurrentMode].isChecked = true;
-
-                // Adjust mode label position to be centred over all mode toggles.
-                float modeRight = ModeX + ((float)ReplacementModes.NumModes * ToggleSize);
-                float modeOffset = (modeRight - Margin - m_modeLabel.width) / 2f;
-                m_modeLabel.relativePosition += new Vector3(modeOffset, 0f);
-
-                // Hide button.
-                _hideButton = AddIconButton(this, MidControlX + ActionSize + ActionSize, ActionsY, ActionSize, "BOB_PNL_HID", UITextures.LoadQuadSpriteAtlas("BOB-InvisibleProp"));
-                _hideButton.eventClicked += HideProp;
-
-                // Probability.
-                UIPanel probabilityPanel = Sliderpanel(this, MidControlX, ProbabilityY, SliderHeight);
-                m_probabilitySlider = AddBOBSlider(probabilityPanel, Margin, 0f, MidControlWidth - (Margin * 2f), "BOB_PNL_PRB", 0, 100, 1, "Probability");
-                m_probabilitySlider.TrueValue = 100f;
-                m_probabilitySlider.LimitToVisible = true;
-
-                // Angle.
-                _rotationPanel = Sliderpanel(this, MidControlX, AngleY, SliderHeight);
-                m_rotationSlider = AddBOBSlider(_rotationPanel, Margin, 0f, MidControlWidth - (Margin * 2f), "BOB_PNL_ANG", -180, 180, 1, "Angle");
-
-                // Offset panel.
-                UIPanel offsetPanel = Sliderpanel(this, MidControlX, OffsetPanelY, OffsetPanelHeight);
-                UILabel offsetLabel = UILabels.AddLabel(offsetPanel, 0f, OffsetLabelY, Translations.Translate("BOB_PNL_OFF"));
-                offsetLabel.textAlignment = UIHorizontalAlignment.Center;
-                while (offsetLabel.width > MidControlWidth)
-                {
-                    offsetLabel.textScale -= 0.05f;
-                    offsetLabel.PerformLayout();
-                }
-
-                offsetLabel.relativePosition = new Vector2((offsetPanel.width - offsetLabel.width) / 2f, OffsetLabelY);
-
-                // Offset sliders.
-                m_xSlider = AddBOBSlider(offsetPanel, Margin, XOffsetY, MidControlWidth - (Margin * 2f), "BOB_PNL_XOF", -32f, 32f, 0.01f, "X offset");
-                m_zSlider = AddBOBSlider(offsetPanel, Margin, ZOffsetY, MidControlWidth - (Margin * 2f), "BOB_PNL_ZOF", -32f, 32f, 0.01f, "Z offset");
-
-                // Height panel.
-                m_heightPanel = Sliderpanel(this, MidControlX, HeightPanelY, HeightPanelShortHeight);
-                UILabel heightLabel = UILabels.AddLabel(m_heightPanel, 0f, OffsetLabelY, Translations.Translate("BOB_PNL_HEI"));
-                m_ySlider = AddBOBSlider(m_heightPanel, Margin, YOffsetY - 20f, MidControlWidth - (Margin * 2f), "BOB_PNL_YOF", -32f, 32f, 0.01f, "Y offset");
-                while (heightLabel.width > MidControlWidth)
-                {
-                    heightLabel.textScale -= 0.05f;
-                    heightLabel.PerformLayout();
-                }
-
-                heightLabel.relativePosition = new Vector2((m_heightPanel.width - heightLabel.width) / 2f, OffsetLabelY);
-
-                // Live application of position changes.
-                m_xSlider.EventTrueValueChanged += SliderChange;
-                m_ySlider.EventTrueValueChanged += SliderChange;
-                m_zSlider.EventTrueValueChanged += SliderChange;
-                m_rotationSlider.EventTrueValueChanged += SliderChange;
-                m_probabilitySlider.EventTrueValueChanged += SliderChange;
-
-                // Normal/random toggle.
-                _randomCheck = UICheckBoxes.AddLabelledCheckBox((UIComponent)(object)this, m_hideVanilla.relativePosition.x, m_hideVanilla.relativePosition.y + m_hideVanilla.height + (Margin / 2f), Translations.Translate("BOB_PNL_RSW"), 12f, 0.7f);
-                _randomCheck.eventCheckChanged += RandomCheckChanged;
-
-                // Random settings button.
-                UIButton randomButton = AddIconButton(this, RandomButtonX, ToggleY, ToggleSize, "BOB_PNL_RST", UITextures.LoadQuadSpriteAtlas("BOB-Random"));
-                randomButton.eventClicked += (c, clickEvent) =>
-                {
-                    // Check that templates were loaded first.
-                    if (PrefabLists.CheckRandomTemplates())
-                    {
-                        StandalonePanelManager<BOBRandomPanel>.Create();
-                        StandalonePanelManager<BOBRandomPanel>.Panel.SelectRandomPrefab(SelectedReplacementPrefab);
-                    }
-                };
-
-                // Set initial button states.
-                UpdateButtonStates();
-                UpdateModeIcons();
-
-                // Add button.
-                m_addButton = AddIconButton(this, MidControlX, ActionsY2, ActionSize, "BOB_PNL_ADD", UITextures.LoadQuadSpriteAtlas("BOB-RoundPlus"));
-                m_addButton.eventClicked += (c, clickEvent) => AddNew();
-
-                // Remove button.
-                m_removeButton = AddIconButton(this, MidControlX + ActionSize, ActionsY2, ActionSize, "BOB_PNL_REM", UITextures.LoadQuadSpriteAtlas("BOB-RoundMinus"));
-                m_removeButton.eventClicked += (c, clickEvent) => RemoveProp();
-
-                // Add/remove button initial visibility.
-                bool eligibleMode = CurrentMode == ReplacementModes.Individual | CurrentMode == ReplacementModes.Grouped;
-                m_addButton.isVisible = eligibleMode;
-                m_removeButton.isVisible = eligibleMode;
-            }
-            catch (Exception e)
-            {
-                // Log and report any exception.
-                Logging.LogException(e, "exception creating info panel");
-            }
-        }
 
         /// <summary>
         /// Replacement modes.
@@ -418,6 +305,125 @@ namespace BOB
         }
 
         /// <summary>
+        /// Called by Unity before the first frame is displayed.
+        /// Used to perform setup.
+        /// </summary>
+        public override void Start()
+        {
+            base.Start();
+            try
+            {
+                // Replacement mode buttons.
+                _modeChecks = new UICheckBox[(int)ReplacementModes.NumModes];
+                for (int i = 0; i < (int)ReplacementModes.NumModes; ++i)
+                {
+                    bool useTreeLabels = PropTreeMode == PropTreeModes.Tree;
+                    _modeChecks[i] = IconToggleCheck(this, ModeX + (i * ToggleSize), ModeY, useTreeLabels ? TreeModeAtlas[i] : PropModeAtlas[i], useTreeLabels ? TreeModeTipKeys[i] : PropModeTipKeys[i]);
+                    _modeChecks[i].objectUserData = i;
+                    _modeChecks[i].eventCheckChanged += ModeCheckChanged;
+                }
+
+                // Set initial mode state.
+                _modeChecks[(int)CurrentMode].isChecked = true;
+
+                // Adjust mode label position to be centred over all mode toggles.
+                float modeRight = ModeX + ((float)ReplacementModes.NumModes * ToggleSize);
+                float modeOffset = (modeRight - Margin - m_modeLabel.width) / 2f;
+                m_modeLabel.relativePosition += new Vector3(modeOffset, 0f);
+
+                // Hide button.
+                _hideButton = AddIconButton(this, MidControlX + ActionSize + ActionSize, ActionsY, ActionSize, "BOB_PNL_HID", UITextures.LoadQuadSpriteAtlas("BOB-InvisibleProp"));
+                _hideButton.eventClicked += HideProp;
+
+                // Probability.
+                UIPanel probabilityPanel = Sliderpanel(this, MidControlX, ProbabilityY, SliderHeight);
+                m_probabilitySlider = AddBOBSlider(probabilityPanel, Margin, 0f, MidControlWidth - (Margin * 2f), "BOB_PNL_PRB", 0, 100, 1, "Probability");
+                m_probabilitySlider.TrueValue = 100f;
+                m_probabilitySlider.LimitToVisible = true;
+
+                // Angle.
+                _rotationPanel = Sliderpanel(this, MidControlX, AngleY, SliderHeight);
+                m_rotationSlider = AddBOBSlider(_rotationPanel, Margin, 0f, MidControlWidth - (Margin * 2f), "BOB_PNL_ANG", -180, 180, 1, "Angle");
+
+                // Offset panel.
+                UIPanel offsetPanel = Sliderpanel(this, MidControlX, OffsetPanelY, OffsetPanelHeight);
+                UILabel offsetLabel = UILabels.AddLabel(offsetPanel, 0f, OffsetLabelY, Translations.Translate("BOB_PNL_OFF"));
+                offsetLabel.textAlignment = UIHorizontalAlignment.Center;
+                while (offsetLabel.width > MidControlWidth)
+                {
+                    offsetLabel.textScale -= 0.05f;
+                    offsetLabel.PerformLayout();
+                }
+
+                offsetLabel.relativePosition = new Vector2((offsetPanel.width - offsetLabel.width) / 2f, OffsetLabelY);
+
+                // Offset sliders.
+                m_xSlider = AddBOBSlider(offsetPanel, Margin, XOffsetY, MidControlWidth - (Margin * 2f), "BOB_PNL_XOF", -32f, 32f, 0.01f, "X offset");
+                m_zSlider = AddBOBSlider(offsetPanel, Margin, ZOffsetY, MidControlWidth - (Margin * 2f), "BOB_PNL_ZOF", -32f, 32f, 0.01f, "Z offset");
+
+                // Height panel.
+                m_heightPanel = Sliderpanel(this, MidControlX, HeightPanelY, HeightPanelShortHeight);
+                UILabel heightLabel = UILabels.AddLabel(m_heightPanel, 0f, OffsetLabelY, Translations.Translate("BOB_PNL_HEI"));
+                m_ySlider = AddBOBSlider(m_heightPanel, Margin, YOffsetY - 20f, MidControlWidth - (Margin * 2f), "BOB_PNL_YOF", -32f, 32f, 0.01f, "Y offset");
+                while (heightLabel.width > MidControlWidth)
+                {
+                    heightLabel.textScale -= 0.05f;
+                    heightLabel.PerformLayout();
+                }
+
+                heightLabel.relativePosition = new Vector2((m_heightPanel.width - heightLabel.width) / 2f, OffsetLabelY);
+
+                // Live application of position changes.
+                m_xSlider.EventTrueValueChanged += SliderChange;
+                m_ySlider.EventTrueValueChanged += SliderChange;
+                m_zSlider.EventTrueValueChanged += SliderChange;
+                m_rotationSlider.EventTrueValueChanged += SliderChange;
+                m_probabilitySlider.EventTrueValueChanged += SliderChange;
+
+                // Normal/random toggle.
+                _randomCheck = UICheckBoxes.AddLabelledCheckBox((UIComponent)(object)this, m_hideVanilla.relativePosition.x, m_hideVanilla.relativePosition.y + m_hideVanilla.height + (Margin / 2f), Translations.Translate("BOB_PNL_RSW"), 12f, 0.7f);
+                _randomCheck.eventCheckChanged += RandomCheckChanged;
+
+                // Random settings button.
+                UIButton randomButton = AddIconButton(this, RandomButtonX, ToggleY, ToggleSize, "BOB_PNL_RST", UITextures.LoadQuadSpriteAtlas("BOB-Random"));
+                randomButton.eventClicked += (c, clickEvent) =>
+                {
+                    // Check that templates were loaded first.
+                    if (PrefabLists.CheckRandomTemplates())
+                    {
+                        StandalonePanelManager<BOBRandomPanel>.Create();
+                        StandalonePanelManager<BOBRandomPanel>.Panel.SelectRandomPrefab(SelectedReplacementPrefab);
+                    }
+                };
+
+                // Set created flag.
+                _created = true;
+
+                // Set initial button states.
+                UpdateButtonStates();
+                UpdateModeIcons();
+
+                // Add button.
+                m_addButton = AddIconButton(this, MidControlX, ActionsY2, ActionSize, "BOB_PNL_ADD", UITextures.LoadQuadSpriteAtlas("BOB-RoundPlus"));
+                m_addButton.eventClicked += (c, clickEvent) => AddNew();
+
+                // Remove button.
+                m_removeButton = AddIconButton(this, MidControlX + ActionSize, ActionsY2, ActionSize, "BOB_PNL_REM", UITextures.LoadQuadSpriteAtlas("BOB-RoundMinus"));
+                m_removeButton.eventClicked += (c, clickEvent) => RemoveProp();
+
+                // Add/remove button initial visibility.
+                bool eligibleMode = CurrentMode == ReplacementModes.Individual | CurrentMode == ReplacementModes.Grouped;
+                m_addButton.isVisible = eligibleMode;
+                m_removeButton.isVisible = eligibleMode;
+            }
+            catch (Exception e)
+            {
+                // Log and report any exception.
+                Logging.LogException(e, "exception creating info panel");
+            }
+        }
+
+        /// <summary>
         /// Sets the target parent prefab.
         /// </summary>
         /// <param name="targetPrefabInfo">Target prefab to set.</param>
@@ -551,6 +557,12 @@ namespace BOB
         /// </summary>
         protected override void UpdateButtonStates()
         {
+            // Don't do anything if panel hasn't been properly set up yet.
+            if (!_created)
+            {
+                return;
+            }
+
             // Disable by default (selectively (re)-enable if eligible).
             m_applyButton.Disable();
             m_revertButton.Disable();

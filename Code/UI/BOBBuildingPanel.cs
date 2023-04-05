@@ -21,7 +21,7 @@ namespace BOB
     internal sealed class BOBBuildingPanel : BOBReplacementPanel
     {
         // Panel components.
-        private readonly UICheckBox _customHeightCheck;
+        private UICheckBox _customHeightCheck;
         private UIPanel _subBuildingPanel;
         private UIList _subBuildingList;
 
@@ -30,34 +30,9 @@ namespace BOB
         private BuildingInfo[] _subBuildings;
         private string[] _subBuildingNames;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BOBBuildingPanel"/> class.
-        /// </summary>
-        internal BOBBuildingPanel()
-        {
-            try
-            {
-                // Fixed height checkbox.
-                _customHeightCheck = UICheckBoxes.AddLabelledCheckBox(m_heightPanel, Margin, FixedHeightY, Translations.Translate("BOB_PNL_CUH"), tooltip: Translations.Translate("BOB_PNL_CUH_TIP"));
-                _customHeightCheck.eventCheckChanged += CustomHeightChange;
-
-                // Adjust y-slider position and panel height.
-                m_ySlider.relativePosition += new Vector3(0f, 20f);
-                m_ySlider.ValueField.relativePosition += new Vector3(0f, 20f);
-                m_heightPanel.height = HeightPanelBottomY;
-
-                // Regenerate replacement list.
-                RegenerateReplacementList();
-
-                // Update button states.
-                UpdateButtonStates();
-            }
-            catch (Exception e)
-            {
-                // Log and report any exception.
-                Logging.LogException(e, "exception creating building panel");
-            }
-        }
+        // Panel status.
+        private bool _panelReady = false;
+        private BuildingInfo _intitialBuilding = null;
 
         /// <summary>
         /// Sets the current target item and updates button states accordingly.
@@ -146,6 +121,43 @@ namespace BOB
         }
 
         /// <summary>
+        /// Called by Unity before the first frame is displayed.
+        /// Used to perform setup.
+        /// </summary>
+        public override void Start()
+        {
+            base.Start();
+            try
+            {
+                // Fixed height checkbox.
+                _customHeightCheck = UICheckBoxes.AddLabelledCheckBox(m_heightPanel, Margin, FixedHeightY, Translations.Translate("BOB_PNL_CUH"), tooltip: Translations.Translate("BOB_PNL_CUH_TIP"));
+                _customHeightCheck.eventCheckChanged += CustomHeightChange;
+
+                // Adjust y-slider position and panel height.
+                m_ySlider.relativePosition += new Vector3(0f, 20f);
+                m_ySlider.ValueField.relativePosition += new Vector3(0f, 20f);
+                m_heightPanel.height = HeightPanelBottomY;
+
+                // Activate panel.
+                _panelReady = true;
+
+                // Set initial parent.
+                SetTargetParent(_intitialBuilding);
+
+                // Regenerate replacement list.
+                RegenerateReplacementList();
+
+                // Update button states.
+                UpdateButtonStates();
+            }
+            catch (Exception e)
+            {
+                // Log and report any exception.
+                Logging.LogException(e, "exception creating building panel");
+            }
+        }
+
+        /// <summary>
         /// Sets the target parent prefab.
         /// </summary>
         /// <param name="targetPrefabInfo">Target prefab to set.</param>
@@ -154,6 +166,13 @@ namespace BOB
             // Don't do anything if invalid target, or target hasn't changed.
             if (!(targetPrefabInfo is BuildingInfo) || SelectedBuilding == targetPrefabInfo)
             {
+                return;
+            }
+
+            // Don't proceed further if panel isn't ready.
+            if (!_panelReady)
+            {
+                _intitialBuilding = targetPrefabInfo as BuildingInfo;
                 return;
             }
 
