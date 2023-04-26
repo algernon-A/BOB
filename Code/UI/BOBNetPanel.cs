@@ -33,6 +33,7 @@ namespace BOB
 
         // Selected segment.
         private ushort _selectedSegment;
+        private bool _hasSkin;
 
         // Event suppression.
         private bool _ignoreIndexChange = false;
@@ -290,8 +291,12 @@ namespace BOB
             // Populate target list.
             RegenerateTargetList();
 
+            // Set skin flag.
+            _hasSkin = NetworkSkins.SegmentSkins[_selectedSegment] != null;
+
             // Apply Harmony rendering patches.
             RenderOverlays.Network = SelectedNet;
+            RenderOverlays.Segment = _hasSkin ? _selectedSegment : (ushort)0u;
             PatcherManager<Patcher>.Instance.PatchNetworkOverlays(true);
         }
 
@@ -918,16 +923,11 @@ namespace BOB
                 int laneIndex = index - 1;
 
                 // Iterate through all segments on map.
-                for (int i = 0; i < segments.Length; ++i)
+                if (_hasSkin)
                 {
-                    // Check for valid segments that match the selected NetInfo.
-                    if ((segments[i].m_flags & NetSegment.Flags.Created) == 0 || segments[i].Info != SelectedNet)
-                    {
-                        continue;
-                    }
-
+                    // Skin - use this segment only.
                     // Iterate through segment lanes until we reach the one we need.
-                    uint laneID = segments[i].m_lanes;
+                    uint laneID = segments[_selectedSegment].m_lanes;
                     for (int j = 0; j < laneIndex; ++j)
                     {
                         // Safety check.
@@ -944,6 +944,38 @@ namespace BOB
                     if (laneID != 0)
                     {
                         tool.LaneOverlays.Add(lanes[laneID].m_bezier);
+                    }
+                }
+                else
+                {
+                    // Not skinned - iterate though all segments.
+                    for (int i = 0; i < segments.Length; ++i)
+                    {
+                        // Check for valid segments that match the selected NetInfo.
+                        if ((segments[i].m_flags & NetSegment.Flags.Created) == 0 || segments[i].Info != SelectedNet)
+                        {
+                            continue;
+                        }
+
+                        // Iterate through segment lanes until we reach the one we need.
+                        uint laneID = segments[i].m_lanes;
+                        for (int j = 0; j < laneIndex; ++j)
+                        {
+                            // Safety check.
+                            if (laneID == 0)
+                            {
+                                break;
+                            }
+
+                            // Get ID of next lane in segment.
+                            laneID = lanes[laneID].m_nextLane;
+                        }
+
+                        // If we ended up with a valid lane ID, add the bezier to the list of lane overlays to be rendered.
+                        if (laneID != 0)
+                        {
+                            tool.LaneOverlays.Add(lanes[laneID].m_bezier);
+                        }
                     }
                 }
             }
@@ -969,6 +1001,13 @@ namespace BOB
             }
 
             NetworkSkins.SegmentSkins[_selectedSegment] = new NetworkSkin(SelectedNet);
+
+            // Set highlighting segment.
+            _hasSkin = true;
+            RenderOverlays.Segment = _selectedSegment;
+
+            // Regenerate target list.
+            RegenerateTargetList();
         }
     }
 }

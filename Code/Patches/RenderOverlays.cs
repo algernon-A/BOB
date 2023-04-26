@@ -30,6 +30,7 @@ namespace BOB
         private static BuildingInfo s_building;
         private static NetInfo.Lane s_lane;
         private static NetInfo s_network;
+        private static ushort s_segment;
 
         /// <summary>
         /// Sets the current prop index to highlight.
@@ -60,6 +61,11 @@ namespace BOB
         /// Sets the current parent net prefab to highlight.
         /// </summary>
         internal static NetInfo Network { set => s_network = value; }
+
+        /// <summary>
+        /// Sets the current net segment to highlight (0 for all segments).
+        /// </summary>
+        internal static ushort Segment { set => s_segment = value; }
 
         /// <summary>
         /// Gets or sets the rendering effect intensity.
@@ -197,7 +203,7 @@ namespace BOB
         /// <param name="index">Prop index.</param>
         public static void HighlightNetworkProp(PropInfo prop, Vector3 position, ushort segmentID, NetInfo.Lane lane, int index)
         {
-            if ((BOBPanelManager.Panel != null & s_prop != null & s_prop == prop) && (s_network == null || s_network == Singleton<NetManager>.instance.m_segments.m_buffer[segmentID].Info) & (s_propIndex < 0 | (s_lane == lane & s_propIndex == index)))
+            if ((BOBPanelManager.Panel != null & s_prop != null & s_prop == prop) && (s_segment == 0 | segmentID == s_segment) && (s_network == null || s_network == Singleton<NetManager>.instance.m_segments.m_buffer[segmentID].Info) & (s_propIndex < 0 | (s_lane == lane & s_propIndex == index)))
             {
                 // Calculate radius of effect - largest of x and z size of props (minimum of 1 in any case).
                 Vector3 size = prop.m_mesh.bounds.size;
@@ -220,7 +226,7 @@ namespace BOB
         /// <param name="index">Prop index.</param>
         public static void HighlightNetworkTree(TreeInfo tree, Vector3 position, ushort segmentID, NetInfo.Lane lane, int index)
         {
-            if (BOBPanelManager.Panel != null & s_tree != null & s_tree == tree && (s_network != null || s_network == Singleton<NetManager>.instance.m_segments.m_buffer[segmentID].Info) & (s_propIndex < 0 | (s_lane == lane && s_propIndex == index)))
+            if (BOBPanelManager.Panel != null & s_tree != null & s_tree == tree && (s_segment == 0 | segmentID == s_segment) && (s_network != null || s_network == Singleton<NetManager>.instance.m_segments.m_buffer[segmentID].Info) & (s_propIndex < 0 | (s_lane == lane && s_propIndex == index)))
             {
                 // Calculate radius of effect - largest of x and z size of props (minimum of 1 in any case).
                 Vector3 size = tree.m_mesh.bounds.size;
@@ -246,6 +252,7 @@ namespace BOB
             s_building = null;
             s_lane = null;
             s_network = null;
+            s_segment = 0;
         }
 
         /// <summary>
