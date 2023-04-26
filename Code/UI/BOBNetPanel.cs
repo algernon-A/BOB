@@ -217,7 +217,7 @@ namespace BOB
                 UIButton packButton = AddIconButton(this, PackButtonX, ToggleY, ToggleSize, "BOB_PNL_PKB", UITextures.LoadQuadSpriteAtlas("BOB-PropPack"));
                 packButton.eventClicked += (component, clickEvent) => StandalonePanelManager<BOBPackPanel>.Create();
 
-                _segmentButton = AddIconButton(this, PackButtonX + 40f, ToggleY, ToggleSize, "BOB_PNL_PKB", UITextures.LoadQuadSpriteAtlas("BOB-PropPack"));
+                _segmentButton = AddIconButton(this, PackButtonX + 40f, ToggleY, ToggleSize, "BOB_PNL_PKB", UITextures.LoadQuadSpriteAtlas("BOB-SegmentSmall"));
                 _segmentButton.eventClicked += (c, p) => AddSkin();
 
                 // Add repeat slider.
@@ -288,15 +288,11 @@ namespace BOB
             _laneMenu.selectedIndex = 0;
             _ignoreIndexChange = false;
 
-            // Populate target list.
-            RegenerateTargetList();
-
-            // Set skin flag.
-            _hasSkin = NetworkSkins.SegmentSkins[_selectedSegment] != null;
+            // Set skin status (also populates target list).
+            SetSkinStatus(NetworkSkins.SegmentSkins[_selectedSegment] != null);
 
             // Apply Harmony rendering patches.
             RenderOverlays.Network = SelectedNet;
-            RenderOverlays.Segment = _hasSkin ? _selectedSegment : (ushort)0u;
             PatcherManager<Patcher>.Instance.PatchNetworkOverlays(true);
         }
 
@@ -1002,9 +998,19 @@ namespace BOB
 
             NetworkSkins.SegmentSkins[_selectedSegment] = new NetworkSkin(SelectedNet);
 
-            // Set highlighting segment.
-            _hasSkin = true;
-            RenderOverlays.Segment = _selectedSegment;
+            // Set skin status.
+            SetSkinStatus(true);
+        }
+
+        /// <summary>
+        /// Sets the skin status for the current selection.
+        /// </summary>
+        /// <param name="status"><c>true</c> if a skin is currently selected, <c>false</c> if a prefab.</param>
+        private void SetSkinStatus(bool status)
+        {
+            _hasSkin = status;
+            _segmentButton.state = status ? UIButton.ButtonState.Pressed : UIButton.ButtonState.Normal;
+            RenderOverlays.Segment = status ? _selectedSegment : (ushort)0u;
 
             // Regenerate target list.
             RegenerateTargetList();
