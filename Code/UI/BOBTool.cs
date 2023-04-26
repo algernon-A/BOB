@@ -423,7 +423,7 @@ namespace BOB
                         UIInput.MouseUsed();
 
                         // Create the info panel with the hovered network prefab.
-                        BOBPanelManager.SetTargetParent(Singleton<NetManager>.instance.m_segments.m_buffer[segment].Info);
+                        BOBPanelManager.SetTargetParent(Singleton<NetManager>.instance.m_segments.m_buffer[segment].Info, segment);
                     }
                 }
                 else

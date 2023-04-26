@@ -8,6 +8,7 @@ namespace BOB
     using System.Collections.Generic;
     using AlgernonCommons;
     using AlgernonCommons.Patching;
+    using BOB.Skins;
     using ICities;
 
     /// <summary>
@@ -41,6 +42,7 @@ namespace BOB
             new Scaling();
             new AddedBuildingProps();
             new AddedNetworkProps();
+            new NetworkSkins();
 
             // Reflect overlay methods.
             PatcherManager<Patcher>.Instance.ReflectOverlays();

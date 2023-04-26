@@ -20,6 +20,9 @@ namespace BOB
     /// </summary>
     internal sealed class BOBMapPanel : BOBReplacementPanelBase
     {
+        // Placeholder instance constant.
+        private const uint SelectedInstance = 0;
+
         // Panel status.
         private bool _panelReady = false;
         private PrefabInfo _initialPrefab = null;
@@ -46,7 +49,7 @@ namespace BOB
                 _panelReady = true;
 
                 // Set initial parent.
-                SetTargetParent(_initialPrefab);
+                SetTargetParent(_initialPrefab, SelectedInstance);
 
                 // Set initial button states.
                 UpdateButtonStates();
@@ -62,7 +65,8 @@ namespace BOB
         /// Sets the target parent prefab.
         /// </summary>
         /// <param name="targetPrefabInfo">Target prefab to set.</param>
-        internal override void SetTargetParent(PrefabInfo targetPrefabInfo)
+        /// <param name="instanceID">Target instance ID.</param>
+        internal override void SetTargetParent(PrefabInfo targetPrefabInfo, uint instanceID)
         {
             // Don't proceed further if panel isn't ready.
             if (!_panelReady)
@@ -72,7 +76,7 @@ namespace BOB
             }
 
             // Base setup.
-            base.SetTargetParent(targetPrefabInfo);
+            base.SetTargetParent(targetPrefabInfo, instanceID);
 
             // Set intial prop/tree mode, deselecting previous selection and disabling events throughout.
             m_ignorePropTreeCheckChanged = true;
@@ -167,7 +171,7 @@ namespace BOB
                     SelectedTargetItem.ReplacementPrefab = null;
 
                     // Update current target.
-                    SetTargetParent(SelectedTargetItem.OriginalPrefab);
+                    SetTargetParent(SelectedTargetItem.OriginalPrefab, SelectedInstance);
                 }
 
                 // Perform post-replacment updates.

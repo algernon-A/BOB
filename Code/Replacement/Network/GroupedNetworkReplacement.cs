@@ -41,11 +41,12 @@ namespace BOB
         /// Finds any existing replacement relevant to the provided arguments.
         /// </summary>
         /// <param name="netInfo">Network info.</param>
+        /// <param name="segmentID">Segment ID (if using a skin; set to 0 otherwise).</param>
         /// <param name="laneIndex">Lane index.</param>
         /// <param name="propIndex">Prop index.</param>
         /// <param name="targetInfo">Target prop/tree prefab.</param>
         /// <returns>Existing replacement entry, if one was found, otherwise null.</returns>
-        protected override BOBConfig.NetReplacement FindReplacement(NetInfo netInfo, int laneIndex, int propIndex, PrefabInfo targetInfo) =>
+        protected override BOBConfig.NetReplacement FindReplacement(NetInfo netInfo, ushort segmentID, int laneIndex, int propIndex, PrefabInfo targetInfo) =>
             ReplacementList(netInfo)?.Find(x => x.TargetInfo == targetInfo);
 
         /// <summary>
@@ -62,10 +63,11 @@ namespace BOB
             }
 
             // Iterate through each lane.
-            for (int laneIndex = 0; laneIndex < replacement.NetInfo.m_lanes.Length; ++laneIndex)
+            NetInfo.Lane[] lanes = replacement.Lanes;
+            for (int laneIndex = 0; laneIndex < lanes.Length; ++laneIndex)
             {
                 // Local references.
-                NetInfo.Lane thisLane = replacement.NetInfo.m_lanes[laneIndex];
+                NetInfo.Lane thisLane = lanes[laneIndex];
                 NetLaneProps.Prop[] theseLaneProps = thisLane?.m_laneProps?.m_props;
 
                 // If no props in this lane, skip it and go to the next one.
@@ -107,7 +109,7 @@ namespace BOB
                         // Match!  Create new handler if there wasn't an existing one.
                         if (handler == null)
                         {
-                            handler = NetHandlers.GetOrAddHandler(replacement.NetInfo, thisLane, propIndex);
+                            handler = NetHandlers.GetOrAddHandler(replacement.NetInfo, replacement.SegmentID, thisLane, propIndex);
                         }
 
                         // Set the new replacement.

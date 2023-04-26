@@ -41,12 +41,13 @@ namespace BOB
         /// Finds any existing replacement relevant to the provided arguments.
         /// </summary>
         /// <param name="netInfo">Network info.</param>
+        /// <param name="segmentID">Segment ID (if using a skin; set to 0 otherwise).</param>
         /// <param name="laneIndex">Lane index.</param>
         /// <param name="propIndex">Prop index.</param>
         /// <param name="targetInfo">Target prop/tree prefab.</param>
         /// <returns>Existing replacement entry, if one was found, otherwise null.</returns>
-        protected override BOBConfig.NetReplacement FindReplacement(NetInfo netInfo, int laneIndex, int propIndex, PrefabInfo targetInfo) =>
-            ReplacementList(netInfo)?.Find(x => x.LaneIndex == laneIndex && x.PropIndex == propIndex);
+        protected override BOBConfig.NetReplacement FindReplacement(NetInfo netInfo, ushort segmentID, int laneIndex, int propIndex, PrefabInfo targetInfo) =>
+            ReplacementList(netInfo)?.Find(x => x.SegmentID == segmentID && x.LaneIndex == laneIndex && x.PropIndex == propIndex);
 
         /// <summary>
         /// Applies a replacement.
@@ -60,15 +61,8 @@ namespace BOB
                 return;
             }
 
-            // Check lane index.
-            if (replacement.LaneIndex < 0 || replacement.LaneIndex >= replacement.NetInfo.m_lanes.Length)
-            {
-                Logging.Message("ignoring invalid individual network replacement lane index ", replacement.LaneIndex, " for network ", replacement.NetInfo.name);
-                return;
-            }
-
             // Check lane record.
-            NetInfo.Lane thisLane = replacement.NetInfo.m_lanes[replacement.LaneIndex];
+            NetInfo.Lane thisLane = replacement.Lane;
             if (thisLane == null)
             {
                 Logging.Message("ignoring invalid individual network replacement lane index ", replacement.LaneIndex, " for network ", replacement.NetInfo.name);
@@ -153,7 +147,7 @@ namespace BOB
             }
 
             // Don't apply replacement if this is an added prop.
-            if (AddedNetworkProps.Instance.IsAdded(replacement.NetInfo, replacement.LaneIndex, replacement.PropIndex))
+            if (AddedNetworkProps.Instance.IsAdded(replacement))
             {
                 return;
             }
@@ -166,7 +160,7 @@ namespace BOB
             }
 
             // Set the new replacement.
-            NetHandlers.GetOrAddHandler(replacement.NetInfo, thisLane, replacement.PropIndex).SetReplacement(replacement, ThisPriority);
+            NetHandlers.GetOrAddHandler(replacement.NetInfo, replacement.SegmentID, thisLane, replacement.PropIndex)?.SetReplacement(replacement, ThisPriority);
         }
     }
 }

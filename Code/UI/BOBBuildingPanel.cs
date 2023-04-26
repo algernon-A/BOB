@@ -20,6 +20,9 @@ namespace BOB
     /// </summary>
     internal sealed class BOBBuildingPanel : BOBReplacementPanel
     {
+        // Placeholder instance constant.
+        private const uint SelectedInstance = 0;
+
         // Panel components.
         private UICheckBox _customHeightCheck;
         private UIPanel _subBuildingPanel;
@@ -142,7 +145,7 @@ namespace BOB
                 _panelReady = true;
 
                 // Set initial parent.
-                SetTargetParent(_intitialBuilding);
+                SetTargetParent(_intitialBuilding, SelectedInstance);
 
                 // Regenerate replacement list.
                 RegenerateReplacementList();
@@ -161,7 +164,8 @@ namespace BOB
         /// Sets the target parent prefab.
         /// </summary>
         /// <param name="targetPrefabInfo">Target prefab to set.</param>
-        internal override void SetTargetParent(PrefabInfo targetPrefabInfo)
+        /// <param name="instanceID">Target instance ID.</param>
+        internal override void SetTargetParent(PrefabInfo targetPrefabInfo, uint instanceID)
         {
             // Don't do anything if invalid target, or target hasn't changed.
             if (!(targetPrefabInfo is BuildingInfo) || SelectedBuilding == targetPrefabInfo)
@@ -177,7 +181,7 @@ namespace BOB
             }
 
             // Base setup.
-            base.SetTargetParent(targetPrefabInfo);
+            base.SetTargetParent(targetPrefabInfo, instanceID);
 
             // Set target reference.
             _selectedSubBuilding = targetPrefabInfo as BuildingInfo;

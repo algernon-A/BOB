@@ -12,6 +12,7 @@ namespace BOB
     using AlgernonCommons.Patching;
     using AlgernonCommons.Translation;
     using AlgernonCommons.UI;
+    using BOB.Skins;
     using ColossalFramework;
     using ColossalFramework.UI;
     using UnityEngine;
@@ -28,6 +29,10 @@ namespace BOB
         // Panel components.
         private UIDropDown _laneMenu;
         private BOBSlider _repeatSlider;
+        private UIButton _segmentButton;
+
+        // Selected segment.
+        private ushort _selectedSegment;
 
         // Event suppression.
         private bool _ignoreIndexChange = false;
@@ -35,6 +40,7 @@ namespace BOB
         // Panel status.
         private bool _panelReady = false;
         private NetInfo _initialNetwork = null;
+        private uint _initialID = 0;
 
         /// <summary>
         /// Sets the current target item and updates button states accordingly.
@@ -167,6 +173,28 @@ namespace BOB
         private int SelectedLaneIndex => _laneMenu.selectedIndex - 1;
 
         /// <summary>
+        /// Gets the currently active lane selection (skin if applied, otherwise basic network).
+        /// </summary>
+        private NetInfo.Lane[] CurrentLanes
+        {
+            get
+            {
+                if (_selectedSegment != 0 && NetworkSkins.SegmentSkins[_selectedSegment] != null)
+                {
+                    return NetworkSkins.SegmentSkins[_selectedSegment].Lanes;
+                }
+
+                // If we got here, no record was returned
+                return SelectedNet.m_lanes;
+            }
+        }
+
+        /// <summary>
+        /// Gets the effective segement ID for the current selection (0 if not a skin, or segment ID if a skin).
+        /// </summary>
+        private ushort EffectiveSegmentID => _selectedSegment != 0 && NetworkSkins.SegmentSkins[_selectedSegment] != null ? _selectedSegment : (ushort)0u;
+
+        /// <summary>
         /// Called by Unity before the first frame is displayed.
         /// Used to perform setup.
         /// </summary>
@@ -188,6 +216,9 @@ namespace BOB
                 UIButton packButton = AddIconButton(this, PackButtonX, ToggleY, ToggleSize, "BOB_PNL_PKB", UITextures.LoadQuadSpriteAtlas("BOB-PropPack"));
                 packButton.eventClicked += (component, clickEvent) => StandalonePanelManager<BOBPackPanel>.Create();
 
+                _segmentButton = AddIconButton(this, PackButtonX + 40f, ToggleY, ToggleSize, "BOB_PNL_PKB", UITextures.LoadQuadSpriteAtlas("BOB-PropPack"));
+                _segmentButton.eventClicked += (c, p) => AddSkin();
+
                 // Add repeat slider.
                 UIPanel repeatPanel = Sliderpanel(this, MidControlX, RepeatSliderY + Margin, SliderHeight);
                 _repeatSlider = AddBOBSlider(repeatPanel, Margin, 0f, MidControlWidth - (Margin * 2f), "BOB_PNL_REP", 1.1f, 50f, 0.1f, "Repeat");
@@ -199,7 +230,7 @@ namespace BOB
                 _panelReady = true;
 
                 // Set initial parent.
-                SetTargetParent(_initialNetwork);
+                SetTargetParent(_initialNetwork, _initialID);
 
                 // Regenerate replacement list.
                 RegenerateReplacementList();
@@ -215,10 +246,11 @@ namespace BOB
         /// Sets the target parent prefab.
         /// </summary>
         /// <param name="targetPrefabInfo">Target prefab to set.</param>
-        internal override void SetTargetParent(PrefabInfo targetPrefabInfo)
+        /// <param name="instanceID">Target instance ID.</param>
+        internal override void SetTargetParent(PrefabInfo targetPrefabInfo, uint instanceID)
         {
             // Don't do anything if target hasn't changed.
-            if (SelectedNet == targetPrefabInfo)
+            if (SelectedNet == targetPrefabInfo && instanceID == _selectedSegment)
             {
                 return;
             }
@@ -226,12 +258,18 @@ namespace BOB
             // Don't proceed further if panel isn't ready.
             if (!_panelReady)
             {
+                // Set targets for when panel becomes ready.
                 _initialNetwork = targetPrefabInfo as NetInfo;
+                _initialID = instanceID;
                 return;
             }
 
             // Base setup.
-            base.SetTargetParent(targetPrefabInfo);
+            base.SetTargetParent(targetPrefabInfo, instanceID);
+
+            // Record selected segment.
+            _selectedSegment = (ushort)instanceID;
+            _segmentButton.tooltip = instanceID.ToString();
 
             // Build lane menu selection list, with 'all lanes' at index 0, selected by default.
             _ignoreIndexChange = true;
@@ -299,6 +337,7 @@ namespace BOB
                     {
                         AddedNetworkProps.Instance.Update(
                             SelectedNet,
+                            EffectiveSegmentID,
                             targetNetItem.OriginalPrefab,
                             replacementPrefab,
                             targetNetItem.LaneIndex,
@@ -323,6 +362,7 @@ namespace BOB
                             case ReplacementModes.Individual:
                                 IndividualNetworkReplacement.Instance.Replace(
                                     SelectedNet,
+                                    EffectiveSegmentID,
                                     targetNetItem.OriginalPrefab,
                                     replacementPrefab,
                                     IndividualLane,
@@ -341,6 +381,7 @@ namespace BOB
                                 // Grouped replacement.
                                 GroupedNetworkReplacement.Instance.Replace(
                                     SelectedNet,
+                                    EffectiveSegmentID,
                                     targetNetItem.OriginalPrefab,
                                     replacementPrefab,
                                     -1,
@@ -359,6 +400,7 @@ namespace BOB
                                 // All- replacement.
                                 AllNetworkReplacement.Instance.Replace(
                                     null,
+                                    0,
                                     targetNetItem.OriginalPrefab,
                                     replacementPrefab,
                                     -1,
@@ -457,17 +499,17 @@ namespace BOB
             // List of prefabs that have passed filtering.
             List<TargetListItem> itemList = new List<TargetListItem>();
 
+            // Local reference.
+            NetInfo.Lane[] lanes = CurrentLanes;
+
             // Check to see if this building contains any lanes.
-            if (SelectedNet?.m_lanes == null || SelectedNet.m_lanes.Length == 0)
+            if (lanes == null || lanes.Length == 0)
             {
                 // No lanes - show 'no props' label and return an empty list.
                 m_noPropsLabel.Show();
                 m_targetList.Data = new FastList<object>();
                 return;
             }
-
-            // Local reference.
-            NetInfo.Lane[] lanes = SelectedNet.m_lanes;
 
             // Iterate through each lane.
             for (int lane = 0; lane < lanes.Length; ++lane)
@@ -519,7 +561,7 @@ namespace BOB
                     targetNetItem.OriginalRepeat = laneProps[propIndex].m_repeatDistance;
 
                     // Is this an added prop?
-                    if (AddedNetworkProps.Instance.ReplacementRecord(SelectedNet, lane, propIndex) is BOBConfig.NetReplacement addedItem)
+                    if (AddedNetworkProps.Instance.ReplacementRecord(SelectedNet, EffectiveSegmentID, lane, propIndex) is BOBConfig.NetReplacement addedItem)
                     {
                         targetNetItem.PropIndex = propIndex;
                         targetNetItem.LaneIndex = lane;
@@ -675,7 +717,9 @@ namespace BOB
                     ParentInfo = SelectedNet,
                     ReplacementInfo = SelectedReplacementPrefab,
                     RepeatDistance = _repeatSlider.parent.isVisible ? _repeatSlider.TrueValue : 0,
+                    SegmentID = EffectiveSegmentID,
                 };
+
                 AddedNetworkProps.Instance.AddNew(newProp);
 
                 // Post-action cleanup.
@@ -686,7 +730,7 @@ namespace BOB
         /// <summary>
         /// Removes an added prop.
         /// </summary>
-        protected override void RemoveAddedProp() => AddedNetworkProps.Instance.RemoveNew(SelectedNet, ((TargetNetItem)SelectedTargetItem).LaneIndex, SelectedTargetItem.PropIndex);
+        protected override void RemoveAddedProp() => AddedNetworkProps.Instance.RemoveNew(SelectedNet, EffectiveSegmentID, ((TargetNetItem)SelectedTargetItem).LaneIndex, SelectedTargetItem.PropIndex);
 
         /// <summary>
         /// Removes an added tree or prop.
@@ -696,7 +740,7 @@ namespace BOB
             // Safety first - need an individual index that's an added prop.
             if (SelectedTargetItem is TargetNetItem targetNetItem)
             {
-                if (targetNetItem.PropIndex < 0 || targetNetItem.LaneIndex < 0 || !AddedNetworkProps.Instance.IsAdded(SelectedNet, targetNetItem.LaneIndex, targetNetItem.PropIndex))
+                if (targetNetItem.PropIndex < 0 || targetNetItem.LaneIndex < 0 || !AddedNetworkProps.Instance.IsAdded(SelectedNet, EffectiveSegmentID, targetNetItem.LaneIndex, targetNetItem.PropIndex))
                 {
                     return;
                 }
@@ -740,7 +784,7 @@ namespace BOB
                                     {
                                         if (laneProps[k].m_finalProp == targetNetItem.ReplacementPrefab || laneProps[k].m_finalTree == targetNetItem.ReplacementPrefab)
                                         {
-                                            m_originalValues.Add(GetOriginalData(prefab, j, k));
+                                            m_originalValues.Add(GetOriginalData(prefab, EffectiveSegmentID, j, k));
                                         }
                                     }
                                 }
@@ -753,13 +797,13 @@ namespace BOB
                     // Grouped replacement - iterate through each instance and record values.
                     for (int i = 0; i < targetNetItem.PropIndexes.Count; ++i)
                     {
-                        m_originalValues.Add(GetOriginalData(SelectedNet, targetNetItem.LaneIndexes[i], targetNetItem.PropIndexes[i]));
+                        m_originalValues.Add(GetOriginalData(SelectedNet, EffectiveSegmentID, targetNetItem.LaneIndexes[i], targetNetItem.PropIndexes[i]));
                     }
                 }
                 else
                 {
                     // Individual replacement - record original values.
-                    m_originalValues.Add(GetOriginalData(SelectedNet, targetNetItem.LaneIndex, targetNetItem.PropIndex));
+                    m_originalValues.Add(GetOriginalData(SelectedNet, EffectiveSegmentID, targetNetItem.LaneIndex, targetNetItem.PropIndex));
                 }
             }
         }
@@ -826,19 +870,20 @@ namespace BOB
         /// Gets original (current) prop data.
         /// </summary>
         /// <param name="netInfo">Network prefab.</param>
+        /// <param name="segmentID">Segment ID (if using a skin; set to 0 otherwise).</param>
         /// <param name="lane">Lane index.</param>
         /// <param name="propIndex">Prop index.</param>
         /// <returns>New prop handler containing original data.</returns>
-        private LanePropHandler GetOriginalData(NetInfo netInfo, int lane, int propIndex)
+        private LanePropHandler GetOriginalData(NetInfo netInfo, ushort segmentID, int lane, int propIndex)
         {
-            // Ensure that the indexes are valid before proceeding.
-            if (netInfo?.m_lanes == null || netInfo.m_lanes.Length <= lane)
+            // Get the lane.
+            NetInfo.Lane thisLane = NetData.GetLane(netInfo, segmentID, lane);
+            if (thisLane == null)
             {
-                Logging.Error("invalid lane index reference of ", lane, " for selected network ", SelectedNet?.name ?? "null");
                 return null;
             }
 
-            NetInfo.Lane thisLane = netInfo.m_lanes[lane];
+            // Ensure that the index is valid before proceeding.
             NetLaneProps.Prop[] propBuffer = thisLane?.m_laneProps?.m_props;
             if (propBuffer == null || propBuffer.Length <= propIndex)
             {
@@ -847,7 +892,7 @@ namespace BOB
             }
 
             // Create a new prop handler based on the current prop state (not the original).
-            return NetHandlers.GetOrAddHandler(netInfo, thisLane, propIndex);
+            return NetHandlers.GetOrAddHandler(netInfo, segmentID, thisLane, propIndex);
         }
 
         /// <summary>
@@ -909,6 +954,21 @@ namespace BOB
                 RegenerateTargetList();
                 UpdateButtonStates();
             }
+        }
+
+        /// <summary>
+        /// Adds a segment skin to the currently selected segment.
+        /// </summary>
+        private void AddSkin()
+        {
+            // Bounds check.
+            if (_selectedSegment == 0 || _selectedSegment >= NetworkSkins.SegmentSkins.Length)
+            {
+                Logging.Error("invalid segment ID ", _selectedSegment, " when adding a network skin");
+                return;
+            }
+
+            NetworkSkins.SegmentSkins[_selectedSegment] = new NetworkSkin(SelectedNet);
         }
     }
 }

@@ -222,11 +222,12 @@ namespace BOB
         /// Finds any existing replacement relevant to the provided arguments.
         /// </summary>
         /// <param name="netInfo">Network info.</param>
+        /// <param name="segmentID">Segment ID (if using a skin; set to 0 otherwise).</param>
         /// <param name="laneIndex">Lane index.</param>
         /// <param name="propIndex">Prop index.</param>
         /// <param name="targetInfo">Target prop/tree prefab.</param>
         /// <returns>Existing replacement entry, if one was found, otherwise null.</returns>
-        protected override BOBConfig.NetReplacement FindReplacement(NetInfo netInfo, int laneIndex, int propIndex, PrefabInfo targetInfo) =>
+        protected override BOBConfig.NetReplacement FindReplacement(NetInfo netInfo, ushort segmentID, int laneIndex, int propIndex, PrefabInfo targetInfo) =>
             ReplacementList(netInfo)?.Find(x => x.TargetInfo == targetInfo);
 
         /// <summary>
@@ -490,7 +491,7 @@ namespace BOB
                             // Match!  Create new handler if there wasn't an existing one.
                             if (handler == null)
                             {
-                                handler = NetHandlers.GetOrAddHandler(netInfo, thisLane, propIndex);
+                                handler = NetHandlers.GetOrAddHandler(netInfo, 0, thisLane, propIndex);
                             }
 
                             // Set the new replacement.

@@ -18,6 +18,7 @@ namespace BOB
 
         // Parent lane prefab.
         private readonly NetInfo.Lane _laneInfo;
+        private readonly ushort _segmentID;
 
         // Original prop data.
         private readonly float _originalAngle;
@@ -31,13 +32,14 @@ namespace BOB
         private BOBConfig.NetReplacement _packReplacement;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="LanePropHandler"/> class.
+        /// Initializes a new instance of the <see cref="LanePropHandler"/> class for a generic info record.
         /// </summary>
-        /// <param name="prefab">Netwok prefab containing this prop (must not be null).</param>
-        /// <param name="laneInfo">Network lane containing this prop (must not be null).</param>
+        /// <param name="prefab"><see cref="NetInfo"/> prefab containing this prop.</param>
+        /// <param name="segmentID">Segment ID (for a skin), default 0 (no skin).</param>
+        /// <param name="laneInfo"><see cref="NetInfo.Lane"/> containing this prop (must not be null).</param>
         /// <param name="propIndex">Prop index.</param>
-        /// <param name="laneProp">Lane prop instance (must not be null).</param>
-        public LanePropHandler(NetInfo prefab, NetInfo.Lane laneInfo, int propIndex, NetLaneProps.Prop laneProp)
+        /// <param name="laneProp">Lane prop instance (must not be <null></null>).</param>
+        public LanePropHandler(NetInfo prefab, ushort segmentID, NetInfo.Lane laneInfo, int propIndex, NetLaneProps.Prop laneProp)
             : base(
                   propIndex,
                   laneProp.m_prop,
@@ -49,6 +51,7 @@ namespace BOB
         {
             // Set original data.
             _netInfo = prefab;
+            _segmentID = segmentID;
             _laneInfo = laneInfo;
             _originalAngle = laneProp.m_angle;
             _originalRepeatDistance = laneProp.m_repeatDistance;
@@ -307,9 +310,8 @@ namespace BOB
                     thisProp.m_repeatDistance = _originalRepeatDistance;
                 }
 
-                // Update network.
-                _netInfo.CheckReferences();
-                NetData.DirtyList.Add(_netInfo);
+                // Update render.
+                NetData.UpdateRender(_netInfo, _segmentID);
             }
         }
 
@@ -392,11 +394,8 @@ namespace BOB
                     _laneInfo.m_laneProps.m_props[PropIndex].m_repeatDistance = netReplacement.RepeatDistance;
                 }
 
-                // Update network prop references.
-                _netInfo.CheckReferences();
-
-                // Add building to dirty list.
-                NetData.DirtyList.Add(_netInfo);
+                // Update render.
+                NetData.UpdateRender(_netInfo, _segmentID);
             }
         }
     }

@@ -427,12 +427,13 @@ namespace BOB
         /// Sets the target parent prefab.
         /// </summary>
         /// <param name="targetPrefabInfo">Target prefab to set.</param>
-        internal override void SetTargetParent(PrefabInfo targetPrefabInfo)
+        /// <param name="instanceID">Target instance ID.</param>
+        internal override void SetTargetParent(PrefabInfo targetPrefabInfo, uint instanceID)
         {
             // First, undo any preview.
             RevertPreview();
 
-            base.SetTargetParent(targetPrefabInfo);
+            base.SetTargetParent(targetPrefabInfo, instanceID);
 
             // Update title label.
             TitleText = Translations.Translate("BOB_NAM") + ": " + GetDisplayName(targetPrefabInfo.name);

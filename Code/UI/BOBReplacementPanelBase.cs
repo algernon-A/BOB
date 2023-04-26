@@ -313,7 +313,8 @@ namespace BOB
         /// Sets the target parent prefab.
         /// </summary>
         /// <param name="targetPrefabInfo">Target prefab to set.</param>
-        internal virtual void SetTargetParent(PrefabInfo targetPrefabInfo)
+        /// <param name="instanceID">Target instance ID.</param>
+        internal virtual void SetTargetParent(PrefabInfo targetPrefabInfo, uint instanceID)
         {
             // Don't do anything if we're already selected.
             if (_selectedParentPrefab != targetPrefabInfo)

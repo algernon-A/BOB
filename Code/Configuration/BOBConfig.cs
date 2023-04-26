@@ -7,6 +7,7 @@ namespace BOB
 {
     using System.Collections.Generic;
     using System.Xml.Serialization;
+    using BOB.Skins;
 
     /// <summary>
     /// BOB configuration XML file format.
@@ -152,16 +153,40 @@ namespace BOB
             public string Network { get; set; } = string.Empty;
 
             /// <summary>
+            /// Gets or sets the list of replacements for XML serialization.
+            /// </summary>
+            [XmlArray("replacements")]
+            [XmlArrayItem("replacement")]
+            public List<NetReplacement> XMLReplacements
+            {
+                get
+                {
+                    // Exclude all replacements with non-zero SegmentIDs, as these refer to skins and shouldn't be serialized other than in the save.
+                    List<NetReplacement> xmlReplacements = new List<NetReplacement>();
+                    foreach (NetReplacement replacement in Replacements)
+                    {
+                        if (replacement.SegmentID == 0)
+                        {
+                            xmlReplacements.Add(replacement);
+                        }
+                    }
+
+                    return xmlReplacements;
+                }
+
+                set => Replacements = value;
+            }
+
+            /// <summary>
             /// Gets the prefab info as NetInfo.
             /// </summary>
             [XmlIgnore]
             public NetInfo NetInfo => Prefab as NetInfo;
 
             /// <summary>
-            /// Gets or sets the list of replacements.
+            /// Gets or sets the list of replacements for mod access.
             /// </summary>
-            [XmlArray("replacements")]
-            [XmlArrayItem("replacement")]
+            [XmlIgnore]
             public List<NetReplacement> Replacements { get; set; } = new List<NetReplacement>();
         }
 
@@ -381,6 +406,41 @@ namespace BOB
             /// </summary>
             [XmlIgnore]
             public NetInfo NetInfo => ParentInfo as NetInfo;
+
+            /// <summary>
+            /// Gets or sets the target nework segment ID.
+            /// A value of 0 means that the replacement refers to the underlying <see cref="NetInfo"/> prefab.
+            /// </summary>
+            [XmlIgnore]
+            public ushort SegmentID { get; set; } = 0;
+
+            /// <summary>
+            /// Gets the <see cref="NetInfo.Lane"/> array referred to by this replacement record.
+            /// </summary>
+            [XmlIgnore]
+            public NetInfo.Lane[] Lanes => NetData.GetLanes(NetInfo, SegmentID);
+
+            /// <summary>
+            /// Gets the <see cref="NetInfo.Lane"/> referred to by this replacement record (<c>null</c> if none).
+            /// </summary>
+            [XmlIgnore]
+            public NetInfo.Lane Lane
+            {
+                get
+                {
+                    // Get lane array.
+                    NetInfo.Lane[] lanes = Lanes;
+
+                    // Bounds check.
+                    if (lanes != null && LaneIndex >= 0 && LaneIndex < lanes.Length)
+                    {
+                        return lanes[LaneIndex];
+                    }
+
+                    // If we got here, no eligible lane was found.
+                    return null;
+                }
+            }
         }
     }
 }

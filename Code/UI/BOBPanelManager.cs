@@ -53,12 +53,13 @@ namespace BOB
         /// Sets the BOB target parent prefab to the selected prefab, creating the relevant info window if necessary.
         /// </summary>
         /// <param name="selectedPrefab">Target parent prefab.</param>
-        internal static void SetTargetParent(PrefabInfo selectedPrefab)
+        /// <param name="instanceID">Target instance ID.</param>
+        internal static void SetTargetParent(PrefabInfo selectedPrefab, uint instanceID = 0)
         {
             // If no existing panel, create it.
             if (Panel == null)
             {
-                Create(selectedPrefab);
+                Create(selectedPrefab, instanceID);
             }
             else
             {
@@ -68,12 +69,12 @@ namespace BOB
                     // Building.
                     if (Panel is BOBBuildingPanel)
                     {
-                        Panel.SetTargetParent(selectedPrefab);
+                        Panel.SetTargetParent(selectedPrefab, instanceID);
                     }
                     else
                     {
                         Panel.Close();
-                        Create(selectedPrefab);
+                        Create(selectedPrefab, instanceID);
                     }
                 }
                 else if (selectedPrefab is NetInfo)
@@ -81,12 +82,12 @@ namespace BOB
                     // Network.
                     if (Panel is BOBNetPanel)
                     {
-                        Panel.SetTargetParent(selectedPrefab);
+                        Panel.SetTargetParent(selectedPrefab, instanceID);
                     }
                     else
                     {
                         Panel.Close();
-                        Create(selectedPrefab);
+                        Create(selectedPrefab, instanceID);
                     }
                 }
                 else if (selectedPrefab is TreeInfo || selectedPrefab is PropInfo)
@@ -94,12 +95,12 @@ namespace BOB
                     // Standalone tree/prop.
                     if (Panel is BOBMapPanel)
                     {
-                        Panel.SetTargetParent(selectedPrefab);
+                        Panel.SetTargetParent(selectedPrefab, instanceID);
                     }
                     else
                     {
                         Panel.Close();
-                        Create(selectedPrefab);
+                        Create(selectedPrefab, instanceID);
                     }
                 }
             }
@@ -152,7 +153,9 @@ namespace BOB
         /// <summary>
         /// Creates the panel object in-game and displays it.
         /// </summary>
-        private static void Create(PrefabInfo selectedPrefab)
+        /// <param name="selectedPrefab">Initial prefab to select.</param>
+        /// <param name="instanceID">Initial instance ID.</param>
+        private static void Create(PrefabInfo selectedPrefab, uint instanceID)
         {
             try
             {
@@ -195,8 +198,8 @@ namespace BOB
                     // Create panel close event handler.
                     s_panel.EventClose += DestroyPanel;
 
-                    // Set up panel with selected prefab.
-                    Panel.SetTargetParent(selectedPrefab);
+                    // Set up panel with selected prefab and instance.
+                    Panel.SetTargetParent(selectedPrefab, instanceID);
                 }
             }
             catch (Exception e)

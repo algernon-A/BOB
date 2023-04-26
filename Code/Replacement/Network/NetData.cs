@@ -6,9 +6,12 @@
 namespace BOB
 {
     using System.Collections.Generic;
+    using System.Reflection;
     using AlgernonCommons;
+    using BOB.Skins;
     using ColossalFramework;
     using UnityEngine;
+    using static NetInfo;
 
     /// <summary>
     /// Class to handle centralised network data.
@@ -17,12 +20,32 @@ namespace BOB
     {
         // List of dirty network prefabs.
         [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.NamingRules", "SA1311:Static readonly fields should begin with upper-case letter", Justification = "Private static readonly field")]
-        private static readonly HashSet<NetInfo> s_dirtyList = new HashSet<NetInfo>();
+        private static readonly HashSet<NetInfo> s_dirtyPrefabs = new HashSet<NetInfo>();
 
         /// <summary>
         /// Gets the dirty prefabs list.
         /// </summary>
-        internal static HashSet<NetInfo> DirtyList => s_dirtyList;
+        internal static HashSet<NetInfo> DirtyPrefabs => s_dirtyPrefabs;
+
+        /// <summary>
+        /// Updates the render for the given prefab or segment.
+        /// </summary>
+        /// <param name="netInfo">Prefab to update (ignored if <c>segmentID</c> is not 0).</param>
+        /// <param name="segmentID">Segment to update (set to 0 if no skin).</param>
+        internal static void UpdateRender(NetInfo netInfo, ushort segmentID)
+        {
+            // Prefab or skin?
+            if (segmentID == 0)
+            {
+                // Prefab - add network prefab to dirty list.
+                s_dirtyPrefabs.Add(netInfo);
+            }
+            else
+            {
+                // Skin - Update renderer directly.
+                Singleton<SimulationManager>.instance.AddAction(() => Singleton<NetManager>.instance.UpdateSegmentRenderer(segmentID, true));
+            }
+        }
 
         /// <summary>
         /// Refreshes network prefab renders for all 'dirty' networks and calls a recalculation of any Network Skins 2 skins.
@@ -42,7 +65,7 @@ namespace BOB
             for (ushort i = 0; i < segments.Length; ++i)
             {
                 // Check that this is a valid network in the dirty list.
-                if (segments[i].m_flags != NetSegment.Flags.None && DirtyList.Contains(segments[i].Info))
+                if (segments[i].m_flags != NetSegment.Flags.None && s_dirtyPrefabs.Contains(segments[i].Info))
                 {
                     // Update segment instance.
                     renderManager.UpdateInstance((uint)(49152 + i));
@@ -70,7 +93,7 @@ namespace BOB
                 // Update group render (all 31 layers, since we've got all kinds of mismatches with replacements).
                 for (int i = 0; i < 31; ++i)
                 {
-                    Singleton<RenderManager>.instance.UpdateGroup(keyPair.Key, keyPair.Value, i);
+                    renderManager.UpdateGroup(keyPair.Key, keyPair.Value, i);
                 }
             }
 
@@ -78,7 +101,53 @@ namespace BOB
             ModUtils.NS2Recalculate();
 
             // Clear dirty prefabs list.
-            s_dirtyList.Clear();
+            s_dirtyPrefabs.Clear();
+        }
+
+        /// <summary>
+        /// Gets the <see cref="NetInfo.Lane"/> referred to by the given prefab or segment and lane index.
+        /// </summary>
+        /// <param name="netInfo">Prefab (ignored if <c>segmentID</c> is not 0).</param>
+        /// <param name="segmentID">Segment ID (set to 0 for no skin).</param>
+        /// <param name="laneIndex">Lane index.</param>
+        /// <returns>Relevant <see cref="NetInfo.Lane"/>.</returns>
+        internal static NetInfo.Lane GetLane(NetInfo netInfo, ushort segmentID, int laneIndex)
+        {
+            NetInfo.Lane[] lanes = GetLanes(netInfo, segmentID);
+
+            // Bounds check.
+            if (laneIndex >= 0 && laneIndex < lanes.Length)
+            {
+                return lanes[laneIndex];
+            }
+
+            // If we got here, no matching lane was found.
+            Logging.Error("invalid lane index reference of ", laneIndex, " for network ", netInfo?.name);
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="NetInfo.Lane"/> array referred to by the given prefab or segment.
+        /// </summary>
+        /// <param name="netInfo">Prefab (ignored if <c>segmentID</c> is not 0).</param>
+        /// <param name="segmentID">Segment ID (set to 0 for no skin).</param>
+        /// <returns>Relevant <see cref="NetInfo.Lane"/> array.</returns>
+        internal static NetInfo.Lane[] GetLanes(NetInfo netInfo, ushort segmentID)
+        {
+            // Skin or prefab?
+            if (segmentID == 0)
+            {
+                // Prefab.
+                return netInfo.m_lanes;
+            }
+            else if (NetworkSkins.SegmentSkins[segmentID] != null)
+            {
+                // Skin.
+                return NetworkSkins.SegmentSkins[segmentID].Lanes;
+            }
+
+            // If we got here, no matching lane was found.
+            return null;
         }
 
         /// <summary>
@@ -114,32 +183,26 @@ namespace BOB
             {
                 NetLaneProps.Prop existingNetLaneProp = laneInfo.m_laneProps.m_props[i];
 
-                newLaneProps.m_props[i] = new NetLaneProps.Prop
-                {
-                    m_flagsRequired = existingNetLaneProp.m_flagsRequired,
-                    m_flagsForbidden = existingNetLaneProp.m_flagsForbidden,
-                    m_startFlagsRequired = existingNetLaneProp.m_startFlagsRequired,
-                    m_startFlagsForbidden = existingNetLaneProp.m_startFlagsForbidden,
-                    m_endFlagsRequired = existingNetLaneProp.m_endFlagsRequired,
-                    m_endFlagsForbidden = existingNetLaneProp.m_endFlagsForbidden,
-                    m_colorMode = existingNetLaneProp.m_colorMode,
-                    m_prop = existingNetLaneProp.m_prop,
-                    m_tree = existingNetLaneProp.m_tree,
-                    m_position = existingNetLaneProp.m_position,
-                    m_angle = existingNetLaneProp.m_angle,
-                    m_segmentOffset = existingNetLaneProp.m_segmentOffset,
-                    m_repeatDistance = existingNetLaneProp.m_repeatDistance,
-                    m_minLength = existingNetLaneProp.m_minLength,
-                    m_cornerAngle = existingNetLaneProp.m_cornerAngle,
-                    m_probability = existingNetLaneProp.m_probability,
-                    m_finalProp = existingNetLaneProp.m_finalProp,
-                    m_finalTree = existingNetLaneProp.m_finalTree,
-                    m_upgradable = existingNetLaneProp.m_upgradable,
-                };
+                newLaneProps.m_props[i] = new NetLaneProps.Prop();
+                CopyFields(existingNetLaneProp, newLaneProps.m_props[i]);
             }
 
             // Replace network laneProps with our new instance.
             laneInfo.m_laneProps = newLaneProps;
+        }
+
+        /// <summary>
+        /// Copies all public instance fields from the source object to the target object.
+        /// </summary>
+        /// <param name="source">Source object.</param>
+        /// <param name="target">Target object.</param>
+        internal static void CopyFields(object source, object target)
+        {
+            FieldInfo[] sourceFields = source.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public);
+            foreach (FieldInfo field in sourceFields)
+            {
+                field.SetValue(target, field.GetValue(source));
+            }
         }
 
         /// <summary>

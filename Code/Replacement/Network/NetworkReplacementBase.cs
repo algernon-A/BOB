@@ -29,6 +29,7 @@ namespace BOB
         /// Applies a new (or updated) replacement.
         /// </summary>
         /// <param name="netInfo">Targeted network prefab.</param>
+        /// <param name="segmentID">Segment ID (if using a skin; set to 0 otherwise).</param>
         /// <param name="targetInfo">Targeted (original) prop prefab.</param>
         /// <param name="replacementInfo">Replacment prop prefab.</param>
         /// <param name="laneIndex">Targeted lane index (in parent network).</param>
@@ -41,7 +42,7 @@ namespace BOB
         /// <param name="probability">Replacement probability.</param>
         /// <param name="repeatDistance">Replacement repeat distance.</param>
         /// <param name="existingReplacement">Existing replacement record (null if none).</param>
-        internal void Replace(NetInfo netInfo, PrefabInfo targetInfo, PrefabInfo replacementInfo, int laneIndex, int propIndex, Vector3 position, float angle, float offsetX, float offsetY, float offsetZ, int probability, float repeatDistance, BOBConfig.NetReplacement existingReplacement)
+        internal void Replace(NetInfo netInfo, ushort segmentID, PrefabInfo targetInfo, PrefabInfo replacementInfo, int laneIndex, int propIndex, Vector3 position, float angle, float offsetX, float offsetY, float offsetZ, int probability, float repeatDistance, BOBConfig.NetReplacement existingReplacement)
         {
             // Null checks.
             if (targetInfo?.name == null || replacementInfo?.name == null)
@@ -54,7 +55,7 @@ namespace BOB
             if (thisReplacement == null)
             {
                 // No existing replacement was provided - try to find an existing match.
-                thisReplacement = FindReplacement(netInfo, laneIndex, propIndex, targetInfo);
+                thisReplacement = FindReplacement(netInfo, segmentID, laneIndex, propIndex, targetInfo);
 
                 // If a match wasn't found, create a new replacement entry.
                 if (thisReplacement == null)
@@ -62,6 +63,7 @@ namespace BOB
                     thisReplacement = new BOBConfig.NetReplacement
                     {
                         ParentInfo = netInfo,
+                        SegmentID = segmentID,
                         Target = targetInfo.name,
                         TargetInfo = targetInfo,
                         PropIndex = propIndex,
@@ -178,11 +180,12 @@ namespace BOB
         /// Finds any existing replacement relevant to the provided arguments.
         /// </summary>
         /// <param name="netInfo">Network info.</param>
+        /// <param name="segmentID">Segment ID (if using a skin; set to 0 otherwise).</param>
         /// <param name="laneIndex">Lane index.</param>
         /// <param name="propIndex">Prop index.</param>
         /// <param name="targetInfo">Target prop/tree prefab.</param>
         /// <returns>Existing replacement entry, if one was found, otherwise null.</returns>
-        protected abstract BOBConfig.NetReplacement FindReplacement(NetInfo netInfo, int laneIndex, int propIndex, PrefabInfo targetInfo);
+        protected abstract BOBConfig.NetReplacement FindReplacement(NetInfo netInfo, ushort segmentID, int laneIndex, int propIndex, PrefabInfo targetInfo);
 
         /// <summary>
         /// Gets the relevant replacement list entry from the active configuration file, if any.
