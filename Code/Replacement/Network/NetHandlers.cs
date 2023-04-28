@@ -22,9 +22,10 @@ namespace BOB
         /// <param name="netInfo">Network prefab for this prop.</param>
         /// <param name="segmentID">Segment ID (if using a skin; set to 0 otherwise).</param>
         /// <param name="laneInfo">Netlane for this prop.</param>
-        /// <param name="propIndex">NetLaneProp prop index.</param>
+        /// <param name="laneIndex">Lane index..</param>
+        /// <param name="propIndex">Prop index.</param>
         /// <returns>Prop handler for this prop (creating a new handler if required).</returns>
-        internal static LanePropHandler GetOrAddHandler(NetInfo netInfo, ushort segmentID, NetInfo.Lane laneInfo, int propIndex)
+        internal static LanePropHandler GetOrAddHandler(NetInfo netInfo, ushort segmentID, NetInfo.Lane laneInfo, int laneIndex, int propIndex)
         {
             // Check for an existing lane entry.
             if (!Handlers.TryGetValue(laneInfo, out Dictionary<int, LanePropHandler> laneDict))
@@ -38,7 +39,7 @@ namespace BOB
             if (!laneDict.TryGetValue(propIndex, out LanePropHandler propHandler))
             {
                 // No existing handler for this prop index - create a new one and add to the dictionary.
-                propHandler = CreateHandler(netInfo, segmentID, laneInfo, propIndex);
+                propHandler = CreateHandler(netInfo, segmentID, laneInfo, laneIndex, propIndex);
                 laneDict.Add(propIndex, propHandler);
             }
 
@@ -101,9 +102,10 @@ namespace BOB
         /// <param name="netInfo">Network prefab for this prop.</param>
         /// <param name="segmentID">Segment ID (if using a skin; set to 0 otherwise).</param>
         /// <param name="laneInfo">Netlane for this prop.</param>
-        /// <param name="propIndex">NetLaneProp prop index.</param>
+        /// <param name="laneIndex">Lane index.</param>
+        /// <param name="propIndex">Prop index.</param>
         /// <returns>New <see cref="LanePropHandler"/> (<c>null</c> if creation failed).</returns>
-        internal static LanePropHandler CreateHandler(NetInfo netInfo, ushort segmentID, NetInfo.Lane laneInfo, int propIndex)
+        internal static LanePropHandler CreateHandler(NetInfo netInfo, ushort segmentID, NetInfo.Lane laneInfo, int laneIndex, int propIndex)
         {
             // Safety checks to ensure prop reference is valid.
             NetLaneProps.Prop[] props = laneInfo?.m_laneProps?.m_props;
@@ -114,7 +116,7 @@ namespace BOB
                 if (prop != null)
                 {
                     // Create and return new reference, recording original values.
-                    return new LanePropHandler(netInfo, segmentID, laneInfo, propIndex, prop);
+                    return new LanePropHandler(netInfo, segmentID, laneInfo, laneIndex, propIndex, prop);
                 }
             }
 

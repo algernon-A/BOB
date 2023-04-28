@@ -160,7 +160,7 @@ namespace BOB
             }
 
             // Set the new replacement.
-            NetHandlers.GetOrAddHandler(replacement.NetInfo, replacement.SegmentID, thisLane, replacement.PropIndex)?.SetReplacement(replacement, ThisPriority);
+            NetHandlers.GetOrAddHandler(replacement.NetInfo, replacement.SegmentID, thisLane, replacement.LaneIndex, replacement.PropIndex)?.SetReplacement(replacement, ThisPriority);
         }
     }
 }

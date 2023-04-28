@@ -246,7 +246,7 @@ namespace BOB
                 thisReplacement.ReplacementName = replacementInfo.name;
 
                 // Update handler.
-                LanePropHandler thisHandler = NetHandlers.GetOrAddHandler(netInfo, segmentID, lane, propIndex);
+                LanePropHandler thisHandler = NetHandlers.GetOrAddHandler(netInfo, segmentID, lane, laneIndex, propIndex);
                 thisHandler.SetReplacement(thisReplacement, ReplacementPriority.AddedReplacement);
             }
         }
@@ -397,7 +397,7 @@ namespace BOB
             };
 
             // Ensure a handler is generated and add the replacement to it (this will update the prop and the renderer).
-            NetHandlers.GetOrAddHandler(netInfo, replacement.SegmentID, lane, newIndex).SetReplacement(replacement, ReplacementPriority.AddedReplacement);
+            NetHandlers.GetOrAddHandler(netInfo, replacement.SegmentID, lane, replacement.LaneIndex, newIndex).SetReplacement(replacement, ReplacementPriority.AddedReplacement);
 
             return newIndex;
         }

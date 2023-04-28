@@ -5,13 +5,13 @@
 
 namespace BOB
 {
+    using System;
     using System.Collections.Generic;
     using System.Reflection;
     using AlgernonCommons;
     using BOB.Skins;
     using ColossalFramework;
     using UnityEngine;
-    using static NetInfo;
 
     /// <summary>
     /// Class to handle centralised network data.
@@ -178,17 +178,33 @@ namespace BOB
             NewNetLaneProps newLaneProps = ScriptableObject.CreateInstance<NewNetLaneProps>();
             newLaneProps.m_props = new NetLaneProps.Prop[laneInfo.m_laneProps.m_props.Length];
 
-            // Iterate through each  in the existing instance
+            // Iterate through each LaneProp in the existing instance and clone it.
             for (int i = 0; i < newLaneProps.m_props.Length; ++i)
             {
-                NetLaneProps.Prop existingNetLaneProp = laneInfo.m_laneProps.m_props[i];
-
-                newLaneProps.m_props[i] = new NetLaneProps.Prop();
-                CopyFields(existingNetLaneProp, newLaneProps.m_props[i]);
+                newLaneProps.m_props[i] = CloneLaneProp(laneInfo.m_laneProps.m_props[i]);
             }
 
             // Replace network laneProps with our new instance.
             laneInfo.m_laneProps = newLaneProps;
+        }
+
+        /// <summary>
+        /// Clones the given <see cref="NetLaneProps.Prop"/>.
+        /// </summary>
+        /// <param name="laneProp">see cref="NetLaneProps.Prop"/> to clone.</param>
+        /// <returns>New clone.</returns>
+        internal static NetLaneProps.Prop CloneLaneProp(NetLaneProps.Prop laneProp)
+        {
+            if (laneProp is ICloneable cloneableProp)
+            {
+                // Adaptive networks lane props are cloneable - easy.
+                return cloneableProp.Clone() as NetLaneProps.Prop;
+            }
+
+            // Otherwise, clone it manually.
+            NetLaneProps.Prop clone = new NetLaneProps.Prop();
+            CopyFields(laneProp, clone);
+            return clone;
         }
 
         /// <summary>

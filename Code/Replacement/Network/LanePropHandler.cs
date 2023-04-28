@@ -6,6 +6,7 @@
 namespace BOB
 {
     using AlgernonCommons;
+    using BOB.Skins;
     using UnityEngine;
 
     /// <summary>
@@ -17,8 +18,9 @@ namespace BOB
         private readonly NetInfo _netInfo;
 
         // Parent lane prefab.
-        private readonly NetInfo.Lane _laneInfo;
+        private readonly NetInfo.Lane _originalLaneInfo;
         private readonly ushort _segmentID;
+        private readonly int _laneIndex;
 
         // Original prop data.
         private readonly float _originalAngle;
@@ -37,9 +39,10 @@ namespace BOB
         /// <param name="prefab"><see cref="NetInfo"/> prefab containing this prop.</param>
         /// <param name="segmentID">Segment ID (for a skin), default 0 (no skin).</param>
         /// <param name="laneInfo"><see cref="NetInfo.Lane"/> containing this prop (must not be null).</param>
+        /// <param name="laneIndex">Lane index.</param>
         /// <param name="propIndex">Prop index.</param>
         /// <param name="laneProp">Lane prop instance (must not be <null></null>).</param>
-        public LanePropHandler(NetInfo prefab, ushort segmentID, NetInfo.Lane laneInfo, int propIndex, NetLaneProps.Prop laneProp)
+        public LanePropHandler(NetInfo prefab, ushort segmentID, NetInfo.Lane laneInfo, int laneIndex, int propIndex, NetLaneProps.Prop laneProp)
             : base(
                   propIndex,
                   laneProp.m_prop,
@@ -52,7 +55,8 @@ namespace BOB
             // Set original data.
             _netInfo = prefab;
             _segmentID = segmentID;
-            _laneInfo = laneInfo;
+            _laneIndex = laneIndex;
+            _originalLaneInfo = laneInfo;
             _originalAngle = laneProp.m_angle;
             _originalRepeatDistance = laneProp.m_repeatDistance;
 
@@ -68,7 +72,7 @@ namespace BOB
         /// <summary>
         /// Gets the lane info for this prop.
         /// </summary>
-        public NetInfo.Lane LaneInfo => _laneInfo;
+        public NetInfo.Lane LaneInfo => _originalLaneInfo;
 
         /// <summary>
         /// Gets the original rotation angle in degrees.
@@ -289,7 +293,7 @@ namespace BOB
         public void RevertToOriginal()
         {
             // Local reference.
-            NetLaneProps.Prop thisProp = _laneInfo?.m_laneProps?.m_props[PropIndex];
+            NetLaneProps.Prop thisProp = _originalLaneInfo?.m_laneProps?.m_props[PropIndex];
             if (thisProp != null)
             {
                 // Added prop?
@@ -327,7 +331,7 @@ namespace BOB
         public override void ClearPreview()
         {
             // Previews may be for now removed added props - perform index check first.
-            if (_laneInfo?.m_laneProps?.m_props != null && PropIndex < _laneInfo.m_laneProps.m_props.Length)
+            if (_originalLaneInfo?.m_laneProps?.m_props != null && PropIndex < _originalLaneInfo.m_laneProps.m_props.Length)
             {
                 UpdateProp();
             }
@@ -359,6 +363,16 @@ namespace BOB
         {
             if (replacement is BOBConfig.NetReplacement netReplacement)
             {
+                NetLaneProps.Prop[] targetProps = _originalLaneInfo.m_laneProps.m_props;
+
+                // Check for skin, and create custom lane reference if needed.
+                if (_segmentID != 0)
+                {
+                    Logging.KeyMessage("ensuring custom lane");
+                    NetworkSkins.SegmentSkins[_segmentID].EnsureCustomLane(_laneIndex);
+                    targetProps = NetworkSkins.SegmentSkins[_segmentID].Lanes[_laneIndex].m_laneProps.m_props;
+                }
+
                 // Convert offset to Vector3.
                 Vector3 offset = new Vector3
                 {
@@ -368,30 +382,30 @@ namespace BOB
                 };
 
                 // Apply replacement.
-                _laneInfo.m_laneProps.m_props[PropIndex].m_prop = netReplacement.ReplacementProp;
-                _laneInfo.m_laneProps.m_props[PropIndex].m_finalProp = netReplacement.ReplacementProp;
-                _laneInfo.m_laneProps.m_props[PropIndex].m_tree = netReplacement.ReplacementTree;
-                _laneInfo.m_laneProps.m_props[PropIndex].m_finalTree = netReplacement.ReplacementTree;
+                targetProps[PropIndex].m_prop = netReplacement.ReplacementProp;
+                targetProps[PropIndex].m_finalProp = netReplacement.ReplacementProp;
+                targetProps[PropIndex].m_tree = netReplacement.ReplacementTree;
+                targetProps[PropIndex].m_finalTree = netReplacement.ReplacementTree;
 
                 // Invert x offset and angle to match original prop x position.
                 float angleMult = 1f;
-                if (_laneInfo.m_position + OriginalPosition.x < 0)
+                if (_originalLaneInfo.m_position + OriginalPosition.x < 0)
                 {
                     offset.x = 0 - offset.x;
                     angleMult = -1;
                 }
 
                 // Angle and offset.
-                _laneInfo.m_laneProps.m_props[PropIndex].m_angle = OriginalAngle + (netReplacement.Angle * angleMult);
-                _laneInfo.m_laneProps.m_props[PropIndex].m_position = OriginalPosition + offset;
+                targetProps[PropIndex].m_angle = OriginalAngle + (netReplacement.Angle * angleMult);
+                targetProps[PropIndex].m_position = OriginalPosition + offset;
 
                 // Probability.
-                _laneInfo.m_laneProps.m_props[PropIndex].m_probability = netReplacement.Probability;
+                targetProps[PropIndex].m_probability = netReplacement.Probability;
 
                 // Repeat distance, if a valid value is set.
                 if (netReplacement.RepeatDistance > 1)
                 {
-                    _laneInfo.m_laneProps.m_props[PropIndex].m_repeatDistance = netReplacement.RepeatDistance;
+                    targetProps[PropIndex].m_repeatDistance = netReplacement.RepeatDistance;
                 }
 
                 // Update render.

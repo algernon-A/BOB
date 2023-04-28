@@ -202,6 +202,7 @@ namespace BOB
         public override void Start()
         {
             base.Start();
+
             try
             {
                 // Add lane menu
@@ -217,7 +218,7 @@ namespace BOB
                 UIButton packButton = AddIconButton(this, PackButtonX, ToggleY, ToggleSize, "BOB_PNL_PKB", UITextures.LoadQuadSpriteAtlas("BOB-PropPack"));
                 packButton.eventClicked += (component, clickEvent) => StandalonePanelManager<BOBPackPanel>.Create();
 
-                _segmentButton = AddIconButton(this, PackButtonX + 40f, ToggleY, ToggleSize, "BOB_PNL_PKB", UITextures.LoadQuadSpriteAtlas("BOB-SegmentSmall"));
+                _segmentButton = AddIconButton(this, ModeX + (3f * ToggleSize), ToggleY + ToggleSize, ToggleSize, "BOB_PNL_PKB", UITextures.LoadQuadSpriteAtlas("BOB-SegmentSmall"));
                 _segmentButton.eventClicked += (c, p) => AddSkin();
 
                 // Add repeat slider.
@@ -872,13 +873,13 @@ namespace BOB
         /// </summary>
         /// <param name="netInfo">Network prefab.</param>
         /// <param name="segmentID">Segment ID (if using a skin; set to 0 otherwise).</param>
-        /// <param name="lane">Lane index.</param>
+        /// <param name="laneIndex">Lane index.</param>
         /// <param name="propIndex">Prop index.</param>
         /// <returns>New prop handler containing original data.</returns>
-        private LanePropHandler GetOriginalData(NetInfo netInfo, ushort segmentID, int lane, int propIndex)
+        private LanePropHandler GetOriginalData(NetInfo netInfo, ushort segmentID, int laneIndex, int propIndex)
         {
             // Get the lane.
-            NetInfo.Lane thisLane = NetData.GetLane(netInfo, segmentID, lane);
+            NetInfo.Lane thisLane = NetData.GetLane(netInfo, segmentID, laneIndex);
             if (thisLane == null)
             {
                 return null;
@@ -888,12 +889,12 @@ namespace BOB
             NetLaneProps.Prop[] propBuffer = thisLane?.m_laneProps?.m_props;
             if (propBuffer == null || propBuffer.Length <= propIndex)
             {
-                Logging.Error("invalid prop index reference of ", propIndex, " for lane ", lane, " of selected network ", SelectedNet?.name ?? "null");
+                Logging.Error("invalid prop index reference of ", propIndex, " for lane ", laneIndex, " of selected network ", SelectedNet?.name ?? "null");
                 return null;
             }
 
             // Create a new prop handler based on the current prop state (not the original).
-            return NetHandlers.GetOrAddHandler(netInfo, segmentID, thisLane, propIndex);
+            return NetHandlers.GetOrAddHandler(netInfo, segmentID, thisLane, laneIndex, propIndex);
         }
 
         /// <summary>

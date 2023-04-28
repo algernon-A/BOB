@@ -46,7 +46,7 @@ namespace BOB.Skins
                 Array.Copy(prefab.m_segments, Segments, segmentSize);
             }
 
-            // Copy lanes.
+            // Assign lane data (pointing to original lane data to start with).
             if (prefab.m_lanes != null)
             {
                 int laneSize = prefab.m_lanes.Length;
@@ -54,28 +54,25 @@ namespace BOB.Skins
 
                 for (int i = 0; i < laneSize; ++i)
                 {
-                    Lanes[i] = new BOBCustomLane(prefab.m_lanes[i]);
+                    Lanes[i] = prefab.m_lanes[i];
                 }
             }
         }
 
         /// <summary>
-        /// Clones the given <see cref="NetLaneProps.Prop"/>.
+        /// Adds a new custom lane for the given lane index.
         /// </summary>
-        /// <param name="laneProp">see cref="NetLaneProps.Prop"/> to clone.</param>
-        /// <returns>New clone.</returns>
-        public static NetLaneProps.Prop CloneLaneProp(NetLaneProps.Prop laneProp)
+        /// <param name="laneIndex">Lane index number.</param>
+        public void EnsureCustomLane(int laneIndex)
         {
-            if (laneProp is ICloneable cloneableProp)
+            // Check to make sure we haven't already done this.
+            if (Lanes[laneIndex] is BOBCustomLane)
             {
-                // Adaptive networks lane props are cloneable - easy.
-                return cloneableProp.Clone() as NetLaneProps.Prop;
+                return;
             }
 
-            // Otherwise, clone it manually.
-            NetLaneProps.Prop clone = new NetLaneProps.Prop();
-            NetData.CopyFields(laneProp, clone);
-            return clone;
+            // Create new BOB lane based on the existing lane.
+            Lanes[laneIndex] = new BOBCustomLane(NetInfo.m_lanes[laneIndex]);
         }
 
         /// <summary>
@@ -116,7 +113,7 @@ namespace BOB.Skins
                     m_laneProps = UnityEngine.Object.Instantiate(original.m_laneProps);
                     for (int i = 0; i < original.m_laneProps.m_props.Length; ++i)
                     {
-                        m_laneProps.m_props[i] = CloneLaneProp(original.m_laneProps.m_props[i]);
+                        m_laneProps.m_props[i] = NetData.CloneLaneProp(original.m_laneProps.m_props[i]);
                     }
                 }
             }
