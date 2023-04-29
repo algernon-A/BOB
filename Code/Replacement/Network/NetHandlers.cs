@@ -22,7 +22,7 @@ namespace BOB
         /// <param name="netInfo">Network prefab for this prop.</param>
         /// <param name="segmentID">Segment ID (if using a skin; set to 0 otherwise).</param>
         /// <param name="laneInfo">Netlane for this prop.</param>
-        /// <param name="laneIndex">Lane index..</param>
+        /// <param name="laneIndex">Lane index.</param>
         /// <param name="propIndex">Prop index.</param>
         /// <returns>Prop handler for this prop (creating a new handler if required).</returns>
         internal static LanePropHandler GetOrAddHandler(NetInfo netInfo, ushort segmentID, NetInfo.Lane laneInfo, int laneIndex, int propIndex)

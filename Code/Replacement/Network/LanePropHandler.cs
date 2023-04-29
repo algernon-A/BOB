@@ -292,7 +292,13 @@ namespace BOB
         /// </summary>
         public void RevertToOriginal()
         {
-            // Local reference.
+            // Is this a skin?
+            if (_segmentID != 0)
+            {
+                // Yes - remove skin change.
+                NetworkSkins.SegmentSkins[_segmentID].RemoveChange(_laneIndex, PropIndex);
+            }
+
             NetLaneProps.Prop thisProp = _originalLaneInfo?.m_laneProps?.m_props[PropIndex];
             if (thisProp != null)
             {
@@ -370,6 +376,7 @@ namespace BOB
                 {
                     Logging.KeyMessage("ensuring custom lane");
                     NetworkSkins.SegmentSkins[_segmentID].EnsureCustomLane(_laneIndex);
+                    NetworkSkins.SegmentSkins[_segmentID].RecordChange(_laneIndex, PropIndex);
                     targetProps = NetworkSkins.SegmentSkins[_segmentID].Lanes[_laneIndex].m_laneProps.m_props;
                 }
 

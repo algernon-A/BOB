@@ -6,6 +6,7 @@
 namespace BOB.Skins
 {
     using System;
+    using System.Collections.Generic;
 
     /// <summary>
     /// Custom network skin.
@@ -17,7 +18,7 @@ namespace BOB.Skins
         /// <summary>
         /// Base network prefab.
         /// </summary>
-        public readonly NetInfo NetInfo;
+        public readonly NetInfo NetPrefab;
 
         /// <summary>
         /// Custom lanes.
@@ -29,6 +30,9 @@ namespace BOB.Skins
         /// </summary>
         public NetInfo.Segment[] Segments;
 
+        // Array of lists of changed prop indicies, in array indexed by lane.
+        private readonly HashSet<int>[] _changedLanes;
+
         ///
         /// <summary>
         /// Initializes a new instance of the <see cref="NetworkSkin"/> class.
@@ -36,7 +40,7 @@ namespace BOB.Skins
         /// <param name="prefab"><see cref="NetInfo"/> prefab to create skin from.</param>
         public NetworkSkin(NetInfo prefab)
         {
-            NetInfo = prefab;
+            NetPrefab = prefab;
 
             // Copy segments.
             if (prefab.m_segments != null)
@@ -56,6 +60,9 @@ namespace BOB.Skins
                 {
                     Lanes[i] = prefab.m_lanes[i];
                 }
+
+                // Initialise change array.
+                _changedLanes = new HashSet<int>[laneSize];
             }
         }
 
@@ -72,8 +79,56 @@ namespace BOB.Skins
             }
 
             // Create new BOB lane based on the existing lane.
-            Lanes[laneIndex] = new BOBCustomLane(NetInfo.m_lanes[laneIndex]);
+            Lanes[laneIndex] = new BOBCustomLane(NetPrefab.m_lanes[laneIndex]);
         }
+
+        /// <summary>
+        /// Records a change to a <see cref="NetLaneProps.Prop"/> being applied to this skin.
+        /// </summary>
+        /// <param name="laneIndex">Lane index of changed <see cref="NetLaneProps.Prop"/>.</param>
+        /// <param name="propIndex">Prop index of changed <see cref="NetLaneProps.Prop"/>.</param>
+        public void RecordChange(int laneIndex, int propIndex)
+        {
+            // Check if a list has already been created for this item.
+            if (_changedLanes[laneIndex] == null)
+            {
+                // No exisitng list - create one.
+                _changedLanes[laneIndex] = new HashSet<int>();
+            }
+            else if (_changedLanes[laneIndex].Contains(propIndex))
+            {
+                // Existing list already contains this prop index - don't do anything further.
+                return;
+            }
+
+            // Record this change.
+            _changedLanes[laneIndex].Add(propIndex);
+        }
+
+        /// <summary>
+        /// Removes all changes to a <see cref="NetLaneProps.Prop"/> from this skin.
+        /// </summary>
+        /// <param name="laneIndex">Lane index of changed <see cref="NetLaneProps.Prop"/>.</param>
+        /// <param name="propIndex">Prop index of changed <see cref="NetLaneProps.Prop"/>.</param>
+        public void RemoveChange(int laneIndex, int propIndex)
+        {
+            // Don't do anything if there's no change recorded for the given item.
+            if (_changedLanes[laneIndex] == null || !_changedLanes[laneIndex].Contains(propIndex))
+            {
+                return;
+            }
+
+            // Remove record.
+            _changedLanes[laneIndex].Remove(propIndex);
+        }
+
+        /// <summary>
+        /// Chceks to see if a skin has a change for the given <see cref="NetLaneProps.Prop"/>.
+        /// </summary>
+        /// <param name="laneIndex">Lane index of <see cref="NetLaneProps.Prop"/>.</param>
+        /// <param name="propIndex">Prop index of <see cref="NetLaneProps.Prop"/>.</param>
+        /// <returns><c>true</c> if this skin has a change for that item, <c>false</c> otherwise.</returns>
+        public bool HasChange(int laneIndex, int propIndex) => _changedLanes[laneIndex] != null && _changedLanes[laneIndex].Contains(propIndex);
 
         /// <summary>
         /// Destroys the object and all ScriptableObject components.
@@ -111,6 +166,8 @@ namespace BOB.Skins
                 if (original.m_laneProps != null)
                 {
                     m_laneProps = UnityEngine.Object.Instantiate(original.m_laneProps);
+
+                    // Copy original props to new lane.
                     for (int i = 0; i < original.m_laneProps.m_props.Length; ++i)
                     {
                         m_laneProps.m_props[i] = NetData.CloneLaneProp(original.m_laneProps.m_props[i]);
