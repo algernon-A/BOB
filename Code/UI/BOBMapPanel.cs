@@ -141,7 +141,7 @@ namespace BOB
             catch (Exception e)
             {
                 // Log and report any exception.
-                Logging.LogException(e, "exception perforiming map replacement");
+                Logging.LogException(e, "exception performing map replacement");
             }
         }
 
@@ -180,7 +180,7 @@ namespace BOB
             catch (Exception e)
             {
                 // Log and report any exception.
-                Logging.LogException(e, "exception perforiming map reversion");
+                Logging.LogException(e, "exception performing map reversion");
             }
         }
 
