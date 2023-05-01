@@ -93,7 +93,7 @@ namespace BOB
                     PropInfo thisProp = thisLaneProp.m_finalProp;
 
                     // Get any active handler.
-                    LanePropHandler handler = NetHandlers.GetHandler(thisLane, propIndex);
+                    LanePropHandler handler = NetHandlers.GetHandler(thisLane, replacement.SegmentID, laneIndex, propIndex);
                     if (handler != null)
                     {
                         // Active handler found - use original values for checking eligibility (instead of currently active values).

@@ -91,7 +91,7 @@ namespace BOB
                     Vector3 originalPosition = prop.m_position;
 
                     // Check for any active replacements; if there are any, retrieve the original prop info.
-                    if (NetHandlers.GetHandler(thisLane, i) is LanePropHandler handler)
+                    if (NetHandlers.GetHandler(thisLane, replacement.SegmentID, replacement.LaneIndex, i) is LanePropHandler handler)
                     {
                         originalProp = handler.OriginalFinalProp;
                         originalTree = handler.OriginalFinalTree;
@@ -121,7 +121,7 @@ namespace BOB
                     Vector3 originalPosition = props[replacement.PropIndex].m_position;
 
                     // Check for any active replacements; if there are any, retrieve the original prop position.
-                    if (NetHandlers.GetHandler(thisLane, replacement.PropIndex) is LanePropHandler handler)
+                    if (NetHandlers.GetHandler(thisLane, replacement.SegmentID, replacement.LaneIndex, replacement.PropIndex) is LanePropHandler handler)
                     {
                         originalPosition = handler.OriginalPosition;
                     }

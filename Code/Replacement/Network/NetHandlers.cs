@@ -7,6 +7,7 @@ namespace BOB
 {
     using System.Collections.Generic;
     using AlgernonCommons;
+    using BOB.Skins;
 
     /// <summary>
     /// Central coordination and tracking of active network replacmenets.
@@ -27,6 +28,21 @@ namespace BOB
         /// <returns>Prop handler for this prop (creating a new handler if required).</returns>
         internal static LanePropHandler GetOrAddHandler(NetInfo netInfo, ushort segmentID, NetInfo.Lane laneInfo, int laneIndex, int propIndex)
         {
+            // Segment skin - these are only temporary and not recorded in dictionary.
+            if (segmentID != 0)
+            {
+                Logging.Message("getting or adding handler with segmentID ", segmentID);
+                if (NetworkSkins.SegmentSkins[segmentID] == null)
+                {
+                    Logging.Message("creating new skin because no existing skin for segment ", segmentID);
+                    {
+                        NetworkSkins.SegmentSkins[segmentID] = new NetworkSkin(netInfo);
+                    }
+                }
+
+                return CreateHandler(netInfo, segmentID, laneInfo, laneIndex, propIndex);
+            }
+
             // Check for an existing lane entry.
             if (!Handlers.TryGetValue(laneInfo, out Dictionary<int, LanePropHandler> laneDict))
             {
@@ -39,7 +55,7 @@ namespace BOB
             if (!laneDict.TryGetValue(propIndex, out LanePropHandler propHandler))
             {
                 // No existing handler for this prop index - create a new one and add to the dictionary.
-                propHandler = CreateHandler(netInfo, segmentID, laneInfo, laneIndex, propIndex);
+                propHandler = CreateHandler(netInfo, 0, laneInfo, laneIndex, propIndex);
                 laneDict.Add(propIndex, propHandler);
             }
 
@@ -50,10 +66,24 @@ namespace BOB
         /// Gets any existing prop handler for the given parameters, returning null if one doesn't already exist.
         /// </summary>
         /// <param name="laneInfo">Netlane for this prop.</param>
+        /// <param name="segmentID">Segment ID (if using a skin; set to 0 otherwise).</param>
+        /// <param name="laneIndex">Lane index.</param>
         /// <param name="propIndex">NetLaneProp prop index.</param>
         /// <returns>Prop handler (null if none).</returns>
-        internal static LanePropHandler GetHandler(NetInfo.Lane laneInfo, int propIndex)
+        internal static LanePropHandler GetHandler(NetInfo.Lane laneInfo, ushort segmentID, int laneIndex, int propIndex)
         {
+            // Check for segment skin - these are only temporary and not recorded in dictionary.
+            if (segmentID != 0)
+            {
+                if (NetworkSkins.SegmentSkins[segmentID] is NetworkSkin skin)
+                {
+                    if (skin.HasChange(laneIndex, propIndex))
+                    {
+                        return CreateHandler(skin.NetPrefab, segmentID, laneInfo, laneIndex, propIndex);
+                    }
+                }
+            }
+
             // Check for an existing lane entry.
             if (Handlers.TryGetValue(laneInfo, out Dictionary<int, LanePropHandler> laneDict))
             {
@@ -73,10 +103,12 @@ namespace BOB
         /// Returns the replacement of the given priority for the given parameters, if any.
         /// </summary>
         /// <param name="laneInfo">Netlane for this prop.</param>
+        /// <param name="segmentID">Segment ID (if using a skin; set to 0 otherwise).</param>
+        /// <param name="laneIndex">Lane index.</param>
         /// <param name="propIndex">NetLaneProp prop index.</param>
         /// <param name="priority">Replacement priority to return.</param>
         /// <returns>Specified network replacment entry (null if none).</returns>
-        internal static BOBConfig.NetReplacement GetReplacement(NetInfo.Lane laneInfo, int propIndex, ReplacementPriority priority) => GetHandler(laneInfo, propIndex)?.GetReplacement(priority);
+        internal static BOBConfig.NetReplacement GetReplacement(NetInfo.Lane laneInfo, ushort segmentID, int laneIndex, int propIndex, ReplacementPriority priority) => GetHandler(laneInfo, segmentID, laneIndex, propIndex)?.GetReplacement(priority);
 
         /// <summary>
         /// Removes the given replacement from all existing handlers.

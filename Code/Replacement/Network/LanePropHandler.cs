@@ -70,6 +70,11 @@ namespace BOB
         public NetInfo NetInfo => _netInfo;
 
         /// <summary>
+        /// Gets the segment ID for this handler.
+        /// </summary>
+        public ushort SegmentID => _segmentID;
+
+        /// <summary>
         /// Gets the lane info for this prop.
         /// </summary>
         public NetInfo.Lane LaneInfo => _originalLaneInfo;

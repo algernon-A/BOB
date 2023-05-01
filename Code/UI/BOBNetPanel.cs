@@ -572,7 +572,7 @@ namespace BOB
                     else
                     {
                         // Non-added prop - see if we've got an existing reference.
-                        LanePropHandler handler = NetHandlers.GetHandler(lanes[lane], propIndex);
+                        LanePropHandler handler = NetHandlers.GetHandler(lanes[lane], EffectiveSegmentID, lane, propIndex);
                         if (handler != null)
                         {
                             // Existing reference found - get the relevant original prefab name.
