@@ -353,6 +353,12 @@ namespace BOB
         /// </summary>
         private void UpdateProp()
         {
+            // Don't do anything further if this is a skin.
+            if (_segmentID != 0)
+            {
+                return;
+            }
+
             // Is there an active replacement for this reference?
             if (ActiveReplacement is BOBConfig.NetReplacement activeReplacement)
             {
@@ -379,9 +385,7 @@ namespace BOB
                 // Check for skin, and create custom lane reference if needed.
                 if (_segmentID != 0)
                 {
-                    Logging.KeyMessage("ensuring custom lane");
-                    NetworkSkins.SegmentSkins[_segmentID].EnsureCustomLane(_laneIndex);
-                    NetworkSkins.SegmentSkins[_segmentID].RecordChange(_laneIndex, PropIndex);
+                    NetworkSkins.SegmentSkins[_segmentID].AddChange(_laneIndex, PropIndex);
                     targetProps = NetworkSkins.SegmentSkins[_segmentID].Lanes[_laneIndex].m_laneProps.m_props;
                 }
 

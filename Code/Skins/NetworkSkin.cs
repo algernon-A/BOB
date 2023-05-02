@@ -67,28 +67,15 @@ namespace BOB.Skins
         }
 
         /// <summary>
-        /// Adds a new custom lane for the given lane index.
-        /// </summary>
-        /// <param name="laneIndex">Lane index number.</param>
-        public void EnsureCustomLane(int laneIndex)
-        {
-            // Check to make sure we haven't already done this.
-            if (Lanes[laneIndex] is BOBCustomLane)
-            {
-                return;
-            }
-
-            // Create new BOB lane based on the existing lane.
-            Lanes[laneIndex] = new BOBCustomLane(NetPrefab.m_lanes[laneIndex]);
-        }
-
-        /// <summary>
         /// Records a change to a <see cref="NetLaneProps.Prop"/> being applied to this skin.
         /// </summary>
         /// <param name="laneIndex">Lane index of changed <see cref="NetLaneProps.Prop"/>.</param>
         /// <param name="propIndex">Prop index of changed <see cref="NetLaneProps.Prop"/>.</param>
-        public void RecordChange(int laneIndex, int propIndex)
+        public void AddChange(int laneIndex, int propIndex)
         {
+            // Ensure a custom lane.
+            EnsureCustomLane(laneIndex);
+
             // Check if a list has already been created for this item.
             if (_changedLanes[laneIndex] == null)
             {
@@ -147,6 +134,22 @@ namespace BOB.Skins
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Ensures that a custom lane exists for the given lane index.
+        /// </summary>
+        /// <param name="laneIndex">Lane index number.</param>
+        private void EnsureCustomLane(int laneIndex)
+        {
+            // Check to make sure we haven't already done this.
+            if (Lanes[laneIndex] is BOBCustomLane)
+            {
+                return;
+            }
+
+            // Create new BOB lane based on the existing lane.
+            Lanes[laneIndex] = new BOBCustomLane(NetPrefab.m_lanes[laneIndex]);
         }
 
         /// <summary>
