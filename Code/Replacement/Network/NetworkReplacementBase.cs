@@ -72,7 +72,12 @@ namespace BOB
                         Ypos = position.y,
                         Zpos = position.z,
                     };
-                    ReplacementEntry(netInfo).Add(thisReplacement);
+
+                    // Record replacement against prefab if this is a prefab replacement.
+                    if (segmentID == 0)
+                    {
+                        ReplacementEntry(netInfo).Add(thisReplacement);
+                    }
                 }
             }
 
