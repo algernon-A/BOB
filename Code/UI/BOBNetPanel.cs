@@ -464,7 +464,7 @@ namespace BOB
                 if (SelectedTargetItem is TargetNetItem targetNetItem)
                 {
                     // Select reversion type.
-                    if (_hasSkin && CurrentSkin != null)
+                    if (targetNetItem.SegmentID != 0 && CurrentSkin != null)
                     {
                         // Skin reversion.
                         CurrentSkin.RemoveChange(targetNetItem.LaneIndex, targetNetItem.PropIndex);
@@ -594,6 +594,9 @@ namespace BOB
                                 continue;
                             }
 
+                            // Record segment ID.
+                            targetNetItem.SegmentID = handler.SegmentID;
+
                             // Record active replacements.
                             targetNetItem.IndividualReplacement = handler.GetReplacement(ReplacementPriority.IndividualReplacement);
                             targetNetItem.GroupedReplacement = handler.GetReplacement(ReplacementPriority.GroupedReplacement);
@@ -611,7 +614,7 @@ namespace BOB
                         }
 
                         // Grouped or individual?
-                        if (CurrentMode == (int)ReplacementModes.Individual)
+                        if (CurrentMode == (int)ReplacementModes.Individual || targetNetItem.SegmentID != 0)
                         {
                             // Individual - set index to the current prop indexes.
                             targetNetItem.PropIndex = propIndex;
@@ -841,7 +844,7 @@ namespace BOB
             }
 
             // Enable revert button if a skin change is selected.
-            if (CurrentMode == ReplacementModes.Individual && _hasSkin && CurrentSkin != null && SelectedTargetItem is TargetNetItem targetNetItem)
+            if (_hasSkin && CurrentSkin != null && SelectedTargetItem is TargetNetItem targetNetItem && targetNetItem.SegmentID != 0)
             {
                 m_revertButton.isEnabled = CurrentSkin.HasChange(targetNetItem.LaneIndex, targetNetItem.PropIndex);
             }

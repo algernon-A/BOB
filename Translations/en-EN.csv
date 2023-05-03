@@ -72,6 +72,7 @@
 "BOB_SPR_ABL","A replacement is currently applied for all buildings"
 "BOB_SPR_SNT","A replacement is currently applied for these networks"
 "BOB_SPR_ANT","A replacement is currently applied for all networks"
+"ACTIVE_SEGMENT","A replacement is currently applied for this segment"
 "BOB_SPR_PCK","A replacement pack is currently applied"
 "BOB_SPR_ADD","This item is added by BOB and is not part of the original asset"
 "BOB_PCK_APP","Apply pack"

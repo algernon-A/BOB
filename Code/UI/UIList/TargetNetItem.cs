@@ -8,6 +8,7 @@ namespace BOB
     using System.Collections.Generic;
     using AlgernonCommons.Translation;
     using AlgernonCommons.UI;
+    using BOB.Skins;
     using ColossalFramework.UI;
 
     /// <summary>
@@ -57,6 +58,11 @@ namespace BOB
         internal float OriginalRepeat;
 
         /// <summary>
+        /// The segment ID for this item, if any (0 for none).
+        /// </summary>
+        internal ushort SegmentID;
+
+        /// <summary>
         /// Gets a value indicating whether there's a currently active replacement for this item.
         /// </summary>
         internal override bool HasActiveReplacement => AddedProp != null | IndividualReplacement != null | GroupedReplacement != null | AllReplacement != null | PackReplacement != null;
@@ -84,6 +90,13 @@ namespace BOB
                 // Added prop.
                 lineSprite.atlas = UITextures.LoadQuadSpriteAtlas("BOB-RoundPlus");
                 lineSprite.tooltip = Translations.Translate("BOB_SPR_ADD");
+                lineSprite.Show();
+            }
+            else if (SegmentID != 0 && NetworkSkins.SegmentSkins[SegmentID] is NetworkSkin skin && skin.HasChange(LaneIndex, PropIndex))
+            {
+                // Skinned replacement.
+                lineSprite.atlas = UITextures.LoadQuadSpriteAtlas("BOB-SegmentSmall");
+                lineSprite.tooltip = Translations.Translate("ACTIVE_SEGMENT");
                 lineSprite.Show();
             }
             else if (IndividualReplacement != null)
