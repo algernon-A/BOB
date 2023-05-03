@@ -131,7 +131,7 @@ namespace BOB
         /// </summary>
         /// <param name="netInfo">Prefab (ignored if <c>segmentID</c> is not 0).</param>
         /// <param name="segmentID">Segment ID (set to 0 for no skin).</param>
-        /// <returns>Relevant <see cref="NetInfo.Lane"/> array.</returns>
+        /// <returns>Relevant <see cref="NetInfo.Lane"/> array (null if none).</returns>
         internal static NetInfo.Lane[] GetLanes(NetInfo netInfo, ushort segmentID)
         {
             // Skin or prefab?
@@ -140,14 +140,9 @@ namespace BOB
                 // Prefab.
                 return netInfo.m_lanes;
             }
-            else if (NetworkSkins.SegmentSkins[segmentID] != null)
-            {
-                // Skin.
-                return NetworkSkins.SegmentSkins[segmentID].Lanes;
-            }
 
-            // If we got here, no matching lane was found.
-            return null;
+            // Return skin lanes (null if none).
+            return NetworkSkins.SegmentSkins[segmentID].Lanes;
         }
 
         /// <summary>

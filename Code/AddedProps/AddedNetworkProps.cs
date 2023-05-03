@@ -8,6 +8,7 @@ namespace BOB
     using System;
     using System.Collections.Generic;
     using AlgernonCommons;
+    using BOB.Skins;
     using UnityEngine;
 
     /// <summary>
@@ -114,15 +115,18 @@ namespace BOB
                 return;
             }
 
-            // Add entry to configuration file.
-            List<BOBConfig.NetReplacement> replacementList = ReplacementEntry(data.NetInfo);
-            BOBConfig.NetReplacement replacementEntry = replacementList.Find(x => x.SegmentID == data.SegmentID && x.PropIndex == data.PropIndex);
-            if (replacementEntry != null)
+            // Add entry to configuration file, if this isn't a skin.
+            if (data.SegmentID == 0)
             {
-                replacementList.Remove(replacementEntry);
-            }
+                List<BOBConfig.NetReplacement> replacementList = ReplacementEntry(data.NetInfo);
+                BOBConfig.NetReplacement replacementEntry = replacementList.Find(x => x.SegmentID == data.SegmentID && x.PropIndex == data.PropIndex);
+                if (replacementEntry != null)
+                {
+                    replacementList.Remove(replacementEntry);
+                }
 
-            replacementList.Add(data);
+                replacementList.Add(data);
+            }
 
             // Add prop to lane.
             AddProp(data);
@@ -203,6 +207,12 @@ namespace BOB
         /// <param name="repeatDistance">Replacement repeat distance.</param>
         internal void Update(NetInfo netInfo, ushort segmentID, PrefabInfo targetInfo, PrefabInfo replacementInfo, int laneIndex, int propIndex, float angle, float offsetX, float offsetY, float offsetZ, int probability, float repeatDistance)
         {
+            // Ignore skins.
+            if (segmentID != 0)
+            {
+                return;
+            }
+
             // Check for valid data.
             if (replacementInfo?.name == null || laneIndex < 0 || netInfo?.m_lanes == null || laneIndex >= netInfo.m_lanes.Length || propIndex < 0)
             {
@@ -327,7 +337,7 @@ namespace BOB
                 lane.m_laneProps = ScriptableObject.CreateInstance<NetLaneProps>();
             }
 
-            // Add lane to changed lanes list, if it's not already there, recording original values..
+            // Add lane to changed lanes list, if it's not already there, recording original values.
             if (!_changedNetLanes.ContainsKey(lane))
             {
                 _changedNetLanes.Add(lane, lane.m_laneProps.m_props);
@@ -411,6 +421,12 @@ namespace BOB
         {
             if (replacement?.NetInfo is NetInfo netInfo)
             {
+                // Ensure a custom lane is created if this is for a skin.
+                if (replacement.SegmentID != 0 && NetworkSkins.SegmentSkins[replacement.SegmentID] is NetworkSkin skin)
+                {
+                    skin.EnsureCustomLane(replacement.LaneIndex);
+                }
+
                 return AddProp(replacement, netInfo, replacement.Lanes);
             }
 

@@ -193,7 +193,12 @@ namespace BOB
         /// <summary>
         /// Gets the effective segement ID for the current selection (0 if not a skin, or segment ID if a skin).
         /// </summary>
-        private ushort EffectiveSegmentID => _selectedSegment != 0 && NetworkSkins.SegmentSkins[_selectedSegment] != null ? _selectedSegment : (ushort)0u;
+        private ushort EffectiveSegmentID => _selectedSegment != 0 && CurrentSkin != null ? _selectedSegment : (ushort)0u;
+
+        /// <summary>
+        /// Gets the currently selected skin (null if none).
+        /// </summary>
+        private NetworkSkin CurrentSkin => NetworkSkins.SegmentSkins[_selectedSegment];
 
         /// <summary>
         /// Called by Unity before the first frame is displayed.
@@ -458,8 +463,13 @@ namespace BOB
                 // Make sure we've got a valid selection.
                 if (SelectedTargetItem is TargetNetItem targetNetItem)
                 {
-                    // Individual prop reversion?
-                    if (targetNetItem.IndividualReplacement != null)
+                    // Select reversion type.
+                    if (_hasSkin && CurrentSkin != null)
+                    {
+                        // Skin reversion.
+                        CurrentSkin.RemoveChange(targetNetItem.LaneIndex, targetNetItem.PropIndex);
+                    }
+                    else if (targetNetItem.IndividualReplacement != null)
                     {
                         // Individual reversion.
                         IndividualNetworkReplacement.Instance.RemoveReplacement(targetNetItem.IndividualReplacement);
@@ -828,6 +838,12 @@ namespace BOB
                 m_addButton.isVisible &= _laneMenu.isVisible;
                 m_removeButton.isVisible &= _laneMenu.isVisible;
                 m_addButton.isEnabled &= _laneMenu.selectedIndex > 0;
+            }
+
+            // Enable revert button if a skin change is selected.
+            if (CurrentMode == ReplacementModes.Individual && _hasSkin && CurrentSkin != null && SelectedTargetItem is TargetNetItem targetNetItem)
+            {
+                m_revertButton.isEnabled = CurrentSkin.HasChange(targetNetItem.LaneIndex, targetNetItem.PropIndex);
             }
         }
 

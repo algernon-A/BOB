@@ -302,8 +302,15 @@ namespace BOB
             {
                 // Yes - remove skin change.
                 NetworkSkins.SegmentSkins[_segmentID].RemoveChange(_laneIndex, PropIndex);
+
+                // Update render.
+                NetData.UpdateRender(_netInfo, _segmentID);
+
+                // Done here.
+                return;
             }
 
+            // Prefab reversion.
             NetLaneProps.Prop thisProp = _originalLaneInfo?.m_laneProps?.m_props[PropIndex];
             if (thisProp != null)
             {

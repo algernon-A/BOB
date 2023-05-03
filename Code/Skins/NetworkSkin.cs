@@ -7,6 +7,7 @@ namespace BOB.Skins
 {
     using System;
     using System.Collections.Generic;
+    using AlgernonCommons;
 
     /// <summary>
     /// Custom network skin.
@@ -73,6 +74,8 @@ namespace BOB.Skins
         /// <param name="propIndex">Prop index of changed <see cref="NetLaneProps.Prop"/>.</param>
         public void AddChange(int laneIndex, int propIndex)
         {
+            Logging.KeyMessage("adding skin change with lane index ", laneIndex, " of ", Lanes.Length, " and prop index ", propIndex, " of ", Lanes[laneIndex]?.m_laneProps?.m_props?.Length);
+
             // Ensure a custom lane.
             EnsureCustomLane(laneIndex);
 
@@ -87,6 +90,9 @@ namespace BOB.Skins
                 // Existing list already contains this prop index - don't do anything further.
                 return;
             }
+
+            // Clone existing prop as template for change.
+            Lanes[laneIndex].m_laneProps.m_props[propIndex] = NetData.CloneLaneProp(Lanes[laneIndex].m_laneProps.m_props[propIndex]);
 
             // Record this change.
             _changedLanes[laneIndex].Add(propIndex);
@@ -105,8 +111,22 @@ namespace BOB.Skins
                 return;
             }
 
+            // Restore original prop.
+            Lanes[laneIndex].m_laneProps.m_props[propIndex] = NetPrefab.m_lanes[laneIndex].m_laneProps.m_props[propIndex];
+
             // Remove record.
             _changedLanes[laneIndex].Remove(propIndex);
+
+            // Remove entire lane if no changes left here.
+            if (_changedLanes[laneIndex].Count == 0)
+            {
+                // NetLaneProps are ScriptableObjects, and should be disposed of properly when no longer in use.
+                UnityEngine.Object.Destroy(Lanes[laneIndex].m_laneProps);
+
+                // Restore original lane.
+                Logging.Message("restoring original lane ", laneIndex);
+                Lanes[laneIndex] = NetPrefab.m_lanes[laneIndex];
+            }
         }
 
         /// <summary>
@@ -140,7 +160,7 @@ namespace BOB.Skins
         /// Ensures that a custom lane exists for the given lane index.
         /// </summary>
         /// <param name="laneIndex">Lane index number.</param>
-        private void EnsureCustomLane(int laneIndex)
+        public void EnsureCustomLane(int laneIndex)
         {
             // Check to make sure we haven't already done this.
             if (Lanes[laneIndex] is BOBCustomLane)
@@ -170,10 +190,10 @@ namespace BOB.Skins
                 {
                     m_laneProps = UnityEngine.Object.Instantiate(original.m_laneProps);
 
-                    // Copy original props to new lane.
+                    // Copy original prop references to new lane.
                     for (int i = 0; i < original.m_laneProps.m_props.Length; ++i)
                     {
-                        m_laneProps.m_props[i] = NetData.CloneLaneProp(original.m_laneProps.m_props[i]);
+                        m_laneProps.m_props[i] = original.m_laneProps.m_props[i];
                     }
                 }
             }
