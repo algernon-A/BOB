@@ -99,6 +99,83 @@ namespace BOB.Skins
         }
 
         /// <summary>
+        /// Removes all changes to a <see cref="NetLaneProps.Prop"/> from this skin (-1 for grouped restoration).
+        /// </summary>
+        /// <param name="originalPrefab">Original <see cref="PropInfo"/> or <see cref="TreeInfo"/> prefab (ignored if both laneIndex and propIndex are 0 or greater).</param>
+        /// <param name="laneIndex">Lane index of changed <see cref="NetLaneProps.Prop"/>.</param>
+        /// <param name="propIndex">Prop index of changed <see cref="NetLaneProps.Prop"/>.</param>
+        public void RemoveChange(PrefabInfo originalPrefab, int laneIndex, int propIndex)
+        {
+            if (laneIndex >= 0 && propIndex >= 0)
+            {
+                RemoveChange(laneIndex, propIndex);
+            }
+            else
+            {
+                RemoveChange(originalPrefab);
+            }
+        }
+
+        /// <summary>
+        /// Removes all changes applied to an original <see cref="PrefabInfo"/> for this skin (e.g. a grouped changed reversion).
+        /// </summary>
+        /// <param name="originalPrefab">Original <see cref="PropInfo"/> or <see cref="TreeInfo"/> prefab.</param>
+        public void RemoveChange(PrefabInfo originalPrefab)
+        {
+            if (originalPrefab == null)
+            {
+                Logging.Error("null prefab passed to NetworkSkin.RemoveChange");
+                return;
+            }
+
+            List<KeyValuePair<int, int>> removedEntries = new List<KeyValuePair<int, int>>();
+
+            // Iterate through each lane
+            for (int laneIndex = 0; laneIndex < _changedLanes.Length; ++laneIndex)
+            {
+                // Only interested in custom lanes.
+                if (Lanes[laneIndex] is BOBCustomLane)
+                {
+                    // Iterate through each prop in original lane.
+                    foreach (int propIndex in _changedLanes[laneIndex])
+                    {
+                        // Check for prefab match.
+                        NetLaneProps.Prop originalProp = NetPrefab.m_lanes[laneIndex].m_laneProps.m_props[propIndex];
+                        if (originalProp.m_finalProp == originalPrefab || originalProp.m_finalTree == originalPrefab)
+                        {
+                            // Restore original prop.
+                            Lanes[laneIndex].m_laneProps.m_props[propIndex] = originalProp;
+
+                            // Record index for removal.
+                            removedEntries.Add(new KeyValuePair<int, int>(laneIndex, propIndex));
+                        }
+                    }
+                }
+            }
+
+            // Remove restored keys.
+            foreach (KeyValuePair<int, int> entry in removedEntries)
+            {
+                _changedLanes[entry.Key].Remove(entry.Value);
+            }
+
+            // Remove entire lane if no changes left.
+            for (int i = 0; i < _changedLanes.Length; ++i)
+            {
+                // Remove entire lane if no changes left here.
+                if (_changedLanes[i] != null && _changedLanes[i].Count == 0)
+                {
+                    // NetLaneProps are ScriptableObjects, and should be disposed of properly when no longer in use.
+                    UnityEngine.Object.Destroy(Lanes[i].m_laneProps);
+
+                    // Restore original lane.
+                    Logging.Message("restoring original lane ", i);
+                    Lanes[i] = NetPrefab.m_lanes[i];
+                }
+            }
+        }
+
+        /// <summary>
         /// Removes all changes to a <see cref="NetLaneProps.Prop"/> from this skin.
         /// </summary>
         /// <param name="laneIndex">Lane index of changed <see cref="NetLaneProps.Prop"/>.</param>
@@ -177,7 +254,6 @@ namespace BOB.Skins
                         NetLaneProps.Prop originalProp = NetPrefab.m_lanes[laneIndex].m_laneProps.m_props[propIndex];
                         if (originalProp.m_finalProp == targetPrefab || originalProp.m_finalTree == targetPrefab)
                         {
-                            Logging.Message("found prefab match in network skin for prefab ", targetPrefab.name);
                             return true;
                         }
                     }

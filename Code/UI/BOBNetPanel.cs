@@ -467,7 +467,7 @@ namespace BOB
                     if (targetNetItem.SegmentID != 0 && CurrentSkin != null)
                     {
                         // Skin reversion.
-                        CurrentSkin.RemoveChange(targetNetItem.LaneIndex, targetNetItem.PropIndex);
+                        CurrentSkin.RemoveChange(targetNetItem.OriginalPrefab, targetNetItem.LaneIndex, targetNetItem.PropIndex);
                     }
                     else if (targetNetItem.IndividualReplacement != null)
                     {
@@ -496,7 +496,7 @@ namespace BOB
             catch (Exception e)
             {
                 // Log and report any exception.
-                Logging.LogException(e, "exception perforiming network reversion");
+                Logging.LogException(e, "exception performing network reversion");
             }
         }
 
