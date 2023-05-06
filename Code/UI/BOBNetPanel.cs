@@ -561,6 +561,25 @@ namespace BOB
                         originalInfo = (PrefabInfo)laneProps[propIndex]?.m_finalProp ?? laneProps[propIndex]?.m_finalTree;
                     }
 
+                    // Get original info if this is a skin.
+                    if (EffectiveSegmentID > 0)
+                    {
+                        NetLaneProps.Prop[] originalLaneProps = SelectedNet.m_lanes[lane].m_laneProps?.m_props;
+
+                        // Bounds check for added props.
+                        if (originalLaneProps != null && propIndex < originalLaneProps.Length)
+                        {
+                            if (PropTreeMode == PropTreeModes.Tree)
+                            {
+                                originalInfo = (PrefabInfo)laneProps[propIndex]?.m_finalTree ?? laneProps[propIndex]?.m_finalProp;
+                            }
+                            else
+                            {
+                                originalInfo = (PrefabInfo)laneProps[propIndex]?.m_finalProp ?? laneProps[propIndex]?.m_finalTree;
+                            }
+                        }
+                    }
+
                     // Check to see if we were succesful - if not (e.g. we only want trees and this is a prop), continue on to next building prop.
                     if (originalInfo?.name == null)
                     {
@@ -614,7 +633,7 @@ namespace BOB
                         }
 
                         // Grouped or individual?
-                        if (CurrentMode == (int)ReplacementModes.Individual || targetNetItem.SegmentID != 0)
+                        if (CurrentMode == (int)ReplacementModes.Individual)
                         {
                             // Individual - set index to the current prop indexes.
                             targetNetItem.PropIndex = propIndex;
@@ -659,7 +678,8 @@ namespace BOB
                                 && item.IndividualReplacement == targetNetItem.IndividualReplacement
                                 && item.GroupedReplacement == targetNetItem.GroupedReplacement
                                 && item.AllReplacement == targetNetItem.AllReplacement
-                                && item.OriginalProbability == targetNetItem.OriginalProbability)
+                                && item.OriginalProbability == targetNetItem.OriginalProbability
+                                && item.SegmentID == targetNetItem.SegmentID)
                             {
                                 // We've already got an identical grouped instance of this item - add this index and lane to the lists of indexes and lanes under that item and set the flag to indicate that we've done so.
                                 item.PropIndexes.Add(propIndex);
@@ -846,7 +866,7 @@ namespace BOB
             // Enable revert button if a skin change is selected.
             if (_hasSkin && CurrentSkin != null && SelectedTargetItem is TargetNetItem targetNetItem && targetNetItem.SegmentID != 0)
             {
-                m_revertButton.isEnabled = CurrentSkin.HasChange(targetNetItem.LaneIndex, targetNetItem.PropIndex);
+                m_revertButton.isEnabled = CurrentSkin.HasChange(targetNetItem.OriginalPrefab, targetNetItem.LaneIndex, targetNetItem.PropIndex);
             }
         }
 

@@ -130,12 +130,64 @@ namespace BOB.Skins
         }
 
         /// <summary>
-        /// Chceks to see if a skin has a change for the given <see cref="NetLaneProps.Prop"/>.
+        /// Checks to see if a skin has a change for the given <see cref="NetLaneProps.Prop"/> for the given lane and prop indices (-1 for prefab matching only).
+        /// Matching will be done first on lane and prop indices if these are both 0 or greater (individual replacement), otherwise on prefab matching (grouped replacement).
+        /// </summary>
+        /// <param name="targetPrefab">Original <see cref="PropInfo"/> or <see cref="TreeInfo"/> prefab (ignored if both laneIndex and propIndex are 0 or greater).</param>
+        /// <param name="laneIndex">Lane index of <see cref="NetLaneProps.Prop"/>.</param>
+        /// <param name="propIndex">Prop index of <see cref="NetLaneProps.Prop"/>.</param>
+        /// <returns><c>true</c> if this skin has a change for that item, <c>false</c> otherwise.</returns>
+        public bool HasChange(PrefabInfo targetPrefab, int laneIndex, int propIndex)
+        {
+            // If valid individual indices, use direct matching.
+            if (laneIndex >= 0 & propIndex >= 0)
+            {
+                return HasChange(laneIndex, propIndex);
+            }
+
+            // Otherwise, use prefab matching.
+            return HasChange(targetPrefab);
+        }
+
+        /// <summary>
+        /// Checks to see if a skin has a change for the given <see cref="NetLaneProps.Prop"/>.
         /// </summary>
         /// <param name="laneIndex">Lane index of <see cref="NetLaneProps.Prop"/>.</param>
         /// <param name="propIndex">Prop index of <see cref="NetLaneProps.Prop"/>.</param>
         /// <returns><c>true</c> if this skin has a change for that item, <c>false</c> otherwise.</returns>
         public bool HasChange(int laneIndex, int propIndex) => _changedLanes[laneIndex] != null && _changedLanes[laneIndex].Contains(propIndex);
+
+        /// <summary>
+        /// Checks to see if a skin has any change for the given original <see cref="PrefabInfo"/>. e.g for a grouped change.
+        /// </summary>
+        /// <param name="targetPrefab">Original <see cref="PropInfo"/> or <see cref="TreeInfo"/> prefab.</param>
+        /// <returns><c>true</c> if this skin has a change for that item, <c>false</c> otherwise.</returns>
+        public bool HasChange(PrefabInfo targetPrefab)
+        {
+            // Iterate through each lane
+            for (int laneIndex = 0; laneIndex < _changedLanes.Length; ++laneIndex)
+            {
+                // Only interested in custom lanes.
+                if (Lanes[laneIndex] is BOBCustomLane)
+                {
+                    // Iterate through each prop in original lane.
+                    foreach (int propIndex in _changedLanes[laneIndex])
+                    {
+                        // Check for prefab match.
+                        NetLaneProps.Prop originalProp = NetPrefab.m_lanes[laneIndex].m_laneProps.m_props[propIndex];
+                        if (originalProp.m_finalProp == targetPrefab || originalProp.m_finalTree == targetPrefab)
+                        {
+                            Logging.Message("found prefab match in network skin for prefab ", targetPrefab.name);
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            // If we got here, no match was detected.
+            Logging.Message("no prefab match in network skin for prefab ", targetPrefab.name);
+            return false;
+        }
 
         /// <summary>
         /// Destroys the object and all ScriptableObject components.

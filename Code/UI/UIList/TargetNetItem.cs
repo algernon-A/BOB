@@ -92,7 +92,7 @@ namespace BOB
                 lineSprite.tooltip = Translations.Translate("BOB_SPR_ADD");
                 lineSprite.Show();
             }
-            else if (SegmentID != 0 && NetworkSkins.SegmentSkins[SegmentID] is NetworkSkin skin && skin.HasChange(LaneIndex, PropIndex))
+            else if (SegmentID != 0 && NetworkSkins.SegmentSkins[SegmentID] is NetworkSkin skin && skin.HasChange(OriginalPrefab, LaneIndex, PropIndex))
             {
                 // Skinned replacement.
                 lineSprite.atlas = UITextures.LoadQuadSpriteAtlas("BOB-SegmentSmall");
