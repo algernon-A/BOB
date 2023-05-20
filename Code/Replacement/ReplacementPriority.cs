@@ -36,6 +36,9 @@ namespace BOB
         /// </summary>
         IndividualReplacement,
 
+        InstanceGroupedReplacement,
+        InstanceIndividualReplacement,
+
         /// <summary>
         /// Added props
         /// </summary>

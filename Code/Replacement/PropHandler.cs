@@ -16,12 +16,12 @@ namespace BOB
         private readonly int _propIndex;
 
         // Original prop data.
-        private readonly PropInfo _originalProp;
-        private readonly PropInfo _originalFinalProp;
-        private readonly TreeInfo _originalTree;
-        private readonly TreeInfo _originalFinalTree;
-        private readonly Vector3 _originalPosition;
-        private readonly int _originalProbability;
+        protected PropInfo _originalProp;
+        protected PropInfo _originalFinalProp;
+        protected TreeInfo _originalTree;
+        protected TreeInfo _originalFinalTree;
+        protected Vector3 _originalPosition;
+        protected int _originalProbability;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropHandler"/> class.

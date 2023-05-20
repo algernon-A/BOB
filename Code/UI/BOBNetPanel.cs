@@ -7,6 +7,7 @@ namespace BOB
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using AlgernonCommons;
     using AlgernonCommons.Patching;
@@ -24,16 +25,14 @@ namespace BOB
     {
         // Layout constants.
         private const float PackButtonX = RandomButtonX + ToggleSize;
-        private const float LaneX = ModeX + (ToggleSize * 3f) + Margin;
+        private const float LaneX = ModeX + (ToggleSize * 5f) + Margin;
 
         // Panel components.
         private UIDropDown _laneMenu;
         private BOBSlider _repeatSlider;
-        private UIButton _segmentButton;
 
         // Selected segment.
         private ushort _selectedSegment;
-        private bool _hasSkin;
 
         // Event suppression.
         private bool _ignoreIndexChange = false;
@@ -63,6 +62,16 @@ namespace BOB
                             RenderOverlays.Lane = SelectedNet.m_lanes[targetNetItem.LaneIndex];
                         }
 
+
+                        if (CurrentMode == ReplacementModes.IndividualInstance || CurrentMode == ReplacementModes.GroupedInstance)
+                        {
+                            RenderOverlays.Segment = _selectedSegment;
+                        }
+                        else
+                        {
+                            RenderOverlays.Segment = 0;
+                        }
+
                         // Set sliders according to highest active replacement (will be null if none).
                         SetSliders(targetNetItem.AddedProp ?? targetNetItem.IndividualReplacement ?? targetNetItem.GroupedReplacement ?? targetNetItem.AllReplacement ?? targetNetItem.PackReplacement);
 
@@ -79,41 +88,49 @@ namespace BOB
         /// <summary>
         /// Gets the mode icon atlas names for prop modes.
         /// </summary>
-        protected override string[] PropModeAtlas => new string[(int)ReplacementModes.NumModes]
+        protected override string[] PropModeAtlas => new string[(int)ReplacementModes.NumNetModes]
         {
             "BOB-ThisPropSmall",
             "BOB-SamePropSmall",
             "BOB-RoadsSmall",
+            "BOB-SegmentSmall",
+            "BOB-SegmentSmall",
         };
 
         /// <summary>
         /// Gets the mode icon atlas names for tree modes.
         /// </summary>
-        protected override string[] TreeModeAtlas => new string[(int)ReplacementModes.NumModes]
+        protected override string[] TreeModeAtlas => new string[(int)ReplacementModes.NumNetModes]
         {
             "BOB-ThisTreeSmall",
             "BOB-SameTreeSmall",
             "BOB-RoadsSmall",
+            "BOB-SegmentSmall",
+            "BOB-SegmentSmall",
         };
 
         /// <summary>
         /// Gets the mode icon tooltip keys for prop modes.
         /// </summary>
-        protected override string[] PropModeTipKeys => new string[(int)ReplacementModes.NumModes]
+        protected override string[] PropModeTipKeys => new string[(int)ReplacementModes.NumNetModes]
         {
             "BOB_PNL_M_PIN",
             "BOB_PNL_M_PGN",
             "BOB_PNL_M_PAN",
+            "SEGMENT_INDIVIDUAL",
+            "SEGMENT_GROUPED",
         };
 
         /// <summary>
         /// Gets the mode icon tooltip keys for tree modes.
         /// </summary>
-        protected override string[] TreeModeTipKeys => new string[(int)ReplacementModes.NumModes]
+        protected override string[] TreeModeTipKeys => new string[(int)ReplacementModes.NumNetModes]
         {
             "BOB_PNL_M_TIN",
             "BOB_PNL_M_TGN",
             "BOB_PNL_M_TAN",
+            "SEGMENT_INDIVIDUAL",
+            "SEGMENT_GROUPED",
         };
 
         /// <summary>
@@ -141,7 +158,7 @@ namespace BOB
             set
             {
                 // Add and remove buttons, lane menu, and repeat distance slider are only valid in individual mode.
-                bool isIndividual = value == ReplacementModes.Individual;
+                bool isIndividual = value == ReplacementModes.Individual || value == ReplacementModes.IndividualInstance;
                 _repeatSlider.parent.isVisible = isIndividual;
                 m_addButton.isVisible = isIndividual;
                 m_removeButton.isVisible = isIndividual;
@@ -193,12 +210,7 @@ namespace BOB
         /// <summary>
         /// Gets the effective segement ID for the current selection (0 if not a skin, or segment ID if a skin).
         /// </summary>
-        private ushort EffectiveSegmentID => _selectedSegment != 0 && CurrentSkin != null ? _selectedSegment : (ushort)0u;
-
-        /// <summary>
-        /// Gets the currently selected skin (null if none).
-        /// </summary>
-        private NetworkSkin CurrentSkin => NetworkSkins.SegmentSkins[_selectedSegment];
+        private ushort EffectiveSegmentID => CurrentMode == ReplacementModes.IndividualInstance || CurrentMode == ReplacementModes.GroupedInstance ? _selectedSegment : (ushort)0u;
 
         /// <summary>
         /// Called by Unity before the first frame is displayed.
@@ -222,9 +234,6 @@ namespace BOB
                 // Add pack button.
                 UIButton packButton = AddIconButton(this, PackButtonX, ToggleY, ToggleSize, "BOB_PNL_PKB", UITextures.LoadQuadSpriteAtlas("BOB-PropPack"));
                 packButton.eventClicked += (component, clickEvent) => StandalonePanelManager<BOBPackPanel>.Create();
-
-                _segmentButton = AddIconButton(this, ModeX + (3f * ToggleSize), ToggleY + ToggleSize, ToggleSize, "BOB_PNL_PKB", UITextures.LoadQuadSpriteAtlas("BOB-SegmentSmall"));
-                _segmentButton.eventClicked += (c, p) => AddSkin();
 
                 // Add repeat slider.
                 UIPanel repeatPanel = Sliderpanel(this, MidControlX, RepeatSliderY + Margin, SliderHeight);
@@ -276,7 +285,6 @@ namespace BOB
 
             // Record selected segment.
             _selectedSegment = (ushort)instanceID;
-            _segmentButton.tooltip = instanceID.ToString();
 
             // Build lane menu selection list, with 'all lanes' at index 0, selected by default.
             _ignoreIndexChange = true;
@@ -366,10 +374,63 @@ namespace BOB
                         // Not an added prop.
                         switch (CurrentMode)
                         {
+                            case ReplacementModes.IndividualInstance when _selectedSegment != 0:
+                                BOBConfig.NetReplacement individualInstanceReplacement = new BOBConfig.NetReplacement
+                                {
+                                    ParentInfo = SelectedNet,
+                                    SegmentID = _selectedSegment,
+                                    Target = targetNetItem.OriginalPrefab.name,
+                                    TargetInfo = targetNetItem.OriginalPrefab,
+                                    ReplacementInfo = replacementPrefab,
+                                    ReplacementName = replacementPrefab.name,
+                                    PropIndex = IndividualIndex,
+                                    LaneIndex = IndividualLane,
+                                    Xpos = targetNetItem.Position.x,
+                                    Ypos = targetNetItem.Position.y,
+                                    Zpos = targetNetItem.Position.z,
+                                    IsTree = replacementPrefab is TreeInfo,
+                                    Angle = m_rotationSlider.TrueValue,
+                                    Probability = (int)m_probabilitySlider.TrueValue,
+                                    RepeatDistance = _repeatSlider.TrueValue,
+                                };
+
+                                NetworkSkins.Instance.AddIndividualReplacement(
+                                    SelectedNet,
+                                    _selectedSegment,
+                                    IndividualLane,
+                                    IndividualIndex,
+                                    individualInstanceReplacement);
+                                break;
+
+                            case ReplacementModes.GroupedInstance when _selectedSegment != 0:
+                                BOBConfig.NetReplacement groupedInstanceReplacement = new BOBConfig.NetReplacement
+                                {
+                                    ParentInfo = SelectedNet,
+                                    SegmentID = _selectedSegment,
+                                    Target = targetNetItem.OriginalPrefab.name,
+                                    TargetInfo = targetNetItem.OriginalPrefab,
+                                    ReplacementInfo = replacementPrefab,
+                                    ReplacementName = replacementPrefab.name,
+                                    PropIndex = -1,
+                                    LaneIndex = -1,
+                                    Xpos = targetNetItem.Position.x,
+                                    Ypos = targetNetItem.Position.y,
+                                    Zpos = targetNetItem.Position.z,
+                                    IsTree = replacementPrefab is TreeInfo,
+                                    Angle = m_rotationSlider.TrueValue,
+                                    Probability = (int)m_probabilitySlider.TrueValue,
+                                    RepeatDistance = _repeatSlider.TrueValue,
+                                };
+                                NetworkSkins.Instance.AddGroupedReplacement(
+                                    SelectedNet,
+                                    _selectedSegment,
+                                    groupedInstanceReplacement);
+                                break;
+
                             case ReplacementModes.Individual:
                                 IndividualNetworkReplacement.Instance.Replace(
                                     SelectedNet,
-                                    EffectiveSegmentID,
+                                    0,
                                     targetNetItem.OriginalPrefab,
                                     replacementPrefab,
                                     IndividualLane,
@@ -388,7 +449,7 @@ namespace BOB
                                 // Grouped replacement.
                                 GroupedNetworkReplacement.Instance.Replace(
                                     SelectedNet,
-                                    EffectiveSegmentID,
+                                    0,
                                     targetNetItem.OriginalPrefab,
                                     replacementPrefab,
                                     -1,
@@ -463,11 +524,15 @@ namespace BOB
                 // Make sure we've got a valid selection.
                 if (SelectedTargetItem is TargetNetItem targetNetItem)
                 {
-                    // Select reversion type.
-                    if (targetNetItem.SegmentID != 0 && CurrentSkin != null)
+                    if (targetNetItem.IndividualSegmentReplacement != null)
                     {
-                        // Skin reversion.
-                        CurrentSkin.RemoveChange(targetNetItem.OriginalPrefab, targetNetItem.LaneIndex, targetNetItem.PropIndex);
+                        // Individual reversion.
+                        NetworkSkins.RemoveIndividualReplacement(_selectedSegment, targetNetItem.LaneIndex, targetNetItem.PropIndex);
+                    }
+                    else if (targetNetItem.GroupedSegmentReplacement != null)
+                    {
+                        // Individual reversion.
+                        NetworkSkins.RemoveGroupedReplacement(_selectedSegment, targetNetItem.GroupedSegmentReplacement);
                     }
                     else if (targetNetItem.IndividualReplacement != null)
                     {
@@ -526,7 +591,7 @@ namespace BOB
             // Iterate through each lane.
             for (int lane = 0; lane < lanes.Length; ++lane)
             {
-                if (CurrentMode == (int)ReplacementModes.Individual)
+                if (CurrentMode == ReplacementModes.Individual || CurrentMode == ReplacementModes.IndividualInstance)
                 {
                     // If individual mode and a lane has been selected, skip any lanes not selected.
                     if (CurrentMode == (int)ReplacementModes.Individual && _laneMenu.selectedIndex > 0 && lane != SelectedLaneIndex)
@@ -601,7 +666,8 @@ namespace BOB
                     else
                     {
                         // Non-added prop - see if we've got an existing reference.
-                        LanePropHandler handler = NetHandlers.GetHandler(lanes[lane], EffectiveSegmentID, lane, propIndex);
+                        LanePropHandler handler = NetHandlers.GetHandler(lanes[lane], _selectedSegment, lane, propIndex);
+
                         if (handler != null)
                         {
                             // Existing reference found - get the relevant original prefab name.
@@ -617,6 +683,8 @@ namespace BOB
                             targetNetItem.SegmentID = handler.SegmentID;
 
                             // Record active replacements.
+                            targetNetItem.IndividualSegmentReplacement = handler.GetReplacement(ReplacementPriority.InstanceIndividualReplacement);
+                            targetNetItem.GroupedSegmentReplacement = handler.GetReplacement(ReplacementPriority.InstanceGroupedReplacement);
                             targetNetItem.IndividualReplacement = handler.GetReplacement(ReplacementPriority.IndividualReplacement);
                             targetNetItem.GroupedReplacement = handler.GetReplacement(ReplacementPriority.GroupedReplacement);
                             targetNetItem.AllReplacement = handler.GetReplacement(ReplacementPriority.AllReplacement);
@@ -633,7 +701,7 @@ namespace BOB
                         }
 
                         // Grouped or individual?
-                        if (CurrentMode == (int)ReplacementModes.Individual)
+                        if (CurrentMode == ReplacementModes.Individual || CurrentMode == ReplacementModes.IndividualInstance)
                         {
                             // Individual - set index to the current prop indexes.
                             targetNetItem.PropIndex = propIndex;
@@ -675,6 +743,8 @@ namespace BOB
 
                             // Check to see if we already have this in the list - matching original prefab, individual replacement prefab, network replacement prefab, all-network replacement prefab, and probability.
                             if (item.OriginalPrefab == targetNetItem.OriginalPrefab
+                                && item.IndividualSegmentReplacement == targetNetItem.IndividualSegmentReplacement
+                                && item.GroupedSegmentReplacement == targetNetItem.GroupedSegmentReplacement
                                 && item.IndividualReplacement == targetNetItem.IndividualReplacement
                                 && item.GroupedReplacement == targetNetItem.GroupedReplacement
                                 && item.AllReplacement == targetNetItem.AllReplacement
@@ -800,6 +870,12 @@ namespace BOB
                     return;
                 }
 
+                ushort effectiveSegment = 0;
+                if (CurrentMode == ReplacementModes.IndividualInstance || CurrentMode == ReplacementModes.GroupedInstance)
+                {
+                    effectiveSegment = _selectedSegment;
+                }
+
                 // Check current mode.
                 if (CurrentMode == ReplacementModes.All)
                 {
@@ -810,7 +886,7 @@ namespace BOB
                         NetInfo.Lane[] lanes = prefab?.m_lanes;
                         if (lanes != null)
                         {
-                            for (int j = 0; j < prefab.m_lanes.Length; ++j)
+                            for (int j = 0; j < lanes.Length; ++j)
                             {
                                 NetLaneProps.Prop[] laneProps = lanes[j]?.m_laneProps?.m_props;
                                 if (laneProps != null)
@@ -819,7 +895,7 @@ namespace BOB
                                     {
                                         if (laneProps[k].m_finalProp == targetNetItem.ReplacementPrefab || laneProps[k].m_finalTree == targetNetItem.ReplacementPrefab)
                                         {
-                                            m_originalValues.Add(GetOriginalData(prefab, EffectiveSegmentID, j, k));
+                                            m_originalValues.Add(GetOriginalData(prefab, effectiveSegment, j, k));
                                         }
                                     }
                                 }
@@ -832,13 +908,13 @@ namespace BOB
                     // Grouped replacement - iterate through each instance and record values.
                     for (int i = 0; i < targetNetItem.PropIndexes.Count; ++i)
                     {
-                        m_originalValues.Add(GetOriginalData(SelectedNet, EffectiveSegmentID, targetNetItem.LaneIndexes[i], targetNetItem.PropIndexes[i]));
+                        m_originalValues.Add(GetOriginalData(SelectedNet, effectiveSegment, targetNetItem.LaneIndexes[i], targetNetItem.PropIndexes[i]));
                     }
                 }
                 else
                 {
                     // Individual replacement - record original values.
-                    m_originalValues.Add(GetOriginalData(SelectedNet, EffectiveSegmentID, targetNetItem.LaneIndex, targetNetItem.PropIndex));
+                    m_originalValues.Add(GetOriginalData(SelectedNet, effectiveSegment, targetNetItem.LaneIndex, targetNetItem.PropIndex));
                 }
             }
         }
@@ -862,12 +938,6 @@ namespace BOB
                 m_removeButton.isVisible &= _laneMenu.isVisible;
                 m_addButton.isEnabled &= _laneMenu.selectedIndex > 0;
             }
-
-            // Enable revert button if a skin change is selected.
-            if (_hasSkin && CurrentSkin != null && SelectedTargetItem is TargetNetItem targetNetItem && targetNetItem.SegmentID != 0)
-            {
-                m_revertButton.isEnabled = CurrentSkin.HasChange(targetNetItem.OriginalPrefab, targetNetItem.LaneIndex, targetNetItem.PropIndex);
-            }
         }
 
         /// <summary>
@@ -880,7 +950,7 @@ namespace BOB
             m_ignoreSliderValueChange = true;
 
             // Are we eligible for repeat distance (eligibile target and in individual mode).
-            if (CurrentMode == ReplacementModes.Individual && SelectedTargetItem is TargetNetItem targetNetItem && (targetNetItem.OriginalRepeat > 1f || targetNetItem.AddedProp != null))
+            if ((CurrentMode == ReplacementModes.Individual || CurrentMode == ReplacementModes.IndividualInstance) && SelectedTargetItem is TargetNetItem targetNetItem && (targetNetItem.OriginalRepeat > 1f || targetNetItem.AddedProp != null))
             {
                 // Yes - do we have a replacement?
                 if (replacement is BOBConfig.NetReplacement netReplacement && netReplacement.RepeatDistance > 1f)
@@ -959,7 +1029,7 @@ namespace BOB
                 int laneIndex = index - 1;
 
                 // Iterate through all segments on map.
-                if (_hasSkin)
+                if (CurrentMode == ReplacementModes.IndividualInstance || CurrentMode == ReplacementModes.GroupedInstance)
                 {
                     // Skin - use this segment only.
                     // Iterate through segment lanes until we reach the one we need.
@@ -1025,35 +1095,17 @@ namespace BOB
         }
 
         /// <summary>
-        /// Adds a segment skin to the currently selected segment.
-        /// </summary>
-        private void AddSkin()
-        {
-            // Bounds check.
-            if (_selectedSegment == 0 || _selectedSegment >= NetworkSkins.SegmentSkins.Length)
-            {
-                Logging.Error("invalid segment ID ", _selectedSegment, " when adding a network skin");
-                return;
-            }
-
-            NetworkSkins.SegmentSkins[_selectedSegment] = new NetworkSkin(SelectedNet);
-
-            // Set skin status.
-            SetSkinStatus(true);
-        }
-
-        /// <summary>
         /// Sets the skin status for the current selection.
         /// </summary>
         /// <param name="status"><c>true</c> if a skin is currently selected, <c>false</c> if a prefab.</param>
         private void SetSkinStatus(bool status)
         {
-            _hasSkin = status;
-            _segmentButton.state = status ? UIButton.ButtonState.Pressed : UIButton.ButtonState.Normal;
             RenderOverlays.Segment = status ? _selectedSegment : (ushort)0u;
 
             // Regenerate target list.
             RegenerateTargetList();
         }
+
+        protected override int NumModes => (int)ReplacementModes.NumNetModes;
     }
 }

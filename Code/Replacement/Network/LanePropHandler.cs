@@ -28,10 +28,14 @@ namespace BOB
 
         // Active replacement references.
         private BOBConfig.NetReplacement _addedReplacement;
+        private BOBConfig.NetReplacement _individualSegmentReplacement;
+        private BOBConfig.NetReplacement _groupedSegmentReplacement;
         private BOBConfig.NetReplacement _individualReplacement;
         private BOBConfig.NetReplacement _groupedReplacement;
         private BOBConfig.NetReplacement _allReplacement;
         private BOBConfig.NetReplacement _packReplacement;
+
+        private LanePropHandler _parentHandler;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LanePropHandler"/> class for a generic info record.
@@ -59,6 +63,22 @@ namespace BOB
             _originalLaneInfo = laneInfo;
             _originalAngle = laneProp.m_angle;
             _originalRepeatDistance = laneProp.m_repeatDistance;
+
+            // Get true original.
+            if (_segmentID != 0)
+            {
+                if (NetHandlers.GetOrAddHandler(prefab, 0, prefab.m_lanes[laneIndex], laneIndex, propIndex) is LanePropHandler handler)
+                {
+                    _originalProp = handler.OriginalProp;
+                    _originalFinalProp = handler.OriginalFinalProp;
+                    _originalTree = handler.OriginalTree;
+                    _originalFinalTree = handler.OriginalFinalTree;
+                    _originalPosition = handler.OriginalPosition;
+                    _originalProbability = handler.OriginalProbability;
+
+                    _parentHandler = handler;
+                }
+            }
 
             // Clone NetLaneProp if required.
             NetData.CloneLanePropInstance(prefab, laneInfo);
@@ -89,6 +109,53 @@ namespace BOB
         /// </summary>
         public float OriginalRepeatDistance => _originalRepeatDistance;
 
+        public BOBConfig.NetReplacement IndividualReplacement
+        {
+            get
+            {
+                if (SegmentID == 0)
+                {
+                    return _individualReplacement;
+                }
+
+                return _parentHandler?._individualReplacement;
+            }
+
+            set
+            {
+                if (SegmentID != 0 && _parentHandler != null)
+                {
+                    _parentHandler._individualReplacement = value;
+                    return;
+                }
+
+                _individualReplacement = value;
+            }
+        }
+        public BOBConfig.NetReplacement GroupedReplacement
+        {
+            get
+            {
+                if (SegmentID == 0)
+                {
+                    return _groupedReplacement;
+                }
+
+                return _parentHandler?._groupedReplacement;
+            }
+
+            set
+            {
+                if (SegmentID != 0 && _parentHandler != null)
+                {
+                    _parentHandler._groupedReplacement = value;
+                    return;
+                }
+
+                _groupedReplacement = value;
+            }
+        }
+
         /// <summary>
         /// Gets the highest priority of any currently active replacements.
         /// </summary>
@@ -102,12 +169,22 @@ namespace BOB
                     return ReplacementPriority.AddedReplacement;
                 }
 
-                if (_individualReplacement != null)
+                if (_individualSegmentReplacement != null)
+                {
+                    return ReplacementPriority.InstanceIndividualReplacement;
+                }
+
+                if (_groupedSegmentReplacement != null)
+                {
+                    return ReplacementPriority.InstanceGroupedReplacement;
+                }
+
+                if (IndividualReplacement != null)
                 {
                     return ReplacementPriority.IndividualReplacement;
                 }
 
-                if (_groupedReplacement != null)
+                if (GroupedReplacement != null)
                 {
                     return ReplacementPriority.GroupedReplacement;
                 }
@@ -135,20 +212,29 @@ namespace BOB
             get
             {
                 // Check highest priorities first.
-                // Check highest priorities first.
                 if (_addedReplacement != null)
                 {
                     return _addedReplacement;
                 }
 
-                if (_individualReplacement != null)
+                if (_individualSegmentReplacement != null)
                 {
-                    return _individualReplacement;
+                    return _individualSegmentReplacement;
                 }
 
-                if (_groupedReplacement != null)
+                if (_groupedSegmentReplacement != null)
                 {
-                    return _groupedReplacement;
+                    return _groupedSegmentReplacement;
+                }
+
+                if (IndividualReplacement != null)
+                {
+                    return IndividualReplacement;
+                }
+
+                if (GroupedReplacement != null)
+                {
+                    return GroupedReplacement;
                 }
 
                 if (_allReplacement != null)
@@ -177,10 +263,14 @@ namespace BOB
             {
                 case ReplacementPriority.AddedReplacement:
                     return _addedReplacement;
+                case ReplacementPriority.InstanceIndividualReplacement:
+                    return _individualSegmentReplacement;
+                case ReplacementPriority.InstanceGroupedReplacement:
+                    return _groupedSegmentReplacement;
                 case ReplacementPriority.IndividualReplacement:
-                    return _individualReplacement;
+                    return IndividualReplacement;
                 case ReplacementPriority.GroupedReplacement:
-                    return _groupedReplacement;
+                    return GroupedReplacement;
                 case ReplacementPriority.AllReplacement:
                     return _allReplacement;
                 case ReplacementPriority.PackReplacement:
@@ -215,24 +305,32 @@ namespace BOB
                     _addedReplacement = replacement;
                     break;
 
-                case ReplacementPriority.IndividualReplacement:
-                    _individualReplacement = replacement;
+                case ReplacementPriority.InstanceIndividualReplacement when replacement.SegmentID != 0:
+                    _individualSegmentReplacement = replacement;
                     break;
 
-                case ReplacementPriority.GroupedReplacement:
-                    _groupedReplacement = replacement;
+                case ReplacementPriority.InstanceGroupedReplacement when replacement.SegmentID != 0:
+                    _groupedSegmentReplacement = replacement;
                     break;
 
-                case ReplacementPriority.AllReplacement:
+                case ReplacementPriority.IndividualReplacement when replacement.SegmentID == 0:
+                    IndividualReplacement = replacement;
+                    break;
+
+                case ReplacementPriority.GroupedReplacement when replacement.SegmentID == 0:
+                    GroupedReplacement = replacement;
+                    break;
+
+                case ReplacementPriority.AllReplacement when replacement.SegmentID == 0:
                     _allReplacement = replacement;
                     break;
 
-                case ReplacementPriority.PackReplacement:
+                case ReplacementPriority.PackReplacement when replacement.SegmentID == 0:
                     _packReplacement = replacement;
                     break;
 
                 default:
-                    Logging.Error("invalid priority ", priority, " passed to LanePropHandler.SetReplacement");
+                    Logging.Error("invalid priority ", priority, " with segment ID" , replacement.SegmentID, " passed to LanePropHandler.SetReplacement");
                     return;
             }
 
@@ -263,14 +361,24 @@ namespace BOB
             ReplacementPriority originalPriority = ActivePriority;
 
             // Clear any references to this replacement.
-            if (_individualReplacement == replacement)
+            if (_individualSegmentReplacement == replacement)
             {
-                _individualReplacement = null;
+                _individualSegmentReplacement = null;
             }
 
-            if (_groupedReplacement == replacement)
+            if (_groupedSegmentReplacement == replacement)
             {
-                _groupedReplacement = null;
+                _groupedSegmentReplacement = null;
+            }
+
+            if (IndividualReplacement == replacement)
+            {
+                IndividualReplacement = null;
+            }
+
+            if (GroupedReplacement == replacement)
+            {
+                GroupedReplacement = null;
             }
 
             if (_allReplacement == replacement)
@@ -297,18 +405,7 @@ namespace BOB
         /// </summary>
         public void RevertToOriginal()
         {
-            // Is this a skin?
-            if (_segmentID != 0)
-            {
-                // Yes - remove skin change.
-                NetworkSkins.SegmentSkins[_segmentID].RemoveChange(_laneIndex, PropIndex);
-
-                // Update render.
-                NetData.UpdateRender(_netInfo, _segmentID);
-
-                // Done here.
-                return;
-            }
+            Logging.KeyMessage("Reverting to original");
 
             // Prefab reversion.
             NetLaneProps.Prop thisProp = _originalLaneInfo?.m_laneProps?.m_props[PropIndex];
@@ -320,8 +417,16 @@ namespace BOB
                     // Added prop - revert to original means reverting to the original replacement values.
                     ReplaceProp(_addedReplacement);
                 }
+                else if (_parentHandler != null)
+                {
+                    Logging.Message("reverting to original via parent handler for segment ", SegmentID);
+
+                    _parentHandler.RevertToOriginal();
+                }
                 else
                 {
+                    Logging.Message("reverting to original directly for segment ", SegmentID);
+
                     thisProp.m_prop = OriginalProp;
                     thisProp.m_finalProp = OriginalFinalProp;
                     thisProp.m_tree = OriginalTree;
@@ -330,6 +435,13 @@ namespace BOB
                     thisProp.m_position = OriginalPosition;
                     thisProp.m_probability = OriginalProbability;
                     thisProp.m_repeatDistance = _originalRepeatDistance;
+                }
+
+                // Is this a skin?
+                if (_segmentID != 0)
+                {
+                    // Yes - remove skin change.
+                    NetworkSkins.SegmentSkins[_segmentID].RemoveChange(_laneIndex, PropIndex);
                 }
 
                 // Update render.
@@ -360,12 +472,6 @@ namespace BOB
         /// </summary>
         private void UpdateProp()
         {
-            // Don't do anything further if this is a skin.
-            if (_segmentID != 0)
-            {
-                return;
-            }
-
             // Is there an active replacement for this reference?
             if (ActiveReplacement is BOBConfig.NetReplacement activeReplacement)
             {

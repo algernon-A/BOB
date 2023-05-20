@@ -164,3 +164,5 @@
 "BOB_UPD_093_0","Major new feature: add props to building prefabs."
 "BOB_UPD_093_1","Add hotkey to toggle disabling of vanilla tree tool (default Ctrl-Shift-T)"
 "BOB_UPD_094_0","Major new feature: add props to network prefabs."
+"SEGMENT_INDIVIDUAL","Individual segment replacement"
+"SEGMENT_GROUPED","Grouped segment replacement"

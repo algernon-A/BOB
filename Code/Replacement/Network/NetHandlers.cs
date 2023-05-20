@@ -14,7 +14,7 @@ namespace BOB
     /// </summary>
     internal static class NetHandlers
     {
-        // The master dicationary of all network props being handled.
+        // The master dictionary of all network props being handled.
         private static readonly Dictionary<NetInfo.Lane, Dictionary<int, LanePropHandler>> Handlers = new Dictionary<NetInfo.Lane, Dictionary<int, LanePropHandler>>();
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace BOB
         /// <returns>Prop handler for this prop (creating a new handler if required).</returns>
         internal static LanePropHandler GetOrAddHandler(NetInfo netInfo, ushort segmentID, NetInfo.Lane laneInfo, int laneIndex, int propIndex)
         {
-            // Segment skin - these are only temporary and not recorded in dictionary.
+            // Segment skin - these are recorded in the skin, and not the master dictionary.
             if (segmentID != 0)
             {
                 Logging.Message("getting or adding handler with segmentID ", segmentID);
@@ -40,7 +40,15 @@ namespace BOB
                     }
                 }
 
-                return CreateHandler(netInfo, segmentID, laneInfo, laneIndex, propIndex);
+                NetworkSkin thisSkin = NetworkSkins.SegmentSkins[segmentID];
+                KeyValuePair<int, int> skinHandlerkey = new KeyValuePair<int, int>(laneIndex, propIndex);
+                if (!thisSkin.Handlers.TryGetValue(skinHandlerkey, out LanePropHandler handler))
+                {
+                    handler = CreateHandler(netInfo, segmentID, laneInfo, laneIndex, propIndex);
+                    thisSkin.Handlers.Add(skinHandlerkey, handler);
+                }
+
+                return handler;
             }
 
             // Check for an existing lane entry.
@@ -77,9 +85,9 @@ namespace BOB
             {
                 if (NetworkSkins.SegmentSkins[segmentID] is NetworkSkin skin)
                 {
-                    if (skin.HasChange(laneIndex, propIndex))
+                    if (skin.Handlers.TryGetValue(new KeyValuePair<int, int>(laneIndex, propIndex), out LanePropHandler handler))
                     {
-                        return CreateHandler(skin.NetPrefab, segmentID, laneInfo, laneIndex, propIndex);
+                        return handler;
                     }
                 }
             }

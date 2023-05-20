@@ -34,6 +34,8 @@ namespace BOB.Skins
         // Array of lists of changed prop indicies, in array indexed by lane.
         private readonly HashSet<int>[] _changedLanes;
 
+        public Dictionary<KeyValuePair<int, int>, LanePropHandler> Handlers { get; } = new Dictionary<KeyValuePair<int, int>, LanePropHandler>();
+
         ///
         /// <summary>
         /// Initializes a new instance of the <see cref="NetworkSkin"/> class.

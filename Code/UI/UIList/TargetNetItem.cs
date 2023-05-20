@@ -32,6 +32,10 @@ namespace BOB
         /// </summary>
         internal BOBConfig.NetReplacement AddedProp;
 
+        internal BOBConfig.NetReplacement IndividualSegmentReplacement;
+
+        internal BOBConfig.NetReplacement GroupedSegmentReplacement;
+
         /// <summary>
         /// The active individual replacement, if any, for this item.
         /// </summary>
@@ -65,7 +69,7 @@ namespace BOB
         /// <summary>
         /// Gets a value indicating whether there's a currently active replacement for this item.
         /// </summary>
-        internal override bool HasActiveReplacement => AddedProp != null | IndividualReplacement != null | GroupedReplacement != null | AllReplacement != null | PackReplacement != null;
+        internal override bool HasActiveReplacement => AddedProp != null | IndividualSegmentReplacement != null | GroupedSegmentReplacement != null | IndividualReplacement != null | GroupedReplacement != null | AllReplacement != null | PackReplacement != null;
 
         /// <summary>
         /// Gets a value indicating whether or not this is an added prop.
@@ -92,7 +96,14 @@ namespace BOB
                 lineSprite.tooltip = Translations.Translate("BOB_SPR_ADD");
                 lineSprite.Show();
             }
-            else if (SegmentID != 0 && NetworkSkins.SegmentSkins[SegmentID] is NetworkSkin skin && skin.HasChange(OriginalPrefab, LaneIndex, PropIndex))
+            else if (IndividualSegmentReplacement != null)
+            {
+                // Skinned replacement.
+                lineSprite.atlas = UITextures.LoadQuadSpriteAtlas("BOB-SegmentSmall");
+                lineSprite.tooltip = Translations.Translate("ACTIVE_SEGMENT");
+                lineSprite.Show();
+            }
+            else if (GroupedSegmentReplacement != null)
             {
                 // Skinned replacement.
                 lineSprite.atlas = UITextures.LoadQuadSpriteAtlas("BOB-SegmentSmall");

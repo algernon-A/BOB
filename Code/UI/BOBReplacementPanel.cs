@@ -101,7 +101,7 @@ namespace BOB
         protected bool m_ignoreSliderValueChange = true;
 
         // Mode button strip relative Y-position.
-        private const float ModeY = ToggleY;
+        protected const float ModeY = ToggleY;
         private const float FieldOffset = SliderHeight + Margin;
         private const float OffsetLabelY = Margin;
         private const float XOffsetY = OffsetLabelY + 20f;
@@ -120,13 +120,13 @@ namespace BOB
         private const float ActionsY2 = ActionsY + ActionSize;
 
         private UICheckBox _randomCheck;
-        private UICheckBox[] _modeChecks;
+        protected UICheckBox[] _modeChecks;
         private UIPanel _rotationPanel;
         private UIButton _hideButton;
 
         // Status flags.
         private bool _created = false;
-        private bool _ignoreModeCheckChanged = false;
+        protected bool _ignoreModeCheckChanged = false;
         private bool _ignoreReplacementSelection = false;
         private bool _unappliedChanges = false;
 
@@ -156,7 +156,11 @@ namespace BOB
             /// <summary>
             /// Number of replacement modes.
             /// </summary>
-            NumModes,
+            NumModes = 3,
+
+            IndividualInstance = 3,
+            GroupedInstance = 4,
+            NumNetModes = 5,
         }
 
         /// <summary>
@@ -304,6 +308,8 @@ namespace BOB
             }
         }
 
+        protected virtual int NumModes => (int)ReplacementModes.NumModes;
+
         /// <summary>
         /// Called by Unity before the first frame is displayed.
         /// Used to perform setup.
@@ -314,8 +320,8 @@ namespace BOB
             try
             {
                 // Replacement mode buttons.
-                _modeChecks = new UICheckBox[(int)ReplacementModes.NumModes];
-                for (int i = 0; i < (int)ReplacementModes.NumModes; ++i)
+                _modeChecks = new UICheckBox[NumModes];
+                for (int i = 0; i < NumModes; ++i)
                 {
                     bool useTreeLabels = PropTreeMode == PropTreeModes.Tree;
                     _modeChecks[i] = IconToggleCheck(this, ModeX + (i * ToggleSize), ModeY, useTreeLabels ? TreeModeAtlas[i] : PropModeAtlas[i], useTreeLabels ? TreeModeTipKeys[i] : PropModeTipKeys[i]);
@@ -412,7 +418,7 @@ namespace BOB
                 m_removeButton.eventClicked += (c, clickEvent) => RemoveProp();
 
                 // Add/remove button initial visibility.
-                bool eligibleMode = CurrentMode == ReplacementModes.Individual | CurrentMode == ReplacementModes.Grouped;
+                bool eligibleMode = CurrentMode == ReplacementModes.Individual || CurrentMode == ReplacementModes.Grouped || CurrentMode == ReplacementModes.IndividualInstance || CurrentMode == ReplacementModes.GroupedInstance;
                 m_addButton.isVisible = eligibleMode;
                 m_removeButton.isVisible = eligibleMode;
             }
@@ -740,7 +746,7 @@ namespace BOB
             foreach (PropHandler handler in m_originalValues)
             {
                 // Restore original values.
-                handler.ClearPreview();
+                handler?.ClearPreview();
             }
 
             // Update prefabs.
@@ -813,7 +819,7 @@ namespace BOB
                     if (thisCheck.objectUserData is int index && index != (int)CurrentMode)
                     {
                         // Iterate through all checkboxes, unchecking all those that aren't this one (checkbox index stored in objectUserData).
-                        for (int i = 0; i < (int)ReplacementModes.NumModes; ++i)
+                        for (int i = 0; i < NumModes; ++i)
                         {
                             if (i != index)
                             {
@@ -825,8 +831,10 @@ namespace BOB
                         ReplacementModes oldMode = CurrentMode;
                         CurrentMode = (ReplacementModes)index;
 
-                        // Update target list if we've changed between individual and grouped modes (we've already filtered out non-changes, so checking for any individual mode will do).
-                        if (oldMode == ReplacementModes.Individual || CurrentMode == ReplacementModes.Individual)
+                        // Update target list if we've changed between individual and grouped modes.
+                        bool oldWasIndividual = oldMode == ReplacementModes.Individual || oldMode == ReplacementModes.IndividualInstance;
+                        bool newIsIndividual = CurrentMode == ReplacementModes.Individual || CurrentMode == ReplacementModes.IndividualInstance;
+                        if (oldWasIndividual != newIsIndividual)
                         {
                             // Rebuild target list.
                             RegenerateTargetList();
