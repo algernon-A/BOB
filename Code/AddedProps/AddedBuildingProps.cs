@@ -240,12 +240,15 @@ namespace BOB
             foreach (BOBConfig.BuildingElement element in elementList)
             {
                 // Try to find building prefab.
-                element.Prefab = PrefabCollection<BuildingInfo>.FindLoaded(element.Building);
-
-                // Don't bother deserializing further if the building info wasn't found.
-                if (element.BuildingInfo != null)
+                if (!string.IsNullOrEmpty(element.Building))
                 {
-                    Deserialize(element.BuildingInfo, element.Replacements);
+                    element.Prefab = PrefabCollection<BuildingInfo>.FindLoaded(element.Building);
+
+                    // Don't bother deserializing further if the building info wasn't found.
+                    if (element.BuildingInfo)
+                    {
+                        Deserialize(element.BuildingInfo, element.Replacements);
+                    }
                 }
             }
         }
@@ -379,7 +382,7 @@ namespace BOB
                 catch (Exception e)
                 {
                     // Don't let a single failure stop us.
-                    Logging.LogException(e, "exception deserializing building replacement");
+                    Logging.LogException(e, "exception deserializing added building replacement");
                 }
             }
         }
