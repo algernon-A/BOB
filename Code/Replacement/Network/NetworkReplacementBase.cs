@@ -237,8 +237,22 @@ namespace BOB
                     // Try to find target prefab.
                     replacement.TargetInfo = replacement.IsTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.Target) : PrefabCollection<PropInfo>.FindLoaded(replacement.Target);
 
+                    // Check that target prefab exists.
+                    if (replacement.ReplacementInfo == null)
+                    {
+                        Logging.Error("target prefab ", replacement.Target, " not found");
+                        continue;
+                    }
+
                     // Try to find replacement prefab.
                     replacement.ReplacementInfo = ConfigurationUtils.FindReplacementPrefab(replacement.ReplacementName, replacement.IsTree);
+
+                    // Check that replacement prefab exists.
+                    if (replacement.ReplacementInfo == null)
+                    {
+                        Logging.Error("replacement prefab ", replacement.ReplacementName, " not found");
+                        continue;
+                    }
 
                     // Try to apply the replacement.
                     ApplyReplacement(replacement);
