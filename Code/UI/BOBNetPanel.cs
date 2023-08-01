@@ -442,7 +442,7 @@ namespace BOB
             catch (Exception e)
             {
                 // Log and report any exception.
-                Logging.LogException(e, "exception perforiming network reversion");
+                Logging.LogException(e, "exception performing network reversion");
             }
         }
 

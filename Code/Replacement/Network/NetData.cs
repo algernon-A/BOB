@@ -6,6 +6,7 @@
 namespace BOB
 {
     using System.Collections.Generic;
+    using System.Reflection;
     using AlgernonCommons;
     using ColossalFramework;
     using UnityEngine;
@@ -70,7 +71,7 @@ namespace BOB
                 // Update group render (all 31 layers, since we've got all kinds of mismatches with replacements).
                 for (int i = 0; i < 31; ++i)
                 {
-                    Singleton<RenderManager>.instance.UpdateGroup(keyPair.Key, keyPair.Value, i);
+                    renderManager.UpdateGroup(keyPair.Key, keyPair.Value, i);
                 }
             }
 
@@ -113,33 +114,26 @@ namespace BOB
             for (int i = 0; i < newLaneProps.m_props.Length; ++i)
             {
                 NetLaneProps.Prop existingNetLaneProp = laneInfo.m_laneProps.m_props[i];
-
-                newLaneProps.m_props[i] = new NetLaneProps.Prop
-                {
-                    m_flagsRequired = existingNetLaneProp.m_flagsRequired,
-                    m_flagsForbidden = existingNetLaneProp.m_flagsForbidden,
-                    m_startFlagsRequired = existingNetLaneProp.m_startFlagsRequired,
-                    m_startFlagsForbidden = existingNetLaneProp.m_startFlagsForbidden,
-                    m_endFlagsRequired = existingNetLaneProp.m_endFlagsRequired,
-                    m_endFlagsForbidden = existingNetLaneProp.m_endFlagsForbidden,
-                    m_colorMode = existingNetLaneProp.m_colorMode,
-                    m_prop = existingNetLaneProp.m_prop,
-                    m_tree = existingNetLaneProp.m_tree,
-                    m_position = existingNetLaneProp.m_position,
-                    m_angle = existingNetLaneProp.m_angle,
-                    m_segmentOffset = existingNetLaneProp.m_segmentOffset,
-                    m_repeatDistance = existingNetLaneProp.m_repeatDistance,
-                    m_minLength = existingNetLaneProp.m_minLength,
-                    m_cornerAngle = existingNetLaneProp.m_cornerAngle,
-                    m_probability = existingNetLaneProp.m_probability,
-                    m_finalProp = existingNetLaneProp.m_finalProp,
-                    m_finalTree = existingNetLaneProp.m_finalTree,
-                    m_upgradable = existingNetLaneProp.m_upgradable,
-                };
+                newLaneProps.m_props[i] = new NetLaneProps.Prop();
+                CopyFields(existingNetLaneProp, newLaneProps.m_props[i]);
             }
 
             // Replace network laneProps with our new instance.
             laneInfo.m_laneProps = newLaneProps;
+        }
+
+        /// <summary>
+        /// Copies all public instance fields from the source object to the target object.
+        /// </summary>
+        /// <param name="source">Source object.</param>
+        /// <param name="target">Target object.</param>
+        internal static void CopyFields(object source, object target)
+        {
+            FieldInfo[] sourceFields = source.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public);
+            foreach (FieldInfo field in sourceFields)
+            {
+                field.SetValue(target, field.GetValue(source));
+            }
         }
 
         /// <summary>
