@@ -11,12 +11,23 @@ namespace BOB
     /// <summary>
     /// BOB options panel.
     /// </summary>
-    public class OptionsPanel : UIPanel
+    public class OptionsPanel : OptionsPanelBase
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="OptionsPanel"/> class.
+        /// Called by the game when the component is destroyed.
         /// </summary>
-        internal OptionsPanel()
+        public override void OnDestroy()
+        {
+            // Re-enable hotkey threading.
+            HotkeyThreading.Operating = true;
+
+            base.OnDestroy();
+        }
+
+        /// <summary>
+        /// Performs on-demand panel setup.
+        /// </summary>
+        protected override void Setup()
         {
             // Add tabstrip.
             UITabstrip tabstrip = AutoTabstrip.AddTabstrip(this, 0f, 0f, OptionsPanelManager<OptionsPanel>.PanelWidth, OptionsPanelManager<OptionsPanel>.PanelHeight, out _);
@@ -32,17 +43,6 @@ namespace BOB
             // Ensure initial selected tab (doing a 'quickstep' to ensure proper events are triggered).
             tabstrip.selectedIndex = -1;
             tabstrip.selectedIndex = 0;
-        }
-
-        /// <summary>
-        /// Called by the game when the component is destroyed.
-        /// </summary>
-        public override void OnDestroy()
-        {
-            // Re-enable hotkey threading.
-            HotkeyThreading.Operating = true;
-
-            base.OnDestroy();
         }
     }
 }

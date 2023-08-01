@@ -117,7 +117,7 @@ namespace BOB
             }
 
             // If we got here, something went wrong; return null.
-            Logging.Error("invalid argument passed to BuildingReplacementBase.CreateReference");
+            Logging.Error("invalid argument passed to LanePropHandler.CreateHandler");
             return null;
         }
     }
