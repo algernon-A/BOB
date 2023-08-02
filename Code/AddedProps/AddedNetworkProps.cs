@@ -431,11 +431,15 @@ namespace BOB
                     // Assign network info.
                     replacement.ParentInfo = netInfo;
 
-                    // Try to find target prefab.
-                    replacement.TargetInfo = replacement.IsTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.Target) : (PrefabInfo)PrefabCollection<PropInfo>.FindLoaded(replacement.Target);
-
-                    // Try to find replacement prefab.
+                    // Try to find added prefab.
                     replacement.ReplacementInfo = ConfigurationUtils.FindReplacementPrefab(replacement.ReplacementName, replacement.IsTree);
+
+                    // Check that added prefab exists.
+                    if (replacement.ReplacementInfo == null)
+                    {
+                        Logging.Error("added network prefab ", replacement.ReplacementName, " not found");
+                        continue;
+                    }
 
                     // Try to apply the replacement.
                     replacement.PropIndex = AddProp(replacement);
