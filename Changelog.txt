@@ -1,4 +1,6 @@
-﻿- Add checks for missing target and/or replacement prefabs
+﻿Verison 1.0.1 -
+
+- Add checks for missing target and/or replacement prefabs
 - Update AlgernonCommons
 
 
