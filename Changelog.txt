@@ -21,7 +21,6 @@ Version 0.9.9 -
 
 - Switch to position- instead of index-based targeting for individual network prop replacements
 - Update CitiesHarmony
-e
 
 Version 0.9.8.2 -
 
