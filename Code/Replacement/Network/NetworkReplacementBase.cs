@@ -238,7 +238,7 @@ namespace BOB
                     replacement.TargetInfo = replacement.IsTree ? (PrefabInfo)PrefabCollection<TreeInfo>.FindLoaded(replacement.Target) : PrefabCollection<PropInfo>.FindLoaded(replacement.Target);
 
                     // Check that target prefab exists.
-                    if (replacement.ReplacementInfo == null)
+                    if (replacement.TargetInfo == null)
                     {
                         Logging.Error("target prefab ", replacement.Target, " not found");
                         continue;
