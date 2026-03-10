@@ -30,7 +30,7 @@ namespace BOB
             const int IVarIndex = 11;
             const int BuildingInfoPropIndex = 12;
             const int TreeVarIndex = 15;
-            const int TreePositionVarIndex = 29;
+            const int TreePositionVarIndex = 30;
 
             // ILCode argument indexes.
             const int BuildingArg = 3;
@@ -45,6 +45,8 @@ namespace BOB
                 nameof(global::TreeInstance.RenderInstance),
                 new Type[] { typeof(RenderManager.CameraInfo), typeof(TreeInfo), typeof(Vector3), typeof(float), typeof(float), typeof(Vector4), typeof(bool) });
 
+            bool bFoundStloc17 = false;
+
             // Iterate through all instructions in original method.
             foreach (CodeInstruction instruction in instructions)
             {
@@ -53,8 +55,8 @@ namespace BOB
                 // Is this stloc.s?
                 if (instruction.opcode == OpCodes.Stloc_S && instruction.operand is LocalBuilder localBuilder)
                 {
-                    // Is this stloc.s 17 (should be only one in entire method)?
-                    if (localBuilder.LocalIndex == 17)
+                    // Is this stloc.s 17 (only looking for the first one)?
+                    if (!bFoundStloc17 && localBuilder.LocalIndex == 17)
                     {
                         // Yes - insert call to RenderOverlays.HighlightBuildingProp(i, prop, ref building)
                         yield return new CodeInstruction(OpCodes.Ldarg_1);
@@ -62,6 +64,7 @@ namespace BOB
                         yield return new CodeInstruction(OpCodes.Ldloc_S, BuildingInfoPropIndex);
                         yield return new CodeInstruction(OpCodes.Ldarg_S, BuildingArg);
                         yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(RenderOverlays), nameof(RenderOverlays.HighlightBuildingProp)));
+                        bFoundStloc17 = true;
                     }
 
                     // Otherwise, is this the first instance of stloc.s 15?
